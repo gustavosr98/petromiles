@@ -1,8 +1,3 @@
-## Título del pull request
-Coloca un breve resumen informativo de tu pull request junto con el código de la fase. 
-
-Por ejemplo: FASE1-003: Realizar la verificación de cuentas bancarias
-
 ## Checklist para el pull request
 Para estar seguro de tu pull request, completa este checklist
 
