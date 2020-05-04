@@ -1,0 +1,14 @@
+export enum StateName {
+  VERIFYING = 'VERIFYING',
+  ACTIVE = 'ACTIVE',
+  BLOCKED = 'BLOCKED',
+  CANCELLED = 'CANCELLED',
+  VALID = 'VALID',
+  INVALID = 'INVALID',
+}
+
+export enum StateType {
+  USER = 'USER',
+  TRANSACTION = 'TRANSACTION',
+  BANK_ACCOUNT = 'BANK_ACCOUNT',
+}
