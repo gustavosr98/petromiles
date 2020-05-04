@@ -1,0 +1,4 @@
+Administration
+
+- components/
+- views/
