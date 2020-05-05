@@ -1,5 +1,5 @@
 import { State } from '../../management/state/state.entity';
-import { ClientBankAccount } from '../../client/client_bank_account/client_bank_account.entity';
+import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
 import {
   BaseEntity,
   Entity,
@@ -12,20 +12,20 @@ import {
 @Entity()
 export class StateBankAccount extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_state_bank_account: number;
+  idStateBankAccount: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  initial_date: Date;
+  initialDate: Date;
 
   @Column({ type: 'timestamp', nullable: true })
-  final_date?: Date;
+  finalDate?: Date;
 
   @Column({ nullable: true })
   description: string;
 
   @ManyToOne(
     type => State,
-    state => state.id_state,
+    state => state.idState,
     {
       onDelete: 'CASCADE',
       nullable: false,
@@ -36,7 +36,7 @@ export class StateBankAccount extends BaseEntity {
 
   @ManyToOne(
     type => ClientBankAccount,
-    clientbankAccount => clientbankAccount.id_client_bank_account,
+    clientbankAccount => clientbankAccount.idClientBankAccount,
     {
       onDelete: 'CASCADE',
       nullable: false,

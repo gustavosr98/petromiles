@@ -2,11 +2,11 @@
 
 export const ROLES = [
   {
-    id_role: 1,
+    idRole: 1,
     name: 'ADMINISTRATOR',
   },
   {
-    id_role: 2,
+    idRole: 2,
     name: 'CLIENT',
   },
 ];

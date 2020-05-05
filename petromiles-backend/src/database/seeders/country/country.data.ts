@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/camelcase */
 export const COUNTRIES = [
   {
-    id_country: 1,
+    idCountry: 1,
     name: 'UNITED STATES',
   },
   {
-    id_country: 2,
+    idCountry: 2,
     name: 'VENEZUELA',
   },
 ];

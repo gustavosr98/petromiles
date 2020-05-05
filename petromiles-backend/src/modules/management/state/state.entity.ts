@@ -1,6 +1,6 @@
-import { StateUser } from '../../user/state_user/state_user.entity';
-import { StateBankAccount } from '../../bank-account/state_bank_account/state_bank_account.entity';
-import { StateTransaction } from '../../transaction/state_transaction/state_transaction.entity';
+import { StateUser } from '../../user/state-user/state-user.entity';
+import { StateBankAccount } from '../../bank-account/state-bank-account/state-bank-account.entity';
+import { StateTransaction } from '../../transaction/state-transaction/state-transaction.entity';
 import {
   BaseEntity,
   Entity,
@@ -12,7 +12,7 @@ import {
 @Entity()
 export class State extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_state: number;
+  idState: number;
 
   @Column()
   name: string;
@@ -22,21 +22,21 @@ export class State extends BaseEntity {
 
   @OneToMany(
     type => StateUser,
-    stateUser => stateUser.id_state_user,
+    stateUser => stateUser.idStateUser,
     { nullable: true },
   )
   stateUser?: StateUser;
 
   @OneToMany(
     type => StateBankAccount,
-    stateBankAccount => stateBankAccount.id_state_bank_account,
+    stateBankAccount => stateBankAccount.idStateBankAccount,
     { nullable: true },
   )
   stateBankAccount?: StateBankAccount;
 
   @OneToMany(
     type => StateTransaction,
-    stateTransaction => stateTransaction.id_state_transaction,
+    stateTransaction => stateTransaction.idStateTransaction,
     { nullable: true },
   )
   stateTransaction?: StateTransaction;

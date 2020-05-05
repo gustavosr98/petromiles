@@ -2,11 +2,11 @@
 
 export const LANGUAGES = [
   {
-    id_language: 1,
+    idLanguage: 1,
     name: 'en',
   },
   {
-    id_language: 2,
+    idLanguage: 2,
     name: 'es',
   },
 ];

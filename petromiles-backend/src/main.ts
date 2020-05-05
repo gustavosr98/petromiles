@@ -26,7 +26,6 @@ async function bootstrap() {
   app.setGlobalPrefix('/api/v1');
 
   app.useGlobalFilters(new PostgreExceptionFilter());
-
   await app.listen(port, () => console.log(`Server is running on ${port}`));
 }
 bootstrap();

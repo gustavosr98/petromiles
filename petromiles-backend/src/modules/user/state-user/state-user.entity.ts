@@ -7,29 +7,28 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { UserAdministrator } from '../user_administrator/user_administrator.entity';
+import { UserAdministrator } from '../user-administrator/user-administrator.entity';
 import { State } from '../../management/state/state.entity';
-import { UserClient } from '../../client/user_client/user_client.entity';
+import { UserClient } from '../../client/user-client/user-client.entity';
 
 @Entity()
 export class StateUser extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_state_user: number;
+  idStateUser: number;
 
   @Column({ type: 'timestamp' })
-  initial_date: Date;
+  initialDate: Date;
 
   @Column({ type: 'timestamp', nullable: true })
-  final_date?: Date;
+  finalDate?: Date;
 
   @Column({ nullable: true })
   description: string;
 
   @ManyToOne(
     type => State,
-    state => state.id_state,
+    state => state.idState,
     {
-      onDelete: 'CASCADE',
       nullable: false,
     },
   )
@@ -38,20 +37,16 @@ export class StateUser extends BaseEntity {
 
   @ManyToOne(
     type => UserClient,
-    userClient => userClient.id_user_client,
-    {
-      onDelete: 'CASCADE',
-      nullable: true,
-    },
+    userClient => userClient.idUserClient,
+    { nullable: true },
   )
   @JoinColumn({ name: 'fk_user_client' })
   userClient: UserClient;
 
   @ManyToOne(
     type => UserAdministrator,
-    userAdministrator => userAdministrator.id_user_administrator,
+    userAdministrator => userAdministrator.idUserAdministrator,
     {
-      onDelete: 'CASCADE',
       nullable: true,
     },
   )

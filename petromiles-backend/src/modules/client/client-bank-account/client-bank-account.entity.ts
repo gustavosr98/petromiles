@@ -1,7 +1,7 @@
-import { UserClient } from '../user_client/user_client.entity';
-import { BankAccount } from '../../bank-account/bank_account/bank_account.entity';
+import { UserClient } from '../user-client/user-client.entity';
+import { BankAccount } from '../../bank-account/bank-account/bank-account.entity';
 import { Transaction } from '../../transaction/transaction/transaction.entity';
-import { StateBankAccount } from '../../bank-account/state_bank_account/state_bank_account.entity';
+import { StateBankAccount } from '../../bank-account/state-bank-account/state-bank-account.entity';
 import {
   BaseEntity,
   Entity,
@@ -14,11 +14,11 @@ import {
 @Entity()
 export class ClientBankAccount extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_client_bank_account: number;
+  idClientBankAccount: number;
 
   @ManyToOne(
     type => UserClient,
-    userClient => userClient.id_user_client,
+    userClient => userClient.idUserClient,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_user_client' })
@@ -26,7 +26,7 @@ export class ClientBankAccount extends BaseEntity {
 
   @ManyToOne(
     type => BankAccount,
-    bankAccount => bankAccount.id_bank_account,
+    bankAccount => bankAccount.idBankAccount,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_bank_account' })
@@ -34,14 +34,14 @@ export class ClientBankAccount extends BaseEntity {
 
   @OneToMany(
     type => Transaction,
-    transaction => transaction.id_transaction,
+    transaction => transaction.idTransaction,
     { nullable: true },
   )
   transaction: Transaction;
 
   @OneToMany(
     type => StateBankAccount,
-    stateBankAccount => stateBankAccount.id_state_bank_account,
+    stateBankAccount => stateBankAccount.idStateBankAccount,
     { nullable: false },
   )
   stateBankAccount: StateBankAccount;

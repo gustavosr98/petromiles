@@ -2,7 +2,7 @@
 
 export const POINTS_CONVERSION = [
   {
-    id_points_convertion: 1,
-    one_point_equals_dollars: 0.002,
+    idPointsConvertion: 1,
+    onePointEqualsDollars: 0.002,
   },
 ];

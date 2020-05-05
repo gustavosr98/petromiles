@@ -50,7 +50,7 @@ VALUES
 
 
 INSERT INTO POINTS_CONVERSION
-    (one_point_equals_dollars)
+    ("onePointEqualsDollars")
 VALUES
     (0.002);
 
@@ -72,7 +72,7 @@ VALUES
 
 
 INSERT INTO SUSCRIPTION
-    (name, cost, upgraded_amount, description)
+    (name, cost, "upgradedAmount", description)
 VALUES
     ('BASIC', 0, null, 'Suscription initial of every new client'),
     ('PREMIUM', 2500, null, 'User must to ask for this suscription'),
@@ -81,7 +81,7 @@ VALUES
 
 
 INSERT INTO THIRD_PARTY_INTEREST
-    (payment_provider,name, amount_dollar_cents)
+    ("paymentProvider",name, "amountDollarCents")
 VALUES
     ('STRIPE', 'Transaction Interest', 75);
 

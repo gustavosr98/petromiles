@@ -1,4 +1,4 @@
-import { UserDetails } from '../user_details/user_details.entity';
+import { UserDetails } from '../user-details/user-details.entity';
 import {
   BaseEntity,
   Entity,
@@ -10,15 +10,15 @@ import {
 @Entity()
 export class Language extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_language: number;
+  idLanguage: number;
 
   @Column()
   name: string;
 
-  // @OneToMany(
-  //   type => UserDetails,
-  //   userDetails => userDetails.id_user_details,
-  //   { nullable: true },
-  // )
-  // userDetails: UserDetails;
+  @OneToMany(
+    type => UserDetails,
+    userDetails => userDetails.idUserDetails,
+    { nullable: true },
+  )
+  userDetails: UserDetails;
 }

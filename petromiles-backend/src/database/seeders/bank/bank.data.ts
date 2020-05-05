@@ -2,83 +2,83 @@
 
 export const BANK = [
   {
-    id_bank: 1,
+    idBank: 1,
     name: 'Bank of America',
   },
   {
-    id_bank: 2,
+    idBank: 2,
     name: 'Ally Bank',
   },
   {
-    id_bank: 3,
+    idBank: 3,
     name: 'BB&T BANK',
   },
   {
-    id_bank: 4,
+    idBank: 4,
     name: 'BBVA Compass',
   },
   {
-    id_bank: 5,
+    idBank: 5,
     name: 'Capital One Bank',
   },
   {
-    id_bank: 6,
+    idBank: 6,
     name: 'Citibank',
   },
   {
-    id_bank: 7,
+    idBank: 7,
     name: 'Citizens Bank',
   },
   {
-    id_bank: 8,
+    idBank: 8,
     name: 'Fifth Third Bank',
   },
   {
-    id_bank: 9,
+    idBank: 9,
     name: 'Wells Fargo Bank',
   },
   {
-    id_bank: 10,
+    idBank: 10,
     name: 'US Bank',
   },
   {
-    id_bank: 11,
+    idBank: 11,
     name: 'USAA',
   },
   {
-    id_bank: 12,
+    idBank: 12,
     name: 'HSBC Bank USA',
   },
   {
-    id_bank: 13,
+    idBank: 13,
     name: 'J.P Morgan Chase Bank',
   },
   {
-    id_bank: 14,
+    idBank: 14,
     name: 'KeyBank',
   },
   {
-    id_bank: 15,
+    idBank: 15,
     name: 'Kinetic Credit Union',
   },
   {
-    id_bank: 16,
+    idBank: 16,
     name: 'Navy Federal Credit Union',
   },
   {
-    id_bank: 17,
+    idBank: 17,
     name: 'PNC Bank',
   },
   {
-    id_bank: 18,
+    idBank: 18,
     name: 'Regions Bank',
   },
   {
-    id_bank: 19,
+    idBank: 19,
     name: 'Sun Trust Bank',
   },
   {
-    id_bank: 20,
+    idBank: 20,
     name: 'TD Bank',
   },
 ];

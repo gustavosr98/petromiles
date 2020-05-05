@@ -2,8 +2,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Repository, InsertResult } from 'typeorm';
 
-import { Bank } from '../../../modules/bank-account/bank/bank.entity';
-import { BANK } from './Bank.data';
+import { BANK } from './bank.data';
+import { Bank } from 'src/modules/bank-account/bank/bank.entity';
 
 @Injectable()
 export class BankSeederService {

@@ -2,9 +2,9 @@
 
 export const THIRD_PARTY_INTEREST = [
   {
-    id_third_party_interest: 1,
-    payment_provider: 'STRIPE',
+    idThirdPartyInterest: 1,
+    paymentProvider: 'STRIPE',
     name: 'Transaction Interest',
-    amount_dollar_cents: 75,
+    amountDollarCents: 75,
   },
 ];

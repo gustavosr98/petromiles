@@ -1,6 +1,6 @@
-import { ClientBankAccount } from '../../client/client_bank_account/client_bank_account.entity';
-import { UserDetails } from '../../user/user_details/user_details.entity';
-import { RoutingNumber } from '../routing_number/routing_number.entity';
+import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
+import { UserDetails } from '../../user/user-details/user-details.entity';
+import { RoutingNumber } from '../routing-number/routing-number.entity';
 import {
   BaseEntity,
   Entity,
@@ -9,37 +9,38 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 
 @Entity()
 export class BankAccount extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_bank_account: number;
+  idBankAccount: number;
 
   @Column()
-  account_number: string;
+  accountNumber: string;
 
   @Column({ nullable: true })
   primary: string;
 
   @OneToMany(
     type => ClientBankAccount,
-    clientBankAccount => clientBankAccount.id_client_bank_account,
+    clientBankAccount => clientBankAccount.idClientBankAccount,
     { nullable: false },
   )
   clientBankAccount: ClientBankAccount;
 
   @ManyToOne(
     type => UserDetails,
-    userDetails => userDetails.id_user_details,
+    userDetails => userDetails.idUserDetails,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_person_details' })
   userDetails: UserDetails;
 
-  @ManyToOne(
+  @OneToOne(
     type => RoutingNumber,
-    routingNumber => routingNumber.id_routing_number,
+    routingNumber => routingNumber.idRoutingNumber,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_routing_number' })

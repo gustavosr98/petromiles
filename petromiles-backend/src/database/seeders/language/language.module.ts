@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LanguageSeederService } from './Language.service';
+import { LanguageSeederService } from './language.service';
 import { Language } from '../../../modules/user/language/language.entity';
 
 @Module({

@@ -1,5 +1,4 @@
-import { UserSuscription } from '../user_suscription/user_suscription.entity';
-import { PlatformInterest } from '../../management/platform_interest/platform_interest.entity';
+import { PlatformInterest } from '../../management/platform-interest/platform-interest.entity';
 import {
   BaseEntity,
   Entity,
@@ -7,11 +6,12 @@ import {
   Column,
   OneToMany,
 } from 'typeorm';
+import { UserSuscription } from 'src/modules/client/user-suscription/user-suscription.entity';
 
 @Entity()
 export class Suscription extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_suscription: number;
+  idSuscription: number;
 
   @Column()
   name: string;
@@ -20,21 +20,21 @@ export class Suscription extends BaseEntity {
   cost: number;
 
   @Column({ nullable: true })
-  upgraded_amount: number;
+  upgradedAmount: number;
 
   @Column({ nullable: true })
   description: string;
 
   @OneToMany(
     type => UserSuscription,
-    userSuscription => userSuscription.id_user_suscription,
+    userSuscription => userSuscription.idUserSuscription,
     { nullable: true },
   )
   userSuscription: UserSuscription;
 
   @OneToMany(
     type => PlatformInterest,
-    platformInterest => platformInterest.id_platform_interest,
+    platformInterest => platformInterest.idPlatformInterest,
     { nullable: false },
   )
   platformInterest: PlatformInterest;

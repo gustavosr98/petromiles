@@ -12,26 +12,25 @@ import {
 @Entity()
 export class StateTransaction extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_state_transaction: number;
+  idStateTransaction: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  initial_date: Date;
+  initialDate: Date;
 
   @Column({
     nullable: true,
     type: 'timestamp',
   })
-  final_date: Date;
+  finalDate: Date;
 
   @Column({ nullable: true })
   description?: string;
 
   @ManyToOne(
     type => State,
-    state => state.id_state,
+    state => state.idState,
     {
       nullable: false,
-      onDelete: 'CASCADE',
     },
   )
   @JoinColumn({ name: 'fk_state' })
@@ -39,8 +38,8 @@ export class StateTransaction extends BaseEntity {
 
   @ManyToOne(
     type => Transaction,
-    transaction => transaction.id_transaction,
-    { nullable: false, onDelete: 'CASCADE' },
+    transaction => transaction.idTransaction,
+    { nullable: false },
   )
   @JoinColumn({ name: 'fk_transaction' })
   transaction: Transaction;

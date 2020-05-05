@@ -1,4 +1,4 @@
-import { UserClient } from '../user_client/user_client.entity';
+import { UserClient } from '../user-client/user-client.entity';
 import { Suscription } from '../../suscription/suscription/suscription.entity';
 import { Transaction } from '../../transaction/transaction/transaction.entity';
 import {
@@ -14,28 +14,28 @@ import {
 @Entity()
 export class UserSuscription extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_user_suscription: number;
+  idUserSuscription: number;
 
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
-  initial_date: Date;
+  initialDate: Date;
 
   @Column({ nullable: true })
-  upgraded_amount: number;
+  upgradedAmount: number;
 
   @Column({ nullable: true })
-  final_date: string;
+  finalDate: string;
 
   @ManyToOne(
     type => UserClient,
-    userClient => userClient.id_user_client,
+    userClient => userClient.idUserClient,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_user_client' })
-  user_client: UserClient;
+  userClient: UserClient;
 
   @ManyToOne(
     type => Suscription,
-    suscription => suscription.id_suscription,
+    suscription => suscription.idSuscription,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_suscription' })
@@ -43,7 +43,7 @@ export class UserSuscription extends BaseEntity {
 
   @OneToOne(
     type => Transaction,
-    transaction => transaction.id_transaction,
+    transaction => transaction.idTransaction,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_transaction' })

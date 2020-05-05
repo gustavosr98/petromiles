@@ -1,4 +1,4 @@
-import { BankAccount } from '../bank_account/bank_account.entity';
+import { BankAccount } from '../bank-account/bank-account.entity';
 import { Bank } from '../bank/bank.entity';
 import {
   BaseEntity,
@@ -8,11 +8,12 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 @Entity()
 export class RoutingNumber extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_routing_number: number;
+  idRoutingNumber: number;
 
   @Column()
   region: string;
@@ -23,15 +24,15 @@ export class RoutingNumber extends BaseEntity {
   @Column()
   ach: number;
 
-  @OneToMany(
+  @OneToOne(
     type => BankAccount,
-    bankAccount => bankAccount.id_bank_account,
+    bankAccount => bankAccount.idBankAccount,
     { nullable: true },
   )
   bankAccount: BankAccount;
   @ManyToOne(
     type => Bank,
-    bank => bank.id_bank,
+    bank => bank.idBank,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_bank' })

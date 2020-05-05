@@ -1,9 +1,9 @@
 import { TransactionType } from './transaction.enum';
-import { UserSuscription } from '../../client/user_suscription/user_suscription.entity';
-import { StateTransaction } from '../state_transaction/state_transaction.entity';
-import { TransactionInterest } from '../transaction_interest/transaction_interest.entity';
-import { PointsConversion } from '../../management/points_conversion/points_conversion.entity';
-import { ClientBankAccount } from '../../client/client_bank_account/client_bank_account.entity';
+import { UserSuscription } from '../../client/user-suscription/user-suscription.entity';
+import { PointsConversion } from '../../management/points-conversion/points-conversion.entity';
+import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
+import { StateTransaction } from '../state-transaction/state-transaction.entity';
+import { TransactionInterest } from '../transaction-interest/transaction-interest.entity';
 import {
   BaseEntity,
   Entity,
@@ -18,23 +18,23 @@ import {
 @Entity()
 export class Transaction extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_transaction: number;
+  idTransaction: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  initial_date: Date;
+  initialDate: Date;
 
   @Column()
-  raw_amount: number;
+  rawAmount: number;
 
   @Column()
-  total_amount_with_interest: number;
+  totalAmountWithInterest: number;
 
   @Column()
   type: TransactionType;
 
   @ManyToOne(
     type => Transaction,
-    transaction => transaction.id_transaction,
+    transaction => transaction.idTransaction,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_transaction' })
@@ -42,28 +42,28 @@ export class Transaction extends BaseEntity {
 
   @OneToOne(
     type => UserSuscription,
-    userSuscription => userSuscription.id_user_suscription,
+    userSuscription => userSuscription.idUserSuscription,
     { nullable: true },
   )
   userSuscription: UserSuscription;
 
   @OneToMany(
     type => StateTransaction,
-    stateTransaction => stateTransaction.id_state_transaction,
+    stateTransaction => stateTransaction.idStateTransaction,
     { nullable: false },
   )
   stateTransaction: StateTransaction;
 
   @OneToMany(
     type => TransactionInterest,
-    transactionInterest => transactionInterest.id_transaction_interest,
+    transactionInterest => transactionInterest.idTransactionInterest,
     { nullable: true },
   )
   transactionInterest: TransactionInterest;
 
   @ManyToOne(
     type => PointsConversion,
-    pointsConversion => pointsConversion.id_points_conversion,
+    pointsConversion => pointsConversion.idPointsConversion,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_points_conversion' })
@@ -71,7 +71,7 @@ export class Transaction extends BaseEntity {
 
   @ManyToOne(
     type => ClientBankAccount,
-    clientBankAccount => clientBankAccount.id_client_bank_account,
+    clientBankAccount => clientBankAccount.idClientBankAccount,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_client_bank_account' })

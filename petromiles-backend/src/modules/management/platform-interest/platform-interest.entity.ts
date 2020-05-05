@@ -1,4 +1,5 @@
 import { Suscription } from '../../suscription/suscription/suscription.entity';
+import { TransactionInterest } from '../../transaction/transaction-interest/transaction-interest.entity';
 import {
   BaseEntity,
   Entity,
@@ -12,7 +13,7 @@ import {
 @Entity()
 export class PlatformInterest extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_platform_interest: number;
+  idPlatformInterest: number;
 
   @Column()
   name: string;
@@ -24,16 +25,31 @@ export class PlatformInterest extends BaseEntity {
   percentage: number;
 
   @Column({ default: () => 'CURRENT_DATE' })
-  initial: Date;
+  initialDate: Date;
 
   @Column({ nullable: true })
-  final_date: Date;
+  finalDate: Date;
 
   @ManyToOne(
     type => Suscription,
-    suscription => suscription.id_suscription,
+    suscription => suscription.idSuscription,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_suscription' })
   suscription = Suscription;
+
+  @OneToMany(
+    type => TransactionInterest,
+    transactionInterest => transactionInterest.idTransactionInterest,
+    { nullable: true },
+  )
+  transactionInterest = TransactionInterest;
+
+  @OneToMany(
+    type => TransactionInterest,
+    transactionInterestExtraPoints =>
+      transactionInterestExtraPoints.idTransactionInterest,
+    { nullable: true },
+  )
+  transactionInterestExtraPoints = TransactionInterest;
 }

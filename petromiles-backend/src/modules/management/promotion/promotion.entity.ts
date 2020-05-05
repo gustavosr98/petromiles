@@ -1,4 +1,4 @@
-import { TransactionInterest } from '../../transaction/transaction_interest/transaction_interest.entity';
+import { TransactionInterest } from '../../transaction/transaction-interest/transaction-interest.entity';
 import {
   BaseEntity,
   Entity,
@@ -10,7 +10,7 @@ import {
 @Entity()
 export class Promotion extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_promotion: number;
+  idPromotion: number;
 
   @Column()
   name: string;
@@ -19,7 +19,7 @@ export class Promotion extends BaseEntity {
   description: string;
 
   @Column({ nullable: true })
-  is_a_discount: string;
+  isADiscount: string;
 
   @Column()
   token: string;
@@ -31,14 +31,14 @@ export class Promotion extends BaseEntity {
   percentage: number;
 
   @Column({ default: () => 'CURRENT_DATE' })
-  initial_date: Date;
+  initialDate: Date;
 
   @Column({ nullable: true })
-  final_date: Date;
+  finalDate: Date;
 
   @OneToMany(
     type => TransactionInterest,
-    transactionInterest => transactionInterest.id_transaction_interest,
+    transactionInterest => transactionInterest.idTransactionInterest,
     { nullable: true },
   )
   transactionInterest: TransactionInterest;

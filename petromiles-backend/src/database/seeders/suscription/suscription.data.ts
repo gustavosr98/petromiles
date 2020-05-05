@@ -5,20 +5,20 @@ import { State } from '../../../modules/management/state/state.entity';
 
 export const SUSCRIPTIONS = [
   {
-    id_suscription: 1,
+    idSuscription: 1,
     name: 'BASIC',
     cost: 0,
     description: 'Suscription initial of every new client',
   },
 
   {
-    id_suscription: 2,
+    idSuscription: 2,
     name: 'PREMIUM',
     cost: 2500,
     description: 'User must to ask for this suscription',
   },
   {
-    id_suscription: 3,
+    idSuscription: 3,
     name: 'GOLD',
     cost: 0,
     upgraded_amount: 15000,

@@ -1,8 +1,8 @@
-import { UserClient } from '../../client/user_client/user_client.entity';
-import { UserAdministrator } from '../../management/user_administrator/user_administrator.entity';
+import { UserClient } from '../../client/user-client/user-client.entity';
 import { Language } from '../language/language.entity';
 import { Country } from '../../management/country/country.entity';
-import { BankAccount } from '../../bank-account/bank_account/bank_account.entity';
+import { BankAccount } from '../../bank-account/bank-account/bank-account.entity';
+import { UserAdministrator } from '../user-administrator/user-administrator.entity';
 import {
   BaseEntity,
   Entity,
@@ -17,52 +17,52 @@ import {
 @Entity()
 export class UserDetails extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_user_details: number;
+  idUserDetails: number;
 
   @Column()
-  first_name: string;
+  firstName: string;
 
   @Column({ nullable: true })
-  middle_name: string;
+  middleName: string;
 
   @Column()
-  last_name: string;
+  lastName: string;
 
   @Column({ nullable: true })
-  second_last_name: string;
+  secondLastName?: string;
 
   @Column({ nullable: true })
-  birthdate: Date;
+  birthdate?: Date;
 
   @Column({ nullable: true })
-  address: string;
+  address?: string;
 
   @Column({ nullable: true })
-  phone: string;
+  phone?: string;
 
   /*FOTO DE QUE TIPO ES */
   @Column({ nullable: true })
-  photo: string;
+  photo?: string;
 
   @OneToOne(
     type => UserClient,
-    userClient => userClient.id_user_client,
+    userClient => userClient.idUserClient,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_user_client' })
-  userClient: UserClient;
+  userClient?: UserClient;
 
   @OneToOne(
     type => UserAdministrator,
-    userAdministrator => userAdministrator.id_user_administrator,
+    userAdministrator => userAdministrator.idUserAdministrator,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_user_administrator' })
-  userAdministrator: UserAdministrator;
+  userAdministrator?: UserAdministrator;
 
   @ManyToOne(
     type => Language,
-    language => language.id_language,
+    language => language.idLanguage,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_language' })
@@ -70,7 +70,7 @@ export class UserDetails extends BaseEntity {
 
   @ManyToOne(
     type => Country,
-    country => country.id_country,
+    country => country.idCountry,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_country' })
@@ -78,8 +78,8 @@ export class UserDetails extends BaseEntity {
 
   @OneToMany(
     type => BankAccount,
-    bankAccount => bankAccount.id_bank_account,
+    bankAccount => bankAccount.idBankAccount,
     { nullable: true },
   )
-  bankAccount: BankAccount;
+  bankAccount?: BankAccount;
 }

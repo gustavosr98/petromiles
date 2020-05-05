@@ -1,4 +1,4 @@
-import { UserRole } from '../../user/user_role/user_role.entity';
+import { UserRole } from '../../user/user-role/user-role.entity';
 import {
   BaseEntity,
   Entity,
@@ -10,14 +10,14 @@ import {
 @Entity()
 export class Role extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_role: number;
+  idRole: number;
 
   @Column({ unique: true })
   name: string;
 
   @OneToMany(
     type => UserRole,
-    userRole => userRole.id_user_role,
+    userRole => userRole.idUserRole,
     { nullable: true },
   )
   userRole?: UserRole;

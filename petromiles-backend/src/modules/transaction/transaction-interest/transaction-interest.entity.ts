@@ -1,4 +1,4 @@
-import { PlatformInterest } from '../../management/platform_interest/platform_interest.entity';
+import { PlatformInterest } from '../../management/platform-interest/platform-interest.entity';
 import { ThirdPartyInterest } from '../../management/third_party_interest/third_party_interest.entity';
 import { Promotion } from '../../management/promotion/promotion.entity';
 import { Transaction } from '../transaction/transaction.entity';
@@ -14,11 +14,11 @@ import {
 @Entity()
 export class TransactionInterest extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id_transaction_interest: number;
+  idTransactionInterest: number;
 
   @ManyToOne(
     type => PlatformInterest,
-    platformInterest => platformInterest.id_platform_interest,
+    platformInterest => platformInterest.idPlatformInterest,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_platform_interest' })
@@ -26,7 +26,7 @@ export class TransactionInterest extends BaseEntity {
 
   @ManyToOne(
     type => PlatformInterest,
-    platformInterest => platformInterest.id_platform_interest,
+    platformInterest => platformInterest.idPlatformInterest,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_platform_interest_extra_points' })
@@ -34,7 +34,7 @@ export class TransactionInterest extends BaseEntity {
 
   @ManyToOne(
     type => ThirdPartyInterest,
-    thirdPartyInterest => thirdPartyInterest.id_third_party_interest,
+    thirdPartyInterest => thirdPartyInterest.idThirdPartyInterest,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_third_party_interest' })
@@ -42,7 +42,7 @@ export class TransactionInterest extends BaseEntity {
 
   @ManyToOne(
     type => Promotion,
-    promotion => promotion.id_promotion,
+    promotion => promotion.idPromotion,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_promotion' })
@@ -50,7 +50,7 @@ export class TransactionInterest extends BaseEntity {
 
   @ManyToOne(
     type => Transaction,
-    transaction => transaction.id_transaction,
+    transaction => transaction.idTransaction,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_transaction' })
