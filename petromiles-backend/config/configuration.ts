@@ -9,4 +9,18 @@ export default () => ({
     password: process.env.DATABASE_PASSWORD,
     synchronize: process.env.DATABASE_SYNCHRONIZE,
   },
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    name: process.env.JWT_NAME,
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  },
+  mails: {
+    sendgrid: {
+      apiKey: process.env.SENDGRID_API_KEY,
+      emailFrom: process.env.SENDGRID_FROM,
+      templates: {
+        welcome: process.env.SENDGRID_WELCOME_TEMPLATE,
+      },
+    },
+  },
 });

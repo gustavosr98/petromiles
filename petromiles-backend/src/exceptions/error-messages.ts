@@ -5,12 +5,8 @@ export const ERROR = Object.freeze<ErrorCollection>({
     statusCode: 500,
     message: 'Internal Server Error: Problem with the database',
   }),
-  DATABASE_FK: Object.freeze<ErrorContent>({
+  USER_EXISTS: Object.freeze<ErrorContent>({
     statusCode: 400,
-    message: 'Bad Request: Invalid payload content | DATABASE_FK ',
-  }),
-  DATABASE_CHECK: Object.freeze<ErrorContent>({
-    statusCode: 400,
-    message: 'Bad Request: Invalid payload content | DATABASE_CHECK',
+    message: 'Bad Request: Email already in use',
   }),
 });

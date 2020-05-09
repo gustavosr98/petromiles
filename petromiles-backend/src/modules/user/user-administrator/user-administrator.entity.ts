@@ -21,6 +21,9 @@ export class UserAdministrator extends BaseEntity {
   @Column()
   password?: string;
 
+  @Column()
+  salt?: string;
+
   @Column({ nullable: true })
   photo?: string;
 

@@ -13,6 +13,8 @@ import { TransactionModule } from './modules/transaction/transaction.module';
 import { UserModule } from './modules/user/user.module';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { LoggerOptions } from '../config/logger/Winston.Config.Service';
+import { AuthModule } from './modules/auth/auth.module';
+import { MailsModule } from './modules/mails/mails.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { LoggerOptions } from '../config/logger/Winston.Config.Service';
     SuscriptionModule,
     TransactionModule,
     UserModule,
+    AuthModule,
+    MailsModule,
   ],
   controllers: [],
   providers: [
