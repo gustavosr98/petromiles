@@ -5,6 +5,8 @@ export const state = {
   user: null,
 };
 
+const baseUrl = process.env.VUE_APP_PETROMILES_API;
+
 export const mutations = {
   SET_USER_DATA(state, userData) {
     //1) Se guarda usuario en el state
@@ -34,15 +36,15 @@ export const mutations = {
 export const actions = {
   async signUp({ commit }, credentials) {
     // Realizamos peticion al backend para crear usuario
-    await httpClient.post("api/v1/auth/signup", credentials).then(data => {
+    await httpClient.post("/auth/signup", credentials).then(data => {
       commit("SET_USER_DATA", data);
       console.log("User is signed");
     });
   },
   async logIn({ commit }, credentials) {
-    await httpClient.post("api/v1/auth/login", credentials).then(data => {
+    await httpClient.post("/auth/login", credentials).then(data => {
       commit("SET_USER_DATA", data);
-      console.log("User is signed");
+      console.log("User is here ");
     });
   },
 

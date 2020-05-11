@@ -1,6 +1,6 @@
 <template>
   <v-window-item>
-    <v-row>
+    <v-row align="center" justify="center">
       <welcome-form :title="title" :msg="msg" />
       <slot />
     </v-row>

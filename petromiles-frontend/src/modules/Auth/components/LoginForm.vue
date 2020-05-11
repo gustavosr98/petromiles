@@ -1,7 +1,17 @@
 <template>
   <v-col cols="12" md="5">
     <v-card-text class="mt-12">
-      <h4 class="text-center mt-4 .subtitle-2">Log in with your PetroMiles account</h4>
+      <!--   <h4 class="text-center mt-4 subtitle-2">Log in with your PetroMiles account</h4>-->
+      <v-row>
+        <no-federeded-button
+          v-for="provider in providers"
+          :key="`${provider.name}`"
+          :provider="provider"
+          @login="login"
+          type="login"
+        >Continue with {{ provider.name }}</no-federeded-button>
+      </v-row>
+      <h4 class="text-center mt-4 caption">Or login with</h4>
       <v-form ref="signUpForm">
         <v-text-field
           label="Email"
@@ -24,7 +34,7 @@
     </v-card-text>
     <v-row class="text-center">
       <v-col cols="6">
-        <h5 class="caption">Forgot your password ?</h5>
+        <h5 class="caption">Forgot your password?</h5>
         <v-spacer />
       </v-col>
       <v-col cols="6">
@@ -34,15 +44,23 @@
         </h5>
       </v-col>
     </v-row>
-    <div class="text-center mt-3">
-      <v-btn @click="login()" color="light-blue darken-4" dark>Login</v-btn>
+    <div class="text-center mt-3 mb-8">
+      <v-btn @click="buildUser()" color="light-blue darken-4" dark>Login</v-btn>
     </div>
   </v-col>
 </template>
 
 <script>
 import store from "@/store/index";
+import NoFederatedButton from "@/modules/Auth/components/NoFederatedButton";
+import { providersMixin } from "@/mixins/Auth/firebaseProvider";
+
 export default {
+  mixins: [providersMixin],
+  components: {
+    "no-federeded-button": NoFederatedButton,
+  },
+
   data() {
     return {
       email: "",
@@ -50,11 +68,14 @@ export default {
     };
   },
   methods: {
-    login() {
+    buildUser() {
       const user = {
         email: this.email,
         password: this.password,
       };
+      this.login(user);
+    },
+    login(user) {
       store
         .dispatch("auth/logIn", user)
         .then(() => {

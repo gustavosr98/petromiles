@@ -1,7 +1,17 @@
 <template>
   <v-col cols="12" md="5">
     <v-card-text class="mt-12">
-      <h4 class="text-center mt-4 .subtitle-2">Sign Up with PetroMiles</h4>
+      <!-- <h4 class="text-center mt-4 .subtitle-2">Sign Up with PetroMiles</h4>-->
+      <v-row>
+        <no-federeded-button
+          v-for="provider in providers"
+          :key="`${provider.name}`"
+          :provider="provider"
+          @signUp="signUp"
+          type="signUp"
+        >Sign Up with {{ provider.name }}</no-federeded-button>
+      </v-row>
+      <h4 class="text-center mt-4 caption">Or sign up with</h4>
       <v-form ref="signUpForm" v-model="formValidity">
         <v-row>
           <v-col cols="6">
@@ -63,8 +73,8 @@
         <router-link :to="{ name: 'Login' }">Log in</router-link>
       </h5>
     </div>
-    <div class="text-center mt-5 mb-8">
-      <v-btn @click="signUp()" type="submit" class="light-blue darken-4" dark>SIGN UP</v-btn>
+    <div class="text-center mt-3 mb-8">
+      <v-btn @click="ckeckingValidForm" type="submit" class="light-blue darken-4" dark>SIGN UP</v-btn>
     </div>
   </v-col>
 </template>
@@ -79,8 +89,13 @@ import {
   minLength,
   alpha,
 } from "vuelidate/lib/validators";
+import NoFederatedButton from "@/modules/Auth/components/NoFederatedButton";
+import { providersMixin } from "@/mixins/Auth/firebaseProvider";
 export default {
-  mixins: [validationMixin],
+  mixins: [validationMixin, providersMixin],
+  components: {
+    "no-federeded-button": NoFederatedButton,
+  },
   data() {
     return {
       formValidity: false,
@@ -140,25 +155,29 @@ export default {
       this.password = "";
       this.$router.name("Login");
     },
-    signUp() {
+    ckeckingValidForm() {
       this.$v.$touch();
-      // Se verifica que el form tenga datos correctos:
-      if (!this.$v.$invalid) {
-        const user = {
-          firstName: this.firstName,
-          lastName: this.lastName,
-          email: this.email,
-          password: this.password,
-        };
-        store
-          .dispatch("auth/signUp", user)
-          .then(() => {
-            this.$router.push({ name: "Home" });
-          })
-          .catch(err => {
-            console.log(err.response.data.message);
-          });
-      }
+      if (!this.$v.$invalid) this.buildUser();
+    },
+    buildUser() {
+      const user = {
+        firstName: this.firstName,
+        lastName: this.lastName,
+        email: this.email,
+        password: this.password,
+      };
+      this.signUp(user);
+    },
+
+    signUp(user) {
+      store
+        .dispatch("auth/signUp", user)
+        .then(() => {
+          this.$router.push({ name: "Home" });
+        })
+        .catch(err => {
+          console.log(err.response.data.message);
+        });
     },
   },
 };
