@@ -9,6 +9,12 @@ export default () => ({
     password: process.env.DATABASE_PASSWORD,
     synchronize: process.env.DATABASE_SYNCHRONIZE,
   },
+  lang: {
+    poeditor: {
+      apiSecretKey: process.env.POEDITOR_API_KEY,
+      projectId: process.env.POEDITOR_PROJECT_ID,
+    },
+  },
   jwt: {
     secret: process.env.JWT_SECRET,
     name: process.env.JWT_NAME,

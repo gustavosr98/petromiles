@@ -3,7 +3,7 @@ import axios from "axios";
 const baseDomain = process.env.VUE_APP_PETROMILES_API;
 
 const httpClient = axios.create({
-  baseURL: baseDomain || "http://localhost:3000",
+  baseURL: baseDomain || "http://localhost:3000/api/v1",
   timeout: 6000,
 });
 

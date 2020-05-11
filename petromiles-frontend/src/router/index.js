@@ -34,6 +34,14 @@ const routes = [
         /* webpackChunkName: "about" */ "@/modules/Example/views/About.vue"
       ),
   },
+  {
+    path: "/i18n-example",
+    name: "i18n",
+    component: () =>
+      import(
+        /* webpackChunkName: "i18n " */ "@/components/i18n-example/HelloI18n.vue"
+      ),
+  },
 ];
 
 const router = new VueRouter({

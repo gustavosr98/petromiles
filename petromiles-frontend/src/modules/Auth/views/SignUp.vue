@@ -4,7 +4,10 @@
       <v-col cols="12" sm="6" md="9">
         <v-card class="elevation-12">
           <v-window>
-            <auth-window title="Welcome to PetroMiles" msg="Start paying with PetroMiles">
+            <auth-window
+              title="Welcome to PetroMiles"
+              msg="Start paying with PetroMiles"
+            >
               <signup-form />
             </auth-window>
           </v-window>

@@ -3,7 +3,7 @@ node_modules
 /dist
 
 # env files
-.env.*
+.env*
 
 # Log files
 npm-debug.log*
@@ -18,3 +18,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+# i18n
+src/locales/*.json
