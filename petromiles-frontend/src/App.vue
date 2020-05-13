@@ -14,3 +14,15 @@ export default {
   metaInfo,
 };
 </script>
+
+<style>
+/* Global develop class helpers */
+.dev-a {
+  background: red;
+  border: solid 1px blue;
+}
+.dev-b {
+  background: green;
+  border: solid 1px purple;
+}
+</style>

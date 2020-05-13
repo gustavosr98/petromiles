@@ -45,7 +45,7 @@ function groupTermsByTags(terms) {
       .map(term => {
         termsGroupedByTags[tag][term.term] =
           term.plural.length > 0
-            ? `${term.translation.content.one} | {count} ${term.translation.content.other}`
+            ? `${term.translation.content.one} | ${term.translation.content.other} | {count} ${term.translation.content.other}`
             : term.translation.content;
       });
   });

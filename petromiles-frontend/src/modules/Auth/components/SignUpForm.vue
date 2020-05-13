@@ -9,7 +9,8 @@
           :provider="provider"
           @signUp="signUp"
           type="signUp"
-        >Sign Up with {{ provider.name }}</no-federeded-button>
+          >Sign Up with {{ provider.name }}</no-federeded-button
+        >
       </v-row>
       <h4 class="text-center mt-4 caption">Or sign up with</h4>
       <v-form ref="signUpForm" v-model="formValidity">
@@ -70,11 +71,17 @@
     <div class="text-left">
       <h5 class="caption text-center" dark>
         Already have an account?
-        <router-link :to="{ name: 'Login' }">Log in</router-link>
+        <router-link :to="{ name: routeNameLogin }">Log in</router-link>
       </h5>
     </div>
     <div class="text-center mt-3 mb-8">
-      <v-btn @click="ckeckingValidForm" type="submit" class="light-blue darken-4" dark>SIGN UP</v-btn>
+      <v-btn
+        @click="ckeckingValidForm"
+        type="submit"
+        class="light-blue darken-4"
+        dark
+        >SIGN UP</v-btn
+      >
     </div>
   </v-col>
 </template>
@@ -91,6 +98,9 @@ import {
 } from "vuelidate/lib/validators";
 import NoFederatedButton from "@/modules/Auth/components/NoFederatedButton";
 import { providersMixin } from "@/mixins/Auth/firebaseProvider";
+
+import clientRoutes from "@/router/clientRoutes";
+
 export default {
   mixins: [validationMixin, providersMixin],
   components: {
@@ -104,6 +114,7 @@ export default {
       email: "",
       password: "",
       lastName: "",
+      routeNameLogin: clientRoutes.LOGIN.name,
     };
   },
   validations: {
@@ -153,7 +164,7 @@ export default {
       this.lastName = "";
       this.email = "";
       this.password = "";
-      this.$router.name("Login");
+      this.$router.name(clientRoutes.LOGIN.name);
     },
     ckeckingValidForm() {
       this.$v.$touch();
@@ -173,7 +184,7 @@ export default {
       store
         .dispatch("auth/signUp", user)
         .then(() => {
-          this.$router.push({ name: "Home" });
+          this.$router.push({ name: clientRoutes.DASHBOARD.name });
         })
         .catch(err => {
           console.log(err.response.data.message);

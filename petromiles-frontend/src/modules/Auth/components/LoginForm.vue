@@ -40,7 +40,7 @@
       <v-col cols="6">
         <h5 class="caption">
           New here?
-          <router-link :to="{ name: 'SignUp' }">Sign Up</router-link>
+          <router-link :to="{ name: routeNameSignUp }">Sign Up</router-link>
         </h5>
       </v-col>
     </v-row>
@@ -55,6 +55,8 @@ import store from "@/store/index";
 import NoFederatedButton from "@/modules/Auth/components/NoFederatedButton";
 import { providersMixin } from "@/mixins/Auth/firebaseProvider";
 
+import clientRoutes from "@/router/clientRoutes";
+
 export default {
   mixins: [providersMixin],
   components: {
@@ -65,6 +67,7 @@ export default {
     return {
       email: "",
       password: "",
+      routeNameSignUp: clientRoutes.SIGN_UP.name,
     };
   },
   methods: {
@@ -79,7 +82,7 @@ export default {
       store
         .dispatch("auth/logIn", user)
         .then(() => {
-          this.$router.push({ name: "Home" });
+          this.$router.push({ name: clientRoutes.DASHBOARD.name });
         })
         .catch(err => {
           console.log(err.response.data.message);
