@@ -15,7 +15,7 @@ export class MailsService {
     try {
       const msg: App.SendGrid.Mail = {
         to: email,
-        from: this.sendGridConfig.emailTo,
+        from: this.sendGridConfig.emailFrom,
         subject: subject,
         templateId: template,
         dynamic_template_data: data,

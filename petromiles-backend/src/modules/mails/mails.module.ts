@@ -8,14 +8,14 @@ import { ConfigService } from '@nestjs/config';
   providers: [
     MailsService,
     {
+      inject: [ConfigService],
       provide: 'SENDGRID_CONFIG',
       useFactory: async (configService: ConfigService) => {
         return {
-          emailFrom: configService.get<string>('mail.sendgrid.emailFrom'),
-          templates: configService.get<string>('mail.sendgrid.templates'),
+          emailFrom: configService.get<string>('mails.sendgrid.emailFrom'),
+          templates: configService.get<string>('mails.sendgrid.templates'),
         };
       },
-      inject: [ConfigService],
     },
   ],
   exports: [MailsService],

@@ -76,7 +76,7 @@ export class AuthService {
     await this.mailsService.sendEmail(
       email,
       'Welcome To PetroMiles',
-      this.configService.get('sendgrid.welcomeTemplate'),
+      this.configService.get('mails.sendgrid.templates.welcome'),
       {
         user: name,
       },

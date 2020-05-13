@@ -5,8 +5,6 @@ export const state = {
   user: null,
 };
 
-const baseUrl = process.env.VUE_APP_PETROMILES_API;
-
 export const mutations = {
   SET_USER_DATA(state, userData) {
     //1) Se guarda usuario en el state
