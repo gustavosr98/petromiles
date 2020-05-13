@@ -1,9 +1,19 @@
-import { LanguageModule } from './modules/language/language.module';
+// NEST CORE
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
-import configuration from 'config/configuration';
 import { APP_FILTER } from '@nestjs/core';
+
+// CONFIGURATION
+import configuration from 'config/configuration';
+
+// LOGGER
+import { WinstonModule } from 'nest-winston';
+// import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import createOptions from './logger/winston/winston-config';
+
+// MODULES
+import { DatabaseModule } from './database/database.module';
+import { LanguageModule } from './modules/language/language.module';
 import { PostgreExceptionFilter } from './exceptions/postgre-exception.filter';
 import { ExampleModule } from './modules/example/example.module';
 import { BankAccountModule } from './modules/bank-account/bank-account.module';
@@ -12,8 +22,6 @@ import { PlatformAdministratorModule } from './modules/management/platform-admin
 import { SuscriptionModule } from './modules/suscription/suscription.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { UserModule } from './modules/user/user.module';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { LoggerOptions } from '../config/logger/Winston.Config.Service';
 import { AuthModule } from './modules/auth/auth.module';
 import { MailsModule } from './modules/mails/mails.module';
 
@@ -22,9 +30,9 @@ import { MailsModule } from './modules/mails/mails.module';
     DatabaseModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: './.env.' + process.env.NODE_ENV,
       load: [configuration],
     }),
+    WinstonModule.forRoot(createOptions({ fileName: 'petromiles-global.log' })),
     ExampleModule,
     BankAccountModule,
     ClientModule,

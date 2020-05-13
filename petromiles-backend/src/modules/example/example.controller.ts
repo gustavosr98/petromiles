@@ -1,20 +1,36 @@
 import { Controller, Inject, Get } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { ConfigService } from '@nestjs/config';
 
 @Controller('example')
 export class ExampleController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    private configService: ConfigService,
   ) {}
 
   @Get()
-  getTest() {
+  testLogger() {
+    this.logger.error(
+      '[EXAMPLE] Testing loggers. Please check out loggers folder',
+    );
+    this.logger.warn(
+      '[EXAMPLE] Testing loggers. Please check out loggers folder',
+    );
+    this.logger.info(
+      '[EXAMPLE] Testing loggers. Please check out loggers folder',
+    );
+    this.logger.http(
+      '[EXAMPLE] Testing loggers. Please check out loggers folder',
+      's',
+    );
+    this.logger.verbose(
+      '[EXAMPLE] Testing loggers. Please check out loggers folder',
+    );
     this.logger.debug(
-      'Testing loggers. Please check out loggers folder %s',
-      ':)',
+      '[EXAMPLE] Testing loggers. Please check out loggers folder',
+    );
+    this.logger.silly(
+      '[EXAMPLE] Testing loggers. Please check out loggers folder',
     );
   }
 }
