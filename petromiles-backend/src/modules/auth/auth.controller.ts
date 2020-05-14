@@ -6,6 +6,7 @@ import {
   UseGuards,
   Request,
   UseInterceptors,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from '../user/dto/create-user.dto';
