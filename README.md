@@ -1,2 +1,280 @@
-# consorcio2-petromiles
-Customer Loyalty Program
+# PetroMiles
+
+<p align="center">
+  <img 
+  alt="PetroMiles Round Logo"
+  width="192" src="petromiles-frontend/public/img/icons/android-chrome-192x192.png">
+</p>
+
+![node version](https://img.shields.io/badge/node-12.16.3-blue)
+![postgresql version](https://img.shields.io/badge/postgresql-12.2-blue)
+
+![vue version](https://img.shields.io/badge/vue-2.6.11-blue)
+![vuex version](https://img.shields.io/badge/vuex-3.1.3-blue)
+![vue-router version](https://img.shields.io/badge/vue--router-3.1.6-blue)
+![vuetify version](https://img.shields.io/badge/vue-2.2.11-blue)
+
+![nest version](https://img.shields.io/badge/nest-7.0.0-blue)
+![stripe version](https://img.shields.io/badge/stripe-8.49.0-blue)
+![class-validator version](https://img.shields.io/badge/class--validator-0.12.2-blue)
+![typeorm version](https://img.shields.io/badge/typeorm-0.2.24-blue)
+
+## Intro
+
+PetroMiles is a web-based customer loyalty platform built to earn, exchage and manage petro points. It provides customers american bank accounts as its main payment method.
+
+Its written with [Vue](https://vuejs.org/) at the client side and [Nest](https://nestjs.com/) on the server side. It also integrates with [Stripe](https://stripe.com/) as its main payment provider.
+
+## Index
+
+- [Manual installation guide](#manual-installation-guide)
+  - [Requirements](#requirements)
+    - [Node and NPM](#node-and-npm)
+    - [PostgreSQL](#postgresql)
+  - [Backend project installation](#backend-project-installation)
+    - [Backend configuration file](#backend-configuration-file)
+    - [Populate the database](#populate-the-database)
+  - [Frontend project installation](#frontend-project-installation)
+    - [Frontend configuration file](#frontend-configuration-file)
+- [Usage](#usage)
+  - [Development usage](#development-usage)
+  - [Production build](#production-build)
+- [Authors and acknowledgment](#authors-and-acknowledgment)
+  - [Team #2](#team-#2)
+  - [Colaborators from Consortium #2](#colaborators-from-consortium-#2)
+
+## Manual installation guide
+
+### Requirements
+
+#### Node and NPM
+
+- Simply download and excecute lastest stable verison or LTS **installer** for your operative system from [Node downloads page](https://nodejs.org/en/)
+- You could also install Node using a **package manager** as it is explaned on [official documentation](https://nodejs.org/en/download/package-manager/)
+
+> **Info**: The installation process of Node should also install **NPM**
+
+> **Recomendation**: Install the same Node version this project uses. This could also be done by installing Node through [NVM](https://github.com/nvm-sh/nvm)
+
+> **WARNING**: If you are using **Windows** do not forget check you have Node instaltion path inside PATH enviroment variable
+
+#### PostgreSQL
+
+1.  Download and excecute the **installer** for your operative system from [official PostgreSQL download page](https://www.postgresql.org/download/)
+
+> **Recomendation**: Install [pgAdmin4](https://www.pgadmin.org/) to administrate PostgreSQL
+
+2. **Create a database** for this project. We recommend you to named it **dbpetromiles** but you could give it the name you wish
+
+---
+
+### Backend project installation
+
+1. Open a terminal inside the project root directory
+
+2. Excecute the following commands if you are on Linux or Windows
+
+```bash
+cd petromiles-backend/ # Move to backend project directory
+npm install # Install dependencies
+```
+
+#### Backend configuration file
+
+Create two files inside **petromiles-backend/** folder named `.env` and `.env.development`
+
+These files will have the following structure
+
+```bash
+# API
+PORT=
+
+# DATABASE
+DATABASE_NAME=
+DATABASE_PORT=
+DATABASE_HOST=
+DATABASE_TYPE=
+DATABASE_USER=
+DATABASE_PASSWORD=
+DATABASE_SYNCHRONIZE=
+
+# STRIPE - TEST MODE
+STRIPE_SECRET_KEY=
+STRIPE_PUBLIC_KEY=
+STRIPE_API_VERSION=
+
+# SENDGRID - TEST MODE
+SENDGRID_API_KEY=
+SENDGRID_FROM=
+SENDGRID_WELCOME_TEMPLATE=
+
+# JWT
+JWT_SECRET=
+JWT_NAME=
+JWT_EXPIRES_IN=
+
+# POEditor
+POEDITOR_API_KEY=
+POEDITOR_PROJECT_ID=
+
+```
+
+Please contact [developers of team #2](#team-#2) to provide you with the enviroment variable corresponding files
+
+> **IMPORTANT**: Do not forget to adjust the enviroment **variables related to the database**
+
+Something went wrong if you see something like this:
+
+<p align="center">
+  <img 
+  alt="Backend_error"
+  width="800" src="https://media.giphy.com/media/L3R09jOoa9mRsLDd3U/giphy.gif">
+</p>
+
+You can be sure the backend is up and running if you see something like this:
+
+<p align="center">
+  <img 
+  alt="Backend_ok"
+  width="800" src="https://media.giphy.com/media/l57Dnrgb4xhuUEGQLU/giphy.gif">
+</p>
+
+#### Populate the database
+
+1. [Run the backend](#development-usage) project to **create the database tables** automatically with TypeORM
+2. Insert SQL entries located inside `/project-root/petromiles-backend/database/inserts.sql` into your database
+
+For futher information on PostgreSQL management please check the [official PostgreSQL documentation](https://www.postgresql.org/download/)
+
+---
+
+### Frontend project installation
+
+Just as in the [backend project installation](#backend-project installation), open a terminal inside the project root directory and excecute the following commands if you are on Linux or Windows
+
+```bash
+cd petromiles-backend/ # Move to backend project directory
+npm install # Install dependencies
+```
+
+Check this link for futher information on [Vue](https://vuejs.org/v2/guide/) and this one for aditional information on [Vue CLI](https://cli.vuejs.org/)
+
+#### Frontend configuration file
+
+Create two files inside **petromiles-frontend/** folder named `.env` and `.env.development`
+
+These files will have the following structure
+
+```bash
+# API
+VUE_APP_PETROMILES_API=
+
+# FIREBASE
+VUE_APP_FIREBASE_APIKEY=
+VUE_APP_FIREBASE_DATABASE_URL=
+VUE_APP_FIREBASE_PROYECT_ID=
+VUE_APP_FIREBASE_STORAGE_BUCKET=
+VUE_APP_FIREBASE_MESSAGING_SENDER_ID=
+VUE_APP_FIREBASE_APP_ID=
+VUE_APP_FIREBASE_AUTH=
+
+# I18N
+VUE_APP_I18N_LOCALE=
+VUE_APP_I18N_FALLBACK_LOCALE=
+
+
+```
+
+As well as with backend configuration files please contact [developers of team #2](#team-#2) to provide you with the enviroment variable corresponding files
+
+> **Warning**: Please note that these enviroment files are not the same as the ones used in the backend project
+
+## Usage
+
+> **Info**: Please follow the [installation guide](#manual-installation-guide) before getting to the usage section
+
+### Development usage
+
+1. Run backend Nest server  
+   1.1. Open a terminal from the project root directory and excecute the following commands
+   ```bash
+    cd petromiles-backend/ # Move to backend project directory
+    npm run start:dev # Start Nest development server
+   ```
+   1.2 If you have not populated the database please follow [instructions here](#populate-the-database)
+
+> **Info**: The first time you run the Nest server will take longer. It will also create database empty tables
+
+2. Run frontend Vue server  
+   2.1. Open a terminal from the project root directory and excecute the following commands
+   ```bash
+    cd petromiles-frontend/ # Move to frontend project directory
+    npm run serve # Start Vue development server
+   ```
+
+> **IMPORTANT**: Do not start the frontend Vue service before the backend service is up and running. Locale international texts are preimported from the backend to avoid fetching language on the client during excecution time. Also notice that most frontend functionalities depend on the backend Nest service.
+
+---
+
+### Production build
+
+Please wait for futher instructions. Production build guide to be defined.
+
+## Authors and acknowledgment
+
+### Team #2
+
+<p>
+  <img
+    alt="Michelle Alleyne Github Avatar" 
+    width="80" 
+    src="https://github.com/michellealleyne.png?size=80">
+    <img
+      alt="Alejandro Jauregui Github Avatar" 
+    width="80" 
+    src="https://github.com/alejjb.png?size=80">
+    <img
+      alt="Gustavo Sánchez Github Avatar" 
+    width="80" 
+    src="https://github.com/gustavosr98.png?size=80">
+</p>
+
+Michelle Alleyne [@michellealleyne](https://github.com/michellealleyne)  
+Alejandro Jauregui [@alejjb](https://github.com/alejjb)  
+Gustavo Sánchez [@gustavosr98](https://github.com/gustavosr98)
+
+### Colaborators from Consortium #2
+
+<p>
+  <img
+    alt="Angel Sucasas Github Avatar" 
+    width="40" 
+    src="https://github.com/angelsucasas.png?size=40">
+    <img
+    alt="Gabriel Ortega Github Avatar" 
+    width="40" 
+    src="https://github.com/GabrielOrtegaUCAB.png?size=40">
+    <img
+    alt="Andrea Da Github Avatar" 
+    width="40" 
+    src="https://github.com/avdasilvab25.png?size=40">
+    <img
+    alt="Diego Gutierrez Github Avatar" 
+    width="40" 
+    src="https://github.com/Dagutierrez14.png?size=40">
+    <img
+    alt="Luis Fuentes Github Avatar" 
+    width="40" 
+    src="https://github.com/LuisRFuentes.png?size=40">
+    <img
+    alt="Anthony Rodríguez Github Avatar" 
+    width="40" 
+    src="https://github.com/thonygrz.png?size=40">
+</p>
+
+Angel Sucasas [@angelsucasas](https://github.com/angelsucasas)  
+Gabriel Ortega [@GabrielOrtegaUCAB](https://github.com/GabrielOrtegaUCAB)  
+Andrea Da Silva [@avdasilvab25](https://github.com/avdasilvab25)  
+Diego Gutierrez [@Dagutierrez14](https://github.com/Dagutierrez14)  
+Luis Fuentes [@LuisRFuentes](https://github.com/LuisRFuentes)  
+Anthony Rodríguez [@thonygrz](https://github.com/thonygrz)

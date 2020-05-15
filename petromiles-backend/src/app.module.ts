@@ -30,6 +30,9 @@ import { MailsModule } from './modules/mails/mails.module';
     DatabaseModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: !process.env.NODE_ENV
+        ? ['.env.development', '.env']
+        : ['.env', '.env.development'],
       load: [configuration],
     }),
     WinstonModule.forRoot(createOptions({ fileName: 'petromiles-global.log' })),
