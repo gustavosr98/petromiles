@@ -1,16 +1,16 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
+
+import { JwtStrategy } from './jwt.strategy';
+
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 import { ClientModule } from '../client/client.module';
 import { MailsModule } from '../mails/mails.module';
 import { PlatformAdministratorModule } from '../management/platform-administrator.module';
 import { UserModule } from '../user/user.module';
-import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './local.strategy';
-import { LoginMiddleware } from './middlewares/login.middleware';
-import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
@@ -26,17 +26,13 @@ import { JwtStrategy } from './jwt.strategy';
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('jwt.secret'),
         signOptions: {
-          expiresIn: config.get<number>('jwt.expiresIn'),
+          expiresIn: config.get<string>('jwt.expiresIn'),
         },
       }),
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, JwtStrategy],
   exports: [JwtStrategy, PassportModule],
 })
-export class AuthModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoginMiddleware).forRoutes('auth/login');
-  }
-}
+export class AuthModule {}

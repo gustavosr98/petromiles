@@ -9,7 +9,8 @@
           :provider="provider"
           @login="login"
           type="login"
-        >Continue with {{ provider.name }}</no-federeded-button>
+          >Continue with {{ provider.name }}</no-federeded-button
+        >
       </v-row>
       <h4 class="text-center mt-4 caption">Or login with</h4>
       <v-form ref="signUpForm">
@@ -75,6 +76,7 @@ export default {
       const user = {
         email: this.email,
         password: this.password,
+        role: "CLIENT",
       };
       this.login(user);
     },

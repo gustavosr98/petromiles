@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { PostgreExceptionFilter } from './exceptions/postgre-exception.filter';
 import * as helmet from 'helmet';
 
 async function bootstrap() {
@@ -25,7 +24,6 @@ async function bootstrap() {
   app.use(helmet());
   app.setGlobalPrefix('/api/v1');
 
-  app.useGlobalFilters(new PostgreExceptionFilter());
   await app.listen(port, () => console.log(`Server is running on ${port}`));
 }
 bootstrap();

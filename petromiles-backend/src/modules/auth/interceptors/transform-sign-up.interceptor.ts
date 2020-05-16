@@ -23,9 +23,8 @@ export class TransformSignUpInterceptor<T>
   ): Promise<Observable<Response<T>>> {
     const req = context.switchToHttp().getRequest();
 
-    // 1) Se verifica que haya una contraseña en el request
+    // Encrypts password only for federated sign up
     if (req.body.password !== undefined) {
-      // 2) Se encripta la contraseña
       const salt = await bcrypt.genSalt();
       const password = req.body.password;
       req.body.password = await this.authService.hashPassword(password, salt);

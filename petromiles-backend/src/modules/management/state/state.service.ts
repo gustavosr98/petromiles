@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { Repository } from 'typeorm';
+
 import { State } from './state.entity';
 import { StateName } from './state.enum';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class StateService {

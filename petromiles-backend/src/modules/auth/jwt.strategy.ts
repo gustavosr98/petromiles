@@ -1,12 +1,17 @@
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, ExtractJwt } from 'passport-jwt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
+
+import { Strategy, ExtractJwt } from 'passport-jwt';
+import { Logger } from 'winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private configService: ConfigService,
     private userService: UserService,
   ) {
@@ -18,15 +23,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: App.Auth.JWTPayload) {
-    const { email } = payload;
-    const user = await this.userService.getUserByEmail(email);
-    if (!user)
+    const user = await this.userService.getUserByEmail(payload);
+    if (!user) {
+      this.logger.error(
+        `[AUTH] The user ${payload.email} does not have authorization. Log in again`,
+      );
       throw new UnauthorizedException(`User does not have authorization`);
+    }
 
     return {
-      email: user.user.email,
+      email: payload.email,
       id: user.userDetails.fk_user_client,
-      role: user.u_role,
+      role: payload.role,
     };
   }
 }

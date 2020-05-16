@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
-import { Injectable, UseFilters, Inject } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
-import { ConfigService } from '@nestjs/config';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class MailsService {
   public constructor(
     @InjectSendGrid() private readonly sendGridClient: SendGridService,
     @Inject('SENDGRID_CONFIG') private sendGridConfig,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   async sendEmail(email, subject, template, data) {
@@ -20,9 +22,15 @@ export class MailsService {
         templateId: template,
         dynamic_template_data: data,
       };
-      return await this.sendGridClient.send(msg);
+
+      await this.sendGridClient.send(msg);
+      this.logger.verbose(
+        `[MAILS] An email with the subject "${subject}" has been sent to ${email}`,
+      );
     } catch (err) {
-      console.log(err.message);
+      this.logger.verbose(
+        `[MAILS] Problem sending email. Reason: ${err.message}`,
+      );
     }
   }
 }

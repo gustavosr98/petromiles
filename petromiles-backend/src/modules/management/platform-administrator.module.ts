@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { StateService } from './state/state.service';
-import { RoleService } from './role/role.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { State } from './state/state.entity';
 import { Role } from './role/role.entity';
+import { StateService } from './state/state.service';
+import { RoleService } from './role/role.service';
 
 @Module({
   imports: [

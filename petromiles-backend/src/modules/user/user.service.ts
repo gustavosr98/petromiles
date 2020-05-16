@@ -1,54 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getConnection } from 'typeorm';
-import { UserAdministrator } from './user-administrator/user-administrator.entity';
-import { StateName } from '../management/state/state.enum';
+
+import { Role as RoleEnum } from 'src/modules/management/role/role.enum';
+import { UserClientService } from '../client/user-client/user-client.service';
+import { UserAdministratorService } from './user-administrator/user-administrator.service';
+import { UserDetailsService } from './user-details/user-details.service';
 
 @Injectable()
 export class UserService {
-  async getUserByEmail(email: string) {
-    const userFound = await getConnection().query(`
-      SELECT u.email, u.password, u.salt , d.*, r.name u_role, l.name u_language
-      FROM user_client u, user_details d, state s, state_user su, role r, user_role ur, language l
-      WHERE u.email = '${email}'
-      AND d.fk_user_client = u."idUserClient"
-      AND s.name ='${StateName.ACTIVE}'
-      AND s."idState"= su.fk_state
-      AND su.fk_user_client = u."idUserClient"
-      AND su."finalDate" is null
-      AND ur.fk_user_client = u."idUserClient"
-      AND ur.fk_role = r."idRole"
-      AND d.fk_language = l."idLanguage"
-      UNION
-      SELECT u.email, u.password, u.salt , d.*, r.name u_role, l.name u_language
-      FROM user_administrator u, user_details d,state s, state_user su, role r, user_role ur, language l
-      WHERE u.email = '${email}'
-      AND d.fk_user_client = u."idUserAdministrator"
-      AND s.name ='${StateName.ACTIVE}'
-      AND s."idState"= su.fk_state
-      AND su.fk_user_administrator = u."idUserAdministrator"
-      AND su."finalDate" is null
-      AND ur.fk_user_administrator = u."idUserAdministrator"
-      AND ur.fk_role = r."idRole"
-      AND d.fk_language = l."idLanguage"`);
+  constructor(
+    private userClientService: UserClientService,
+    private userAdministratorService: UserAdministratorService,
+    private userDetailsService: UserDetailsService,
+  ) {}
 
-    if (userFound.length !== 0) {
-      const {
-        password,
-        email,
-        u_language,
-        u_role,
-        salt,
-        ...userDetails
-      } = userFound[0];
-      const user = {
-        password,
-        email,
-        salt,
-      };
-      return { user, u_language, u_role, userDetails: userDetails };
+  async getUserByEmail(credentials: App.Auth.LoginRequest) {
+    const { email, role } = credentials;
+    let user, userDetails;
+    if (role === RoleEnum.ADMINISTRATOR) {
+      user = await this.userAdministratorService.getActiveAdministrator(email);
+      userDetails = await this.userDetailsService.getAdministratorDetails(user);
+    } else {
+      user = await this.userClientService.getActiveClient(email);
+      userDetails = await this.userDetailsService.getClientDetails(user);
     }
 
+    if (user) {
+      const credentials = {
+        password: user.password,
+        email: user.email,
+        salt: user.salt,
+      };
+      return { user: credentials, userDetails };
+    }
     return null;
   }
 }

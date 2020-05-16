@@ -8,6 +8,7 @@ declare namespace App {
 
     interface JWTPayload {
       email: string;
+      role: import('../src/modules/management/role/role.enum').Role;
     }
 
     interface Response {
@@ -15,7 +16,12 @@ declare namespace App {
       userDetails: object;
       token: string;
       role: import('../src/modules/management/role/role.enum').Role;
-      language: string;
+    }
+
+    interface LoginRequest {
+      email: string;
+      password?: string;
+      role: import('../src/modules/management/role/role.enum').Role;
     }
   }
 

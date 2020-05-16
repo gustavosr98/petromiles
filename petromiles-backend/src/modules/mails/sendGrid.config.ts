@@ -1,5 +1,5 @@
-import { SendGridModule } from '@ntegral/nestjs-sendgrid';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SendGridModule } from '@ntegral/nestjs-sendgrid';
 
 export const SendGridConfig = SendGridModule.forRootAsync({
   imports: [ConfigModule],

@@ -40,7 +40,6 @@ export class UserDetails extends BaseEntity {
   @Column({ nullable: true })
   phone?: string;
 
-  /*FOTO DE QUE TIPO ES */
   @Column({ nullable: true })
   photo?: string;
 
@@ -63,7 +62,7 @@ export class UserDetails extends BaseEntity {
   @ManyToOne(
     type => Language,
     language => language.idLanguage,
-    { nullable: false },
+    { nullable: false, eager: true },
   )
   @JoinColumn({ name: 'fk_language' })
   language: Language;

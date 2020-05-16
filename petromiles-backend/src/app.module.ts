@@ -14,7 +14,6 @@ import createOptions from './logger/winston/winston-config';
 // MODULES
 import { DatabaseModule } from './database/database.module';
 import { LanguageModule } from './modules/language/language.module';
-import { PostgreExceptionFilter } from './exceptions/postgre-exception.filter';
 import { ExampleModule } from './modules/example/example.module';
 import { BankAccountModule } from './modules/bank-account/bank-account.module';
 import { ClientModule } from './modules/client/client.module';
@@ -48,11 +47,6 @@ import { MailsModule } from './modules/mails/mails.module';
     MailsModule,
   ],
   controllers: [],
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: PostgreExceptionFilter,
-    },
-  ],
+  providers: [],
 })
 export class AppModule {}

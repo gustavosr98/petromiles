@@ -94,7 +94,6 @@ import {
   maxLength,
   email,
   minLength,
-  alpha,
 } from "vuelidate/lib/validators";
 import NoFederatedButton from "@/modules/Auth/components/NoFederatedButton";
 import { providersMixin } from "@/mixins/Auth/firebaseProvider";
@@ -118,8 +117,8 @@ export default {
     };
   },
   validations: {
-    firstName: { required, alpha },
-    lastName: { required, alpha },
+    firstName: { required },
+    lastName: { required },
     email: { required, email },
     password: { required, minLength: minLength(8), maxLength: maxLength(16) },
   },
@@ -135,15 +134,12 @@ export default {
       const errors = [];
       if (!this.$v.firstName.$dirty) return errors;
       !this.$v.firstName.required && errors.push("Name is required");
-      !this.$v.firstName.alpha && errors.push("Name must have letters");
       return errors;
     },
     lastNameErrors() {
       const errors = [];
       if (!this.$v.lastName.$dirty) return errors;
       !this.$v.lastName.required && errors.push("Last name is required");
-      !this.$v.lastName.alpha && errors.push("Last name must have letters");
-
       return errors;
     },
     passwordErrors() {

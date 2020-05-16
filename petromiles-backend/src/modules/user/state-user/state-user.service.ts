@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { StateUser } from './state-user.entity';
 import { getConnection } from 'typeorm';
+
+import { StateUser } from './state-user.entity';
 import { StateService } from '../../management/state/state.service';
 import { UserClient } from '../../client/user-client/user-client.entity';
 import { StateName } from '../../management/state/state.enum';
@@ -11,7 +12,7 @@ export class StateUserService {
 
   constructor(private stateService: StateService) {}
 
-  async createStateUserClient(
+  async createClientState(
     user: UserClient,
     stateName: StateName,
     description: string,
