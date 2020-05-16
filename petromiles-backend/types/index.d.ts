@@ -34,4 +34,31 @@ declare namespace App {
       dynamic_template_data: object;
     }
   }
+
+  namespace BankAccount {
+    interface validate {
+      validateRoutingNumber(routingNumber: number): boolean;
+    }
+  }
+
+  namespace Transaction {
+    interface TransactionCreation {
+      totalAmountWithInterest: number;
+      transaction?: import('../src/modules/transaction/transaction/transaction.entity').Transaction;
+      rawAmount: number;
+      type: import('../src/modules/transaction/transaction/transaction.enum').TransactionType;
+      pointsConversion: import('../src/modules/management/points-conversion/points-conversion.entity').PointsConversion;
+      clientBankAccount: import('../src/modules/client/client-bank-account/client-bank-account.entity').ClientBankAccount;
+      thirdPartyInterest?: import('../src/modules/management/third-party-interest/third-party-interest.entity').ThirdPartyInterest;
+      platformInterest: import('../src/modules/management/platform-interest/platform-interest.entity').PlatformInterest;
+      stateTransactionDescription: string;
+      promotion?: import('../src/modules/management/promotion/promotion.entity').Promotion;
+      platformInterestExtraPoints?: import('../src/modules/management/platform-interest/platform-interest.entity').PlatformInterest;
+    }
+    interface TransactionInterests {
+      platformInterestType: import('../src/modules/management/platform-interest/platform-interest.enum').PlatformInterest;
+      platformInterestExtraPointsType: import('../src/modules/management/platform-interest/platform-interest.enum').PlatformInterest;
+      thirdPartyInterestType: import('../src/modules/management/third-party-interest/third-party-interest.enum').ThirdPartyInterest;
+    }
+  }
 }

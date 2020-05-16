@@ -1,8 +1,3 @@
-import { PlatformInterest } from '../../management/platform-interest/platform-interest.entity';
-import { ThirdPartyInterest } from '../../management/third_party_interest/third_party_interest.entity';
-import { Promotion } from '../../management/promotion/promotion.entity';
-import { Transaction } from '../transaction/transaction.entity';
-
 import {
   BaseEntity,
   Entity,
@@ -10,6 +5,11 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+
+import { PlatformInterest } from '../../management/platform-interest/platform-interest.entity';
+import { ThirdPartyInterest } from '../../management/third-party-interest/third-party-interest.entity';
+import { Promotion } from '../../management/promotion/promotion.entity';
+import { Transaction } from '../transaction/transaction.entity';
 
 @Entity()
 export class TransactionInterest extends BaseEntity {

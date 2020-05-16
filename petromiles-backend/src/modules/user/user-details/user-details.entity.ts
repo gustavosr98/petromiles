@@ -62,10 +62,10 @@ export class UserDetails extends BaseEntity {
   @ManyToOne(
     type => Language,
     language => language.idLanguage,
-    { nullable: false, eager: true },
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_language' })
-  language: Language;
+  language?: Language;
 
   @ManyToOne(
     type => Country,
@@ -73,7 +73,7 @@ export class UserDetails extends BaseEntity {
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_country' })
-  country: Country;
+  country?: Country;
 
   @OneToMany(
     type => BankAccount,

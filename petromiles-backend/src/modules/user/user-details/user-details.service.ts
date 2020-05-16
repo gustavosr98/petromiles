@@ -19,7 +19,6 @@ export class UserDetailsService {
 
   async createClientDetails(userClientDetails): Promise<UserDetails> {
     const result = await this.userDetailsRepository.save(userClientDetails);
-
     result.userClient = null;
     return result;
   }

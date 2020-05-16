@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@mdi/font": "^3.6.95",
+    "@mdi/js": "^5.2.45",
     "axios": "^0.19.2",
     "change-case": "^4.1.1",
     "core-js": "^3.6.4",

@@ -3,10 +3,7 @@
     <!-- Horizontal App Bar  -->
 
     <v-app-bar app class="app-bar" color="primary">
-      <v-app-bar-nav-icon
-        @click="drawer = true"
-        color="white"
-      ></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="drawer = true" color="white"></v-app-bar-nav-icon>
       <v-toolbar-title>PetroMiles</v-toolbar-title>
       <v-spacer></v-spacer>
     </v-app-bar>

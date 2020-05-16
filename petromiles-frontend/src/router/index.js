@@ -7,6 +7,7 @@ Vue.use(VueRouter);
 
 const routes = [
   ...clientRoutesArray,
+
   {
     path: "/i18n-example",
     name: "i18n",

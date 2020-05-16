@@ -1,9 +1,3 @@
-import { TransactionType } from './transaction.enum';
-import { UserSuscription } from '../../client/user-suscription/user-suscription.entity';
-import { PointsConversion } from '../../management/points-conversion/points-conversion.entity';
-import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
-import { StateTransaction } from '../state-transaction/state-transaction.entity';
-import { TransactionInterest } from '../transaction-interest/transaction-interest.entity';
 import {
   BaseEntity,
   Entity,
@@ -14,6 +8,12 @@ import {
   OneToOne,
   OneToMany,
 } from 'typeorm';
+import { TransactionType } from './transaction.enum';
+import { UserSuscription } from '../../client/user-suscription/user-suscription.entity';
+import { PointsConversion } from '../../management/points-conversion/points-conversion.entity';
+import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
+import { StateTransaction } from '../state-transaction/state-transaction.entity';
+import { TransactionInterest } from '../transaction-interest/transaction-interest.entity';
 
 @Entity()
 export class Transaction extends BaseEntity {
@@ -23,10 +23,10 @@ export class Transaction extends BaseEntity {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   initialDate: Date;
 
-  @Column()
+  @Column('decimal', { precision: 8, scale: 3 })
   rawAmount: number;
 
-  @Column()
+  @Column('decimal', { precision: 8, scale: 3 })
   totalAmountWithInterest: number;
 
   @Column()
@@ -67,7 +67,7 @@ export class Transaction extends BaseEntity {
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_points_conversion' })
-  pointsConvertion: PointsConversion;
+  pointsConversion: PointsConversion;
 
   @ManyToOne(
     type => ClientBankAccount,

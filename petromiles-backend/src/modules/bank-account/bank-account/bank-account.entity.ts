@@ -1,6 +1,5 @@
 import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
 import { UserDetails } from '../../user/user-details/user-details.entity';
-import { RoutingNumber } from '../routing-number/routing-number.entity';
 import {
   BaseEntity,
   Entity,
@@ -20,13 +19,22 @@ export class BankAccount extends BaseEntity {
   @Column()
   accountNumber: string;
 
+  @Column()
+  checkNumber: string;
+
+  @Column()
+  type: string;
+
   @Column({ nullable: true })
-  primary: string;
+  primary?: string;
+
+  @Column()
+  routingNumber: number;
 
   @OneToMany(
     type => ClientBankAccount,
     clientBankAccount => clientBankAccount.idClientBankAccount,
-    { nullable: false },
+    { nullable: true },
   )
   clientBankAccount: ClientBankAccount;
 
@@ -37,12 +45,4 @@ export class BankAccount extends BaseEntity {
   )
   @JoinColumn({ name: 'fk_person_details' })
   userDetails: UserDetails;
-
-  @OneToOne(
-    type => RoutingNumber,
-    routingNumber => routingNumber.idRoutingNumber,
-    { nullable: false },
-  )
-  @JoinColumn({ name: 'fk_routing_number' })
-  routingNumber: RoutingNumber;
 }

@@ -1,5 +1,5 @@
 <template>
-  <v-content>
+  <v-content class="pt-3">
     <navbar :navigationModules="navigationModules"></navbar>
     <slot></slot>
   </v-content>

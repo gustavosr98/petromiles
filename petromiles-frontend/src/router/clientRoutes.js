@@ -39,6 +39,7 @@ const clientRoutesRaw = Object.freeze({
         /* webpackChunkName: "client-bank-account-list" */ "@/modules/Client/views/ClientBankAccountList"
       ),
   },
+
   TRANSACTION_LIST: {
     path: "/transactions",
     name: "ClientTransactionList",

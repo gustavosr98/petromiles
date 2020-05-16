@@ -14,7 +14,6 @@ export const mutations = {
       language: userData.language,
       role: userData.role,
     };
-    console.log(state.user);
 
     // 2) Se guarda usuario en el storage para mantener datos si se recarga la pagina
     localStorage.setItem("user", `Bearer ${JSON.stringify(userData.token)}`);
@@ -54,5 +53,9 @@ export const actions = {
 export const getters = {
   loggedIn(state) {
     return !!state.user;
+  },
+
+  getUser(state) {
+    return state.user;
   },
 };

@@ -1,7 +1,6 @@
 <template>
   <v-col cols="12" md="5">
     <v-card-text class="mt-12">
-      <!-- <h4 class="text-center mt-4 .subtitle-2">Sign Up with PetroMiles</h4>-->
       <v-row>
         <no-federeded-button
           v-for="provider in providers"

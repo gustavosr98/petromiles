@@ -1,5 +1,3 @@
-import { State } from '../../management/state/state.entity';
-import { Transaction } from '../transaction/transaction.entity';
 import {
   BaseEntity,
   Entity,
@@ -8,6 +6,9 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+
+import { State } from '../../management/state/state.entity';
+import { Transaction } from '../transaction/transaction.entity';
 
 @Entity()
 export class StateTransaction extends BaseEntity {

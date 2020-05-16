@@ -27,7 +27,6 @@ export class StateBankAccount extends BaseEntity {
     type => State,
     state => state.idState,
     {
-      onDelete: 'CASCADE',
       nullable: false,
     },
   )
@@ -38,7 +37,6 @@ export class StateBankAccount extends BaseEntity {
     type => ClientBankAccount,
     clientbankAccount => clientbankAccount.idClientBankAccount,
     {
-      onDelete: 'CASCADE',
       nullable: false,
     },
   )

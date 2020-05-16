@@ -17,7 +17,7 @@ export default new Vuetify({
       },
     },
     icons: {
-      iconfont: "md" || "fa",
+      iconfont: "md" || "fa" || "mdi",
     },
     themes: {
       light: {

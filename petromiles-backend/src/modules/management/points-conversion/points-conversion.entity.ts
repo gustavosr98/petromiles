@@ -18,6 +18,9 @@ export class PointsConversion extends BaseEntity {
   @Column({ default: () => 'CURRENT_DATE' })
   initialDate: Date;
 
+  @Column({ nullable: true })
+  finalDate: Date;
+
   @OneToMany(
     type => Transaction,
     transaction => transaction.idTransaction,

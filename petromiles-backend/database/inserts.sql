@@ -42,11 +42,11 @@ VALUES
 INSERT INTO PLATFORM_INTEREST
     (name, percentage,amount)
 VALUES
-    ('Premium Extra', 20, null),
-    ( 'Gold Extra', 20, 5000),
-    ('Verification Interest', null, 250),
-    ('Buy Interest', 1.5, null),
-    ('Withdrawal Interest', 5, null);
+    ('PREMIUM', 20, null),
+    ('GOLD_EXTRA', 20, 5000),
+    ('VERIFICATION', null, 250),
+    ('BUY', 1.5, null),
+    ('WITHDRAWAL', 5, null);
 
 
 INSERT INTO POINTS_CONVERSION
