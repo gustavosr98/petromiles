@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { State } from '../../../modules/management/state/state.entity';
 
-/* MONEY IS REPRESENTED IN CENTS, 25$ = 2500 cents*/
+/* MONEY IS REPRESENTED IN CENTS, $25 = 2500 cents*/
+import { Suscription } from './../../../modules/suscription/suscription.enum';
 
 export const SUSCRIPTIONS = [
   {
     idSuscription: 1,
-    name: 'BASIC',
+    name: Suscription.BASIC,
     cost: 0,
     description: 'Suscription initial of every new client',
   },
 
   {
     idSuscription: 2,
-    name: 'PREMIUM',
+    name: Suscription.PREMIUM,
     cost: 2500,
     description: 'User must to ask for this suscription',
   },
   {
     idSuscription: 3,
-    name: 'GOLD',
+    name: Suscription.GOLD,
     cost: 0,
     upgraded_amount: 15000,
     description:

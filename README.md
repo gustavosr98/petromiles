@@ -123,26 +123,16 @@ Please contact [developers of team #2](#team-#2) to provide you with the envirom
 
 > **IMPORTANT**: Do not forget to adjust the enviroment **variables related to the database**
 
-Something went wrong if you see something like this:
-
-<p align="center">
-  <img 
-  alt="Backend_error"
-  width="800" src="https://media.giphy.com/media/L3R09jOoa9mRsLDd3U/giphy.gif">
-</p>
-
-You can be sure the backend is up and running if you see something like this:
-
-<p align="center">
-  <img 
-  alt="Backend_ok"
-  width="800" src="https://media.giphy.com/media/l57Dnrgb4xhuUEGQLU/giphy.gif">
-</p>
-
 #### Populate the database
 
-1. [Run the backend](#development-usage) project to **create the database tables** automatically with TypeORM
-2. Insert SQL entries located inside `/project-root/petromiles-backend/database/inserts.sql` into your database
+Follow the next commands
+
+```bash
+cd petromiles-backend/ # Move to backend project directory
+npm run seed:clean # This cleans the database, creates the tables and inserts initial rows
+```
+
+> **WARNING**: Be carefull with the database you specify. **This command cleans the whole database** before creating tables and inserting rows.
 
 For futher information on PostgreSQL management please check the [official PostgreSQL documentation](https://www.postgresql.org/download/)
 
@@ -204,6 +194,22 @@ As well as with backend configuration files please contact [developers of team #
    1.2 If you have not populated the database please follow [instructions here](#populate-the-database)
 
 > **Info**: The first time you run the Nest server will take longer. It will also create database empty tables
+
+Something went wrong if you see something like this:
+
+<p align="center">
+  <img 
+  alt="Backend_error"
+  width="800" src="https://media.giphy.com/media/L3R09jOoa9mRsLDd3U/giphy.gif">
+</p>
+
+You can be sure the backend is up and running if you see something like this:
+
+<p align="center">
+  <img 
+  alt="Backend_ok"
+  width="800" src="https://media.giphy.com/media/l57Dnrgb4xhuUEGQLU/giphy.gif">
+</p>
 
 2. Run frontend Vue server  
    2.1. Open a terminal from the project root directory and excecute the following commands

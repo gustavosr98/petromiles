@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
+
 import { StateSeederService } from './state/state.service';
 import { RolesSeederService } from './role/role.service';
 import { CountrySeederService } from './country/country.service';
@@ -13,6 +14,7 @@ import { BankSeederService } from './bank/bank.service';
 @Injectable()
 export class Seeder {
   constructor(
+    private readonly logger: Logger,
     private readonly stateSeederService: StateSeederService,
     private readonly roleSeederService: RolesSeederService,
     private readonly countrySeederService: CountrySeederService,
@@ -25,100 +27,31 @@ export class Seeder {
   ) {}
 
   async clean() {
-    //   const queryRunner = getConnection().createQueryRunner();
+    const queryRunner = getConnection().createQueryRunner();
+    await queryRunner.clearDatabase();
   }
 
   async seed() {
-    let ROLES_ROWS = 0;
-    let STATE_ROWS = 0;
-    let COUNTRY_ROWS = 0;
-    let LANGUAGE_ROWS = 0;
-    let SUSCRIPTION_ROWS = 0;
-    let PLATFORM_ROWS = 0;
-    let THIRD_PARTY_INTEREST_ROWS = 0;
-    let POINTS_CONVERSION_ROWS = 0;
-    let BANK_ROWS = 0;
+    const rowsInserted = {
+      initialRows: await this.seedInitial(),
+    };
 
-    await this.role()
-      .then(completed => {
-        ROLES_ROWS = completed;
-        return ROLES_ROWS;
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
+    this.logger.verbose('Database rows inserted');
+    this.logger.verbose(rowsInserted);
+  }
 
-    await this.state()
-      .then(completed => {
-        STATE_ROWS = completed;
-        return STATE_ROWS;
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-
-    await this.country()
-      .then(completed => {
-        COUNTRY_ROWS = completed;
-        return COUNTRY_ROWS;
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-
-    await this.language()
-      .then(completed => {
-        LANGUAGE_ROWS = completed;
-        return LANGUAGE_ROWS;
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-
-    await this.suscription()
-      .then(completed => {
-        SUSCRIPTION_ROWS = completed;
-        return SUSCRIPTION_ROWS;
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-
-    await this.platformInterest()
-      .then(completed => {
-        PLATFORM_ROWS = completed;
-        return PLATFORM_ROWS;
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-
-    await this.thirdPartyInterest()
-      .then(completed => {
-        THIRD_PARTY_INTEREST_ROWS = completed;
-        return THIRD_PARTY_INTEREST_ROWS;
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-
-    await this.pointsConversion()
-      .then(completed => {
-        POINTS_CONVERSION_ROWS = completed;
-        return POINTS_CONVERSION_ROWS;
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
-
-    await this.bank()
-      .then(completed => {
-        BANK_ROWS = completed;
-        return BANK_ROWS;
-      })
-      .catch(error => {
-        return Promise.reject(error);
-      });
+  async seedInitial() {
+    return {
+      ROLES: await this.role(),
+      STATE: await this.state(),
+      COUNTRY: await this.country(),
+      BANK: await this.bank(),
+      LANGUAGE: await this.language(),
+      SUSCRIPTION: await this.suscription(),
+      PLATFORM: await this.platformInterest(),
+      THIRD_PARTY_INTEREST: await this.thirdPartyInterest(),
+      POINTS_CONVERSION: await this.pointsConversion(),
+    };
   }
 
   async state(): Promise<number> {
