@@ -7,6 +7,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Role } from '../management/role/role.enum';
 import { GetUser } from '../auth/decorators/get-user.decorator';
+import { ExampleService } from './example.service';
 
 // Controller for authenticated users.
 @UseGuards(AuthGuard('jwt'))
@@ -14,6 +15,7 @@ import { GetUser } from '../auth/decorators/get-user.decorator';
 export class ExampleController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    private example: ExampleService,
   ) {}
 
   @Roles()
@@ -69,5 +71,10 @@ export class ExampleController {
   forAdministrators(@GetUser() user) {
     this.logger.debug('The user %s is a administrator', user.email);
     return user;
+  }
+
+  @Get('relations')
+  testRelations(@GetUser() user) {
+    this.example.example();
   }
 }

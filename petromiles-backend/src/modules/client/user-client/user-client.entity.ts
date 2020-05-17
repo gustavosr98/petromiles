@@ -35,36 +35,36 @@ export class UserClient extends BaseEntity {
 
   @OneToMany(
     type => StateUser,
-    stateUser => stateUser.idStateUser,
+    stateUser => stateUser.userClient,
     { nullable: true },
   )
-  stateUser: StateUser;
+  stateUser: StateUser[];
 
   @OneToMany(
     type => UserRole,
-    userRole => userRole.idUserRole,
+    userRole => userRole.userClient,
     { nullable: true },
   )
-  userRole: UserRole;
+  userRole: UserRole[];
 
   @OneToOne(
     type => UserDetails,
-    userDetails => userDetails.idUserDetails,
+    userDetails => userDetails.userClient,
     { nullable: true },
   )
-  userDetails: UserDetails;
+  userDetails: UserDetails[];
 
   @OneToMany(
     type => UserSuscription,
-    userSuscription => userSuscription.idUserSuscription,
+    userSuscription => userSuscription.userClient,
     { nullable: false },
   )
-  userSuscription: UserSuscription;
+  userSuscription: UserSuscription[];
 
   @OneToMany(
     type => ClientBankAccount,
-    clientBankAccount => clientBankAccount.idClientBankAccount,
+    clientBankAccount => clientBankAccount.userClient,
     { nullable: true },
   )
-  clientBankAccount: ClientBankAccount;
+  clientBankAccount: ClientBankAccount[];
 }

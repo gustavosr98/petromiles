@@ -29,22 +29,22 @@ export class UserAdministrator extends BaseEntity {
 
   @OneToMany(
     type => StateUser,
-    stateUser => stateUser.idStateUser,
+    stateUser => stateUser.userAdministrator,
     { nullable: true },
   )
-  stateUser?: StateUser;
+  stateUser?: StateUser[];
 
   @OneToOne(
     type => UserDetails,
-    userDetails => userDetails.idUserDetails,
+    userDetails => userDetails.userAdministrator,
     { nullable: true },
   )
-  userDetails?: UserDetails;
+  userDetails?: UserDetails[];
 
   @OneToMany(
     type => UserRole,
-    userRole => userRole.idUserRole,
+    userRole => userRole.userAdministrator,
     { nullable: true },
   )
-  userRole?: UserRole;
+  userRole?: UserRole[];
 }

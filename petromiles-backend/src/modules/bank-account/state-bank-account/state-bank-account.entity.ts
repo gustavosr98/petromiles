@@ -41,5 +41,5 @@ export class StateBankAccount extends BaseEntity {
     },
   )
   @JoinColumn({ name: 'fk_client_bank_account' })
-  clientbankAccount: ClientBankAccount;
+  clientBankAccount: ClientBankAccount;
 }

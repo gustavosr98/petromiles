@@ -42,24 +42,24 @@ export class Transaction extends BaseEntity {
 
   @OneToOne(
     type => UserSuscription,
-    userSuscription => userSuscription.idUserSuscription,
+    userSuscription => userSuscription.transaction,
     { nullable: true },
   )
   userSuscription: UserSuscription;
 
   @OneToMany(
     type => StateTransaction,
-    stateTransaction => stateTransaction.idStateTransaction,
+    stateTransaction => stateTransaction.transaction,
     { nullable: false },
   )
-  stateTransaction: StateTransaction;
+  stateTransaction: StateTransaction[];
 
   @OneToMany(
     type => TransactionInterest,
-    transactionInterest => transactionInterest.idTransactionInterest,
+    transactionInterest => transactionInterest.transaction,
     { nullable: true },
   )
-  transactionInterest: TransactionInterest;
+  transactionInterest: TransactionInterest[];
 
   @ManyToOne(
     type => PointsConversion,

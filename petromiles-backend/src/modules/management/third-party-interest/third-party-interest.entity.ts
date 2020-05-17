@@ -32,8 +32,8 @@ export class ThirdPartyInterest extends BaseEntity {
 
   @OneToMany(
     type => TransactionInterest,
-    transactionInterest => transactionInterest.idTransactionInterest,
+    transactionInterest => transactionInterest.thirdPartyInterest,
     { nullable: true },
   )
-  transactionInterest: TransactionInterest;
+  transactionInterest: TransactionInterest[];
 }

@@ -27,15 +27,15 @@ export class Suscription extends BaseEntity {
 
   @OneToMany(
     type => UserSuscription,
-    userSuscription => userSuscription.idUserSuscription,
+    userSuscription => userSuscription.suscription,
     { nullable: true },
   )
-  userSuscription: UserSuscription;
+  userSuscription: UserSuscription[];
 
   @OneToMany(
     type => PlatformInterest,
-    platformInterest => platformInterest.idPlatformInterest,
+    platformInterest => platformInterest.suscription,
     { nullable: false },
   )
-  platformInterest: PlatformInterest;
+  platformInterest: PlatformInterest[];
 }

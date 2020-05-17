@@ -34,15 +34,15 @@ export class ClientBankAccount extends BaseEntity {
 
   @OneToMany(
     type => Transaction,
-    transaction => transaction.idTransaction,
+    transaction => transaction.clientBankAccount,
     { nullable: true },
   )
-  transaction: Transaction;
+  transaction: Transaction[];
 
   @OneToMany(
     type => StateBankAccount,
-    stateBankAccount => stateBankAccount.idStateBankAccount,
+    stateBankAccount => stateBankAccount.clientBankAccount,
     { nullable: false },
   )
-  stateBankAccount: StateBankAccount;
+  stateBankAccount: StateBankAccount[];
 }

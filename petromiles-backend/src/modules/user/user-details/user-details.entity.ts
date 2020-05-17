@@ -77,8 +77,8 @@ export class UserDetails extends BaseEntity {
 
   @OneToMany(
     type => BankAccount,
-    bankAccount => bankAccount.idBankAccount,
+    bankAccount => bankAccount.userDetails,
     { nullable: true },
   )
-  bankAccount?: BankAccount;
+  bankAccount?: BankAccount[];
 }

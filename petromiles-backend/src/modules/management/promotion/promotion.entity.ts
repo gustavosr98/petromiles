@@ -38,8 +38,8 @@ export class Promotion extends BaseEntity {
 
   @OneToMany(
     type => TransactionInterest,
-    transactionInterest => transactionInterest.idTransactionInterest,
+    transactionInterest => transactionInterest.promotion,
     { nullable: true },
   )
-  transactionInterest: TransactionInterest;
+  transactionInterest: TransactionInterest[];
 }

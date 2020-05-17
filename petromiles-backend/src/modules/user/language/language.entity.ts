@@ -17,8 +17,8 @@ export class Language extends BaseEntity {
 
   @OneToMany(
     type => UserDetails,
-    userDetails => userDetails.idUserDetails,
+    userDetails => userDetails.language,
     { nullable: true },
   )
-  userDetails: UserDetails;
+  userDetails: UserDetails[];
 }

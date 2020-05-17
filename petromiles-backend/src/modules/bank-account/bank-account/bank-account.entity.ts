@@ -33,10 +33,10 @@ export class BankAccount extends BaseEntity {
 
   @OneToMany(
     type => ClientBankAccount,
-    clientBankAccount => clientBankAccount.idClientBankAccount,
+    clientBankAccount => clientBankAccount.bankAccount,
     { nullable: true },
   )
-  clientBankAccount: ClientBankAccount;
+  clientBankAccount: ClientBankAccount[];
 
   @ManyToOne(
     type => UserDetails,

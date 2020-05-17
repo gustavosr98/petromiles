@@ -23,8 +23,8 @@ export class PointsConversion extends BaseEntity {
 
   @OneToMany(
     type => Transaction,
-    transaction => transaction.idTransaction,
+    transaction => transaction.pointsConversion,
     { nullable: true },
   )
-  transaction: Transaction;
+  transaction: Transaction[];
 }

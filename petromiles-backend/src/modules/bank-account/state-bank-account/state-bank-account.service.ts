@@ -23,7 +23,7 @@ export class StateBankAccountService {
   ) {
     const state = await this.stateService.getState(stateName);
     const stateBankAccount = new StateBankAccount();
-    stateBankAccount.clientbankAccount = clientBankAccount;
+    stateBankAccount.clientBankAccount = clientBankAccount;
     stateBankAccount.description = description;
     stateBankAccount.state = state;
 

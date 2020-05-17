@@ -23,7 +23,7 @@ export class UserSuscription extends BaseEntity {
   upgradedAmount: number;
 
   @Column({ nullable: true })
-  finalDate: string;
+  finalDate: Date;
 
   @ManyToOne(
     type => UserClient,
@@ -44,7 +44,7 @@ export class UserSuscription extends BaseEntity {
   @OneToOne(
     type => Transaction,
     transaction => transaction.idTransaction,
-    { nullable: false },
+    { nullable: true },
   )
   @JoinColumn({ name: 'fk_transaction' })
   transaction: Transaction;

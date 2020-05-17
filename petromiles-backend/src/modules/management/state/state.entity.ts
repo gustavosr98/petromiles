@@ -22,22 +22,22 @@ export class State extends BaseEntity {
 
   @OneToMany(
     type => StateUser,
-    stateUser => stateUser.idStateUser,
+    stateUser => stateUser.state,
     { nullable: true },
   )
-  stateUser?: StateUser;
+  stateUser?: StateUser[];
 
   @OneToMany(
     type => StateBankAccount,
-    stateBankAccount => stateBankAccount.idStateBankAccount,
+    stateBankAccount => stateBankAccount.state,
     { nullable: true },
   )
-  stateBankAccount?: StateBankAccount;
+  stateBankAccount?: StateBankAccount[];
 
   @OneToMany(
     type => StateTransaction,
-    stateTransaction => stateTransaction.idStateTransaction,
+    stateTransaction => stateTransaction.state,
     { nullable: true },
   )
-  stateTransaction?: StateTransaction;
+  stateTransaction?: StateTransaction[];
 }

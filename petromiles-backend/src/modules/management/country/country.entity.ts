@@ -18,15 +18,15 @@ export class Country extends BaseEntity {
 
   @OneToMany(
     type => Bank,
-    bank => bank.idBank,
+    bank => bank.country,
     { nullable: true },
   )
-  bank: Bank;
+  bank: Bank[];
 
   @OneToMany(
     type => UserDetails,
-    UserDetails => UserDetails.idUserDetails,
+    UserDetails => UserDetails.country,
     { nullable: true },
   )
-  UserDetails: UserDetails;
+  UserDetails: UserDetails[];
 }

@@ -40,16 +40,16 @@ export class PlatformInterest extends BaseEntity {
 
   @OneToMany(
     type => TransactionInterest,
-    transactionInterest => transactionInterest.idTransactionInterest,
+    transactionInterest => transactionInterest.platformInterest,
     { nullable: true },
   )
-  transactionInterest = TransactionInterest;
+  transactionInterest: TransactionInterest[];
 
   @OneToMany(
     type => TransactionInterest,
     transactionInterestExtraPoints =>
-      transactionInterestExtraPoints.idTransactionInterest,
+      transactionInterestExtraPoints.platformInterest,
     { nullable: true },
   )
-  transactionInterestExtraPoints = TransactionInterest;
+  transactionInterestExtraPoints: TransactionInterest[];
 }

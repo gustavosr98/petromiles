@@ -1,5 +1,4 @@
 import { Country } from '../../management/country/country.entity';
-import { RoutingNumber } from '../routing-number/routing-number.entity';
 import {
   BaseEntity,
   Entity,
@@ -25,11 +24,4 @@ export class Bank extends BaseEntity {
   )
   @JoinColumn({ name: 'fk_country' })
   country: Country;
-
-  @OneToMany(
-    type => RoutingNumber,
-    routingNumber => routingNumber.idRoutingNumber,
-    { nullable: true },
-  )
-  routingNumber: RoutingNumber;
 }
