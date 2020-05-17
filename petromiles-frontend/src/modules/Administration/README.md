@@ -1,4 +1,0 @@
-Administration
-
-- components/
-- views/

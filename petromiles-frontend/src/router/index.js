@@ -2,12 +2,13 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 
 import { clientRoutesArray } from "@/router/clientRoutes";
+import { adminRoutesArray } from "@/router/adminRoutes";
 
 Vue.use(VueRouter);
 
 const routes = [
   ...clientRoutesArray,
-
+  ...adminRoutesArray,
   {
     path: "/i18n-example",
     name: "i18n",
