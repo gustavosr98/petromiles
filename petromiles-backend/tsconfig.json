@@ -9,7 +9,11 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true
+    "incremental": true,
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "typeRoots": ["node_modules/@types", "types"]
   },
   "exclude": ["node_modules", "dist"]
 }

@@ -1,3 +1,5 @@
+import Stripe from 'stripe';
+
 export default () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   database: {
@@ -5,9 +7,18 @@ export default () => ({
     type: process.env.DATABASE_TYPE,
     host: process.env.DATABASE_HOST,
     port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
-    user: process.env.DATABASE_USER,
+    username: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     synchronize: process.env.DATABASE_SYNCHRONIZE,
+  },
+  paymentProvider: {
+    stripe: {
+      secretKey: <string>process.env.STRIPE_SECRET_KEY,
+      publicKey: <string>process.env.STRIPE_PUBLIC_KEY,
+      config: <Stripe.StripeConfig>{
+        apiVersion: process.env.STRIPE_API_VERSION,
+      },
+    },
   },
   lang: {
     poeditor: {
