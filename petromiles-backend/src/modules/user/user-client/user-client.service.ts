@@ -5,14 +5,19 @@ import { Repository, getConnection } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-import { UserClient } from './user-client.entity';
-import { StateUserService } from '../../user/state-user/state-user.service';
-import { Role } from '../../management/role/role.enum';
-import { UserRoleService } from '../../user/user-role/user-role.service';
-import { CreateUserDTO } from '../../user/dto/create-user.dto';
-import { UserDetailsService } from '../../user/user-details/user-details.service';
+// INTERFACES
+import { CreateUserDTO } from '../dto/create-user.dto';
 import { StateName } from '../../management/state/state.enum';
-import { StateUser } from '../../user/state-user/state-user.entity';
+import { Role } from '../../management/role/role.enum';
+
+// SERVICES
+import { StateUserService } from '../state-user/state-user.service';
+import { UserRoleService } from '../user-role/user-role.service';
+import { UserDetailsService } from '../user-details/user-details.service';
+
+//  ENTITIES
+import { UserClient } from './user-client.entity';
+import { StateUser } from '../state-user/state-user.entity';
 import { State } from '../../management/state/state.entity';
 
 @Injectable()
@@ -25,6 +30,10 @@ export class UserClientService {
     private userRoleService: UserRoleService,
     private userDetailsService: UserDetailsService,
   ) {}
+
+  async findAll() {
+    return await this.userClientRepository.find();
+  }
 
   async createUser(credentials: CreateUserDTO): Promise<App.Auth.UserClient> {
     const {

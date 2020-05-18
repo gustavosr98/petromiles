@@ -77,6 +77,10 @@
                         <ul class="index-list">
                             <li>
                                     <span class="modifier">Async</span>
+                                <a href="#findAll">findAll</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
                                 <a href="#getUserByEmail">getUserByEmail</a>
                             </li>
                         </ul>
@@ -91,6 +95,78 @@
     </table>
 </section>
 
+            <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(userClientService: <a href="../injectables/UserClientService.html">UserClientService</a>, userAdministratorService: <a href="../injectables/UserAdministratorService.html">UserAdministratorService</a>, userDetailsService: <a href="../injectables/UserDetailsService.html">UserDetailsService</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="9" class="link-to-prism">src/modules/user/user.service.ts:9</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>userClientService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/UserClientService.html" target="_self" >UserClientService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>userAdministratorService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/UserAdministratorService.html" target="_self" >UserAdministratorService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>userDetailsService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/UserDetailsService.html" target="_self" >UserDetailsService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
 
             <section>
     
@@ -101,28 +177,28 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="getUserByEmail"></a>
+                    <a name="findAll"></a>
                     <span class="name">
                         <b>
                             <span class="modifier">Async</span>
-                            getUserByEmail
+                            findAll
                         </b>
-                        <a href="#getUserByEmail"><span class="icon ion-ios-link"></span></a>
+                        <a href="#findAll"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>getUserByEmail(email: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                    <code>findAll(role: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="9"
-                            class="link-to-prism">src/modules/user/user.service.ts:9</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="16"
+                            class="link-to-prism">src/modules/user/user.service.ts:16</a></div>
                 </td>
             </tr>
 
@@ -142,9 +218,81 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>email</td>
+                                    <td>role</td>
                                     <td>
                                                 <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getUserByEmail"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getUserByEmail
+                        </b>
+                        <a href="#getUserByEmail"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getUserByEmail(credentials: App.Auth.LoginRequest)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="26"
+                            class="link-to-prism">src/modules/user/user.service.ts:26</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>credentials</td>
+                                    <td>
+                                            <code>App.Auth.LoginRequest</code>
                                     </td>
 
                                     <td>
@@ -176,56 +324,49 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@nestjs/common&#x27;;
-import { InjectRepository } from &#x27;@nestjs/typeorm&#x27;;
-import { Repository, getConnection } from &#x27;typeorm&#x27;;
-import { UserAdministrator } from &#x27;./user-administrator/user-administrator.entity&#x27;;
-import { StateName } from &#x27;../management/state/state.enum&#x27;;
+
+import { Role as RoleEnum } from &#x27;src/modules/management/role/role.enum&#x27;;
+import { UserClientService } from &#x27;./user-client/user-client.service&#x27;;
+import { UserAdministratorService } from &#x27;./user-administrator/user-administrator.service&#x27;;
+import { UserDetailsService } from &#x27;./user-details/user-details.service&#x27;;
 
 @Injectable()
 export class UserService {
-  async getUserByEmail(email: string) {
-    const userFound &#x3D; await getConnection().query(&#x60;
-      SELECT u.email, u.password, u.salt , d.*, r.name u_role, l.name u_language
-      FROM user_client u, user_details d, state s, state_user su, role r, user_role ur, language l
-      WHERE u.email &#x3D; &#x27;${email}&#x27;
-      AND d.fk_user_client &#x3D; u.&quot;idUserClient&quot;
-      AND s.name &#x3D;&#x27;${StateName.ACTIVE}&#x27;
-      AND s.&quot;idState&quot;&#x3D; su.fk_state
-      AND su.fk_user_client &#x3D; u.&quot;idUserClient&quot;
-      AND su.&quot;finalDate&quot; is null
-      AND ur.fk_user_client &#x3D; u.&quot;idUserClient&quot;
-      AND ur.fk_role &#x3D; r.&quot;idRole&quot;
-      AND d.fk_language &#x3D; l.&quot;idLanguage&quot;
-      UNION
-      SELECT u.email, u.password, u.salt , d.*, r.name u_role, l.name u_language
-      FROM user_administrator u, user_details d,state s, state_user su, role r, user_role ur, language l
-      WHERE u.email &#x3D; &#x27;${email}&#x27;
-      AND d.fk_user_client &#x3D; u.&quot;idUserAdministrator&quot;
-      AND s.name &#x3D;&#x27;${StateName.ACTIVE}&#x27;
-      AND s.&quot;idState&quot;&#x3D; su.fk_state
-      AND su.fk_user_administrator &#x3D; u.&quot;idUserAdministrator&quot;
-      AND su.&quot;finalDate&quot; is null
-      AND ur.fk_user_administrator &#x3D; u.&quot;idUserAdministrator&quot;
-      AND ur.fk_role &#x3D; r.&quot;idRole&quot;
-      AND d.fk_language &#x3D; l.&quot;idLanguage&quot;&#x60;);
+  constructor(
+    private userClientService: UserClientService,
+    private userAdministratorService: UserAdministratorService,
+    private userDetailsService: UserDetailsService,
+  ) {}
 
-    if (userFound.length !&#x3D;&#x3D; 0) {
-      const {
-        password,
-        email,
-        u_language,
-        u_role,
-        salt,
-        ...userDetails
-      } &#x3D; userFound[0];
-      const user &#x3D; {
-        password,
-        email,
-        salt,
-      };
-      return { user, u_language, u_role, userDetails: userDetails };
+  async findAll(role: string) {
+    if (role &#x3D;&#x3D;&#x3D; RoleEnum.CLIENT) {
+      const clients &#x3D; await this.userClientService.findAll();
+      return clients;
+    } else if (role &#x3D;&#x3D;&#x3D; RoleEnum.ADMINISTRATOR) {
+      // const admins &#x3D; await this.userAdministratorService.findAll();
+      // return admins;
+    }
+  }
+
+  async getUserByEmail(credentials: App.Auth.LoginRequest) {
+    const { email, role } &#x3D; credentials;
+    let user, userDetails;
+    if (role &#x3D;&#x3D;&#x3D; RoleEnum.ADMINISTRATOR) {
+      user &#x3D; await this.userAdministratorService.getActiveAdministrator(email);
+      userDetails &#x3D; await this.userDetailsService.getAdministratorDetails(user);
+    } else {
+      user &#x3D; await this.userClientService.getActiveClient(email);
+      userDetails &#x3D; await this.userDetailsService.getClientDetails(user);
     }
 
+    if (user) {
+      const credentials &#x3D; {
+        password: user.password,
+        email: user.email,
+        salt: user.salt,
+      };
+      return { user: credentials, userDetails };
+    }
     return null;
   }
 }

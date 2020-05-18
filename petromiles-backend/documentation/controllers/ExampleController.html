@@ -82,7 +82,16 @@
                     <td class="col-md-4">
                         <ul class="index-list">
                             <li>
-                                <a href="#getTest">getTest</a>
+                                <a href="#forAdministrators">forAdministrators</a>
+                            </li>
+                            <li>
+                                <a href="#forClients">forClients</a>
+                            </li>
+                            <li>
+                                <a href="#protectedWithoutRole">protectedWithoutRole</a>
+                            </li>
+                            <li>
+                                <a href="#testLogger">testLogger</a>
                             </li>
                         </ul>
                     </td>
@@ -105,18 +114,18 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="getTest"></a>
+                    <a name="forAdministrators"></a>
                     <span class="name">
                         <b>
-                            getTest
+                            forAdministrators
                         </b>
-                        <a href="#getTest"><span class="icon ion-ios-link"></span></a>
+                        <a href="#forAdministrators"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getTest()</code>
+<code>forAdministrators(user)</code>
                 </td>
             </tr>
 
@@ -124,14 +133,14 @@
                 <td class="col-md-4">
                     <b>Decorators : </b>
                     <br />
-                    <code>@Get()<br /></code>
+                    <code>@Roles(Role.ADMINISTRATOR)<br />@UseGuards(RolesGuard)<br />@Get(&#x27;protected/admin&#x27;)<br /></code>
                 </td>
             </tr>
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="14"
-                            class="link-to-prism">src/modules/example/example.controller.ts:14</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="69"
+                            class="link-to-prism">src/modules/example/example.controller.ts:69</a></div>
                 </td>
             </tr>
 
@@ -140,8 +149,254 @@
                 <td class="col-md-4">
 
                     <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>user</td>
 
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="forClients"></a>
+                    <span class="name">
+                        <b>
+                            forClients
+                        </b>
+                        <a href="#forClients"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>forClients(user)</code>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <b>Decorators : </b>
+                    <br />
+                    <code>@Roles(Role.CLIENT)<br />@UseGuards(RolesGuard)<br />@Get(&#x27;protected/client&#x27;)<br /></code>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="61"
+                            class="link-to-prism">src/modules/example/example.controller.ts:61</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>user</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="protectedWithoutRole"></a>
+                    <span class="name">
+                        <b>
+                            protectedWithoutRole
+                        </b>
+                        <a href="#protectedWithoutRole"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>protectedWithoutRole(user)</code>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <b>Decorators : </b>
+                    <br />
+                    <code>@Roles()<br />@UseGuards(RolesGuard)<br />@Get(&#x27;protected&#x27;)<br /></code>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="52"
+                            class="link-to-prism">src/modules/example/example.controller.ts:52</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>user</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="testLogger"></a>
+                    <span class="name">
+                        <b>
+                            testLogger
+                        </b>
+                        <a href="#testLogger"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>testLogger(user)</code>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <b>Decorators : </b>
+                    <br />
+                    <code>@Roles()<br />@UseGuards(RolesGuard)<br />@Get()<br /></code>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="22"
+                            class="link-to-prism">src/modules/example/example.controller.ts:22</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>user</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
                     </div>
                 </td>
             </tr>
@@ -151,24 +406,77 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Controller, Inject, Get } from &#x27;@nestjs/common&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Controller, Inject, Get, UseGuards, Request } from &#x27;@nestjs/common&#x27;;
 import { WINSTON_MODULE_PROVIDER } from &#x27;nest-winston&#x27;;
 import { Logger } from &#x27;winston&#x27;;
 import { ConfigService } from &#x27;@nestjs/config&#x27;;
+import { AuthGuard } from &#x27;@nestjs/passport&#x27;;
+import { Roles } from &#x27;../auth/decorators/roles.decorator&#x27;;
+import { RolesGuard } from &#x27;../auth/guards/roles.guard&#x27;;
+import { Role } from &#x27;../management/role/role.enum&#x27;;
+import { GetUser } from &#x27;../auth/decorators/get-user.decorator&#x27;;
 
+// Controller for authenticated users.
+@UseGuards(AuthGuard(&#x27;jwt&#x27;))
 @Controller(&#x27;example&#x27;)
 export class ExampleController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    private configService: ConfigService,
   ) {}
 
+  @Roles()
+  @UseGuards(RolesGuard)
   @Get()
-  getTest() {
-    this.logger.debug(
-      &#x27;Testing loggers. Please check out loggers folder %s&#x27;,
-      &#x27;:)&#x27;,
+  testLogger(@GetUser() user) {
+    this.logger.error(
+      &#x27;[EXAMPLE] Testing loggers. Please check out loggers folder&#x27;,
     );
+    this.logger.warn(
+      &#x27;[EXAMPLE] Testing loggers. Please check out loggers folder&#x27;,
+    );
+    this.logger.info(
+      &#x27;[EXAMPLE] Testing loggers. Please check out loggers folder&#x27;,
+    );
+    this.logger.http(
+      &#x27;[EXAMPLE] Testing loggers. Please check out loggers folder&#x27;,
+      &#x27;s&#x27;,
+    );
+    this.logger.verbose(
+      &#x27;[EXAMPLE] Testing loggers. Please check out loggers folder&#x27;,
+    );
+    this.logger.debug(
+      &#x27;[EXAMPLE] Testing loggers. Please check out loggers folder&#x27;,
+    );
+    this.logger.silly(
+      &#x27;[EXAMPLE] Testing loggers. Please check out loggers folder&#x27;,
+    );
+    return user;
+  }
+
+  // Router without any  role restrictions
+  @Roles()
+  @UseGuards(RolesGuard)
+  @Get(&#x27;protected&#x27;)
+  protectedWithoutRole(@GetUser() user) {
+    this.logger.debug(&#x27;The user %s has his verification token.&#x27;, user.email);
+    return user;
+  }
+
+  // Router just for clients
+  @Roles(Role.CLIENT)
+  @UseGuards(RolesGuard)
+  @Get(&#x27;protected/client&#x27;)
+  forClients(@GetUser() user) {
+    this.logger.debug(&#x27;The user %s is a client&#x27;, user.email);
+    return user;
+  }
+  // Router just for administrators
+  @Roles(Role.ADMINISTRATOR)
+  @UseGuards(RolesGuard)
+  @Get(&#x27;protected/admin&#x27;)
+  forAdministrators(@GetUser() user) {
+    this.logger.debug(&#x27;The user %s is a administrator&#x27;, user.email);
+    return user;
   }
 }
 </code></pre>

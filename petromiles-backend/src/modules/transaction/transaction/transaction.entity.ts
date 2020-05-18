@@ -9,9 +9,9 @@ import {
   OneToMany,
 } from 'typeorm';
 import { TransactionType } from './transaction.enum';
-import { UserSuscription } from '../../client/user-suscription/user-suscription.entity';
+import { UserSuscription } from '../../user-suscription/user-suscription.entity';
 import { PointsConversion } from '../../management/points-conversion/points-conversion.entity';
-import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
+import { ClientBankAccount } from '../../bank-account/client-bank-account/client-bank-account.entity';
 import { StateTransaction } from '../state-transaction/state-transaction.entity';
 import { TransactionInterest } from '../transaction-interest/transaction-interest.entity';
 

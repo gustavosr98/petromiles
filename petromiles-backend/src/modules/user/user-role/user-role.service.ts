@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { getConnection } from 'typeorm';
 
-import { UserClient } from '../../client/user-client/user-client.entity';
+import { UserClient } from '../user-client/user-client.entity';
 import { RoleService } from '../../management/role/role.service';
 import { Role } from 'src/modules/management/role/role.enum';
 import { UserRole } from './user-role.entity';

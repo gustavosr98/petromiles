@@ -60,7 +60,7 @@
             <h3>File</h3>
         </p>
         <p class="comment">
-            <code>src/modules/client/user-suscription/user-suscription.entity.ts</code>
+            <code>src/modules/user-suscription/user-suscription.entity.ts</code>
         </p>
 
 
@@ -154,7 +154,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="26" class="link-to-prism">src/modules/client/user-suscription/user-suscription.entity.ts:26</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="28" class="link-to-prism">src/modules/user-suscription/user-suscription.entity.ts:28</a></div>
                             </td>
                         </tr>
 
@@ -190,7 +190,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/modules/client/user-suscription/user-suscription.entity.ts:17</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/modules/user-suscription/user-suscription.entity.ts:19</a></div>
                             </td>
                         </tr>
 
@@ -226,7 +226,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/modules/client/user-suscription/user-suscription.entity.ts:20</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="22" class="link-to-prism">src/modules/user-suscription/user-suscription.entity.ts:22</a></div>
                             </td>
                         </tr>
 
@@ -262,7 +262,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="42" class="link-to-prism">src/modules/client/user-suscription/user-suscription.entity.ts:42</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="44" class="link-to-prism">src/modules/user-suscription/user-suscription.entity.ts:44</a></div>
                             </td>
                         </tr>
 
@@ -298,7 +298,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="50" class="link-to-prism">src/modules/client/user-suscription/user-suscription.entity.ts:50</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="52" class="link-to-prism">src/modules/user-suscription/user-suscription.entity.ts:52</a></div>
                             </td>
                         </tr>
 
@@ -334,7 +334,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="23" class="link-to-prism">src/modules/client/user-suscription/user-suscription.entity.ts:23</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/modules/user-suscription/user-suscription.entity.ts:25</a></div>
                             </td>
                         </tr>
 
@@ -370,7 +370,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="34" class="link-to-prism">src/modules/client/user-suscription/user-suscription.entity.ts:34</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="36" class="link-to-prism">src/modules/user-suscription/user-suscription.entity.ts:36</a></div>
                             </td>
                         </tr>
 
@@ -389,10 +389,7 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { UserClient } from &#x27;../user-client/user-client.entity&#x27;;
-import { Suscription } from &#x27;../../suscription/suscription/suscription.entity&#x27;;
-import { Transaction } from &#x27;../../transaction/transaction/transaction.entity&#x27;;
-import {
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
@@ -401,6 +398,11 @@ import {
   JoinColumn,
   OneToOne,
 } from &#x27;typeorm&#x27;;
+
+// ENTITIES
+import { UserClient } from &#x27;../user/user-client/user-client.entity&#x27;;
+import { Suscription } from &#x27;../suscription/suscription/suscription.entity&#x27;;
+import { Transaction } from &#x27;../transaction/transaction/transaction.entity&#x27;;
 
 @Entity()
 export class UserSuscription extends BaseEntity {

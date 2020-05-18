@@ -1,32 +1,28 @@
 // NEST CORE
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
 
 // CONFIGURATION
 import configuration from 'config/configuration';
 
 // LOGGER
 import { WinstonModule } from 'nest-winston';
-// import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import createOptions from './logger/winston/winston-config';
 
 // MODULES
-import { DatabaseModule } from './database/database.module';
-import { LanguageModule } from './modules/language/language.module';
-import { ExampleModule } from './modules/example/example.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { BankAccountModule } from './modules/bank-account/bank-account.module';
-import { ClientModule } from './modules/client/client.module';
-import { PlatformAdministratorModule } from './modules/management/platform-administrator.module';
+import { DatabaseModule } from './database/database.module';
+import { ExampleModule } from './modules/example/example.module';
+import { LanguageModule } from './modules/language/language.module';
+import { MailsModule } from './modules/mails/mails.module';
+import { ManagementModule } from './modules/management/management.module';
 import { SuscriptionModule } from './modules/suscription/suscription.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { UserModule } from './modules/user/user.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { MailsModule } from './modules/mails/mails.module';
 
 @Module({
   imports: [
-    DatabaseModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: !process.env.NODE_ENV
@@ -34,19 +30,17 @@ import { MailsModule } from './modules/mails/mails.module';
         : ['.env', '.env.development'],
       load: [configuration],
     }),
-    WinstonModule.forRoot(createOptions({ fileName: 'petromiles-global.log' })),
-    ExampleModule,
+    AuthModule,
     BankAccountModule,
-    ClientModule,
-    PlatformAdministratorModule,
+    DatabaseModule,
+    ExampleModule,
+    LanguageModule,
+    MailsModule,
+    ManagementModule,
     SuscriptionModule,
     TransactionModule,
     UserModule,
-    LanguageModule,
-    AuthModule,
-    MailsModule,
+    WinstonModule.forRoot(createOptions({ fileName: 'petromiles-global.log' })),
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

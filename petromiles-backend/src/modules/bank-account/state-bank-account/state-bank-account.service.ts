@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 import { StateBankAccount } from './state-bank-account.entity';
 import { getConnection } from 'typeorm';
 import { StateService } from '../../management/state/state.service';
-import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
+import { ClientBankAccount } from '../client-bank-account/client-bank-account.entity';
 import { StateName } from '../../management/state/state.enum';
 
 @Injectable()

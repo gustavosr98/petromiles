@@ -98,12 +98,12 @@
                 <tr>
                     <td class="col-md-4">
                                 <span class="modifier">Public</span>
-                        <code>constructor(sendGridClient: SendGridService, sendGridConfig)</code>
+                        <code>constructor(sendGridClient: SendGridService, sendGridConfig, logger: Logger)</code>
                     </td>
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="8" class="link-to-prism">src/modules/mails/mails.service.ts:8</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="9" class="link-to-prism">src/modules/mails/mails.service.ts:9</a></div>
                             </td>
                         </tr>
 
@@ -136,6 +136,18 @@
                                                         <td>sendGridConfig</td>
                                                   
                                                         <td>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>logger</td>
+                                                  
+                                                        <td>
+                                                                    <code>Logger</code>
                                                         </td>
                                                   
                                                     <td>
@@ -181,8 +193,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="14"
-                            class="link-to-prism">src/modules/mails/mails.service.ts:14</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="16"
+                            class="link-to-prism">src/modules/mails/mails.service.ts:16</a></div>
                 </td>
             </tr>
 
@@ -242,7 +254,7 @@
                     <div>
                     </div>
                     <div class="io-description">
-                        <b>Returns : </b>    <code>{}</code>
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
 
                     </div>
                     <div class="io-description">
@@ -258,15 +270,17 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable, UseFilters, Inject } from &#x27;@nestjs/common&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable, Inject } from &#x27;@nestjs/common&#x27;;
 import { InjectSendGrid, SendGridService } from &#x27;@ntegral/nestjs-sendgrid&#x27;;
-import { ConfigService } from &#x27;@nestjs/config&#x27;;
+import { WINSTON_MODULE_PROVIDER } from &#x27;nest-winston&#x27;;
+import { Logger } from &#x27;winston&#x27;;
 
 @Injectable()
 export class MailsService {
   public constructor(
     @InjectSendGrid() private readonly sendGridClient: SendGridService,
     @Inject(&#x27;SENDGRID_CONFIG&#x27;) private sendGridConfig,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   async sendEmail(email, subject, template, data) {
@@ -278,9 +292,15 @@ export class MailsService {
         templateId: template,
         dynamic_template_data: data,
       };
-      return await this.sendGridClient.send(msg);
+
+      await this.sendGridClient.send(msg);
+      this.logger.verbose(
+        &#x60;[MAILS] An email with the subject &quot;${subject}&quot; has been sent to ${email}&#x60;,
+      );
     } catch (err) {
-      console.log(err.message);
+      this.logger.verbose(
+        &#x60;[MAILS] Problem sending email. Reason: ${err.message}&#x60;,
+      );
     }
   }
 }

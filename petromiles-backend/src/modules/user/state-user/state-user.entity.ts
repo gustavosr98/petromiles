@@ -9,7 +9,7 @@ import {
 
 import { UserAdministrator } from '../user-administrator/user-administrator.entity';
 import { State } from '../../management/state/state.entity';
-import { UserClient } from '../../client/user-client/user-client.entity';
+import { UserClient } from '../user-client/user-client.entity';
 
 @Entity()
 export class StateUser extends BaseEntity {
@@ -30,6 +30,7 @@ export class StateUser extends BaseEntity {
     state => state.idState,
     {
       nullable: false,
+      eager: true,
     },
   )
   @JoinColumn({ name: 'fk_state' })

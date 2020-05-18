@@ -6,7 +6,7 @@ import {
   Column,
   OneToMany,
 } from 'typeorm';
-import { UserSuscription } from 'src/modules/client/user-suscription/user-suscription.entity';
+import { UserSuscription } from 'src/modules/user-suscription/user-suscription.entity';
 
 @Entity()
 export class Suscription extends BaseEntity {

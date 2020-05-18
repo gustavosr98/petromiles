@@ -8,7 +8,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 import { Role } from 'src/modules/management/role/role.enum';
 import { CreateUserDTO } from '../user/dto/create-user.dto';
-import { UserClientService } from '../client/user-client/user-client.service';
+import { UserClientService } from '../user/user-client/user-client.service';
 import { MailsService } from '../mails/mails.service';
 import { UserService } from '../user/user.service';
 import { MailsSubject } from '../mails/mails.enum';

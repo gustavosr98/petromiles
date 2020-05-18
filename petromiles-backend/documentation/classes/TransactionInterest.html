@@ -350,18 +350,18 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { PlatformInterest } from &#x27;../../management/platform-interest/platform-interest.entity&#x27;;
-import { ThirdPartyInterest } from &#x27;../../management/third_party_interest/third_party_interest.entity&#x27;;
-import { Promotion } from &#x27;../../management/promotion/promotion.entity&#x27;;
-import { Transaction } from &#x27;../transaction/transaction.entity&#x27;;
-
-import {
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
 } from &#x27;typeorm&#x27;;
+
+import { PlatformInterest } from &#x27;../../management/platform-interest/platform-interest.entity&#x27;;
+import { ThirdPartyInterest } from &#x27;../../management/third-party-interest/third-party-interest.entity&#x27;;
+import { Promotion } from &#x27;../../management/promotion/promotion.entity&#x27;;
+import { Transaction } from &#x27;../transaction/transaction.entity&#x27;;
 
 @Entity()
 export class TransactionInterest extends BaseEntity {

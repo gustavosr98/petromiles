@@ -60,7 +60,7 @@
             <h3>File</h3>
         </p>
         <p class="comment">
-            <code>src/modules/client/client-bank-account/client-bank-account.entity.ts</code>
+            <code>src/modules/bank-account/client-bank-account/client-bank-account.entity.ts</code>
         </p>
 
 
@@ -148,7 +148,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="33" class="link-to-prism">src/modules/client/client-bank-account/client-bank-account.entity.ts:33</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="35" class="link-to-prism">src/modules/bank-account/client-bank-account/client-bank-account.entity.ts:35</a></div>
                             </td>
                         </tr>
 
@@ -184,7 +184,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/modules/client/client-bank-account/client-bank-account.entity.ts:17</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/modules/bank-account/client-bank-account/client-bank-account.entity.ts:19</a></div>
                             </td>
                         </tr>
 
@@ -220,7 +220,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="47" class="link-to-prism">src/modules/client/client-bank-account/client-bank-account.entity.ts:47</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="49" class="link-to-prism">src/modules/bank-account/client-bank-account/client-bank-account.entity.ts:49</a></div>
                             </td>
                         </tr>
 
@@ -256,7 +256,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="40" class="link-to-prism">src/modules/client/client-bank-account/client-bank-account.entity.ts:40</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="42" class="link-to-prism">src/modules/bank-account/client-bank-account/client-bank-account.entity.ts:42</a></div>
                             </td>
                         </tr>
 
@@ -292,7 +292,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/modules/client/client-bank-account/client-bank-account.entity.ts:25</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/modules/bank-account/client-bank-account/client-bank-account.entity.ts:27</a></div>
                             </td>
                         </tr>
 
@@ -311,11 +311,7 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { UserClient } from &#x27;../user-client/user-client.entity&#x27;;
-import { BankAccount } from &#x27;../../bank-account/bank-account/bank-account.entity&#x27;;
-import { Transaction } from &#x27;../../transaction/transaction/transaction.entity&#x27;;
-import { StateBankAccount } from &#x27;../../bank-account/state-bank-account/state-bank-account.entity&#x27;;
-import {
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
@@ -323,6 +319,12 @@ import {
   JoinColumn,
   OneToMany,
 } from &#x27;typeorm&#x27;;
+
+// ENTITIES
+import { UserClient } from &#x27;../../user/user-client/user-client.entity&#x27;;
+import { BankAccount } from &#x27;../bank-account/bank-account.entity&#x27;;
+import { Transaction } from &#x27;../../transaction/transaction/transaction.entity&#x27;;
+import { StateBankAccount } from &#x27;../state-bank-account/state-bank-account.entity&#x27;;
 
 @Entity()
 export class ClientBankAccount extends BaseEntity {

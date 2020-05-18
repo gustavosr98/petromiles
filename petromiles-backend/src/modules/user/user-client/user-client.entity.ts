@@ -6,12 +6,13 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
-import { ClientBankAccount } from '../client-bank-account/client-bank-account.entity';
-import { StateUser } from '../../user/state-user/state-user.entity';
-import { UserDetails } from '../../user/user-details/user-details.entity';
-import { UserRole } from '../../user/user-role/user-role.entity';
-import { UserSuscription } from '../user-suscription/user-suscription.entity';
+import { ClientBankAccount } from '../../bank-account/client-bank-account/client-bank-account.entity';
+import { StateUser } from '../state-user/state-user.entity';
+import { UserDetails } from '../user-details/user-details.entity';
+import { UserRole } from '../user-role/user-role.entity';
+import { UserSuscription } from '../../user-suscription/user-suscription.entity';
 
 @Entity()
 export class UserClient extends BaseEntity {
@@ -19,6 +20,7 @@ export class UserClient extends BaseEntity {
   idUserClient: number;
 
   @Column({ nullable: true })
+  @Exclude()
   salt: string;
 
   @Column({ nullable: true })
@@ -31,12 +33,13 @@ export class UserClient extends BaseEntity {
   email: string;
 
   @Column({ nullable: true })
+  @Exclude()
   password: string;
 
   @OneToMany(
     type => StateUser,
     stateUser => stateUser.userClient,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   stateUser: StateUser[];
 
@@ -50,14 +53,14 @@ export class UserClient extends BaseEntity {
   @OneToOne(
     type => UserDetails,
     userDetails => userDetails.userClient,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   userDetails: UserDetails[];
 
   @OneToMany(
     type => UserSuscription,
     userSuscription => userSuscription.userClient,
-    { nullable: false },
+    { nullable: false, eager: true },
   )
   userSuscription: UserSuscription[];
 

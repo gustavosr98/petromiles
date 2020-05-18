@@ -71,11 +71,7 @@ export default {
   data() {
     return { drawer: false, model: 1 };
   },
-  methods: {
-    navigateTo(x) {
-      console.log(x);
-    },
-  },
+  methods: {},
 };
 </script>
 

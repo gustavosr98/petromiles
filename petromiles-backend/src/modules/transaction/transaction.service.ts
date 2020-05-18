@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 
 import { PlatformInterestService } from '../management/platform-interest/platform-interest.service';
 import { PlatformInterest } from '../management/platform-interest/platform-interest.enum';
-import { ClientBankAccount } from '../client/client-bank-account/client-bank-account.entity';
+import { ClientBankAccount } from '../bank-account/client-bank-account/client-bank-account.entity';
 import { PointsConversionService } from '../management/points-conversion/points-conversion.service';
 import { Transaction } from './transaction/transaction.entity';
 import { ThirdPartyInterestService } from '../management/third-party-interest/third-party-interest.service';

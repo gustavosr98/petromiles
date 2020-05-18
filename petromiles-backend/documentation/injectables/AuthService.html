@@ -77,7 +77,7 @@
                         <ul class="index-list">
                             <li>
                                     <span class="modifier">Private</span>
-                                <a href="#createJWT">createJWT</a>
+                                <a href="#createToken">createToken</a>
                             </li>
                             <li>
                                     <span class="modifier">Async</span>
@@ -114,12 +114,12 @@
             <tbody>
                 <tr>
                     <td class="col-md-4">
-<code>constructor(userClientService: <a href="../injectables/UserClientService.html">UserClientService</a>, jwtService: JwtService, mailsService: <a href="../injectables/MailsService.html">MailsService</a>, configService: ConfigService, userService: <a href="../injectables/UserService.html">UserService</a>)</code>
+<code>constructor(logger: Logger, userClientService: <a href="../injectables/UserClientService.html">UserClientService</a>, jwtService: JwtService, mailsService: <a href="../injectables/MailsService.html">MailsService</a>, configService: ConfigService, userService: <a href="../injectables/UserService.html">UserService</a>)</code>
                     </td>
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/modules/auth/auth.service.ts:14</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/modules/auth/auth.service.ts:17</a></div>
                             </td>
                         </tr>
 
@@ -136,6 +136,18 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                                <tr>
+                                                        <td>logger</td>
+                                                  
+                                                        <td>
+                                                                    <code>Logger</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
                                                 <tr>
                                                         <td>userClientService</td>
                                                   
@@ -214,28 +226,28 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="createJWT"></a>
+                    <a name="createToken"></a>
                     <span class="name">
                         <b>
                             <span class="modifier">Private</span>
-                            createJWT
+                            createToken
                         </b>
-                        <a href="#createJWT"><span class="icon ion-ios-link"></span></a>
+                        <a href="#createToken"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>createJWT(email: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                    <code>createToken(email: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, role: <a href="../classes/Role.html">Role</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="70"
-                            class="link-to-prism">src/modules/auth/auth.service.ts:70</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="82"
+                            class="link-to-prism">src/modules/auth/auth.service.ts:82</a></div>
                 </td>
             </tr>
 
@@ -258,6 +270,18 @@
                                     <td>email</td>
                                     <td>
                                                 <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>role</td>
+                                    <td>
+                                                <code><a href="../classes/Role.html" target="_self" >Role</a></code>
                                     </td>
 
                                     <td>
@@ -306,8 +330,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="23"
-                            class="link-to-prism">src/modules/auth/auth.service.ts:23</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="27"
+                            class="link-to-prism">src/modules/auth/auth.service.ts:27</a></div>
                 </td>
             </tr>
 
@@ -379,8 +403,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="75"
-                            class="link-to-prism">src/modules/auth/auth.service.ts:75</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="87"
+                            class="link-to-prism">src/modules/auth/auth.service.ts:87</a></div>
                 </td>
             </tr>
 
@@ -456,8 +480,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="86"
-                            class="link-to-prism">src/modules/auth/auth.service.ts:86</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="98"
+                            class="link-to-prism">src/modules/auth/auth.service.ts:98</a></div>
                 </td>
             </tr>
 
@@ -533,15 +557,15 @@
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>validateUser(email: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, pass: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                    <code>validateUser(credentials: App.Auth.LoginRequest)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="44"
-                            class="link-to-prism">src/modules/auth/auth.service.ts:44</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="45"
+                            class="link-to-prism">src/modules/auth/auth.service.ts:45</a></div>
                 </td>
             </tr>
 
@@ -561,21 +585,9 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>email</td>
+                                    <td>credentials</td>
                                     <td>
-                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                                <tr>
-                                    <td>pass</td>
-                                    <td>
-                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                            <code>App.Auth.LoginRequest</code>
                                     </td>
 
                                     <td>
@@ -590,7 +602,7 @@
                     <div>
                     </div>
                     <div class="io-description">
-                        <b>Returns : </b>        <code><a href="../interfaces/Response.html" target="_self" >Promise&lt;App.Auth.Response | null&gt;</a></code>
+                        <b>Returns : </b>        <code><a href="../interfaces/Response.html" target="_self" >Promise&lt;App.Auth.Response&gt;</a></code>
 
                     </div>
                     <div class="io-description">
@@ -606,19 +618,25 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@nestjs/common&#x27;;
-import { Role } from &#x27;src/modules/management/role/role.enum&#x27;;
-import { ConfigService } from &#x27;@nestjs/config&#x27;;
-import { CreateUserDTO } from &#x27;../user/dto/create-user.dto&#x27;;
-import { UserClientService } from &#x27;../client/user-client/user-client.service&#x27;;
-import { MailsService } from &#x27;../mails/mails.service&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { ConfigService } from &#x27;@nestjs/config&#x27;;
+import { Injectable, UnauthorizedException, Inject } from &#x27;@nestjs/common&#x27;;
 import { JwtService } from &#x27;@nestjs/jwt&#x27;;
-import { UserService } from &#x27;../user/user.service&#x27;;
+
 import * as bcrypt from &#x27;bcrypt&#x27;;
+import { Logger } from &#x27;winston&#x27;;
+import { WINSTON_MODULE_PROVIDER } from &#x27;nest-winston&#x27;;
+
+import { Role } from &#x27;src/modules/management/role/role.enum&#x27;;
+import { CreateUserDTO } from &#x27;../user/dto/create-user.dto&#x27;;
+import { UserClientService } from &#x27;../user/user-client/user-client.service&#x27;;
+import { MailsService } from &#x27;../mails/mails.service&#x27;;
+import { UserService } from &#x27;../user/user.service&#x27;;
+import { MailsSubject } from &#x27;../mails/mails.enum&#x27;;
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private userClientService: UserClientService,
     private jwtService: JwtService,
     private mailsService: MailsService,
@@ -627,61 +645,69 @@ export class AuthService {
   ) {}
 
   async createUserClient(user: CreateUserDTO): Promise&lt;App.Auth.Response&gt; {
-    // 1) Crear usuario
     const createdUser &#x3D; await this.userClientService.createUser(user);
-    // 2) Crear token
-    const token &#x3D; this.createJWT(createdUser.user.email);
-    // 3) Crear correo de bienvenida
+
+    const token &#x3D; this.createToken(createdUser.user.email, Role.CLIENT);
+
     this.createWelcomeEmail(
       createdUser.user.email,
       createdUser.userDetails.firstName,
     );
 
-    const { language, ...result } &#x3D; createdUser.userDetails;
     return {
       email: createdUser.user.email,
-      userDetails: result,
+      userDetails: createdUser.userDetails,
       role: Role.CLIENT,
       token,
-      language: language.name,
     };
   }
 
   async validateUser(
-    email: string,
-    pass: string,
-  ): Promise&lt;App.Auth.Response | null&gt; {
-    const info &#x3D; await this.userService.getUserByEmail(email);
+    credentials: App.Auth.LoginRequest,
+  ): Promise&lt;App.Auth.Response&gt; {
+    const { email, password, role } &#x3D; credentials;
+    const info &#x3D; await this.userService.getUserByEmail(credentials);
+
     if (info) {
-      const { user, u_language, u_role, userDetails } &#x3D; info;
+      const { user, userDetails } &#x3D; info;
       const result &#x3D; {
-        email: user.email,
-        userDetails: userDetails,
-        language: u_language,
-        role: u_role,
-        token: this.createJWT(user.email),
+        email,
+        userDetails,
+        role,
+        token: this.createToken(email, role),
       };
-      // Si el usuario no posee contraseña porque proviene de ingreso federado
+
+      // If the user didn&#x27;t sign up with email and password
       if (!info.user.password) {
         return result;
       }
-      // Si el usuario posee contraseña verificamos que sea la correcta
-      const passHash &#x3D; await this.hashPassword(pass, user.salt);
+
+      const passHash &#x3D; await this.hashPassword(password, user.salt);
       if (user &amp;&amp; user.password &#x3D;&#x3D;&#x3D; passHash) {
         return result;
-      } else return null;
+      } else {
+        this.logger.error(&#x60;[AUTH] Email or password incorrect&#x60;);
+        throw new UnauthorizedException(&#x27;Email or password incorrect&#x27;);
+      }
     }
-    return null;
+
+    this.logger.error(
+      &#x60;[AUTH] The user ${email} was not found or user is not active&#x60;,
+    );
+    throw new UnauthorizedException(
+      &#x27;The user was not found or user is not active&#x27;,
+    );
   }
-  private createJWT(email: string) {
-    const payload: App.Auth.JWTPayload &#x3D; { email };
+
+  private createToken(email: string, role: Role) {
+    const payload: App.Auth.JWTPayload &#x3D; { email, role };
     return this.jwtService.sign(payload);
   }
 
   private async createWelcomeEmail(email, name) {
     await this.mailsService.sendEmail(
       email,
-      &#x27;Welcome To PetroMiles&#x27;,
+      MailsSubject.WELCOME,
       this.configService.get(&#x27;mails.sendgrid.templates.welcome&#x27;),
       {
         user: name,
@@ -690,6 +716,13 @@ export class AuthService {
   }
 
   async hashPassword(password: string, salt: string): Promise&lt;string&gt; {
+    if (!password) {
+      this.logger.error(
+        &#x60;[AUTH] The user is a federated user, so needs a password&#x60;,
+      );
+      throw new UnauthorizedException(&#x27;Email or password incorrect&#x27;);
+    }
+
     return bcrypt.hash(password, salt);
   }
 }

@@ -92,7 +92,7 @@
                         <ul class="index-list">
                             <li>
                                     <span class="modifier">Async</span>
-                                <a href="#createStateUserClient">createStateUserClient</a>
+                                <a href="#createClientState">createClientState</a>
                             </li>
                         </ul>
                     </td>
@@ -117,7 +117,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/modules/user/state-user/state-user.service.ts:10</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="11" class="link-to-prism">src/modules/user/state-user/state-user.service.ts:11</a></div>
                             </td>
                         </tr>
 
@@ -164,28 +164,28 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="createStateUserClient"></a>
+                    <a name="createClientState"></a>
                     <span class="name">
                         <b>
                             <span class="modifier">Async</span>
-                            createStateUserClient
+                            createClientState
                         </b>
-                        <a href="#createStateUserClient"><span class="icon ion-ios-link"></span></a>
+                        <a href="#createClientState"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>createStateUserClient(user: <a href="../classes/UserClient.html">UserClient</a>, stateName: <a href="../classes/State.html">StateName</a>, description: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                    <code>createClientState(user: <a href="../classes/UserClient.html">UserClient</a>, stateName: <a href="../classes/State.html">StateName</a>, description: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="14"
-                            class="link-to-prism">src/modules/user/state-user/state-user.service.ts:14</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="15"
+                            class="link-to-prism">src/modules/user/state-user/state-user.service.ts:15</a></div>
                 </td>
             </tr>
 
@@ -282,7 +282,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/modules/user/state-user/state-user.service.ts:10</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="11" class="link-to-prism">src/modules/user/state-user/state-user.service.ts:11</a></div>
                             </td>
                         </tr>
 
@@ -296,10 +296,11 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@nestjs/common&#x27;;
-import { StateUser } from &#x27;./state-user.entity&#x27;;
 import { getConnection } from &#x27;typeorm&#x27;;
+
+import { StateUser } from &#x27;./state-user.entity&#x27;;
 import { StateService } from &#x27;../../management/state/state.service&#x27;;
-import { UserClient } from &#x27;../../client/user-client/user-client.entity&#x27;;
+import { UserClient } from &#x27;../user-client/user-client.entity&#x27;;
 import { StateName } from &#x27;../../management/state/state.enum&#x27;;
 
 @Injectable()
@@ -308,7 +309,7 @@ export class StateUserService {
 
   constructor(private stateService: StateService) {}
 
-  async createStateUserClient(
+  async createClientState(
     user: UserClient,
     stateName: StateName,
     description: string,

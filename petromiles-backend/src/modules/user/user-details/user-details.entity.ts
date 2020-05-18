@@ -1,8 +1,3 @@
-import { UserClient } from '../../client/user-client/user-client.entity';
-import { Language } from '../language/language.entity';
-import { Country } from '../../management/country/country.entity';
-import { BankAccount } from '../../bank-account/bank-account/bank-account.entity';
-import { UserAdministrator } from '../user-administrator/user-administrator.entity';
 import {
   BaseEntity,
   Entity,
@@ -13,6 +8,13 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
+
+// ENTITIES
+import { UserClient } from '../user-client/user-client.entity';
+import { Language } from '../language/language.entity';
+import { Country } from '../../management/country/country.entity';
+import { BankAccount } from '../../bank-account/bank-account/bank-account.entity';
+import { UserAdministrator } from '../user-administrator/user-administrator.entity';
 
 @Entity()
 export class UserDetails extends BaseEntity {

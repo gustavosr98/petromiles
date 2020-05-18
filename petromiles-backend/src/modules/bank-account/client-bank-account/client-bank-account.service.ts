@@ -3,14 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 
-import { BankAccountService } from '../../bank-account/bank-account.service';
+import { BankAccountService } from '../bank-account.service';
 import { ClientBankAccount } from './client-bank-account.entity';
-import { StateBankAccountService } from '../../bank-account/state-bank-account/state-bank-account.service';
+import { StateBankAccountService } from '../state-bank-account/state-bank-account.service';
 import {
   StateName,
   StateDescription,
 } from 'src/modules/management/state/state.enum';
-import { UserClientService } from '../user-client/user-client.service';
+import { UserClientService } from '../../user/user-client/user-client.service';
 import { TransactionService } from '../../transaction/transaction.service';
 
 @Injectable()

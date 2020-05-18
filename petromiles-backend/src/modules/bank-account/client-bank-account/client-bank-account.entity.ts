@@ -1,7 +1,3 @@
-import { UserClient } from '../user-client/user-client.entity';
-import { BankAccount } from '../../bank-account/bank-account/bank-account.entity';
-import { Transaction } from '../../transaction/transaction/transaction.entity';
-import { StateBankAccount } from '../../bank-account/state-bank-account/state-bank-account.entity';
 import {
   BaseEntity,
   Entity,
@@ -10,6 +6,12 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
+
+// ENTITIES
+import { UserClient } from '../../user/user-client/user-client.entity';
+import { BankAccount } from '../bank-account/bank-account.entity';
+import { Transaction } from '../../transaction/transaction/transaction.entity';
+import { StateBankAccount } from '../state-bank-account/state-bank-account.entity';
 
 @Entity()
 export class ClientBankAccount extends BaseEntity {

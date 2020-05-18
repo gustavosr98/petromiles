@@ -146,13 +146,13 @@
                             <b>Decorators : </b>
                             <br />
                             <code>
-                                @ManyToOne(undefined, undefined, {onDelete: &#x27;CASCADE&#x27;, nullable: false})<br />@JoinColumn({name: &#x27;fk_client_bank_account&#x27;})<br />
+                                @ManyToOne(undefined, undefined, {nullable: false})<br />@JoinColumn({name: &#x27;fk_client_bank_account&#x27;})<br />
                             </code>
                         </td>
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="46" class="link-to-prism">src/modules/bank-account/state-bank-account/state-bank-account.entity.ts:46</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="44" class="link-to-prism">src/modules/bank-account/state-bank-account/state-bank-account.entity.ts:44</a></div>
                             </td>
                         </tr>
 
@@ -327,13 +327,13 @@
                             <b>Decorators : </b>
                             <br />
                             <code>
-                                @ManyToOne(undefined, undefined, {onDelete: &#x27;CASCADE&#x27;, nullable: false})<br />@JoinColumn({name: &#x27;fk_state&#x27;})<br />
+                                @ManyToOne(undefined, undefined, {nullable: false})<br />@JoinColumn({name: &#x27;fk_state&#x27;})<br />
                             </code>
                         </td>
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="35" class="link-to-prism">src/modules/bank-account/state-bank-account/state-bank-account.entity.ts:35</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="34" class="link-to-prism">src/modules/bank-account/state-bank-account/state-bank-account.entity.ts:34</a></div>
                             </td>
                         </tr>
 
@@ -353,7 +353,7 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { State } from &#x27;../../management/state/state.entity&#x27;;
-import { ClientBankAccount } from &#x27;../../client/client-bank-account/client-bank-account.entity&#x27;;
+import { ClientBankAccount } from &#x27;../client-bank-account/client-bank-account.entity&#x27;;
 import {
   BaseEntity,
   Entity,
@@ -381,7 +381,6 @@ export class StateBankAccount extends BaseEntity {
     type &#x3D;&gt; State,
     state &#x3D;&gt; state.idState,
     {
-      onDelete: &#x27;CASCADE&#x27;,
       nullable: false,
     },
   )
@@ -392,7 +391,6 @@ export class StateBankAccount extends BaseEntity {
     type &#x3D;&gt; ClientBankAccount,
     clientbankAccount &#x3D;&gt; clientbankAccount.idClientBankAccount,
     {
-      onDelete: &#x27;CASCADE&#x27;,
       nullable: false,
     },
   )

@@ -4,9 +4,16 @@ import Vue from "vue";
 import Vuetify from "vuetify/lib";
 import minifyTheme from "minify-css-string";
 
+import es from "vuetify/es5/locale/es";
+import en from "vuetify/es5/locale/en";
+
 Vue.use(Vuetify);
 
 export default new Vuetify({
+  lang: {
+    locales: { en, es },
+    current: "en",
+  },
   theme: {
     options: {
       customProperties: true,

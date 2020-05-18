@@ -153,7 +153,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:27</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="28" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:28</a></div>
                             </td>
                         </tr>
 
@@ -189,7 +189,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="24" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:24</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:25</a></div>
                             </td>
                         </tr>
 
@@ -225,7 +225,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="15" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:15</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="16" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:16</a></div>
                             </td>
                         </tr>
 
@@ -261,7 +261,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:18</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:19</a></div>
                             </td>
                         </tr>
 
@@ -297,7 +297,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="37" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:37</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="38" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:38</a></div>
                             </td>
                         </tr>
 
@@ -333,7 +333,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="45" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:45</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="46" class="link-to-prism">src/modules/transaction/state-transaction/state-transaction.entity.ts:46</a></div>
                             </td>
                         </tr>
 
@@ -352,9 +352,7 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { State } from &#x27;../../management/state/state.entity&#x27;;
-import { Transaction } from &#x27;../transaction/transaction.entity&#x27;;
-import {
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
@@ -362,6 +360,9 @@ import {
   ManyToOne,
   JoinColumn,
 } from &#x27;typeorm&#x27;;
+
+import { State } from &#x27;../../management/state/state.entity&#x27;;
+import { Transaction } from &#x27;../transaction/transaction.entity&#x27;;
 
 @Entity()
 export class StateTransaction extends BaseEntity {

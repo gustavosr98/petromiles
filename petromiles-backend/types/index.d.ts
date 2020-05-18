@@ -1,7 +1,7 @@
 declare namespace App {
   namespace Auth {
     interface UserClient {
-      user: import('../src/modules/client/user-client/user-client.entity').UserClient;
+      user: import('../src/modules/user/user-client/user-client.entity').UserClient;
       userDetails: import('../src/modules/user/user-details/user-details.entity').UserDetails;
       role: import('../src/modules/management/role/role.enum').Role;
     }
@@ -48,7 +48,7 @@ declare namespace App {
       rawAmount: number;
       type: import('../src/modules/transaction/transaction/transaction.enum').TransactionType;
       pointsConversion: import('../src/modules/management/points-conversion/points-conversion.entity').PointsConversion;
-      clientBankAccount: import('../src/modules/client/client-bank-account/client-bank-account.entity').ClientBankAccount;
+      clientBankAccount: import('../src/modules/bank-account/client-bank-account/client-bank-account.entity').ClientBankAccount;
       thirdPartyInterest?: import('../src/modules/management/third-party-interest/third-party-interest.entity').ThirdPartyInterest;
       platformInterest: import('../src/modules/management/platform-interest/platform-interest.entity').PlatformInterest;
       stateTransactionDescription: string;

@@ -14,7 +14,7 @@ export interface Response<T> {
 }
 
 @Injectable()
-export class TransformSignUpInterceptor<T>
+export class PasswordEncryptorInterceptor<T>
   implements NestInterceptor<T, Response<T>> {
   constructor(@Inject(AuthService) private authService: AuthService) {}
   async intercept(

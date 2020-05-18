@@ -20,7 +20,7 @@ const adminRoutesRaw = Object.freeze({
     name: "AdminUserList",
     component: () =>
       import(
-        /* webpackChunkName: "admin-user-list" */ "@/modules/Admin/views/AdminUserList"
+        /* webpackChunkName: "admin-user-list" */ "@/modules/User/views/AdminUserList"
       ),
   },
   PLATFORM_CONFIG: {

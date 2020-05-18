@@ -102,7 +102,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="7" class="link-to-prism">src/modules/management/role/role.service.ts:7</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="8" class="link-to-prism">src/modules/management/role/role.service.ts:8</a></div>
                             </td>
                         </tr>
 
@@ -169,8 +169,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="12"
-                            class="link-to-prism">src/modules/management/role/role.service.ts:12</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="13"
+                            class="link-to-prism">src/modules/management/role/role.service.ts:13</a></div>
                 </td>
             </tr>
 
@@ -223,11 +223,12 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@nestjs/common&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { InjectRepository } from &#x27;@nestjs/typeorm&#x27;;
+import { Injectable } from &#x27;@nestjs/common&#x27;;
+import { Repository } from &#x27;typeorm&#x27;;
 import { Role } from &#x27;./role.entity&#x27;;
 import { Role as RoleEmun } from &#x27;./role.enum&#x27;;
-import { Repository } from &#x27;typeorm&#x27;;
-import { InjectRepository } from &#x27;@nestjs/typeorm&#x27;;
+
 @Injectable()
 export class RoleService {
   constructor(

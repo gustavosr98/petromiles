@@ -168,9 +168,10 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Module } from &#x27;@nestjs/common&#x27;;
+import { ConfigService } from &#x27;@nestjs/config&#x27;;
+
 import { MailsService } from &#x27;./mails.service&#x27;;
 import { SendGridConfig } from &#x27;./sendGrid.config&#x27;;
-import { ConfigService } from &#x27;@nestjs/config&#x27;;
 
 @Module({
   imports: [SendGridConfig],

@@ -1,6 +1,3 @@
-import { UserAdministrator } from '../user-administrator/user-administrator.entity';
-import { Role } from '../../management/role/role.entity';
-import { UserClient } from '../../client/user-client/user-client.entity';
 import {
   BaseEntity,
   Entity,
@@ -8,6 +5,11 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+
+// ENTITIES
+import { UserAdministrator } from '../user-administrator/user-administrator.entity';
+import { Role } from '../../management/role/role.entity';
+import { UserClient } from '../user-client/user-client.entity';
 
 @Entity()
 export class UserRole extends BaseEntity {

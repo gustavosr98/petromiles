@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 
 import { UserDetails } from './user-details.entity';
 import { Language } from './../language/language.entity';
-import { UserClient } from '../../client/user-client/user-client.entity';
+import { UserClient } from '../user-client/user-client.entity';
 import { UserAdministrator } from '../user-administrator/user-administrator.entity';
 
 @Injectable()
@@ -16,6 +16,13 @@ export class UserDetailsService {
     @InjectRepository(UserDetails)
     private userDetailsRepository: Repository<UserDetails>,
   ) {}
+
+  async findAllClients() {
+    return await this.userDetailsRepository.find({
+      select: ['firstName', 'lastName'],
+      relations: ['userClient'],
+    });
+  }
 
   async createClientDetails(userClientDetails): Promise<UserDetails> {
     const result = await this.userDetailsRepository.save(userClientDetails);

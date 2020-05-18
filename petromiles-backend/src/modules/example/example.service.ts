@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { getConnection } from 'typeorm';
-import { ClientBankAccount } from '../client/client-bank-account/client-bank-account.entity';
+import { ClientBankAccount } from './../bank-account/client-bank-account/client-bank-account.entity';
 import { BankAccount } from '../bank-account/bank-account/bank-account.entity';
 
 @Injectable()

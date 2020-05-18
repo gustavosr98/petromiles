@@ -12,7 +12,7 @@ import { Logger } from 'winston';
 
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from '../user/dto/create-user.dto';
-import { TransformSignUpInterceptor } from './interceptors/transform-sign-up.interceptor';
+import { PasswordEncryptorInterceptor } from './interceptors/password-encryptor.interceptor';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +21,7 @@ export class AuthController {
     private authService: AuthService,
   ) {}
 
-  @UseInterceptors(TransformSignUpInterceptor)
+  @UseInterceptors(PasswordEncryptorInterceptor)
   @Post('signup')
   async signUpClient(@Body(ValidationPipe) user: CreateUserDTO) {
     this.logger.http(

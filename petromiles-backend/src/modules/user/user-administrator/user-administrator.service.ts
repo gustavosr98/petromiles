@@ -1,6 +1,7 @@
+import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 
-import { getConnection } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 
 import { StateUser } from '../state-user/state-user.entity';
 import { State } from '../../management/state/state.entity';
@@ -9,6 +10,17 @@ import { UserAdministrator } from './user-administrator.entity';
 
 @Injectable()
 export class UserAdministratorService {
+  constructor(
+    @InjectRepository(UserAdministrator)
+    private userAdministratorRepository: Repository<UserAdministrator>,
+  ) {}
+
+  async findAll() {
+    return await this.userAdministratorRepository.find({
+      relations: ['stateUser', 'userDetails', 'userRole'],
+    });
+  }
+
   async getActiveAdministrator(email: string): Promise<UserAdministrator> {
     return await getConnection()
       .createQueryBuilder()

@@ -11,7 +11,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { CreateBankAccountDTO } from './bank-account/dto/createBankAccount.dto';
-import { ClientBankAccountService } from '../client/client-bank-account/client-bank-account.service';
+import { ClientBankAccountService } from './client-bank-account/client-bank-account.service';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthGuard } from '@nestjs/passport';

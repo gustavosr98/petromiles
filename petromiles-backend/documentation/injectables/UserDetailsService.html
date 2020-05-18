@@ -66,21 +66,6 @@
     <h3 id="index">Index</h3>
     <table class="table table-sm table-bordered index-table">
         <tbody>
-                <tr>
-                    <td class="col-md-4">
-                        <h6><b>Properties</b></h6>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <ul class="index-list">
-                            <li>
-                                    <span class="modifier">Private</span>
-                                <a href="#connection">connection</a>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
 
                 <tr>
                     <td class="col-md-4">
@@ -92,7 +77,19 @@
                         <ul class="index-list">
                             <li>
                                     <span class="modifier">Async</span>
-                                <a href="#createUserClientDetails">createUserClientDetails</a>
+                                <a href="#createClientDetails">createClientDetails</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#findAllClients">findAllClients</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getAdministratorDetails">getAdministratorDetails</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getClientDetails">getClientDetails</a>
                             </li>
                             <li>
                                     <span class="modifier">Async</span>
@@ -121,7 +118,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/modules/user/user-details/user-details.service.ts:10</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/modules/user/user-details/user-details.service.ts:12</a></div>
                             </td>
                         </tr>
 
@@ -180,28 +177,28 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="createUserClientDetails"></a>
+                    <a name="createClientDetails"></a>
                     <span class="name">
                         <b>
                             <span class="modifier">Async</span>
-                            createUserClientDetails
+                            createClientDetails
                         </b>
-                        <a href="#createUserClientDetails"><span class="icon ion-ios-link"></span></a>
+                        <a href="#createClientDetails"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>createUserClientDetails(userClientDetails)</code>
+                    <code>createClientDetails(userClientDetails)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="19"
-                            class="link-to-prism">src/modules/user/user-details/user-details.service.ts:19</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="27"
+                            class="link-to-prism">src/modules/user/user-details/user-details.service.ts:27</a></div>
                 </td>
             </tr>
 
@@ -221,6 +218,191 @@
                             <tbody>
                                 <tr>
                                     <td>userClientDetails</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="../classes/UserDetails.html" target="_self" >Promise&lt;UserDetails&gt;</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findAllClients"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            findAllClients
+                        </b>
+                        <a href="#findAllClients"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>findAllClients()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="20"
+                            class="link-to-prism">src/modules/user/user-details/user-details.service.ts:20</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getAdministratorDetails"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getAdministratorDetails
+                        </b>
+                        <a href="#getAdministratorDetails"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getAdministratorDetails(userAdministrator: <a href="../classes/UserAdministrator.html">UserAdministrator</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="41"
+                            class="link-to-prism">src/modules/user/user-details/user-details.service.ts:41</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>userAdministrator</td>
+                                    <td>
+                                                <code><a href="../classes/UserAdministrator.html" target="_self" >UserAdministrator</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="../classes/UserDetails.html" target="_self" >Promise&lt;UserDetails&gt;</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getClientDetails"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getClientDetails
+                        </b>
+                        <a href="#getClientDetails"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getClientDetails(userClient: <a href="../classes/UserClient.html">UserClient</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="37"
+                            class="link-to-prism">src/modules/user/user-details/user-details.service.ts:37</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>userClient</td>
+                                    <td>
+                                                <code><a href="../classes/UserClient.html" target="_self" >UserClient</a></code>
+                                    </td>
 
                                     <td>
                                         No
@@ -268,8 +450,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="26"
-                            class="link-to-prism">src/modules/user/user-details/user-details.service.ts:26</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="33"
+                            class="link-to-prism">src/modules/user/user-details/user-details.service.ts:33</a></div>
                 </td>
             </tr>
 
@@ -317,55 +499,23 @@
         </tbody>
     </table>
 </section>
-            <section>
-    
-        <h3 id="inputs">
-            Properties
-        </h3>
-        <table class="table table-sm table-bordered">
-            <tbody>
-                <tr>
-                    <td class="col-md-4">
-                        <a name="connection"></a>
-                        <span class="name">
-                            <b>
-                                <span class="modifier">Private</span>
-                            connection</b>
-                            <a href="#connection"><span class="icon ion-ios-link"></span></a>
-                        </span>
-                    </td>
-                </tr>
-                    <tr>
-                        <td class="col-md-4">
-                            <i>Default value : </i><code>getConnection()</code>
-                        </td>
-                    </tr>
-                        <tr>
-                            <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/modules/user/user-details/user-details.service.ts:10</a></div>
-                            </td>
-                        </tr>
-
-
-            </tbody>
-        </table>
-</section>
 
     </div>
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@nestjs/common&#x27;;
-import { UserDetails } from &#x27;./user-details.entity&#x27;;
 import { InjectRepository } from &#x27;@nestjs/typeorm&#x27;;
-import { Repository, getConnection } from &#x27;typeorm&#x27;;
+
+import { Repository } from &#x27;typeorm&#x27;;
+
+import { UserDetails } from &#x27;./user-details.entity&#x27;;
 import { Language } from &#x27;./../language/language.entity&#x27;;
-import { UserClient } from &#x27;../../client/user-client/user-client.entity&#x27;;
+import { UserClient } from &#x27;../user-client/user-client.entity&#x27;;
+import { UserAdministrator } from &#x27;../user-administrator/user-administrator.entity&#x27;;
 
 @Injectable()
 export class UserDetailsService {
-  private connection &#x3D; getConnection();
-
   constructor(
     @InjectRepository(Language)
     private languageRepository: Repository&lt;Language&gt;,
@@ -373,15 +523,31 @@ export class UserDetailsService {
     private userDetailsRepository: Repository&lt;UserDetails&gt;,
   ) {}
 
-  async createUserClientDetails(userClientDetails): Promise&lt;UserDetails&gt; {
-    const result &#x3D; await this.userDetailsRepository.save(userClientDetails);
+  async findAllClients() {
+    return await this.userDetailsRepository.find({
+      select: [&#x27;firstName&#x27;, &#x27;lastName&#x27;],
+      relations: [&#x27;userClient&#x27;],
+    });
+  }
 
+  async createClientDetails(userClientDetails): Promise&lt;UserDetails&gt; {
+    const result &#x3D; await this.userDetailsRepository.save(userClientDetails);
     result.userClient &#x3D; null;
     return result;
   }
 
   async getLanguage(name: string) {
     return await this.languageRepository.findOne({ name });
+  }
+
+  async getClientDetails(userClient: UserClient): Promise&lt;UserDetails&gt; {
+    return await this.userDetailsRepository.findOne(userClient);
+  }
+
+  async getAdministratorDetails(
+    userAdministrator: UserAdministrator,
+  ): Promise&lt;UserDetails&gt; {
+    return await this.userDetailsRepository.findOne(userAdministrator);
   }
 }
 </code></pre>

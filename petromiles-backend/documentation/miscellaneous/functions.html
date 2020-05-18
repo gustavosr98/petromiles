@@ -61,7 +61,10 @@
                             <a href="#bootstrap" title="src/main.ts"><b>bootstrap</b>&nbsp;&nbsp;&nbsp;(src/.../main.ts)</a>
                         </li>
                         <li>
-                            <a href="#LoginMiddleware" title="src/modules/auth/middlewares/login.middleware.ts"><b>LoginMiddleware</b>&nbsp;&nbsp;&nbsp;(src/.../login.middleware.ts)</a>
+                            <a href="#createDir" title="src/logger/winston/winston-config.ts"><b>createDir</b>&nbsp;&nbsp;&nbsp;(src/.../winston-config.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#createOptions" title="src/logger/winston/winston-config.ts"><b>createOptions</b>&nbsp;&nbsp;&nbsp;(src/.../winston-config.ts)</a>
                         </li>
                     </ul>
                 </td>
@@ -96,24 +99,24 @@
 
         </tbody>
     </table>
-</section>    <h3>src/modules/auth/middlewares/login.middleware.ts</h3>
+</section>    <h3>src/logger/winston/winston-config.ts</h3>
     <section>
     <h3></h3>    <table class="table table-sm table-bordered">
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="LoginMiddleware"></a>
+                    <a name="createDir"></a>
                     <span class="name">
                         <b>
-                            LoginMiddleware
+                            createDir
                         </b>
-                        <a href="#LoginMiddleware"><span class="icon ion-ios-link"></span></a>
+                        <a href="#createDir"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>LoginMiddleware(req, res, next)</code>
+<code>createDir(dir)</code>
                 </td>
             </tr>
 
@@ -134,25 +137,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>req</td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                                <tr>
-                                    <td>res</td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                                <tr>
-                                    <td>next</td>
+                                    <td>dir</td>
 
                                     <td>
                                         No
@@ -164,6 +149,73 @@
                         </table>
                     </div>
                     <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createOptions"></a>
+                    <span class="name">
+                        <b>
+                            createOptions
+                        </b>
+                        <a href="#createOptions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>createOptions(params)</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>params</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>WinstonModuleOptions</code>
+
+                    </div>
+                    <div class="io-description">
+                        
                     </div>
                 </td>
             </tr>

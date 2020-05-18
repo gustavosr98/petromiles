@@ -1,5 +1,5 @@
 import { State } from '../../management/state/state.entity';
-import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
+import { ClientBankAccount } from '../client-bank-account/client-bank-account.entity';
 import {
   BaseEntity,
   Entity,

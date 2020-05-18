@@ -61,10 +61,10 @@
                             <a href="#BANK" title="src/database/seeders/bank/bank.data.ts"><b>BANK</b>&nbsp;&nbsp;&nbsp;(src/.../bank.data.ts)</a>
                         </li>
                         <li>
-                            <a href="#commonFormat" title="config/logger/loggerCommonFormat.ts"><b>commonFormat</b>&nbsp;&nbsp;&nbsp;(config/.../loggerCommonFormat.ts)</a>
+                            <a href="#commonFormat" title="src/logger/winston/format.ts"><b>commonFormat</b>&nbsp;&nbsp;&nbsp;(src/.../format.ts)</a>
                         </li>
                         <li>
-                            <a href="#consoleFormat" title="config/logger/loggerCommonFormat.ts"><b>consoleFormat</b>&nbsp;&nbsp;&nbsp;(config/.../loggerCommonFormat.ts)</a>
+                            <a href="#consoleFormat" title="src/logger/winston/format.ts"><b>consoleFormat</b>&nbsp;&nbsp;&nbsp;(src/.../format.ts)</a>
                         </li>
                         <li>
                             <a href="#COUNTRIES" title="src/database/seeders/country/country.data.ts"><b>COUNTRIES</b>&nbsp;&nbsp;&nbsp;(src/.../country.data.ts)</a>
@@ -76,10 +76,10 @@
                             <a href="#dbConfig" title="src/database/seeders/typeorm.config.ts"><b>dbConfig</b>&nbsp;&nbsp;&nbsp;(src/.../typeorm.config.ts)</a>
                         </li>
                         <li>
-                            <a href="#ERROR" title="src/exceptions/error-messages.ts"><b>ERROR</b>&nbsp;&nbsp;&nbsp;(src/.../error-messages.ts)</a>
+                            <a href="#fileFormat" title="src/logger/winston/format.ts"><b>fileFormat</b>&nbsp;&nbsp;&nbsp;(src/.../format.ts)</a>
                         </li>
                         <li>
-                            <a href="#fileFormat" title="config/logger/loggerCommonFormat.ts"><b>fileFormat</b>&nbsp;&nbsp;&nbsp;(config/.../loggerCommonFormat.ts)</a>
+                            <a href="#GetUser" title="src/modules/auth/decorators/get-user.decorator.ts"><b>GetUser</b>&nbsp;&nbsp;&nbsp;(src/.../get-user.decorator.ts)</a>
                         </li>
                         <li>
                             <a href="#LANGUAGES" title="src/database/seeders/language/language.data.ts"><b>LANGUAGES</b>&nbsp;&nbsp;&nbsp;(src/.../language.data.ts)</a>
@@ -89,6 +89,9 @@
                         </li>
                         <li>
                             <a href="#POINTS_CONVERSION" title="src/database/seeders/points_conversion/points_conversion.data.ts"><b>POINTS_CONVERSION</b>&nbsp;&nbsp;&nbsp;(src/.../points_conversion.data.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#Roles" title="src/modules/auth/decorators/roles.decorator.ts"><b>Roles</b>&nbsp;&nbsp;&nbsp;(src/.../roles.decorator.ts)</a>
                         </li>
                         <li>
                             <a href="#ROLES" title="src/database/seeders/role/role.data.ts"><b>ROLES</b>&nbsp;&nbsp;&nbsp;(src/.../role.data.ts)</a>
@@ -226,7 +229,7 @@
             </tbody>
         </table>
 </section>
-    <h3>config/logger/loggerCommonFormat.ts</h3>
+    <h3>src/logger/winston/format.ts</h3>
     <section>
     <h3></h3>        <table class="table table-sm table-bordered">
             <tbody>
@@ -268,7 +271,7 @@
   winston.format.splat(),
   winston.format.colorize(),
   winston.format.printf(msg &#x3D;&gt; {
-    return &#x60;[${new Date(msg.timestamp).toLocaleString()}] | ${msg.level} - ${
+    return &#x60;[${new Date(msg.timestamp).toLocaleString()}] [${msg.level}] ${
       msg.message
     }&#x60;;
   }),
@@ -299,7 +302,7 @@
   winston.format.printf(msg &#x3D;&gt; {
     return &#x60;[${new Date(
       msg.timestamp,
-    ).toLocaleString()}] |  ${msg.level.toUpperCase()} - ${msg.message}&#x60;;
+    ).toLocaleString()}] [${msg.level.toUpperCase()}] ${msg.message}&#x60;;
   }),
 )</code>
                         </td>
@@ -449,31 +452,25 @@
             </tbody>
         </table>
 </section>
-    <h3>src/exceptions/error-messages.ts</h3>
+    <h3>src/modules/auth/decorators/get-user.decorator.ts</h3>
     <section>
     <h3></h3>        <table class="table table-sm table-bordered">
             <tbody>
                 <tr>
                     <td class="col-md-4">
-                        <a name="ERROR"></a>
+                        <a name="GetUser"></a>
                         <span class="name">
                             <b>
-                            ERROR</b>
-                            <a href="#ERROR"><span class="icon ion-ios-link"></span></a>
+                            GetUser</b>
+                            <a href="#GetUser"><span class="icon ion-ios-link"></span></a>
                         </span>
                     </td>
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                            <i>Default value : </i><code>Object.freeze&lt;ErrorCollection&gt;({
-  DATABASE: Object.freeze&lt;ErrorContent&gt;({
-    statusCode: 500,
-    message: &#x27;Internal Server Error: Problem with the database&#x27;,
-  }),
-  USER_EXISTS: Object.freeze&lt;ErrorContent&gt;({
-    statusCode: 400,
-    message: &#x27;Bad Request: Email already in use&#x27;,
-  }),
+                            <i>Default value : </i><code>createParamDecorator((data, ctx: ExecutionContext) &#x3D;&gt; {
+  const req &#x3D; ctx.switchToHttp().getRequest();
+  return req.user;
 })</code>
                         </td>
                     </tr>
@@ -608,6 +605,30 @@
     onePointEqualsDollars: 0.002,
   },
 ]</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+    <h3>src/modules/auth/decorators/roles.decorator.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="Roles"></a>
+                        <span class="name">
+                            <b>
+                            Roles</b>
+                            <a href="#Roles"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>(...roles: string[]) &#x3D;&gt; SetMetadata(&#x27;roles&#x27;, roles)</code>
                         </td>
                     </tr>
 

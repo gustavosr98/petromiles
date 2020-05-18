@@ -1,6 +1,3 @@
-import { UserClient } from '../user-client/user-client.entity';
-import { Suscription } from '../../suscription/suscription/suscription.entity';
-import { Transaction } from '../../transaction/transaction/transaction.entity';
 import {
   BaseEntity,
   Entity,
@@ -10,6 +7,11 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
+
+// ENTITIES
+import { UserClient } from '../user/user-client/user-client.entity';
+import { Suscription } from '../suscription/suscription/suscription.entity';
+import { Transaction } from '../transaction/transaction/transaction.entity';
 
 @Entity()
 export class UserSuscription extends BaseEntity {

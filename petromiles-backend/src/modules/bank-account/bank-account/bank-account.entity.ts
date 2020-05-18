@@ -1,4 +1,4 @@
-import { ClientBankAccount } from '../../client/client-bank-account/client-bank-account.entity';
+import { ClientBankAccount } from '../client-bank-account/client-bank-account.entity';
 import { UserDetails } from '../../user/user-details/user-details.entity';
 import {
   BaseEntity,

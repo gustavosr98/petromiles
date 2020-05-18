@@ -92,7 +92,7 @@
                         <ul class="index-list">
                             <li>
                                     <span class="modifier">Async</span>
-                                <a href="#createUserRoleClient">createUserRoleClient</a>
+                                <a href="#createClientRole">createClientRole</a>
                             </li>
                         </ul>
                     </td>
@@ -117,7 +117,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/modules/user/user-role/user-role.service.ts:10</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/modules/user/user-role/user-role.service.ts:12</a></div>
                             </td>
                         </tr>
 
@@ -164,28 +164,28 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="createUserRoleClient"></a>
+                    <a name="createClientRole"></a>
                     <span class="name">
                         <b>
                             <span class="modifier">Async</span>
-                            createUserRoleClient
+                            createClientRole
                         </b>
-                        <a href="#createUserRoleClient"><span class="icon ion-ios-link"></span></a>
+                        <a href="#createClientRole"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
                     <span class="modifier-icon icon ion-ios-reset"></span>
-                    <code>createUserRoleClient(user: <a href="../classes/UserClient.html">UserClient</a>)</code>
+                    <code>createClientRole(user: <a href="../classes/UserClient.html">UserClient</a>)</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="14"
-                            class="link-to-prism">src/modules/user/user-role/user-role.service.ts:14</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="16"
+                            class="link-to-prism">src/modules/user/user-role/user-role.service.ts:16</a></div>
                 </td>
             </tr>
 
@@ -258,7 +258,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/modules/user/user-role/user-role.service.ts:10</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/modules/user/user-role/user-role.service.ts:12</a></div>
                             </td>
                         </tr>
 
@@ -272,11 +272,13 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@nestjs/common&#x27;;
-import { UserClient } from &#x27;../../client/user-client/user-client.entity&#x27;;
+
+import { getConnection } from &#x27;typeorm&#x27;;
+
+import { UserClient } from &#x27;../user-client/user-client.entity&#x27;;
 import { RoleService } from &#x27;../../management/role/role.service&#x27;;
 import { Role } from &#x27;src/modules/management/role/role.enum&#x27;;
 import { UserRole } from &#x27;./user-role.entity&#x27;;
-import { getConnection } from &#x27;typeorm&#x27;;
 
 @Injectable()
 export class UserRoleService {
@@ -284,7 +286,7 @@ export class UserRoleService {
 
   constructor(private roleService: RoleService) {}
 
-  async createUserRoleClient(user: UserClient): Promise&lt;UserRole&gt; {
+  async createClientRole(user: UserClient): Promise&lt;UserRole&gt; {
     const role &#x3D; await this.roleService.getRoleByName(Role.CLIENT);
 
     const userRole &#x3D; new UserRole();

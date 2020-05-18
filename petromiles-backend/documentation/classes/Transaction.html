@@ -95,7 +95,7 @@
                                 <a href="#initialDate">initialDate</a>
                             </li>
                             <li>
-                                <a href="#pointsConvertion">pointsConvertion</a>
+                                <a href="#pointsConversion">pointsConversion</a>
                             </li>
                             <li>
                                 <a href="#rawAmount">rawAmount</a>
@@ -249,11 +249,11 @@
             <tbody>
                 <tr>
                     <td class="col-md-4">
-                        <a name="pointsConvertion"></a>
+                        <a name="pointsConversion"></a>
                         <span class="name">
                             <b>
-                            pointsConvertion</b>
-                            <a href="#pointsConvertion"><span class="icon ion-ios-link"></span></a>
+                            pointsConversion</b>
+                            <a href="#pointsConversion"><span class="icon ion-ios-link"></span></a>
                         </span>
                     </td>
                 </tr>
@@ -304,7 +304,7 @@
                             <b>Decorators : </b>
                             <br />
                             <code>
-                                @Column()<br />
+                                @Column(&#x27;decimal&#x27;, {precision: 8, scale: 3})<br />
                             </code>
                         </td>
                     </tr>
@@ -376,7 +376,7 @@
                             <b>Decorators : </b>
                             <br />
                             <code>
-                                @Column()<br />
+                                @Column(&#x27;decimal&#x27;, {precision: 8, scale: 3})<br />
                             </code>
                         </td>
                     </tr>
@@ -545,13 +545,7 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { TransactionType } from &#x27;./transaction.enum&#x27;;
-import { UserSuscription } from &#x27;../../client/user-suscription/user-suscription.entity&#x27;;
-import { PointsConversion } from &#x27;../../management/points-conversion/points-conversion.entity&#x27;;
-import { ClientBankAccount } from &#x27;../../client/client-bank-account/client-bank-account.entity&#x27;;
-import { StateTransaction } from &#x27;../state-transaction/state-transaction.entity&#x27;;
-import { TransactionInterest } from &#x27;../transaction-interest/transaction-interest.entity&#x27;;
-import {
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
@@ -561,6 +555,12 @@ import {
   OneToOne,
   OneToMany,
 } from &#x27;typeorm&#x27;;
+import { TransactionType } from &#x27;./transaction.enum&#x27;;
+import { UserSuscription } from &#x27;../../user-suscription/user-suscription.entity&#x27;;
+import { PointsConversion } from &#x27;../../management/points-conversion/points-conversion.entity&#x27;;
+import { ClientBankAccount } from &#x27;../../bank-account/client-bank-account/client-bank-account.entity&#x27;;
+import { StateTransaction } from &#x27;../state-transaction/state-transaction.entity&#x27;;
+import { TransactionInterest } from &#x27;../transaction-interest/transaction-interest.entity&#x27;;
 
 @Entity()
 export class Transaction extends BaseEntity {
@@ -570,10 +570,10 @@ export class Transaction extends BaseEntity {
   @Column({ type: &#x27;timestamp&#x27;, default: () &#x3D;&gt; &#x27;CURRENT_TIMESTAMP&#x27; })
   initialDate: Date;
 
-  @Column()
+  @Column(&#x27;decimal&#x27;, { precision: 8, scale: 3 })
   rawAmount: number;
 
-  @Column()
+  @Column(&#x27;decimal&#x27;, { precision: 8, scale: 3 })
   totalAmountWithInterest: number;
 
   @Column()
@@ -614,7 +614,7 @@ export class Transaction extends BaseEntity {
     { nullable: false },
   )
   @JoinColumn({ name: &#x27;fk_points_conversion&#x27; })
-  pointsConvertion: PointsConversion;
+  pointsConversion: PointsConversion;
 
   @ManyToOne(
     type &#x3D;&gt; ClientBankAccount,
