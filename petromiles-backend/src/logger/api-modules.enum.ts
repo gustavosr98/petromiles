@@ -1,0 +1,19 @@
+enum ApiModules {
+  AUTH = 'AUTH',
+  BANK_ACCOUNT = 'BANK_ACCOUNT',
+  CLIENT = 'CLIENT',
+  EXAMPLE = 'EXAMPLE',
+  LANGUAGE = 'LANGUAGE',
+  PAYMENT_PROVIDER = 'PAYMENT_PROVIDER',
+  SUSCRIPTION = 'SUSCRIPTION',
+  TRANSACTION = 'TRANSACTION',
+  MAILS = 'MAILS',
+  USER = 'USER',
+}
+
+enum ApiSubmodules {
+  STRIPE = 'STRIPE',
+  POEDITOR = 'POEDITOR',
+}
+
+export { ApiModules, ApiSubmodules };
