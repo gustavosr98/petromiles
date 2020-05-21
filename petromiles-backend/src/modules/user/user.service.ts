@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { getManager } from 'typeorm';
 
 import { Role as RoleEnum } from 'src/modules/management/role/role.enum';
+
+import { ClientPoints } from './user-client/user-points.entity';
+
 import { UserClientService } from './user-client/user-client.service';
 import { UserAdministratorService } from './user-administrator/user-administrator.service';
 import { UserDetailsService } from './user-details/user-details.service';
@@ -48,5 +52,22 @@ export class UserService {
       return { user: credentials, userDetails };
     }
     return null;
+  }
+
+  async getPoints(email: string): Promise<ClientPoints> {
+    let points = await getManager()
+      .createQueryBuilder()
+      .select('clientPoints.dollars')
+      .addSelect('clientPoints.points')
+      .from(ClientPoints, 'clientPoints')
+      .where(`email='${email}'`)
+      .getOne();
+
+    if (!points) {
+      points = new ClientPoints();
+      points.dollars = 0;
+      points.points = 0;
+    }
+    return points;
   }
 }

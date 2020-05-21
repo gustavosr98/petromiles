@@ -33,7 +33,7 @@ export class Transaction extends BaseEntity {
   type: TransactionType;
 
   @Column({ nullable: true })
-  operation: number;
+  operation?: number;
 
   @ManyToOne(
     (type) => Transaction,
