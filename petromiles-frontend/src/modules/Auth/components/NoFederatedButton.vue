@@ -7,9 +7,7 @@
       @click="signIn()"
       :class="provider.class"
     >
-      <v-icon :color="provider.colorIcon" class="mr-5"
-        >mdi-{{ provider.name }}</v-icon
-      >
+      <v-icon :color="provider.colorIcon" class="mr-5">mdi-{{ provider.name }}</v-icon>
       <slot />
     </v-btn>
   </v-col>
@@ -30,7 +28,7 @@ export default {
     },
   },
   methods: {
-    signIn() {
+    async signIn() {
       const event = this;
       firebase
         .auth()

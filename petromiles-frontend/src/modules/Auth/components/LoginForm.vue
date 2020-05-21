@@ -9,8 +9,7 @@
           :provider="provider"
           @login="login"
           type="login"
-          >Continue with {{ provider.name }}</no-federeded-button
-        >
+        >Continue with {{ provider.name }}</no-federeded-button>
       </v-row>
       <h4 class="text-center mt-4 caption">Or login with</h4>
       <v-form ref="signUpForm">
@@ -52,7 +51,6 @@
 </template>
 
 <script>
-import store from "@/store/index";
 import NoFederatedButton from "@/modules/Auth/components/NoFederatedButton";
 import { providersMixin } from "@/mixins/Auth/firebaseProvider";
 
@@ -81,14 +79,7 @@ export default {
       this.login(user);
     },
     login(user) {
-      store
-        .dispatch("auth/logIn", user)
-        .then(() => {
-          this.$router.push({ name: clientRoutes.DASHBOARD.name });
-        })
-        .catch(err => {
-          console.log(err.response.data.message);
-        });
+      this.$store.dispatch("auth/logIn", user);
     },
   },
 };

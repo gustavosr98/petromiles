@@ -8,8 +8,7 @@
           :provider="provider"
           @signUp="signUp"
           type="signUp"
-          >Sign Up with {{ provider.name }}</no-federeded-button
-        >
+        >Sign Up with {{ provider.name }}</no-federeded-button>
       </v-row>
       <h4 class="text-center mt-4 caption">Or sign up with</h4>
       <v-form ref="signUpForm" v-model="formValidity">
@@ -74,19 +73,12 @@
       </h5>
     </div>
     <div class="text-center mt-3 mb-8">
-      <v-btn
-        @click="ckeckingValidForm"
-        type="submit"
-        class="light-blue darken-4"
-        dark
-        >SIGN UP</v-btn
-      >
+      <v-btn @click="ckeckingValidForm" type="submit" class="light-blue darken-4" dark>SIGN UP</v-btn>
     </div>
   </v-col>
 </template>
 
 <script>
-import store from "@/store/index";
 import { validationMixin } from "vuelidate";
 import {
   required,
@@ -176,7 +168,7 @@ export default {
     },
 
     signUp(user) {
-      store
+      this.$store
         .dispatch("auth/signUp", user)
         .then(() => {
           this.$router.push({ name: clientRoutes.DASHBOARD.name });

@@ -1,4 +1,5 @@
 import httpClient from "@/http/http-client";
+import authConstants from "@/modules/Auth/authConstants";
 
 export const namespaced = true;
 export const state = {
@@ -6,47 +7,64 @@ export const state = {
 };
 
 export const mutations = {
-  SET_USER_DATA(state, userData) {
-    //1) Se guarda usuario en el state
+  setUserLocalStorage(state, userData) {
     state.user = {
       email: userData.email,
       details: userData.userDetails,
       language: userData.language,
       role: userData.role,
+      authToken: userData.token,
     };
 
-    // 2) Se guarda usuario en el storage para mantener datos si se recarga la pagina
-    localStorage.setItem("user", `Bearer ${JSON.stringify(userData.token)}`);
-
-    // 3) Se coloca el token en el header para mandarlo al backend en todas las peticiones
-    httpClient.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${userData.token}`;
+    localStorage.setItem(
+      authConstants.USER_LOCAL_STORAGE,
+      JSON.stringify(state.user)
+    );
   },
 
-  LOG_OUT() {
-    localStorage.removeItem("user");
+  loadUserToken() {
+    const user = JSON.parse(
+      localStorage.getItem(authConstants.USER_LOCAL_STORAGE)
+    );
+
+    if (user && user.authToken) {
+      console.log(`${user.email} is inside his sesion as ${user.role}`);
+      httpClient.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${user.authToken}`;
+    }
+  },
+
+  logout() {
+    localStorage.removeItem(authConstants.USER_LOCAL_STORAGE);
     location.reload();
   },
 };
 
 export const actions = {
   async signUp({ commit }, credentials) {
-    // Realizamos peticion al backend para crear usuario
-    await httpClient.post("/auth/signup", credentials).then(data => {
-      commit("SET_USER_DATA", data);
-      console.log("User is signed");
+    httpClient.post("/auth/signup", credentials).then(data => {
+      commit("setUserLocalStorage", data);
+      commit("loadUserToken");
+      location.reload();
     });
   },
   async logIn({ commit }, credentials) {
-    await httpClient.post("/auth/login", credentials).then(data => {
-      commit("SET_USER_DATA", data);
-      console.log("User is here ");
+    httpClient.post("/auth/login", credentials).then(data => {
+      commit("setUserLocalStorage", data);
+      commit("loadUserToken");
+      location.reload();
     });
   },
-
   logout({ commit }) {
-    commit("LOG_OUT");
+    commit("logout");
+  },
+  async checkUserToken({ commit }) {
+    commit("loadUserToken");
+
+    httpClient.get("/auth/checkToken").catch(e => {
+      commit("logout");
+    });
   },
 };
 

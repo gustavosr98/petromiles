@@ -38,7 +38,7 @@
       <!-- Loggout button  -->
       <template v-slot:append>
         <div class="pa-2">
-          <v-btn block>
+          <v-btn block @click="logout">
             {{ $t("navbar.logout") }}
             <v-spacer></v-spacer>
 
@@ -53,6 +53,9 @@
 </template>
 
 <script>
+import { createNamespacedHelpers } from "vuex";
+const { mapMutations, mapActions } = createNamespacedHelpers("auth");
+
 export default {
   name: "navbar",
   props: {
@@ -71,7 +74,13 @@ export default {
   data() {
     return { drawer: false, model: 1 };
   },
-  methods: {},
+  methods: {
+    ...mapMutations(["logout"]),
+    ...mapActions(["checkUserToken"]),
+  },
+  async mounted() {
+    await this.checkUserToken();
+  },
 };
 </script>
 
