@@ -36,7 +36,9 @@ export class BankAccountService {
   }
 
   async getBankAccounts(): Promise<BankAccount[]> {
-    return await getConnection().getRepository(BankAccount).find();
+    return await getConnection()
+      .getRepository(BankAccount)
+      .find();
   }
 
   async createBankAccount(options): Promise<BankAccount> {
@@ -86,5 +88,8 @@ export class BankAccountService {
 
   async existsBankAccount(accountNumber): Promise<BankAccount> {
     return await this.bankAccountRepository.findOne({ accountNumber });
+  }
+  async getBankAccount(idBankAccount: number): Promise<BankAccount> {
+    return await this.bankAccountRepository.findOne(idBankAccount);
   }
 }

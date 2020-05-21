@@ -40,5 +40,6 @@ import { UserModule } from './modules/user/user.module';
     UserModule,
     WinstonModule.forRoot(createOptions({ fileName: 'petromiles-global.log' })),
   ],
+  providers: [],
 })
 export class AppModule {}

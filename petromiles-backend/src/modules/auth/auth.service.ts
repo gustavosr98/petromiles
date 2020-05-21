@@ -12,6 +12,8 @@ import { CreateUserDTO } from '../user/dto/create-user.dto';
 import { UserClientService } from '../user/user-client/user-client.service';
 import { MailsService } from '../mails/mails.service';
 import { UserService } from '../user/user.service';
+import { SuscriptionService } from '../suscription/suscription.service';
+import { Suscription } from '../suscription/suscription/suscription.enum';
 
 @Injectable()
 export class AuthService {
@@ -22,12 +24,19 @@ export class AuthService {
     private mailsService: MailsService,
     private configService: ConfigService,
     private userService: UserService,
+    private suscriptionService: SuscriptionService,
   ) {}
 
   async createUserClient(user: CreateUserDTO): Promise<App.Auth.Response> {
     const createdUser = await this.userClientService.createUser(user);
 
     const token = this.createToken(createdUser.user.email, Role.CLIENT);
+
+    await this.suscriptionService.createUserSuscription(
+      createdUser.user,
+      Suscription.BASIC,
+      null,
+    );
 
     this.createWelcomeEmail(
       createdUser.user.email,

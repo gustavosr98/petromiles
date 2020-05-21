@@ -14,6 +14,7 @@ import { UserModule } from '../user/user.module';
 // SERVICES
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
+import { SuscriptionModule } from '../suscription/suscription.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { JwtStrategy } from './jwt.strategy';
     ManagementModule,
     PassportModule,
     ConfigModule,
+    SuscriptionModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -17,6 +17,7 @@ import { TransactionType } from './transaction/transaction.enum';
 import { StateName, StateDescription } from '../management/state/state.enum';
 import { TransactionInterestService } from './transaction-interest/transaction-interest.service';
 import { StateTransactionService } from './state-transaction/state-transaction.service';
+import { Suscription } from '../suscription/suscription/suscription.entity';
 
 @Injectable()
 export class TransactionService {
@@ -133,5 +134,28 @@ export class TransactionService {
           StateDescription.VERIFICATION_TRANSACTION_CREATION,
       });
     }
+  }
+
+  async createUpgradeSuscriptionTransaction(
+    clientBankAccount: ClientBankAccount,
+    suscription: Suscription,
+  ) {
+    const options = await this.getTransactionInterests({
+      platformInterestType: PlatformInterest.PREMIUM,
+      platformInterestExtraPointsType: null,
+      thirdPartyInterestType: ThirdPartyInterest.STRIPE,
+    });
+
+    return await this.createTransaction({
+      totalAmountWithInterest:
+        suscription.cost + options.thirdPartyInterest.amountDollarCents,
+      rawAmount: 0,
+      type: TransactionType.SUSCRIPTION_PAYMENT,
+      pointsConversion: options.pointsConversion,
+      clientBankAccount: clientBankAccount,
+      thirdPartyInterest: options.thirdPartyInterest,
+      platformInterest: options.interest,
+      stateTransactionDescription: StateDescription.SUSCRIPTION_UPGRADE,
+    });
   }
 }
