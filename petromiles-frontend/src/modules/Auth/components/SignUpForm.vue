@@ -79,6 +79,7 @@
 </template>
 
 <script>
+import store from "@/store/index";
 import { validationMixin } from "vuelidate";
 import {
   required,
@@ -168,7 +169,7 @@ export default {
     },
 
     signUp(user) {
-      this.$store
+      store
         .dispatch("auth/signUp", user)
         .then(() => {
           this.$router.push({ name: clientRoutes.DASHBOARD.name });

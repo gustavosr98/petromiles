@@ -69,13 +69,13 @@ const adminRoutesRaw = Object.freeze({
 
 // To be used in Vue Router
 const adminRoutesArray = Object.keys(adminRoutesRaw).map(
-  cr => adminRoutesRaw[cr]
+  (cr) => adminRoutesRaw[cr]
 );
 
 // To be used inside componentes
 let adminRoutes = {};
 Object.keys(adminRoutesRaw).map(
-  cr =>
+  (cr) =>
     (adminRoutes[cr] = {
       ...adminRoutesRaw[cr],
       component: null,

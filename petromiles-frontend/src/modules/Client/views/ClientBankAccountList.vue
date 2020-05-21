@@ -1,7 +1,7 @@
 <template>
   <client-layout>
     <sub-navbar :items="items" @changeComponent="changeComponent" />
-    <!-- Put here the component for the account list-->
+    <bank-account-table v-if="active === 0" />
     <bank-account-creation @finish="finish" v-if="active === 1" />
     <!-- Put here the component for the account verification-->
   </client-layout>
@@ -9,7 +9,9 @@
 
 <script>
 import ClientLayout from "@/modules/Client/components/ClientLayout";
-import BankAccountCreation from "@/modules/BankAccount/BankAccountCreation/components/BankAccountCreation";
+import BankAccountCreation from "@/modules/BankAccount/components/BankAccountCreation/BankAccountCreation";
+import BankAccountsTable from "@/modules/BankAccount/components/BankAccountList/BankAccountsTable";
+
 import SubNavBar from "@/components/SubNavBar";
 import clientRoutes from "@/router/clientRoutes";
 
@@ -18,6 +20,7 @@ export default {
   components: {
     "client-layout": ClientLayout,
     "bank-account-creation": BankAccountCreation,
+    "bank-account-table": BankAccountsTable,
     "sub-navbar": SubNavBar,
   },
   data() {

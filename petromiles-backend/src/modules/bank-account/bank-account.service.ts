@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { Repository } from 'typeorm';
+import { Repository, getConnection } from 'typeorm';
 
 import { BankAccount } from './bank-account/bank-account.entity';
 import { UserDetails } from '../user/user-details/user-details.entity';
@@ -18,7 +18,31 @@ export class BankAccountService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
+  async getClientBankAccounts(idUserClient: number): Promise<BankAccount[]> {
+    return await getConnection()
+      .getRepository(BankAccount)
+      .find({
+        where: `"userClient"."idUserClient" ='${idUserClient}' and "stateBankAccount"."finalDate" is null`,
+        join: {
+          alias: 'bankAccount',
+          innerJoinAndSelect: {
+            clientBankAccount: 'bankAccount.clientBankAccount',
+            stateBankAccount: 'clientBankAccount.stateBankAccount',
+            userClient: 'clientBankAccount.userClient',
+            state: 'stateBankAccount.state',
+          },
+        },
+      });
+  }
+
+  async getBankAccounts(): Promise<BankAccount[]> {
+    return await getConnection().getRepository(BankAccount).find();
+  }
+
   async createBankAccount(options): Promise<BankAccount> {
+    if (await this.existsBankAccount(options.accountNumber))
+      throw new BadRequestException('Bank account already exists');
+
     if (!this.validate(options.routingNumber))
       throw new BadRequestException('Invalid Routing Number');
 
@@ -45,7 +69,6 @@ export class BankAccountService {
     );
     return bankAccount;
   }
-
   // Valitation for american bank accounts
   validate(routingNumber) {
     const digits = routingNumber.toString();
@@ -59,5 +82,9 @@ export class BankAccountService {
 
     if (n != 0 && n % 10 == 0) return true;
     else return false;
+  }
+
+  async existsBankAccount(accountNumber): Promise<BankAccount> {
+    return await this.bankAccountRepository.findOne({ accountNumber });
   }
 }

@@ -23,19 +23,16 @@ export class StateBankAccount extends BaseEntity {
   @Column({ nullable: true })
   description: string;
 
-  @ManyToOne(
-    type => State,
-    state => state.idState,
-    {
-      nullable: false,
-    },
-  )
+  @ManyToOne((type) => State, (state) => state.idState, {
+    nullable: false,
+    eager: true,
+  })
   @JoinColumn({ name: 'fk_state' })
   state: State;
 
   @ManyToOne(
-    type => ClientBankAccount,
-    clientbankAccount => clientbankAccount.idClientBankAccount,
+    (type) => ClientBankAccount,
+    (clientbankAccount) => clientbankAccount.idClientBankAccount,
     {
       nullable: false,
     },

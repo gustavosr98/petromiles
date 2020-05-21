@@ -1,25 +1,27 @@
-import { AuthGuard } from '@nestjs/passport';
-import { HttpRequest } from './../../logger/http-requests.enum';
-import { RolesGuard } from './guards/roles.guard';
 import {
   Controller,
   Post,
   Body,
   ValidationPipe,
   UseInterceptors,
+  Inject,
+  UseGuards,
+  Get,
 } from '@nestjs/common';
-import { Inject, UseGuards, Get } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-import { AuthService } from './auth.service';
 import { CreateUserDTO } from '../user/dto/create-user.dto';
-import { PasswordEncryptorInterceptor } from './interceptors/password-encryptor.interceptor';
-
 import { GetUser } from './decorators/get-user.decorator';
-import { ApiModules } from '@/logger/api-modules.enum';
 import { Roles } from './decorators/roles.decorator';
+import { ApiModules } from '@/logger/api-modules.enum';
+import { HttpRequest } from './../../logger/http-requests.enum';
+
+import { PasswordEncryptorInterceptor } from './interceptors/password-encryptor.interceptor';
+import { RolesGuard } from './guards/roles.guard';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {

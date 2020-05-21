@@ -18,33 +18,31 @@ export class ClientBankAccount extends BaseEntity {
   @PrimaryGeneratedColumn()
   idClientBankAccount: number;
 
-  @ManyToOne(
-    type => UserClient,
-    userClient => userClient.idUserClient,
-    { nullable: false },
-  )
+  @ManyToOne((type) => UserClient, (userClient) => userClient.idUserClient, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'fk_user_client' })
   userClient: UserClient;
 
   @ManyToOne(
-    type => BankAccount,
-    bankAccount => bankAccount.idBankAccount,
+    (type) => BankAccount,
+    (bankAccount) => bankAccount.idBankAccount,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_bank_account' })
   bankAccount: BankAccount;
 
   @OneToMany(
-    type => Transaction,
-    transaction => transaction.clientBankAccount,
+    (type) => Transaction,
+    (transaction) => transaction.clientBankAccount,
     { nullable: true },
   )
   transaction: Transaction[];
 
   @OneToMany(
-    type => StateBankAccount,
-    stateBankAccount => stateBankAccount.clientBankAccount,
-    { nullable: false },
+    (type) => StateBankAccount,
+    (stateBankAccount) => stateBankAccount.clientBankAccount,
+    { nullable: false, eager: true },
   )
   stateBankAccount: StateBankAccount[];
 }

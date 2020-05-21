@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import store from "@/store/index";
 import NoFederatedButton from "@/modules/Auth/components/NoFederatedButton";
 import { providersMixin } from "@/mixins/Auth/firebaseProvider";
 
@@ -79,7 +80,14 @@ export default {
       this.login(user);
     },
     login(user) {
-      this.$store.dispatch("auth/logIn", user);
+      store
+        .dispatch("auth/logIn", user)
+        .then(() => {
+          this.$router.push({ name: clientRoutes.DASHBOARD.name });
+        })
+        .catch(err => {
+          console.log(err.response.data.message);
+        });
     },
   },
 };

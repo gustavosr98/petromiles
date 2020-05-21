@@ -16,6 +16,7 @@ declare namespace App {
       userDetails: object;
       token: string;
       role: import('../src/modules/management/role/role.enum').Role;
+      id: number;
     }
 
     interface LoginRequest {

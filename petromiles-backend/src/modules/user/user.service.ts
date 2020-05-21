@@ -40,6 +40,10 @@ export class UserService {
         password: user.password,
         email: user.email,
         salt: user.salt,
+        id:
+          user.idUserAdministrator !== undefined
+            ? user.idUserAdministrator
+            : user.idUserClient,
       };
       return { user: credentials, userDetails };
     }

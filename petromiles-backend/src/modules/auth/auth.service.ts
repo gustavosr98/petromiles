@@ -7,11 +7,11 @@ import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 import { Role } from 'src/modules/management/role/role.enum';
+import { MailsSubject } from '../mails/mails.enum';
 import { CreateUserDTO } from '../user/dto/create-user.dto';
 import { UserClientService } from '../user/user-client/user-client.service';
 import { MailsService } from '../mails/mails.service';
 import { UserService } from '../user/user.service';
-import { MailsSubject } from '../mails/mails.enum';
 
 @Injectable()
 export class AuthService {
@@ -39,6 +39,7 @@ export class AuthService {
       userDetails: createdUser.userDetails,
       role: Role.CLIENT,
       token,
+      id: createdUser.user.idUserClient,
     };
   }
 
@@ -54,6 +55,7 @@ export class AuthService {
         email,
         userDetails,
         role,
+        id: user.id,
         token: this.createToken(email, role),
       };
 

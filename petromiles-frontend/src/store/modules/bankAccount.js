@@ -4,6 +4,7 @@ export const namespaced = true;
 export const state = {
   userDetails: null,
   bankAccount: null,
+  bankAccounts: null,
 };
 
 export const mutations = {
@@ -13,6 +14,9 @@ export const mutations = {
 
   SET_BANK_ACCOUNT(state, bankAccount) {
     state.bankAccount = bankAccount;
+  },
+  SET_BANK_ACCOUNTS(state, bankAccounts) {
+    state.bankAccounts = bankAccounts;
   },
 };
 

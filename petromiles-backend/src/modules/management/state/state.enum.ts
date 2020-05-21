@@ -1,10 +1,10 @@
 export enum StateName {
-  VERIFYING = 'VERIFYING',
-  ACTIVE = 'ACTIVE',
-  BLOCKED = 'BLOCKED',
-  CANCELLED = 'CANCELLED',
-  VALID = 'VALID',
-  INVALID = 'INVALID',
+  VERIFYING = 'verifying',
+  ACTIVE = 'active',
+  BLOCKED = 'blocked',
+  CANCELLED = 'cancelled',
+  VALID = 'valid',
+  INVALID = 'invalid',
 }
 
 export enum StateType {

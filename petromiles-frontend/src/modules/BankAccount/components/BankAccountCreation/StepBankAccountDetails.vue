@@ -1,26 +1,15 @@
 <template>
   <v-stepper-content :step="step" justify="center">
-    <!-- Subtitle -->
-
     <v-row justify="center">
       <v-col cols="6">
-        <v-alert
-          v-if="error"
-          dismissible
-          dense
-          outlined
-          type="error"
-          class="my-4"
-        >
+        <v-alert v-if="error" dismissible dense outlined type="error" class="my-4">
           <strong>Error associating your bank account</strong>
         </v-alert>
       </v-col>
     </v-row>
 
     <v-row justify="center">
-      <header class="font-weight-light">
-        {{ $t("bank-account-creation.bankAccountFormTitle") }}
-      </header>
+      <header class="font-weight-light">{{ $t("bank-account-creation.bankAccountFormTitle") }}</header>
     </v-row>
 
     <!-- Form for account details -->
@@ -106,7 +95,6 @@ export default {
   methods: {
     ...mapActions("bankAccount", ["setBankAccount"]),
     nextStep() {
-      // Saving bank account details
       const bankAccount = {
         routingNumber: this.routingNumber,
         type: this.type,

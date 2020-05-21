@@ -28,7 +28,7 @@ export default {
     },
   },
   methods: {
-    async signIn() {
+    signIn() {
       const event = this;
       firebase
         .auth()
