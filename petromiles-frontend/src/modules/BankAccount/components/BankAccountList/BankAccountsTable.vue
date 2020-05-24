@@ -25,7 +25,7 @@ export default {
           value: "idBankAccount",
         },
         {
-          text: this.$tc("bank-account-properties.type"),
+          text: this.$tc("common.type"),
           value: "type",
         },
         {
