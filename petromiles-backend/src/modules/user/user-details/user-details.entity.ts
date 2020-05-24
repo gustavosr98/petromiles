@@ -8,6 +8,7 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 // ENTITIES
 import { UserClient } from '../user-client/user-client.entity';
@@ -44,6 +45,14 @@ export class UserDetails extends BaseEntity {
 
   @Column({ nullable: true })
   photo?: string;
+
+  @Column({ nullable: true })
+  @Exclude()
+  customerId?: string;
+
+  @Column({ nullable: true })
+  @Exclude()
+  accountId?: string;
 
   @OneToOne(
     type => UserClient,

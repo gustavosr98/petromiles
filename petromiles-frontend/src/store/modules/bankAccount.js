@@ -21,14 +21,8 @@ export const mutations = {
 };
 
 export const actions = {
-  setUserDetails({ commit, rootState }, userDetailsData) {
-    if (rootState.auth.user !== null) {
-      if (userDetailsData.email !== rootState.auth.user.email) {
-        commit("SET_USER_DETAILS", userDetailsData);
-      }
-    } else {
-      commit("SET_USER_DETAILS", userDetailsData);
-    }
+  setUserDetails({ commit }, userDetailsData) {
+    commit("SET_USER_DETAILS", userDetailsData);
   },
   async setBankAccount({ commit, state }, bankAccount) {
     commit("SET_BANK_ACCOUNT", bankAccount);

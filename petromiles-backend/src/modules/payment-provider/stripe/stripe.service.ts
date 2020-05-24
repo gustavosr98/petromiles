@@ -17,10 +17,39 @@ export class StripeService {
   }
 
   async createBankAccountBySource(
-    bankAccount: Stripe.TokenCreateParams,
-  ): Promise<Stripe.Token> {
-    const bankAccountSource = await this.stripe.tokens.create(bankAccount);
+    bankAccount: Stripe.SourceCreateParams,
+  ): Promise<Stripe.Source> {
+    const bankAccountSource = await this.stripe.sources.create(bankAccount);
     return bankAccountSource;
+  }
+
+  async verifyBankAccount({
+    customerId,
+    bankAccountId,
+    amounts,
+  }: {
+    customerId: string;
+    bankAccountId: string;
+    amounts: number[];
+  }) {
+    const verification = await this.stripe.customers.verifySource(
+      customerId,
+      bankAccountId,
+      { amounts },
+    );
+    console.log(verification);
+    return verification;
+  }
+
+  async asociateBankToCustomer(
+    customerId: string,
+    bankAccountToken: string,
+  ): Promise<Stripe.CustomerSource> {
+    const bankAsociatedToCustomed = await this.stripe.customers.createSource(
+      customerId,
+      { source: bankAccountToken },
+    );
+    return bankAsociatedToCustomed;
   }
 
   // CHARGES
@@ -39,16 +68,31 @@ export class StripeService {
     return payout;
   }
 
-  // CUSTOMER AND BANKS
-  async asociateBankToCustomer(
-    customerId: string,
-    bankBySource,
-  ): Promise<Stripe.CustomerSource> {
-    const bankAsociatedToCustomed = await this.stripe.customers.createSource(
-      customerId,
-      { source: bankBySource.id },
+  // ACCOUNTS
+  async createAccount(
+    accountCreateParams: Stripe.AccountCreateParams,
+  ): Promise<Stripe.Account> {
+    const account = await this.stripe.accounts.create(accountCreateParams);
+    return account;
+  }
+
+  async asociateBankAccountToAccount(
+    accountId: string,
+    bankAccountId: string,
+  ): Promise<Stripe.BankAccount | Stripe.Card> {
+    const asociatedBankAccount = await this.stripe.accounts.createExternalAccount(
+      accountId,
+      { external_account: bankAccountId },
     );
-    return bankAsociatedToCustomed;
+    return asociatedBankAccount;
+  }
+
+  // TRANSFERS
+  async createTransfer(
+    transferCreateParams: Stripe.TransferCreateParams,
+  ): Promise<Stripe.Transfer> {
+    const transfer = await this.stripe.transfers.create(transferCreateParams);
+    return transfer;
   }
 
   // CUSTOMER

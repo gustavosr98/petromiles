@@ -5,9 +5,13 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { Repository, getConnection } from 'typeorm';
 
+import { UserDetailsService } from '../user/user-details/user-details.service';
+
 import { BankAccount } from './bank-account/bank-account.entity';
 import { UserDetails } from '../user/user-details/user-details.entity';
-import { UserDetailsService } from '../user/user-details/user-details.service';
+
+import { ApiModules } from '@/logger/api-modules.enum';
+import americanRoutingNumbers from '@/constants/americanRoutingNumbers';
 
 @Injectable()
 export class BankAccountService {
@@ -41,49 +45,49 @@ export class BankAccountService {
       .find();
   }
 
-  async createBankAccount(options): Promise<BankAccount> {
-    if (await this.existsBankAccount(options.accountNumber))
+  async createBankAccount(bankAccountCreateParams): Promise<BankAccount> {
+    if (!this.validRoutingNumber(bankAccountCreateParams.routingNumber)) {
+      this.logger.error(
+        `[${ApiModules.BANK_ACCOUNT}] Invalid Routing Number ${bankAccountCreateParams.routingNumber}`,
+      );
       throw new BadRequestException('Bank account already exists');
-
-    if (!this.validate(options.routingNumber))
-      throw new BadRequestException('Invalid Routing Number');
+    }
 
     //  Verify if the account is of a Petromiles User. If it isn't, create the person in the entity UserDetails
     let userOwner: UserDetails = null;
-    if (options.userDetails) {
+    if (bankAccountCreateParams.userDetails) {
       userOwner = await this.userDetailsService.createClientDetails(
-        options.userDetails,
+        bankAccountCreateParams.userDetails,
       );
     }
 
     const account = new BankAccount();
-    account.routingNumber = options.routingNumber;
+    account.routingNumber = bankAccountCreateParams.routingNumber;
     account.userDetails = userOwner;
-    account.accountNumber = options.accountNumber;
-    account.type = options.type;
-    account.checkNumber = options.checkNumber;
+    account.accountNumber = bankAccountCreateParams.accountNumber;
+    account.type = bankAccountCreateParams.type;
+    account.checkNumber = bankAccountCreateParams.checkNumber;
 
     const bankAccount = await this.bankAccountRepository.create(account).save();
 
     this.logger.silly(
-      '[BANK_ACCOUNT] Bank Account ID: %s is created',
+      `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: %s was created`,
       bankAccount.idBankAccount,
     );
     return bankAccount;
   }
-  // Valitation for american bank accounts
-  validate(routingNumber) {
-    const digits = routingNumber.toString();
-    let n = 0;
-    for (let i = 0; i < digits.length; i += 3) {
-      n +=
-        parseInt(digits.charAt(i), 10) * 3 +
-        parseInt(digits.charAt(i + 1), 10) * 7 +
-        parseInt(digits.charAt(i + 2), 10);
-    }
 
-    if (n != 0 && n % 10 == 0) return true;
-    else return false;
+  validRoutingNumber(routingNumber): boolean {
+    return this.isRoutingNumberListed(routingNumber);
+  }
+
+  // Only validates American bank routing numbers
+  private isRoutingNumberListed(routingNumber: string): boolean {
+    let isListed = false;
+    americanRoutingNumbers.map(arm => {
+      if (arm == routingNumber) isListed = true;
+    });
+    return isListed;
   }
 
   async existsBankAccount(accountNumber): Promise<BankAccount> {

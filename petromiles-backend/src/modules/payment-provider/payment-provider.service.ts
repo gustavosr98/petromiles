@@ -1,5 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { ApiModules } from '@/logger/api-modules.enum';
+import { Injectable, Inject } from '@nestjs/common';
+
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+// SERVICES
 import { StripeService } from '@/modules/payment-provider/stripe/stripe.service';
+
+// INTERFACES
 import {
   CreateBankAccountParams,
   BankAccount,
@@ -21,16 +28,78 @@ import {
 
 @Injectable()
 export class PaymentProviderService {
-  constructor(private stripeService: StripeService) {}
+  constructor(
+    private stripeService: StripeService,
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
+  ) {}
 
   // BANKS
-  async createBankAccount(
-    bankAccount: CreateBankAccountParams,
-  ): Promise<BankAccount> {
-    const bankAccountSource: BankAccount = await this.stripeService.createBankAccountBySource(
-      bankAccount,
+  async createBankAccount(userClient, bankAccountCreateParams) {
+    this.logger.verbose(
+      `[${ApiModules.PAYMENT_PROVIDER}] {${userClient.email}} createBankAccount()`,
     );
-    return bankAccountSource;
+
+    // Asocitating with Customer to charge from
+    let bankAccountToken = await this.stripeService.createBankAccountByToken({
+      bank_account: {
+        country: 'US',
+        currency: 'usd',
+        account_holder_name: `${bankAccountCreateParams.userDetails.firstName} ${bankAccountCreateParams.userDetails.lastName}`,
+        account_holder_type: 'individual',
+        routing_number: bankAccountCreateParams.routingNumber,
+        account_number: bankAccountCreateParams.accountNumber,
+      },
+    });
+    this.logger.verbose(
+      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account first token created ${bankAccountToken.id}`,
+    );
+
+    const bankAccountSource = await this.asociateBankToCustomer(
+      userClient.userDetails.customerId,
+      bankAccountToken.id,
+    );
+    this.logger.verbose(
+      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account asociated to CUSTOMER {last4: ${bankAccountSource.last4}} `,
+    );
+
+    // Asocitating with Account to send money to
+    bankAccountToken = await this.stripeService.createBankAccountByToken({
+      bank_account: {
+        country: 'US',
+        currency: 'usd',
+        account_holder_name: `${bankAccountCreateParams.userDetails.firstName} ${bankAccountCreateParams.userDetails.lastName}`,
+        account_holder_type: 'individual',
+        routing_number: bankAccountCreateParams.routingNumber,
+        account_number: bankAccountCreateParams.accountNumber,
+      },
+    });
+    this.logger.verbose(
+      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account second token created ${bankAccountToken.id}`,
+    );
+
+    const asociatedBankAccount = await this.stripeService.asociateBankAccountToAccount(
+      userClient.userDetails.accountId,
+      bankAccountToken.id,
+    );
+    this.logger.verbose(
+      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account asociated to ACCOUNT {last4: ${bankAccountSource.last4}} `,
+    );
+
+    return {
+      transferId: asociatedBankAccount.id,
+      chargeId: bankAccountSource.id,
+    };
+  }
+
+  async verifyBankAccount(verificationRequest: {
+    customerId: string;
+    bankAccountId: string;
+    amounts: number[];
+  }) {
+    const verification = await this.stripeService.verifyBankAccount(
+      verificationRequest,
+    );
+    return verification;
   }
 
   // CHARGES
@@ -45,11 +114,41 @@ export class PaymentProviderService {
     return payout;
   }
 
+  // ACCOUNTS
+  async createAccount(user: { email: string; customerId: string }) {
+    const account = await this.stripeService.createAccount({
+      type: 'custom',
+      country: 'US',
+      email: user.email,
+      requested_capabilities: ['transfers'],
+      metadata: {
+        customerId: user.customerId,
+      },
+    });
+
+    this.logger.verbose(
+      `[${ApiModules.PAYMENT_PROVIDER}] {${user.email}} createAccount(): ${account.id}`,
+    );
+
+    return account;
+  }
+
+  // TRANSFERS
+  async createTransfer(transferCreateParams) {
+    const transfer = await this.stripeService.createAccount(
+      transferCreateParams,
+    );
+    return transfer;
+  }
+
   // CUSTOMER AND BANKS
-  async asociateBankToCustomer(customerId: string, bankBySource) {
+  private async asociateBankToCustomer(
+    customerId: string,
+    bankAccountToken: string,
+  ): Promise<any> {
     const bankAsociatedToCustomed = await this.stripeService.asociateBankToCustomer(
       customerId,
-      { source: bankBySource.id },
+      bankAccountToken,
     );
     return bankAsociatedToCustomed;
   }
@@ -67,6 +166,9 @@ export class PaymentProviderService {
 
   async createCustomer(customerInfo: CustomerCreateParams): Promise<Customer> {
     const customer = await this.stripeService.createCustomer(customerInfo);
+    this.logger.verbose(
+      `[${ApiModules.PAYMENT_PROVIDER}] {${customerInfo.email}} createCustomer(): ${customer.id}`,
+    );
     return customer;
   }
 

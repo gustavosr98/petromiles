@@ -1,42 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository, getConnection } from 'typeorm';
+import { Repository } from 'typeorm';
 
-import { BankAccountService } from '../bank-account.service';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+
+// SERVICES
+import { BankAccountService } from '@/modules/bank-account/bank-account.service';
+import { StateBankAccountService } from '@/modules/bank-account/state-bank-account/state-bank-account.service';
+import { UserClientService } from '@/modules/user/user-client/user-client.service';
+import { TransactionService } from '@/modules/transaction/transaction.service';
+import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
+
+// ENTITIES
+import { UserClient } from '@/modules/user/user-client/user-client.entity';
 import { ClientBankAccount } from './client-bank-account.entity';
-import { StateBankAccountService } from '../state-bank-account/state-bank-account.service';
+
+// ENUMS
+import { PaymentProvider } from '@/modules/payment-provider/payment-provider.enum';
+import { ApiModules } from '@/logger/api-modules.enum';
 import {
   StateName,
   StateDescription,
-} from 'src/modules/management/state/state.enum';
-import { UserClientService } from '../../user/user-client/user-client.service';
-import { TransactionService } from '../../transaction/transaction.service';
-import { UserClient } from '../../user/user-client/user-client.entity';
-import { BankAccount } from '../bank-account/bank-account.entity';
+} from '@/modules/management/state/state.enum';
 
 @Injectable()
 export class ClientBankAccountService {
   constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private bankAccountService: BankAccountService,
     @InjectRepository(ClientBankAccount)
     private clientBankAccountRepository: Repository<ClientBankAccount>,
     private stateBankAccountService: StateBankAccountService,
     private userClientService: UserClientService,
     private transactionService: TransactionService,
+    private paymentProviderService: PaymentProviderService,
   ) {}
 
-  async createClientBankAccount(email, account): Promise<ClientBankAccount> {
-    const bankAccount = await this.bankAccountService.createBankAccount({
-      ...account,
-    });
+  async createClientBankAccount(
+    bankAccountCreateParams,
+  ): Promise<ClientBankAccount> {
+    let userClient = await this.userClientService.getActiveClient(
+      bankAccountCreateParams.email,
+    );
+    userClient = await this.userClientService.getClient(userClient.email);
 
-    const userClient = await this.userClientService.getActiveClient(email);
+    const bankAccount = await this.bankAccountService.createBankAccount(
+      bankAccountCreateParams,
+    );
+
+    const paymentProviderBankAccount = await this.paymentProviderService.createBankAccount(
+      userClient,
+      bankAccountCreateParams,
+    );
 
     const clientBankAccount = await this.clientBankAccountRepository
       .create({
         bankAccount,
         userClient,
+        transferId: paymentProviderBankAccount.transferId,
+        chargeId: paymentProviderBankAccount.chargeId,
+        paymentProvider: PaymentProvider.STRIPE,
       })
       .save();
 
@@ -50,7 +75,22 @@ export class ClientBankAccountService {
       clientBankAccount,
     );
 
+    this.logger.verbose(
+      `[${ApiModules.BANK_ACCOUNT}] {${bankAccountCreateParams.email}} Bank account successfully created`,
+    );
+
     return clientBankAccount;
+  }
+
+  async verifyBankAccount(verificationRequest: {
+    customerId: string;
+    bankAccountId: string;
+    amounts: number[];
+  }) {
+    const verification = await this.paymentProviderService.verifyBankAccount(
+      verificationRequest,
+    );
+    return verification;
   }
 
   async getClientBankAccount(

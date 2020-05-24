@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 // MODULES
 import { ManagementModule } from '../management/management.module';
+import { PaymentProviderModule } from '@/modules/payment-provider/payment-provider.module';
 
 // SERVICES
 import { TransactionService } from './transaction.service';
@@ -12,10 +13,10 @@ import { StateTransactionService } from './state-transaction/state-transaction.s
 // ENTITIES
 import { Transaction } from './transaction/transaction.entity';
 import { TransactionInterest } from './transaction-interest/transaction-interest.entity';
-
 @Module({
   imports: [
     ManagementModule,
+    PaymentProviderModule,
     TypeOrmModule.forFeature([Transaction, TransactionInterest]),
   ],
   providers: [

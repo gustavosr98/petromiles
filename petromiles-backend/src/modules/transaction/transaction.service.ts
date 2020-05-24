@@ -6,18 +6,25 @@ import { Logger } from 'winston';
 
 import { Repository } from 'typeorm';
 
-import { PlatformInterestService } from '../management/platform-interest/platform-interest.service';
-import { PlatformInterest } from '../management/platform-interest/platform-interest.enum';
+// SERVICES
+import { PlatformInterestService } from '@/modules/management/platform-interest/platform-interest.service';
+import { PointsConversionService } from '@/modules/management/points-conversion/points-conversion.service';
+import { ThirdPartyInterestService } from '@/modules/management/third-party-interest/third-party-interest.service';
+import { TransactionInterestService } from '@/modules/transaction/transaction-interest/transaction-interest.service';
+import { StateTransactionService } from '@/modules/transaction/state-transaction/state-transaction.service';
+import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
+
+// ENTITIES
 import { ClientBankAccount } from '../bank-account/client-bank-account/client-bank-account.entity';
-import { PointsConversionService } from '../management/points-conversion/points-conversion.service';
 import { Transaction } from './transaction/transaction.entity';
-import { ThirdPartyInterestService } from '../management/third-party-interest/third-party-interest.service';
+import { Suscription } from '../suscription/suscription/suscription.entity';
+
+// INTERFACES
+import { PlatformInterest } from '../management/platform-interest/platform-interest.enum';
 import { ThirdPartyInterest } from '../management/third-party-interest/third-party-interest.enum';
 import { TransactionType } from './transaction/transaction.enum';
 import { StateName, StateDescription } from '../management/state/state.enum';
-import { TransactionInterestService } from './transaction-interest/transaction-interest.service';
-import { StateTransactionService } from './state-transaction/state-transaction.service';
-import { Suscription } from '../suscription/suscription/suscription.entity';
+import { ApiModules } from '@/logger/api-modules.enum';
 
 @Injectable()
 export class TransactionService {
@@ -29,10 +36,11 @@ export class TransactionService {
     private thirdPartyInterestService: ThirdPartyInterestService,
     private transactionInterestService: TransactionInterestService,
     private stateTransactionService: StateTransactionService,
+    private paymentProviderService: PaymentProviderService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  /* FOR ALL TYPE OF TRANSACTION */
+  // ANY TYPE OF TRANSACTION
 
   async getTransactionInterests(options: App.Transaction.TransactionInterests) {
     const interest = await this.platformInterestService.getInterestByName(
@@ -80,28 +88,31 @@ export class TransactionService {
     );
 
     this.logger.silly(
-      `[BANK_ACCOUNT] Transaction ID: ${transaction.idTransaction} is created`,
+      `[${ApiModules.TRANSACTION}] Transaction ID: ${transaction.idTransaction} was created`,
     );
     return transaction;
   }
 
-  /* FOR  BANK ACCOUNT VERIFICATION  TRANSACTION */
+  // BANK ACCOUNT VERIFICATION TRANSACTION
 
-  generateRandomAmounts(amount: number, paymentProviderInterest: number) {
+  private generateRandomAmounts(
+    amount: number,
+    paymentProviderInterest: number,
+  ) {
     const max = amount - paymentProviderInterest;
     const baseRandomAmount = Number(
       (
         Math.random() * (max - paymentProviderInterest) +
         paymentProviderInterest
-      ).toFixed(2),
+      ).toFixed(0),
     );
-    const randomAmount = Number((amount - baseRandomAmount).toFixed(2));
+    const randomAmount = Number((amount - baseRandomAmount).toFixed(0));
     return [baseRandomAmount, randomAmount];
   }
 
   async createVerificationTransaction(clientBankAccount: ClientBankAccount) {
     this.logger.verbose(
-      '[BANK_ACCOUNT] Creating bank account verification transactions',
+      `[${ApiModules.TRANSACTION}] Creating bank account verification transactions`,
     );
 
     const options = await this.getTransactionInterests({
@@ -116,7 +127,7 @@ export class TransactionService {
     );
 
     this.logger.verbose(
-      `[BANK_ACCOUNT] Random amounts for each transaction are: ${randomAmounts[0]} - ${randomAmounts[1]}`,
+      `[${ApiModules.TRANSACTION}] Random amounts for each transaction are: [${randomAmounts[0]}, ${randomAmounts[1]}]`,
     );
 
     let verificationTransaction: Transaction = null;

@@ -7,6 +7,7 @@ import {
   Inject,
   UseGuards,
   Get,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -24,6 +25,7 @@ import { RolesGuard } from './guards/roles.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
+@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
@@ -34,7 +36,7 @@ export class AuthController {
   @Post('signup')
   async signUpClient(@Body(ValidationPipe) user: CreateUserDTO) {
     this.logger.http(
-      `[${ApiModules.AUTH}] Client with the email: ${user.email} is starting the sign up process`,
+      `[${ApiModules.AUTH}] {${user.email}} Client is starting the sign up process`,
     );
     return await this.authService.createUserClient(user);
   }
@@ -42,11 +44,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() credentials: App.Auth.LoginRequest) {
     this.logger.http(
-      `[${ApiModules.AUTH}] The user with the email: ${credentials.email} is starting the login process`,
+      `[${ApiModules.AUTH}] {${credentials.email}} The user is starting the login process`,
     );
     const user = await this.authService.validateUser(credentials);
     this.logger.verbose(
-      `[${ApiModules.AUTH}] The user ${credentials.email} is logged in`,
+      `[${ApiModules.AUTH}] The user ${credentials.email} has logged in`,
     );
     return user;
   }

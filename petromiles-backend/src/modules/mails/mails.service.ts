@@ -5,6 +5,8 @@ import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
+import { ApiModules } from '@/logger/api-modules.enum';
+
 @Injectable()
 export class MailsService {
   public constructor(
@@ -25,11 +27,11 @@ export class MailsService {
 
       await this.sendGridClient.send(msg);
       this.logger.verbose(
-        `[MAILS] An email with the subject "${subject}" has been sent to ${email}`,
+        `[${ApiModules.MAILS}] {${email}} An email with the subject "${subject}" has been sent`,
       );
     } catch (err) {
-      this.logger.verbose(
-        `[MAILS] Problem sending email. Reason: ${err.message}`,
+      this.logger.error(
+        `[${ApiModules.MAILS}] {${email}} Problem sending email. Reason: ${err.message}`,
       );
     }
   }

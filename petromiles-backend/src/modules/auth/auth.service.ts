@@ -15,6 +15,8 @@ import { UserService } from '../user/user.service';
 import { SuscriptionService } from '../suscription/suscription.service';
 import { Suscription } from '../suscription/suscription/suscription.enum';
 
+import { ApiModules } from '@/logger/api-modules.enum';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -77,13 +79,15 @@ export class AuthService {
       if (user && user.password === passHash) {
         return result;
       } else {
-        this.logger.error(`[AUTH] Email or password incorrect`);
+        this.logger.error(
+          `[${ApiModules.AUTH}] {${email}} Email or password incorrect`,
+        );
         throw new UnauthorizedException('Email or password incorrect');
       }
     }
 
     this.logger.error(
-      `[AUTH] The user ${email} was not found or user is not active`,
+      `[${ApiModules.AUTH}] {${email}} The user was not found or user is not active`,
     );
     throw new UnauthorizedException(
       'The user was not found or user is not active',
@@ -109,7 +113,7 @@ export class AuthService {
   async hashPassword(password: string, salt: string): Promise<string> {
     if (!password) {
       this.logger.error(
-        `[AUTH] The user is a federated user, so needs a password`,
+        `[${ApiModules.AUTH}] The user is a federated user, so needs a password`,
       );
       throw new UnauthorizedException('Email or password incorrect');
     }

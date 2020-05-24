@@ -27,7 +27,7 @@
             prepend-icon="check"
             v-model="routingNumber"
             :label="$t('bank-account-properties.routingNumber')"
-            type="number"
+            type="text"
             @change="$v.routingNumber.$touch()"
             @blur="$v.routingNumber.$touch()"
             :error-messages="routingNumberError"
@@ -40,7 +40,7 @@
             prepend-icon="check"
             v-model="checkNumber"
             :label="$t('bank-account-properties.checkNumber')"
-            type="number"
+            type="text"
             @change="$v.checkNumber.$touch()"
             @blur="$v.checkNumber.$touch()"
             :error-messages="checkNumberError"
@@ -51,7 +51,7 @@
             prepend-icon="check"
             v-model="accountNumber"
             :label="$t('bank-account-properties.accountNumber')"
-            type="number"
+            type="text"
             @change="$v.accountNumber.$touch()"
             @blur="$v.accountNumber.$touch()"
             :error-messages="accountNumberError"
@@ -110,9 +110,7 @@ export default {
             this.$emit("nextStep", parseInt(this.step) + 1);
           })
           .catch(error => {
-            console.log(
-              `Failed to associate bank account because: ${error.response.data.message}`
-            );
+            console.log(`Failed to associate bank account because: ${error}`);
             this.error = true;
           });
       }

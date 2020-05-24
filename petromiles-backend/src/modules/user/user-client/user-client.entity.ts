@@ -55,7 +55,7 @@ export class UserClient extends BaseEntity {
     userDetails => userDetails.userClient,
     { nullable: true, eager: true },
   )
-  userDetails: UserDetails[];
+  userDetails: UserDetails;
 
   @OneToMany(
     type => UserSuscription,
