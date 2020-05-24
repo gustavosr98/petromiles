@@ -66,6 +66,18 @@ const clientRoutesRaw = Object.freeze({
       requiresClientAuth: true,
     },
   },
+  TRANSACTION_DETAILS: {
+    path: "/transaction-details/:id",
+    name: "TransactionDetails",
+    props: true,
+    component: () =>
+      import(
+        /* webpackChunkName: "client-transaction-details" */ "@/modules/Transaction/views/TransactionDetails"
+      ),
+    meta: {
+      requiresClientAuth: true,
+    },
+  },
   BUY_POINTS: {
     path: "/buy-points",
     name: "ClientBuyPoints",
@@ -92,13 +104,13 @@ const clientRoutesRaw = Object.freeze({
 
 // To be used in Vue Router
 const clientRoutesArray = Object.keys(clientRoutesRaw).map(
-  (cr) => clientRoutesRaw[cr]
+  cr => clientRoutesRaw[cr]
 );
 
 // To be used inside componentes
 let clientRoutes = {};
 Object.keys(clientRoutesRaw).map(
-  (cr) =>
+  cr =>
     (clientRoutes[cr] = {
       ...clientRoutesRaw[cr],
       component: null,

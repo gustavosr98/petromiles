@@ -19,7 +19,7 @@ export class TransactionInterest extends BaseEntity {
   @ManyToOne(
     type => PlatformInterest,
     platformInterest => platformInterest.idPlatformInterest,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_platform_interest' })
   platformInterest: PlatformInterest;

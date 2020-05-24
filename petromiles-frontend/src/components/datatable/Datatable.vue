@@ -19,14 +19,19 @@
       :search="search"
     >
       <template #item.state="{value}">
-        <v-chip class="overline" :color="getColor(value)" label dark>{{value}}</v-chip>
+        <v-chip outlined class="overline" :color="getColor(value)" label dark>{{value}}</v-chip>
+      </template>
+      <template #item.details="{item}">
+        <v-btn color="secondary" x-small :to="createLink(item.id)">
+          <v-icon dark>mdi-plus</v-icon>
+        </v-btn>
       </template>
     </v-data-table>
   </v-card>
 </template>
 
 <script>
-import { StateConstants } from "@/constants/constants.js";
+import { States } from "@/constants/state.js";
 export default {
   name: "datatable",
   props: {
@@ -42,28 +47,22 @@ export default {
       type: Array,
       required: true,
     },
+    linkTo: { type: String },
   },
   data() {
     return {
       search: "",
       searchLabel: this.$tc("datatable.search"),
       isLoading: false,
-      show_start_date: false,
-      start_date: null,
-      show_end_date: false,
-      end_date: null,
-      selected: [],
-      filters: {
-        search: "",
-        start_date: null,
-        end_date: null,
-      },
     };
   },
   methods: {
+    createLink(id) {
+      return `${this.linkTo}/${id}`;
+    },
     getColor(state) {
       let color = "";
-      StateConstants.map(s => {
+      States.map(s => {
         if (s.state === state) {
           color = s.color;
         }

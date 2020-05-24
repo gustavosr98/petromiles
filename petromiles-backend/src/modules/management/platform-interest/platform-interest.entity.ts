@@ -33,10 +33,10 @@ export class PlatformInterest extends BaseEntity {
   @ManyToOne(
     type => Suscription,
     suscription => suscription.idSuscription,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_suscription' })
-  suscription = Suscription;
+  suscription: Suscription;
 
   @OneToMany(
     type => TransactionInterest,

@@ -1,6 +1,6 @@
 export enum TransactionType {
-  SUSCRIPTION_PAYMENT = 'SUSCRIPTION_PAYMENT',
-  DEPOSIT = 'DEPOSIT',
-  WITHDRAW = 'WITHDRAW',
-  BANK_ACCOUNT_VALIDATION = 'BANK_ACCOUNT_VALIDATION',
+  SUSCRIPTION_PAYMENT = 'subscriptionPayment',
+  DEPOSIT = 'deposit',
+  WITHDRAW = 'withdrawal',
+  BANK_ACCOUNT_VALIDATION = 'bankAccountValidation',
 }

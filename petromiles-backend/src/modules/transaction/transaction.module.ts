@@ -13,6 +13,8 @@ import { StateTransactionService } from './state-transaction/state-transaction.s
 // ENTITIES
 import { Transaction } from './transaction/transaction.entity';
 import { TransactionInterest } from './transaction-interest/transaction-interest.entity';
+import { TransactionController } from './transaction.controller';
+
 @Module({
   imports: [
     ManagementModule,
@@ -30,5 +32,6 @@ import { TransactionInterest } from './transaction-interest/transaction-interest
     StateTransactionService,
     TypeOrmModule.forFeature([Transaction, TransactionInterest]),
   ],
+  controllers: [TransactionController],
 })
 export class TransactionModule {}

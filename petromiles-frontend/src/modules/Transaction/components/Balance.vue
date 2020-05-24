@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row>
-      <v-col class="py-1">
+      <v-col class="py-1 mb-5">
         <div class="d-flex justify-center">
           <balance-option :header="$t('user-balance.myPoints')" :value="points.points" type />
           <div class="mr-5">

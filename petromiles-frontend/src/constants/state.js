@@ -1,4 +1,4 @@
-export const StateConstants = [
+export const States = [
   {
     state: "Verifying",
     color: "blue",

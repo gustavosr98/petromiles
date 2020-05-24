@@ -66,6 +66,25 @@ export class TransactionService {
     };
   }
 
+  async getTransactions(email: string) {
+    const transactions = await this.transactionRepository.find({
+      where: `userClient.email = '${email}' AND stateTransaction.finalDate is null AND transaction.transaction is null`,
+      join: {
+        alias: 'transaction',
+        innerJoinAndSelect: {
+          clientBankAccount: 'transaction.clientBankAccount',
+          stateTransaction: 'transaction.stateTransaction',
+          state: 'stateTransaction.state',
+          transactionInterest: 'transaction.transactionInterest',
+          platformInterest: 'transactionInterest.platformInterest',
+          userClient: 'clientBankAccount.userClient',
+        },
+      },
+    });
+
+    return transactions;
+  }
+
   async createTransaction(
     options: App.Transaction.TransactionCreation,
   ): Promise<Transaction> {

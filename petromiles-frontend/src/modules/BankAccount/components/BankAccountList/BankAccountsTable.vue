@@ -21,19 +21,22 @@ export default {
       headers: [
         {
           text: `${this.$tc("common.code")}`,
-          align: "start",
+          align: "center",
           value: "idBankAccount",
         },
         {
           text: this.$tc("common.type"),
+          align: "center",
           value: "type",
         },
         {
           text: this.$tc("bank-account-properties.lastFourDigits"),
+          align: "center",
           value: "accountNumber",
         },
         {
           text: this.$tc("common.state"),
+          align: "center",
           value: "state",
         },
       ],
