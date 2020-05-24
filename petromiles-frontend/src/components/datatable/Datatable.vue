@@ -53,7 +53,6 @@ export default {
       show_end_date: false,
       end_date: null,
       selected: [],
-
       filters: {
         search: "",
         start_date: null,

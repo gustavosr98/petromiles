@@ -5,8 +5,8 @@ import {
   UseInterceptors,
   Param,
   Inject,
+  UseGuards
 } from '@nestjs/common';
-import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -20,6 +20,15 @@ import { ApiModules } from '@/logger/api-modules.enum';
 import { ClientPoints } from './user-client/user-points.entity';
 
 import { UserService } from './user.service';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { UserClientService } from './user-client/user-client.service';
+
+
+
+
+
+
 
 // Needs endpoint role protection
 
@@ -27,10 +36,12 @@ const baseEndpoint = Object.freeze('user');
 @UseGuards(AuthGuard('jwt'))
 @Controller(baseEndpoint)
 @UseInterceptors(ClassSerializerInterceptor)
+ @UseGuards(AuthGuard('jwt'))
+@Controller('user')
 export class UserController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    private readonly userService: UserService,
+    private readonly userService: UserService, private userClientService: UserClientService
   ) {}
 
   @Get(':role')
@@ -41,6 +52,7 @@ export class UserController {
     return this.userService.findAll(role);
   }
 
+
   @Get('points/conversion')
   getUserPoints(@GetUser() user): Promise<ClientPoints> {
     this.logger.http(
@@ -48,4 +60,16 @@ export class UserController {
     );
     return this.userService.getPoints(user.email);
   }
+
+
+  @Roles()
+  @UseGuards()
+  @Get('client/details')
+  async getDetail(@GetUser() user){
+
+    return await this.userClientService.getClient(user.email);
+
+  }  
+
 }
+
