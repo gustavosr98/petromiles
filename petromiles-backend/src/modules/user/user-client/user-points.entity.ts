@@ -29,7 +29,7 @@ import { StateName } from '@/modules/management/state/state.enum';
         new Brackets(type => {
           type
             .where(`transaction.type = '${TransactionType.DEPOSIT}'`)
-            .orWhere(`transaction.type = '${TransactionType.WITHDRAW}'`);
+            .orWhere(`transaction.type = '${TransactionType.WITHDRAWAL}'`);
         }),
       )
       .groupBy('userClient.email'),

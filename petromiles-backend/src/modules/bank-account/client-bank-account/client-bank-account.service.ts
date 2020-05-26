@@ -92,21 +92,4 @@ export class ClientBankAccountService {
     );
     return verification;
   }
-
-  async getClientBankAccount(
-    userClient: UserClient,
-    idBankAccount: number,
-  ): Promise<ClientBankAccount> {
-    const bankAccount = await this.clientBankAccountRepository.find({
-      where: `userClient.idUserClient = ${userClient.idUserClient} AND bankAccount.idBankAccount = ${idBankAccount}`,
-      join: {
-        alias: 'clientBankAccount',
-        innerJoin: {
-          bankAccount: 'clientBankAccount.bankAccount',
-          userClient: 'clientBankAccount.userClient',
-        },
-      },
-    });
-    return bankAccount[0];
-  }
 }

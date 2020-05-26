@@ -1,6 +1,6 @@
 <template>
   <client-layout>
-  	<user-detail></user-detail>
+    <user-detail></user-detail>
   </client-layout>
 </template>
 
@@ -8,12 +8,11 @@
 import ClientLayout from "@/modules/Client/components/ClientLayout";
 import UserDetail from "@/modules/User/views/Detail.vue";
 
-
 export default {
   name: "client-profile",
   components: {
     "client-layout": ClientLayout,
-    "user-detail" : UserDetail,
+    "user-detail": UserDetail,
   },
 };
 </script>

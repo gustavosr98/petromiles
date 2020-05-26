@@ -9,6 +9,7 @@ enum ApiModules {
   TRANSACTION = 'TRANSACTION',
   MAILS = 'MAILS',
   USER = 'USER',
+  PAYMENTS = 'PAYMENTS',
 }
 
 enum ApiSubmodules {

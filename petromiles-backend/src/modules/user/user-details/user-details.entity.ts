@@ -54,42 +54,35 @@ export class UserDetails extends BaseEntity {
   @Exclude()
   accountId?: string;
 
-  @OneToOne(
-    type => UserClient,
-    userClient => userClient.idUserClient,
-    { nullable: true },
-  )
+  @OneToOne((type) => UserClient, (userClient) => userClient.idUserClient, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'fk_user_client' })
   userClient?: UserClient;
 
   @OneToOne(
-    type => UserAdministrator,
-    userAdministrator => userAdministrator.idUserAdministrator,
+    (type) => UserAdministrator,
+    (userAdministrator) => userAdministrator.idUserAdministrator,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_user_administrator' })
   userAdministrator?: UserAdministrator;
 
-  @ManyToOne(
-    type => Language,
-    language => language.idLanguage,
-    { nullable: true, eager: true },
-  )
+  @ManyToOne((type) => Language, (language) => language.idLanguage, {
+    nullable: true,
+    eager: true,
+  })
   @JoinColumn({ name: 'fk_language' })
   language?: Language;
 
-  @ManyToOne(
-    type => Country,
-    country => country.idCountry,
-    { nullable: true },
-  )
+  @ManyToOne((type) => Country, (country) => country.idCountry, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'fk_country' })
   country?: Country;
 
-  @OneToMany(
-    type => BankAccount,
-    bankAccount => bankAccount.userDetails,
-    { nullable: true },
-  )
+  @OneToMany((type) => BankAccount, (bankAccount) => bankAccount.userDetails, {
+    nullable: true,
+  })
   bankAccount?: BankAccount[];
 }

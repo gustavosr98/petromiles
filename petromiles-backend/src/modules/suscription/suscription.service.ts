@@ -11,8 +11,8 @@ import { Transaction } from '../transaction/transaction/transaction.entity';
 import { Suscription } from './suscription/suscription.entity';
 import { UserSuscription } from '../user-suscription/user-suscription.entity';
 import { UserClientService } from '../user/user-client/user-client.service';
-import { ClientBankAccountService } from '../bank-account/client-bank-account/client-bank-account.service';
 import { TransactionService } from '../transaction/transaction.service';
+import { BankAccountService } from '../bank-account/bank-account.service';
 import { ApiModules } from 'src/logger/api-modules.enum';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class SuscriptionService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     private userClientService: UserClientService,
-    private clientBankAccount: ClientBankAccountService,
+    private bankAccountService: BankAccountService,
     private transactionService: TransactionService,
   ) {}
   async getSuscription(suscriptionType: SuscriptionType): Promise<Suscription> {
@@ -74,8 +74,8 @@ export class SuscriptionService {
     const userClient = await this.userClientService.getClient(email);
     const suscription = await this.getSuscription(SuscriptionType.PREMIUM);
 
-    const clientBankAccount = await this.clientBankAccount.getClientBankAccount(
-      userClient,
+    const clientBankAccount = await this.bankAccountService.getClientBankAccount(
+      userClient.idUserClient,
       idBankAccount,
     );
 

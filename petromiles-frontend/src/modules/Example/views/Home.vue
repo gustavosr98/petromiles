@@ -8,7 +8,6 @@
 // @ is an alias to /src
 import HelloWorld from "@/modules/Example/components/HelloWorld.vue";
 
-
 export default {
   name: "Home",
   components: {

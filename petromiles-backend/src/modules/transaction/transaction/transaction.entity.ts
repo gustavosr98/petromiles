@@ -22,14 +22,14 @@ export class Transaction extends BaseEntity {
   @PrimaryGeneratedColumn()
   idTransaction: number;
 
-  @Transform(date => date.toLocaleDateString())
+  @Transform((date) => date.toLocaleDateString())
   @Column({ default: () => 'CURRENT_DATE' })
   initialDate: Date;
 
-  @Column('decimal', { precision: 8, scale: 3 })
+  @Column('decimal', { precision: 12, scale: 3 })
   rawAmount: number;
 
-  @Column('decimal', { precision: 8, scale: 3 })
+  @Column('decimal', { precision: 12, scale: 3 })
   totalAmountWithInterest: number;
 
   @Column()
@@ -39,45 +39,45 @@ export class Transaction extends BaseEntity {
   operation?: number;
 
   @ManyToOne(
-    type => Transaction,
-    transaction => transaction.idTransaction,
+    (type) => Transaction,
+    (transaction) => transaction.idTransaction,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_transaction' })
   transaction: Transaction;
 
   @OneToOne(
-    type => UserSuscription,
-    userSuscription => userSuscription.transaction,
+    (type) => UserSuscription,
+    (userSuscription) => userSuscription.transaction,
     { nullable: true },
   )
   userSuscription: UserSuscription;
 
   @OneToMany(
-    type => StateTransaction,
-    stateTransaction => stateTransaction.transaction,
+    (type) => StateTransaction,
+    (stateTransaction) => stateTransaction.transaction,
     { nullable: false, eager: true },
   )
   stateTransaction: StateTransaction[];
 
   @OneToMany(
-    type => TransactionInterest,
-    transactionInterest => transactionInterest.transaction,
+    (type) => TransactionInterest,
+    (transactionInterest) => transactionInterest.transaction,
     { nullable: true, eager: true },
   )
   transactionInterest: TransactionInterest[];
 
   @ManyToOne(
-    type => PointsConversion,
-    pointsConversion => pointsConversion.idPointsConversion,
+    (type) => PointsConversion,
+    (pointsConversion) => pointsConversion.idPointsConversion,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_points_conversion' })
   pointsConversion: PointsConversion;
 
   @ManyToOne(
-    type => ClientBankAccount,
-    clientBankAccount => clientBankAccount.idClientBankAccount,
+    (type) => ClientBankAccount,
+    (clientBankAccount) => clientBankAccount.idClientBankAccount,
     { nullable: false, eager: true },
   )
   @JoinColumn({ name: 'fk_client_bank_account' })

@@ -9,6 +9,7 @@ import { UserDetailsService } from '../user/user-details/user-details.service';
 
 import { BankAccount } from './bank-account/bank-account.entity';
 import { UserDetails } from '../user/user-details/user-details.entity';
+import { ClientBankAccount } from './client-bank-account/client-bank-account.entity';
 
 import { ApiModules } from '@/logger/api-modules.enum';
 import americanRoutingNumbers from '@/constants/americanRoutingNumbers';
@@ -40,9 +41,7 @@ export class BankAccountService {
   }
 
   async getBankAccounts(): Promise<BankAccount[]> {
-    return await getConnection()
-      .getRepository(BankAccount)
-      .find();
+    return await getConnection().getRepository(BankAccount).find();
   }
 
   async createBankAccount(bankAccountCreateParams): Promise<BankAccount> {
@@ -84,7 +83,7 @@ export class BankAccountService {
   // Only validates American bank routing numbers
   private isRoutingNumberListed(routingNumber: string): boolean {
     let isListed = false;
-    americanRoutingNumbers.map(arm => {
+    americanRoutingNumbers.map((arm) => {
       if (arm == routingNumber) isListed = true;
     });
     return isListed;
@@ -95,5 +94,24 @@ export class BankAccountService {
   }
   async getBankAccount(idBankAccount: number): Promise<BankAccount> {
     return await this.bankAccountRepository.findOne(idBankAccount);
+  }
+
+  async getClientBankAccount(
+    idUserClient: number,
+    idBankAccount: number,
+  ): Promise<ClientBankAccount> {
+    const bankAccount = await getConnection()
+      .getRepository(ClientBankAccount)
+      .find({
+        where: `userClient.idUserClient = ${idUserClient} AND bankAccount.idBankAccount = ${idBankAccount}`,
+        join: {
+          alias: 'clientBankAccount',
+          innerJoin: {
+            bankAccount: 'clientBankAccount.bankAccount',
+            userClient: 'clientBankAccount.userClient',
+          },
+        },
+      });
+    return bankAccount[0];
   }
 }

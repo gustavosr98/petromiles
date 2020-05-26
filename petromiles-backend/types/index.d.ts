@@ -55,6 +55,7 @@ declare namespace App {
       stateTransactionDescription: string;
       promotion?: import('../src/modules/management/promotion/promotion.entity').Promotion;
       platformInterestExtraPoints?: import('../src/modules/management/platform-interest/platform-interest.entity').PlatformInterest;
+      operation?: number;
     }
     interface TransactionInterests {
       platformInterestType: import('../src/modules/management/platform-interest/platform-interest.enum').PlatformInterest;

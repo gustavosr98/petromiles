@@ -18,11 +18,11 @@ export class PlatformInterest extends BaseEntity {
   @Column()
   name: string;
 
-  @Column('decimal', { nullable: true, precision: 8, scale: 2 })
-  amount: number;
+  @Column({ nullable: true })
+  amount: string;
 
-  @Column('decimal', { nullable: true, precision: 8, scale: 2 })
-  percentage: number;
+  @Column({ nullable: true })
+  percentage: string;
 
   @Column({ default: () => 'CURRENT_DATE' })
   initialDate: Date;
@@ -31,23 +31,23 @@ export class PlatformInterest extends BaseEntity {
   finalDate: Date;
 
   @ManyToOne(
-    type => Suscription,
-    suscription => suscription.idSuscription,
+    (type) => Suscription,
+    (suscription) => suscription.idSuscription,
     { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_suscription' })
   suscription: Suscription;
 
   @OneToMany(
-    type => TransactionInterest,
-    transactionInterest => transactionInterest.platformInterest,
+    (type) => TransactionInterest,
+    (transactionInterest) => transactionInterest.platformInterest,
     { nullable: true },
   )
   transactionInterest: TransactionInterest[];
 
   @OneToMany(
-    type => TransactionInterest,
-    transactionInterestExtraPoints =>
+    (type) => TransactionInterest,
+    (transactionInterestExtraPoints) =>
       transactionInterestExtraPoints.platformInterest,
     { nullable: true },
   )

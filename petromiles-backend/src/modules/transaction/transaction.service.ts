@@ -141,7 +141,7 @@ export class TransactionService {
     });
 
     const randomAmounts = this.generateRandomAmounts(
-      options.interest.amount,
+      parseInt(options.interest.amount),
       options.thirdPartyInterest.amountDollarCents,
     );
 
@@ -166,12 +166,14 @@ export class TransactionService {
     }
   }
 
+  // TRANSACTION TO UPGRADE TO PREMIUM
+
   async createUpgradeSuscriptionTransaction(
     clientBankAccount: ClientBankAccount,
     suscription: Suscription,
-  ) {
+  ): Promise<Transaction> {
     const options = await this.getTransactionInterests({
-      platformInterestType: PlatformInterest.PREMIUM,
+      platformInterestType: PlatformInterest.PREMIUM_EXTRA,
       platformInterestExtraPointsType: null,
       thirdPartyInterestType: ThirdPartyInterest.STRIPE,
     });
@@ -186,6 +188,68 @@ export class TransactionService {
       thirdPartyInterest: options.thirdPartyInterest,
       platformInterest: options.interest,
       stateTransactionDescription: StateDescription.SUSCRIPTION_UPGRADE,
+    });
+  }
+
+  //POINT PURCHASE TRANSACTION
+  async createDepositTransaction(
+    clientBankAccount: ClientBankAccount,
+    extraPointsType: PlatformInterest,
+    amount: number,
+  ): Promise<Transaction> {
+    const options = await this.getTransactionInterests({
+      platformInterestType: PlatformInterest.BUY,
+      platformInterestExtraPointsType: extraPointsType,
+      thirdPartyInterestType: ThirdPartyInterest.STRIPE,
+    });
+
+    return await this.createTransaction({
+      totalAmountWithInterest:
+        options.thirdPartyInterest.amountDollarCents +
+        parseFloat(options.interest.percentage) * amount,
+      rawAmount: this.calculateExtraPoints(options.extraPoints, amount),
+      type: TransactionType.DEPOSIT,
+      pointsConversion: options.pointsConversion,
+      clientBankAccount,
+      thirdPartyInterest: options.thirdPartyInterest,
+      platformInterest: options.interest,
+      stateTransactionDescription: StateDescription.DEPOSIT,
+      platformInterestExtraPoints: options.extraPoints,
+      operation: 1,
+    });
+  }
+
+  private calculateExtraPoints(extraPoints, amount) {
+    if (!extraPoints) return amount;
+    if (extraPoints.name === PlatformInterest.PREMIUM_EXTRA)
+      return amount * extraPoints.percentage + amount;
+    if (extraPoints.name === PlatformInterest.GOLD_EXTRA)
+      return amount * extraPoints.percentage + amount + extraPoints.amount;
+  }
+
+  // WITHDRAWAL TRANSACTION
+  async createWithdrawalTransaction(
+    clientBankAccount: ClientBankAccount,
+    amount: number,
+  ): Promise<Transaction> {
+    const options = await this.getTransactionInterests({
+      platformInterestType: PlatformInterest.WITHDRAWAL,
+      platformInterestExtraPointsType: null,
+      thirdPartyInterestType: ThirdPartyInterest.STRIPE,
+    });
+
+    return await this.createTransaction({
+      totalAmountWithInterest:
+        options.thirdPartyInterest.amountDollarCents +
+        parseFloat(options.interest.percentage) * amount,
+      rawAmount: amount,
+      type: TransactionType.WITHDRAWAL,
+      pointsConversion: options.pointsConversion,
+      clientBankAccount,
+      thirdPartyInterest: options.thirdPartyInterest,
+      platformInterest: options.interest,
+      stateTransactionDescription: StateDescription.WITHDRAWAL,
+      operation: -1,
     });
   }
 }

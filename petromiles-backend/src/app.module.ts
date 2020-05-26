@@ -19,6 +19,7 @@ import { MailsModule } from './modules/mails/mails.module';
 import { ManagementModule } from './modules/management/management.module';
 import { SuscriptionModule } from './modules/suscription/suscription.module';
 import { UserModule } from './modules/user/user.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { UserModule } from './modules/user/user.module';
     SuscriptionModule,
     UserModule,
     WinstonModule.forRoot(createOptions({ fileName: 'petromiles-global.log' })),
+    PaymentsModule,
   ],
   providers: [],
 })
