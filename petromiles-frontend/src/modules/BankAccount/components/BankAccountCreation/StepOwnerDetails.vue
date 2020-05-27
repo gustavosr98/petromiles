@@ -93,7 +93,6 @@ export default {
       this.phone = this.user.details.phone;
       this.email = this.user.email;
     }
-    console.log(this.user);
   },
   methods: {
     ...mapActions("bankAccount", ["setUserDetails"]),

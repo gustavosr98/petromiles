@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
@@ -83,13 +83,66 @@ export class ClientBankAccountService {
   }
 
   async verifyBankAccount(verificationRequest: {
-    customerId: string;
-    bankAccountId: string;
+    clientBankAccountId: number;
     amounts: number[];
   }) {
-    const verification = await this.paymentProviderService.verifyBankAccount(
-      verificationRequest,
+    const clientBankAccount = await this.clientBankAccountRepository.findOne({
+      idClientBankAccount: verificationRequest.clientBankAccountId,
+    });
+
+    if (
+      !(await this.checkCorrectVerificationAmounts(
+        clientBankAccount,
+        verificationRequest.amounts,
+      ))
+    ) {
+      const message = `[${ApiModules.BANK_ACCOUNT}] Invalid verification amounts for the client bank account ID ${clientBankAccount.idClientBankAccount}`;
+      this.logger.error(message);
+      throw new BadRequestException(message);
+    }
+
+    const verification = await this.paymentProviderService.verifyBankAccount({
+      customerId: clientBankAccount.userClient.userDetails.customerId,
+      bankAccountId: clientBankAccount.chargeId,
+      amounts: verificationRequest.amounts,
+    });
+
+    await this.stateBankAccountService.createStateBankAccount(
+      StateName.ACTIVE,
+      clientBankAccount,
+      StateDescription.BANK_ACCOUNT_VALIDATION,
     );
     return verification;
+  }
+
+  async checkCorrectVerificationAmounts(clientBankAccount, amounts) {
+    const transactions = await this.transactionService.getClientBankAccountTransaction(
+      clientBankAccount,
+    );
+    let correctValues = true;
+
+    transactions.forEach(transaction => {
+      if (!amounts.includes(transaction.totalAmountWithInterest / 100)) {
+        correctValues = false;
+      }
+    });
+
+    return correctValues;
+  }
+  async getClientBankAccount(
+    userClient: UserClient,
+    idBankAccount: number,
+  ): Promise<ClientBankAccount> {
+    const bankAccount = await this.clientBankAccountRepository.find({
+      where: `userClient.idUserClient = ${userClient.idUserClient} AND bankAccount.idBankAccount = ${idBankAccount}`,
+      join: {
+        alias: 'clientBankAccount',
+        innerJoin: {
+          bankAccount: 'clientBankAccount.bankAccount',
+          userClient: 'clientBankAccount.userClient',
+        },
+      },
+    });
+    return bankAccount[0];
   }
 }

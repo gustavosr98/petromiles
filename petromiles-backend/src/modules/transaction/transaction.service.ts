@@ -112,6 +112,10 @@ export class TransactionService {
     return transaction;
   }
 
+  async getClientBankAccountTransaction(clientBankAccount) {
+    return await this.transactionRepository.find({ clientBankAccount });
+  }
+
   // BANK ACCOUNT VERIFICATION TRANSACTION
 
   private generateRandomAmounts(
@@ -146,7 +150,10 @@ export class TransactionService {
     );
 
     this.logger.verbose(
-      `[${ApiModules.TRANSACTION}] Random amounts for each transaction are: [${randomAmounts[0]}, ${randomAmounts[1]}]`,
+      `[${
+        ApiModules.TRANSACTION
+      }] Random amounts for each transaction are: [${randomAmounts[0] /
+        100}, ${randomAmounts[1] / 100}]`,
     );
 
     let verificationTransaction: Transaction = null;

@@ -3,7 +3,7 @@
     <sub-navbar :items="items" @changeComponent="changeComponent" />
     <bank-account-table v-if="active === 0" />
     <bank-account-creation @finish="finish" v-if="active === 1" />
-    <!-- Put here the component for the account verification-->
+    <bank-account-verification @finish="finish" v-if="active === 2" />
   </client-layout>
 </template>
 
@@ -11,6 +11,7 @@
 import ClientLayout from "@/modules/Client/components/ClientLayout";
 import BankAccountCreation from "@/modules/BankAccount/components/BankAccountCreation/BankAccountCreation";
 import BankAccountsTable from "@/modules/BankAccount/components/BankAccountList/BankAccountsTable";
+import BankAccountVerification from "@/modules/BankAccount/components/BankAccountVerification/BankAccountVerification";
 
 import SubNavBar from "@/components/SubNavBar";
 import clientRoutes from "@/router/clientRoutes";
@@ -21,6 +22,7 @@ export default {
     "client-layout": ClientLayout,
     "bank-account-creation": BankAccountCreation,
     "bank-account-table": BankAccountsTable,
+    "bank-account-verification": BankAccountVerification,
     "sub-navbar": SubNavBar,
   },
   data() {

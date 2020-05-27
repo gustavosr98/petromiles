@@ -37,8 +37,6 @@ export class BankAccountController {
     private bankAccountService: BankAccountService,
   ) {}
 
-  @Roles()
-  @UseGuards(RolesGuard)
   @Post()
   async createClientBankAccount(
     @Body(ValidationPipe) bankAccountCreateParams: CreateBankAccountDTO,
@@ -59,14 +57,14 @@ export class BankAccountController {
     return bankAccountCreated;
   }
 
-  @Roles()
-  @UseGuards(RolesGuard)
-  @Post()
-  async verifyBankAccount(verificationRequest: {
-    customerId: string;
-    bankAccountId: string;
-    amounts: number[];
-  }) {
+  @Post('verify')
+  async verifyBankAccount(
+    @Body()
+    verificationRequest: {
+      clientBankAccountId: number;
+      amounts: number[];
+    },
+  ) {
     const verification = await this.clientBankAccountService.verifyBankAccount(
       verificationRequest,
     );

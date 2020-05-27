@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { States } from "@/constants/state.js";
+import { statesArray } from "@/constants/state.js";
 export default {
   name: "datatable",
   props: {
@@ -62,7 +62,7 @@ export default {
     },
     getColor(state) {
       let color = "";
-      States.map(s => {
+      statesArray.map(s => {
         if (s.state === state) {
           color = s.color;
         }

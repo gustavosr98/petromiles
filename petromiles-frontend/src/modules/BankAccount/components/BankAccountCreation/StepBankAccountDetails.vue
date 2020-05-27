@@ -64,7 +64,7 @@
 
     <v-row justify="space-between" class="ma-1 mt-8">
       <v-btn text @click="backStep">Cancel</v-btn>
-      <v-btn color="primary" @click="nextStep">Continue</v-btn>
+      <v-btn color="primary" @click="nextStep" :loading="processing" :disable="processing">Continue</v-btn>
     </v-row>
   </v-stepper-content>
 </template>
@@ -85,6 +85,7 @@ export default {
       routingNumber: null,
       checkNumber: null,
       accountNumber: null,
+      processing: false,
       error: false,
       types: [
         `${this.$tc("bank-account-properties.saving")}`,
@@ -94,7 +95,7 @@ export default {
   },
   methods: {
     ...mapActions("bankAccount", ["setBankAccount"]),
-    nextStep() {
+    async nextStep() {
       const bankAccount = {
         routingNumber: this.routingNumber,
         type: this.type,
@@ -105,7 +106,8 @@ export default {
       // Checking if all fields are valid
       this.$v.$touch();
       if (!this.$v.$invalid) {
-        this.setBankAccount(bankAccount)
+        this.processing = true;
+        await this.setBankAccount(bankAccount)
           .then(() => {
             this.$emit("nextStep", parseInt(this.step) + 1);
           })
@@ -113,6 +115,7 @@ export default {
             console.log(`Failed to associate bank account because: ${error}`);
             this.error = true;
           });
+        this.processing = false;
       }
     },
     backStep() {

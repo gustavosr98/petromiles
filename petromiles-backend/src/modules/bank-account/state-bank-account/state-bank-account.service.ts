@@ -8,6 +8,7 @@ import { getConnection } from 'typeorm';
 import { StateService } from '../../management/state/state.service';
 import { ClientBankAccount } from '../client-bank-account/client-bank-account.entity';
 import { StateName } from '../../management/state/state.enum';
+import { ApiModules } from '@/logger/api-modules.enum';
 
 @Injectable()
 export class StateBankAccountService {
@@ -21,6 +22,9 @@ export class StateBankAccountService {
     clientBankAccount: ClientBankAccount,
     description,
   ) {
+    if (clientBankAccount.stateBankAccount)
+      await this.changeCurrentState(clientBankAccount);
+
     const state = await this.stateService.getState(stateName);
     const stateBankAccount = new StateBankAccount();
     stateBankAccount.clientBankAccount = clientBankAccount;
@@ -28,10 +32,23 @@ export class StateBankAccountService {
     stateBankAccount.state = state;
 
     this.logger.silly(
-      `[BANK_ACCOUNT] State of the bank account ID: ${clientBankAccount.bankAccount.idBankAccount} is ${stateName}`,
+      `[${ApiModules.BANK_ACCOUNT}] New state:  (${stateName})`,
     );
     return await getConnection()
       .getRepository(StateBankAccount)
       .save(stateBankAccount);
+  }
+
+  async changeCurrentState(clientBankAccount: ClientBankAccount) {
+    const stateBankAccountRepository = await getConnection().getRepository(
+      StateBankAccount,
+    );
+    const currentStateBankAccount = await stateBankAccountRepository.findOne({
+      clientBankAccount,
+      finalDate: null,
+    });
+
+    currentStateBankAccount.finalDate = new Date();
+    await stateBankAccountRepository.save(currentStateBankAccount);
   }
 }
