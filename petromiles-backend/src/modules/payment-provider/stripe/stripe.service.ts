@@ -2,6 +2,7 @@ import { Injectable, Inject, UseFilters } from '@nestjs/common';
 import Stripe from 'stripe';
 
 import { StripeFilter } from '@/modules/payment-provider/stripe/filters/stripe.filter';
+import { StripeBankAccountStatus } from './bank-account-status.enum';
 
 @Injectable()
 @UseFilters(new StripeFilter())
@@ -9,6 +10,23 @@ export class StripeService {
   constructor(@Inject('STRIPE') private stripe: Stripe) {}
 
   // BANKS
+  async getBankAccount({
+    customerId,
+    bankAccountId,
+  }: {
+    customerId: string;
+    bankAccountId: string;
+  }): Promise<{ id: string; status: StripeBankAccountStatus }> {
+    const bankAccount: any = await this.stripe.customers.retrieveSource(
+      customerId,
+      bankAccountId,
+    );
+    return {
+      id: bankAccount.id,
+      status: bankAccount.status,
+    };
+  }
+
   async createBankAccountByToken(
     bankAccount: Stripe.TokenCreateParams,
   ): Promise<Stripe.Token> {
@@ -53,6 +71,11 @@ export class StripeService {
   }
 
   // CHARGES
+  async getCharge(chargeId: string): Promise<Stripe.Charge> {
+    const charge = await this.stripe.charges.retrieve(chargeId);
+    return charge;
+  }
+
   async createCharge(
     chargeCreateParams: Stripe.ChargeCreateParams,
   ): Promise<Stripe.Charge> {

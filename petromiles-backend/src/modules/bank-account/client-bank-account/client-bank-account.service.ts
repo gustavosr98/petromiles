@@ -1,7 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { Repository, getConnection } from 'typeorm';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -16,6 +16,7 @@ import { PaymentProviderService } from '@/modules/payment-provider/payment-provi
 // ENTITIES
 import { UserClient } from '@/modules/user/user-client/user-client.entity';
 import { ClientBankAccount } from './client-bank-account.entity';
+import { StateBankAccount } from '@/modules/bank-account/state-bank-account/state-bank-account.entity';
 
 // ENUMS
 import { PaymentProvider } from '@/modules/payment-provider/payment-provider.enum';
@@ -32,6 +33,7 @@ export class ClientBankAccountService {
     private bankAccountService: BankAccountService,
     @InjectRepository(ClientBankAccount)
     private clientBankAccountRepository: Repository<ClientBankAccount>,
+
     private stateBankAccountService: StateBankAccountService,
     private userClientService: UserClientService,
     private transactionService: TransactionService,
@@ -65,7 +67,7 @@ export class ClientBankAccountService {
       })
       .save();
 
-    await this.stateBankAccountService.createStateBankAccount(
+    await this.stateBankAccountService.updateStateBankAccount(
       StateName.VERIFYING,
       clientBankAccount,
       StateDescription.NEWLY_CREATED_ACCOUNT,
@@ -107,7 +109,7 @@ export class ClientBankAccountService {
       amounts: verificationRequest.amounts,
     });
 
-    await this.stateBankAccountService.createStateBankAccount(
+    await this.stateBankAccountService.updateStateBankAccount(
       StateName.ACTIVE,
       clientBankAccount,
       StateDescription.BANK_ACCOUNT_VALIDATION,
@@ -144,5 +146,61 @@ export class ClientBankAccountService {
       },
     });
     return bankAccount[0];
+  }
+
+  async updateState(
+    idClientBankAccount: number,
+    state: StateName,
+    description?: string,
+  ): Promise<StateBankAccount> {
+    const clientBankAccount: ClientBankAccount = await this.clientBankAccountRepository.findOne(
+      {
+        idClientBankAccount,
+      },
+    );
+
+    return await this.stateBankAccountService.updateStateBankAccount(
+      state,
+      clientBankAccount,
+      description,
+    );
+  }
+
+  async getByState(
+    states: StateName[],
+  ): Promise<
+    (ClientBankAccount & {
+      email: string;
+      customerId: string;
+      idStateBankAccount: number;
+    })[]
+  > {
+    const bankAccounts = await getConnection().query(
+      `
+      SELECT
+        CLIENT_BANK_ACCOUNT.*, USER_CLIENT.email, USER_DETAILS."customerId",  STATE_BANK_ACCOUNT."idStateBankAccount"
+      FROM 
+        CLIENT_BANK_ACCOUNT,
+        USER_CLIENT,
+        USER_DETAILS, 
+        STATE_USER,
+        STATE_BANK_ACCOUNT,
+        STATE STATE_BA,
+        STATE STATE_U
+      WHERE
+        -- Relations
+        CLIENT_BANK_ACCOUNT.fk_user_client = USER_CLIENT."idUserClient"
+        AND STATE_BANK_ACCOUNT.fk_client_bank_account = CLIENT_BANK_ACCOUNT."idClientBankAccount"
+        AND STATE_BANK_ACCOUNT.fk_state = STATE_BA."idState"
+        AND STATE_USER.fk_user_client = USER_CLIENT."idUserClient"
+        AND STATE_USER.fk_state = STATE_U."idState" 
+        AND USER_DETAILS.fk_user_client = USER_CLIENT."idUserClient"
+        -- Conditions
+        AND STATE_U.name = 'active'
+        AND STATE_BA.name = ANY($1)    
+    `,
+      [states],
+    );
+    return bankAccounts;
   }
 }

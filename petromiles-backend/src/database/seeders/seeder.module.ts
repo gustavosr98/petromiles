@@ -15,6 +15,7 @@ import { PlatformInterestSeederModule } from './platform_interest/platform_inter
 import { ThirdPartyInterestSeederModule } from './third_party_interest/third_party_interest.module';
 import { PointsConversionSeederModule } from './points_conversion/points_conversion.module';
 import { BankSeederModule } from './bank/bank.module';
+import { TaskSeederModule } from './task/task.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { BankSeederModule } from './bank/bank.module';
     ThirdPartyInterestSeederModule,
     PointsConversionSeederModule,
     BankSeederModule,
+    TaskSeederModule,
   ],
   providers: [Seeder, Logger],
 })

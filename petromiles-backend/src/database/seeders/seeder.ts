@@ -10,6 +10,7 @@ import { PlatformInterestSeederService } from './platform_interest/platform_inte
 import { ThirdPartyInterestSeederService } from './third_party_interest/third_party_interest.service';
 import { PointsConversionSeederService } from './points_conversion/points_conversion.service';
 import { BankSeederService } from './bank/bank.service';
+import { TaskSeederService } from './task/task.service';
 
 @Injectable()
 export class Seeder {
@@ -24,6 +25,7 @@ export class Seeder {
     private readonly thirdPartyInterestSeederService: ThirdPartyInterestSeederService,
     private readonly pointsConversionSeederService: PointsConversionSeederService,
     private readonly bankSeederService: BankSeederService,
+    private readonly taskSeederService: TaskSeederService,
   ) {}
 
   async clean() {
@@ -51,6 +53,7 @@ export class Seeder {
       PLATFORM: await this.platformInterest(),
       THIRD_PARTY_INTEREST: await this.thirdPartyInterest(),
       POINTS_CONVERSION: await this.pointsConversion(),
+      TASKS: await this.task(),
     };
   }
 
@@ -171,6 +174,19 @@ export class Seeder {
           nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
         ).length;
         return BANK_ROWS;
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
+  }
+
+  async task(): Promise<number> {
+    return await Promise.all(this.taskSeederService.createTask())
+      .then(createdTasks => {
+        const TASK_ROWS = createdTasks.filter(
+          nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
+        ).length;
+        return TASK_ROWS;
       })
       .catch(error => {
         return Promise.reject(error);

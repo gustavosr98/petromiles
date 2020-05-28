@@ -10,9 +10,9 @@ import {
 import { Exclude } from 'class-transformer';
 
 // ENTITIES
-import { UserClient } from '../../user/user-client/user-client.entity';
+import { UserClient } from '@/modules/user/user-client/user-client.entity';
 import { BankAccount } from '../bank-account/bank-account.entity';
-import { Transaction } from '../../transaction/transaction/transaction.entity';
+import { Transaction } from '@/modules/transaction/transaction/transaction.entity';
 import { StateBankAccount } from '../state-bank-account/state-bank-account.entity';
 
 import { PaymentProvider } from '@/modules/payment-provider/payment-provider.enum';

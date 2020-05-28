@@ -41,6 +41,12 @@ export class TransactionService {
   ) {}
 
   // ANY TYPE OF TRANSACTION
+  async get(idTransaction: number): Promise<Transaction> {
+    const transaction = await this.transactionRepository.findOne({
+      idTransaction,
+    });
+    return transaction;
+  }
 
   async getTransactionInterests(options: App.Transaction.TransactionInterests) {
     const interest = await this.platformInterestService.getInterestByName(
