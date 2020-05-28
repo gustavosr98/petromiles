@@ -1,18 +1,20 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import { getManager, getConnection, Repository } from 'typeorm';
 
-import { Role as RoleEnum } from 'src/modules/management/role/role.enum';
+// SERVICES
+import { UserClientService } from './user-client/user-client.service';
+import { UserAdministratorService } from './user-administrator/user-administrator.service';
+import { UserDetailsService } from './user-details/user-details.service';
 
+// ENTITIES
 import { ClientPoints } from './user-client/user-points.entity';
 import { UserClient } from './user-client/user-client.entity';
 import { Language } from './language/language.entity';
 import { UserDetails } from './user-details/user-details.entity';
 
-import { UserClientService } from './user-client/user-client.service';
-import { UserAdministratorService } from './user-administrator/user-administrator.service';
-import { UserDetailsService } from './user-details/user-details.service';
+// INTERFACES
+import { Role as RoleEnum } from 'src/modules/management/role/role.enum';
 
 @Injectable()
 export class UserService {
@@ -35,6 +37,10 @@ export class UserService {
       const admins = await this.userAdministratorService.findAll();
       return admins;
     }
+  }
+
+  async getClient(email: string): Promise<UserClient> {
+    return await this.userClientService.getClient(email);
   }
 
   async getUserByEmail(credentials: App.Auth.LoginRequest) {

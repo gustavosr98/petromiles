@@ -1,3 +1,4 @@
+import { PaymentProvider } from '@/modules/payment-provider/payment-provider.enum';
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -21,7 +22,6 @@ import { Suscription } from '../suscription/suscription/suscription.entity';
 
 // INTERFACES
 import { PlatformInterest } from '../management/platform-interest/platform-interest.enum';
-import { ThirdPartyInterest } from '../management/third-party-interest/third-party-interest.enum';
 import { TransactionType } from './transaction/transaction.enum';
 import { StateName, StateDescription } from '../management/state/state.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
@@ -147,7 +147,7 @@ export class TransactionService {
     const options = await this.getTransactionInterests({
       platformInterestType: PlatformInterest.VERIFICATION,
       platformInterestExtraPointsType: null,
-      thirdPartyInterestType: ThirdPartyInterest.STRIPE,
+      thirdPartyInterestType: PaymentProvider.STRIPE,
     });
 
     const randomAmounts = this.generateRandomAmounts(
@@ -188,7 +188,7 @@ export class TransactionService {
     const options = await this.getTransactionInterests({
       platformInterestType: PlatformInterest.PREMIUM_EXTRA,
       platformInterestExtraPointsType: null,
-      thirdPartyInterestType: ThirdPartyInterest.STRIPE,
+      thirdPartyInterestType: PaymentProvider.STRIPE,
     });
 
     return await this.createTransaction({
@@ -205,15 +205,16 @@ export class TransactionService {
   }
 
   //POINT PURCHASE TRANSACTION
-  async createDepositTransaction(
+  async createDeposit(
     clientBankAccount: ClientBankAccount,
     extraPointsType: PlatformInterest,
     amount: number,
+    paymentProviderTransactionId: string,
   ): Promise<Transaction> {
     const options = await this.getTransactionInterests({
       platformInterestType: PlatformInterest.BUY,
       platformInterestExtraPointsType: extraPointsType,
-      thirdPartyInterestType: ThirdPartyInterest.STRIPE,
+      thirdPartyInterestType: PaymentProvider.STRIPE,
     });
 
     return await this.createTransaction({
@@ -229,6 +230,7 @@ export class TransactionService {
       stateTransactionDescription: StateDescription.DEPOSIT,
       platformInterestExtraPoints: options.extraPoints,
       operation: 1,
+      paymentProviderTransactionId,
     });
   }
 
@@ -248,7 +250,7 @@ export class TransactionService {
     const options = await this.getTransactionInterests({
       platformInterestType: PlatformInterest.WITHDRAWAL,
       platformInterestExtraPointsType: null,
-      thirdPartyInterestType: ThirdPartyInterest.STRIPE,
+      thirdPartyInterestType: PaymentProvider.STRIPE,
     });
 
     return await this.createTransaction({

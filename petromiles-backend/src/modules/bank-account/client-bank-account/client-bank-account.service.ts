@@ -131,6 +131,7 @@ export class ClientBankAccountService {
 
     return correctValues;
   }
+
   async getClientBankAccount(
     userClient: UserClient,
     idBankAccount: number,

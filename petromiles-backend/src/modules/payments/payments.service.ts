@@ -1,17 +1,26 @@
+import { Interest } from './interest.interface';
+import { TransactionType } from './../transaction/transaction/transaction.enum';
+import { PointsConversionService } from '@/modules/management/points-conversion/points-conversion.service';
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
-import { BankAccountService } from '../bank-account/bank-account.service';
-import { Suscription } from '../suscription/suscription/suscription.enum';
-import { PlatformInterest } from '../management/platform-interest/platform-interest.enum';
-import { TransactionService } from '../transaction/transaction.service';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
-import { Transaction } from '../transaction/transaction/transaction.entity';
-import { UserService } from '../user/user.service';
+// SERVICES
+import { BankAccountService } from '../bank-account/bank-account.service';
+import { TransactionService } from '../transaction/transaction.service';
 import { ThirdPartyInterestService } from '../management/third-party-interest/third-party-interest.service';
 import { PlatformInterestService } from '../management/platform-interest/platform-interest.service';
-import { ThirdPartyInterest } from '../management/third-party-interest/third-party-interest.enum';
-import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
+
+// ENTITIES
+import { Transaction } from '../transaction/transaction/transaction.entity';
+import { UserService } from '../user/user.service';
+import { PlatformInterest } from '../management/platform-interest/platform-interest.enum';
+
+// INTERFACES
+import { Suscription } from '../suscription/suscription/suscription.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
+import { PaymentProvider } from './../payment-provider/payment-provider.enum';
 
 @Injectable()
 export class PaymentsService {
@@ -22,17 +31,56 @@ export class PaymentsService {
     private thirdPartyInterestService: ThirdPartyInterestService,
     private platformInterestService: PlatformInterestService,
     private userService: UserService,
+    private pointsConversionService: PointsConversionService,
+    private paymentProviderService: PaymentProviderService,
   ) {}
 
+  async getOnePointToDollars(): Promise<number> {
+    const mostRecentRate = await this.pointsConversionService.getRecentPointsConversion();
+    return mostRecentRate.onePointEqualsDollars;
+  }
+
+  async getInterests(trasactionType: TransactionType): Promise<Interest[]> {
+    let interests: Interest[] = [];
+    const thirdPartyInterest = await this.thirdPartyInterestService.get(
+      PaymentProvider.STRIPE,
+      trasactionType,
+    );
+    interests.push({
+      operation: 1,
+      amount: thirdPartyInterest.amountDollarCents || 0,
+      percentage: thirdPartyInterest.percentage || 0,
+    });
+
+    const platformInterest = await this.platformInterestService.getInterestByName(
+      PlatformInterest.BUY,
+    );
+    interests.push({
+      operation: 1,
+      amount: parseFloat(platformInterest.amount) || 0,
+      percentage: parseFloat(platformInterest.percentage) || 0,
+    });
+
+    return interests;
+  }
+
   async buyPoints(
-    idUserClient,
-    idClientBankAccount,
+    idUserClient: number,
+    idClientBankAccount: number,
     amount,
+    amountToCharge,
   ): Promise<Transaction> {
     const clientBankAccount = await this.bankAccountService.getClientBankAccount(
       idUserClient,
       idClientBankAccount,
     );
+
+    const charge = await this.paymentProviderService.createCharge({
+      customer: clientBankAccount.userClient.userDetails.customerId,
+      source: clientBankAccount.chargeId,
+      currency: 'usd',
+      amount: amountToCharge,
+    });
 
     let currentUserSuscription = clientBankAccount.userClient.userSuscription.find(
       suscription => !suscription.finalDate,
@@ -42,10 +90,11 @@ export class PaymentsService {
       currentUserSuscription.suscription.name,
     );
 
-    return await this.transactionService.createDepositTransaction(
+    return await this.transactionService.createDeposit(
       clientBankAccount,
       extraPointsType,
       amount,
+      charge.id,
     );
   }
 
@@ -83,8 +132,9 @@ export class PaymentsService {
   // Only verify points of valid transactions
   private async verifyEnoughPoints(email: string, amount: number) {
     const { dollars } = await this.userService.getPoints(email);
-    const thirdPartyInterest = await this.thirdPartyInterestService.getThirdPartyInterest(
-      ThirdPartyInterest.STRIPE,
+    const thirdPartyInterest = await this.thirdPartyInterestService.get(
+      PaymentProvider.STRIPE,
+      TransactionType.WITHDRAWAL,
     );
     const platformInterest = (
       await this.platformInterestService.getInterestByName(

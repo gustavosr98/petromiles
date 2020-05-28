@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 
-import { PaymentProviderService } from './payment-provider.service';
-
 import { StripeModule } from './stripe/stripe.module';
+
+import { PaymentProviderService } from './payment-provider.service';
 
 @Module({
   imports: [StripeModule],

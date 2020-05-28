@@ -1,3 +1,5 @@
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 import { Injectable, Inject, UseFilters } from '@nestjs/common';
 import Stripe from 'stripe';
 
@@ -7,7 +9,10 @@ import { StripeBankAccountStatus } from './bank-account-status.enum';
 @Injectable()
 @UseFilters(new StripeFilter())
 export class StripeService {
-  constructor(@Inject('STRIPE') private stripe: Stripe) {}
+  constructor(
+    @Inject('STRIPE') private stripe: Stripe,
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
+  ) {}
 
   // BANKS
   async getBankAccount({

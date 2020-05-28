@@ -56,11 +56,12 @@ declare namespace App {
       promotion?: import('../src/modules/management/promotion/promotion.entity').Promotion;
       platformInterestExtraPoints?: import('../src/modules/management/platform-interest/platform-interest.entity').PlatformInterest;
       operation?: number;
+      paymentProviderTransactionId?: string;
     }
     interface TransactionInterests {
       platformInterestType: import('../src/modules/management/platform-interest/platform-interest.enum').PlatformInterest;
       platformInterestExtraPointsType: import('../src/modules/management/platform-interest/platform-interest.enum').PlatformInterest;
-      thirdPartyInterestType: import('../src/modules/management/third-party-interest/third-party-interest.enum').ThirdPartyInterest;
+      thirdPartyInterestType: import('./../src/modules/payment-provider/payment-provider.enum').PaymentProvider;
     }
   }
 }

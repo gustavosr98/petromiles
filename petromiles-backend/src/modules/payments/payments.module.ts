@@ -6,6 +6,7 @@ import { BankAccountModule } from '../bank-account/bank-account.module';
 import { SuscriptionModule } from '../suscription/suscription.module';
 import { UserModule } from '../user/user.module';
 import { ManagementModule } from '../management/management.module';
+import { PaymentProviderModule } from './../payment-provider/payment-provider.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ManagementModule } from '../management/management.module';
     SuscriptionModule,
     UserModule,
     ManagementModule,
+    PaymentProviderModule,
   ],
   controllers: [PaymentsController],
   providers: [PaymentsService],

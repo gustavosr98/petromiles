@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+// CONTROLLER
+import { TransactionController } from './transaction.controller';
+
 // MODULES
 import { ManagementModule } from '../management/management.module';
 import { PaymentProviderModule } from '@/modules/payment-provider/payment-provider.module';
@@ -13,10 +16,10 @@ import { StateTransactionService } from './state-transaction/state-transaction.s
 // ENTITIES
 import { Transaction } from './transaction/transaction.entity';
 import { TransactionInterest } from './transaction-interest/transaction-interest.entity';
-import { TransactionController } from './transaction.controller';
 
 @Module({
   imports: [
+    PaymentProviderModule,
     ManagementModule,
     PaymentProviderModule,
     TypeOrmModule.forFeature([Transaction, TransactionInterest]),

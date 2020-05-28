@@ -19,6 +19,7 @@ import { LanguageModule } from '@/modules/language/language.module';
 import { MailsModule } from '@/modules/mails/mails.module';
 import { ManagementModule } from '@/modules/management/management.module';
 import { SuscriptionModule } from '@/modules/suscription/suscription.module';
+import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { UserModule } from '@/modules/user/user.module';
 import { PaymentsModule } from '@/modules/payments/payments.module';
 
@@ -41,6 +42,7 @@ import { PaymentsModule } from '@/modules/payments/payments.module';
     ManagementModule,
     SuscriptionModule,
     UserModule,
+    TransactionModule,
     WinstonModule.forRoot(createOptions({ fileName: 'petromiles-global.log' })),
     PaymentsModule,
   ],

@@ -1,3 +1,4 @@
+import { Interest } from './interest.interface';
 import {
   Controller,
   Post,
@@ -5,16 +6,21 @@ import {
   UseGuards,
   ValidationPipe,
   Inject,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { Logger } from 'winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 import { GetUser } from '../auth/decorators/get-user.decorator';
-import { CreatePaymentDTO } from './dto/create-payment.dto';
 import { PaymentsService } from './payments.service';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+
+// INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
+import { TransactionType } from '@/modules/transaction/transaction/transaction.enum';
+import { CreatePaymentDTO } from './dto/create-payment.dto';
 
 const baseEndpoint = 'payments';
 
@@ -27,19 +33,24 @@ export class PaymentsController {
   ) {}
 
   @Post('buy-points')
-  buyPoints(
+  async buyPoints(
     @GetUser() user,
     @Body(ValidationPipe) paymentProperties: CreatePaymentDTO,
   ) {
-    const { idClientBankAccount, amount } = paymentProperties;
+    const { idClientBankAccount, amount, amountToCharge } = paymentProperties;
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/buy-points`,
     );
-    return this.paymentsService.buyPoints(user.id, idClientBankAccount, amount);
+    return await this.paymentsService.buyPoints(
+      user.id,
+      idClientBankAccount,
+      amount,
+      amountToCharge,
+    );
   }
 
   @Post('withdraw-points')
-  withdrawPoints(
+  async withdrawPoints(
     @GetUser() user,
     @Body(ValidationPipe) paymentProperties: CreatePaymentDTO,
   ) {
@@ -48,10 +59,31 @@ export class PaymentsController {
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/withdraw-points`,
     );
 
-    return this.paymentsService.withdrawPoints(
+    return await this.paymentsService.withdrawPoints(
       user,
       idClientBankAccount,
       amount,
     );
+  }
+
+  @Get('one-point-to-dollars')
+  async getOnePointToDollars(@GetUser() user): Promise<number> {
+    this.logger.http(
+      `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/one-point-to-dollars`,
+    );
+    const onePointToDollars = await this.paymentsService.getOnePointToDollars();
+    return onePointToDollars;
+  }
+
+  @Get('interests/:transactionType')
+  async getInterest(
+    @GetUser() user,
+    @Param('transactionType') transactionType: TransactionType,
+  ): Promise<Interest[]> {
+    this.logger.http(
+      `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/interests/${transactionType}`,
+    );
+    const interests = await this.paymentsService.getInterests(transactionType);
+    return interests;
   }
 }

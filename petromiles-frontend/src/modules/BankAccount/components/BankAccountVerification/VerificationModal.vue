@@ -35,11 +35,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn
-          color="primary darken-1"
-          text
-          @click="closeModal"
-        >{{$t("bank-account-creation-form.cancelButton")}}</v-btn>
+        <v-btn color="primary darken-1" text @click="closeModal">{{$t("common.cancel")}}</v-btn>
         <v-btn
           color="primary darken-1"
           text

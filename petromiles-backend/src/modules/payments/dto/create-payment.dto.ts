@@ -5,4 +5,7 @@ export class CreatePaymentDTO {
 
   @IsNotEmpty()
   amount: string;
+
+  @IsNotEmpty()
+  amountToCharge: string;
 }
