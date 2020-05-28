@@ -3,7 +3,7 @@
     <v-row justify="center">
       <v-col cols="6">
         <v-alert v-if="error" dismissible dense outlined type="error" class="my-4">
-          <strong>Error associating your bank account</strong>
+          <strong>{{$t('bank-account-creation.errorMessageBankAccountCreation')}}</strong>
         </v-alert>
       </v-col>
     </v-row>
@@ -63,8 +63,13 @@
     <!-- Actions -->
 
     <v-row justify="space-between" class="ma-1 mt-8">
-      <v-btn text @click="backStep">Cancel</v-btn>
-      <v-btn color="primary" @click="nextStep" :loading="processing" :disable="processing">Continue</v-btn>
+      <v-btn text @click="backStep">{{$t('bank-account-creation-form.cancelButton')}}</v-btn>
+      <v-btn
+        color="primary"
+        @click="nextStep"
+        :loading="processing"
+        :disable="processing"
+      >{{$t('bank-account-creation-form.continueButton')}}</v-btn>
     </v-row>
   </v-stepper-content>
 </template>

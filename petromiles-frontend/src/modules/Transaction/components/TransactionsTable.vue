@@ -24,10 +24,39 @@ export default {
   },
   data() {
     return {
-      title: `${this.$tc("navbar.transaction", 1)}`,
       transactions: [],
       fetchedData: [],
-      headers: [
+    };
+  },
+  async mounted() {
+    this.fetchedData = await this.$http.get("/transaction");
+    this.transactions = this.fetchedData;
+  },
+
+  methods: {
+    filterData(filteredData) {
+      this.fetchedData = filteredData;
+    },
+    getTransactionAmount(transaction) {
+      if (transaction.type === Transaction.BANK_ACCOUNT_VERIFICATION) {
+        return (
+          parseInt(transaction.transactionInterest[0].platformInterest.amount) /
+          100
+        );
+      }
+
+      return (
+        parseInt(transaction.rawAmount) / 100 +
+        parseInt(transaction.totalAmountWithInterest) / 100
+      );
+    },
+  },
+  computed: {
+    title() {
+      return this.$tc("navbar.transaction", 1);
+    },
+    headers() {
+      return [
         {
           text: this.$tc("common.code"),
           align: "center",
@@ -58,33 +87,8 @@ export default {
           align: "center",
           value: "details",
         },
-      ],
-    };
-  },
-  async mounted() {
-    this.fetchedData = await this.$http.get("/transaction");
-    this.transactions = this.fetchedData;
-  },
-
-  methods: {
-    filterData(filteredData) {
-      this.fetchedData = filteredData;
+      ];
     },
-    getTransactionAmount(transaction) {
-      if (transaction.type === Transaction.BANK_ACCOUNT_VERIFICATION) {
-        return (
-          parseInt(transaction.transactionInterest[0].platformInterest.amount) /
-          100
-        );
-      }
-
-      return (
-        parseInt(transaction.rawAmount) / 100 +
-        parseInt(transaction.totalAmountWithInterest) / 100
-      );
-    },
-  },
-  computed: {
     mungedData() {
       return this.fetchedData.map(data => {
         const state = this.$tc(

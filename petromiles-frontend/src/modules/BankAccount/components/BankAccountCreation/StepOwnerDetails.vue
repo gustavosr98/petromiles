@@ -2,7 +2,7 @@
   <v-stepper-content :step="step">
     <!-- Subtitle -->
     <v-row justify="center">
-      <header class="font-weight-light">Who owns this account?</header>
+      <header class="font-weight-light">{{$t('bank-account-creation.ownerDetailsFormTitle')}}</header>
     </v-row>
 
     <!-- Form for owner of the account -->
@@ -60,7 +60,7 @@
 
     <!-- Actions -->
     <v-row justify="end" class="ma-1 mt-8">
-      <v-btn color="primary" @click="nextStep()">Continue</v-btn>
+      <v-btn color="primary" @click="nextStep()">{{$t('bank-account-creation-form.continueButton')}}</v-btn>
     </v-row>
   </v-stepper-content>
 </template>

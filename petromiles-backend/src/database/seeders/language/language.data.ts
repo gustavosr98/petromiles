@@ -3,10 +3,12 @@
 export const LANGUAGES = [
   {
     idLanguage: 1,
-    name: 'en',
+    name: 'english',
+    shortname: 'en',
   },
   {
     idLanguage: 2,
-    name: 'es',
+    name: 'spanish',
+    shortname: 'es',
   },
 ];

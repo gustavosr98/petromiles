@@ -10,6 +10,7 @@ import { Logger } from 'winston';
 import { CreateUserDTO } from '../dto/create-user.dto';
 import { StateName } from '../../management/state/state.enum';
 import { Role } from '../../management/role/role.enum';
+import { Language } from '../language/language.enum';
 
 // SERVICES
 import { StateUserService } from '../state-user/state-user.service';
@@ -85,7 +86,7 @@ export class UserClientService {
         address,
         phone,
         photo,
-        language: await this.userDetailsService.getLanguage('en'),
+        language: await this.userDetailsService.getLanguage(Language.ENGLISH),
         userClient,
         customerId: paymentProviderCustomer.id,
         accountId: paymentProviderAccount.id,

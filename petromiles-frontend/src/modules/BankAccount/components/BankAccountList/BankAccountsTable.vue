@@ -16,9 +16,19 @@ export default {
   },
   data() {
     return {
-      title: `${this.$tc("navbar.bankAccount")}`,
       fetchedData: [],
-      headers: [
+    };
+  },
+  async mounted() {
+    this.fetchedData = await this.$http.get("/bank-account");
+    this.$store.commit("bankAccount/SET_BANK_ACCOUNTS", this.fetchedData);
+  },
+  computed: {
+    title() {
+      return this.$tc("navbar.bankAccount");
+    },
+    headers() {
+      return [
         {
           text: `${this.$tc("common.code")}`,
           align: "center",
@@ -39,14 +49,8 @@ export default {
           align: "center",
           value: "state",
         },
-      ],
-    };
-  },
-  async mounted() {
-    this.fetchedData = await this.$http.get("/bank-account");
-    this.$store.commit("bankAccount/SET_BANK_ACCOUNTS", this.fetchedData);
-  },
-  computed: {
+      ];
+    },
     mungedData() {
       return this.fetchedData.map(data => {
         const state = this.$tc(

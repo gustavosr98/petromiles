@@ -6,6 +6,9 @@
       <v-app-bar-nav-icon @click="drawer = true" color="white"></v-app-bar-nav-icon>
       <v-toolbar-title>PetroMiles</v-toolbar-title>
       <v-spacer></v-spacer>
+      <div class="text-center">
+        <languages-dropdown color="primary white--text" />
+      </div>
     </v-app-bar>
 
     <!-- Vertical Nav Bar  -->
@@ -28,7 +31,7 @@
                 <v-icon v-text="navModule.mdiIcon"></v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="navModule.name"></v-list-item-title>
+                <v-list-item-title v-text="$tc(navModule.name)"></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -56,8 +59,13 @@
 import { createNamespacedHelpers } from "vuex";
 const { mapMutations, mapActions } = createNamespacedHelpers("auth");
 
+import LanguageDropDown from "@/components/LanguageDropDown";
+
 export default {
   name: "navbar",
+  components: {
+    "languages-dropdown": LanguageDropDown,
+  },
   props: {
     navigationModules: {
       type: Array,
@@ -72,7 +80,10 @@ export default {
     },
   },
   data() {
-    return { drawer: false, model: 1 };
+    return {
+      drawer: false,
+      model: 1,
+    };
   },
   methods: {
     ...mapMutations(["logout"]),

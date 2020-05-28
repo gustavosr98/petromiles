@@ -6,7 +6,7 @@
       <v-text-field
         v-model="search"
         append-icon="mdi-magnify"
-        :label="searchLabel"
+        :label="$tc('datatable.search')"
         single-line
         hide-details
       ></v-text-field>
@@ -52,7 +52,6 @@ export default {
   data() {
     return {
       search: "",
-      searchLabel: this.$tc("datatable.search"),
       isLoading: false,
     };
   },

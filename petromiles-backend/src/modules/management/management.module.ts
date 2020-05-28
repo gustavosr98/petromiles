@@ -15,7 +15,10 @@ import { State } from './state/state.entity';
 import { Role } from './role/role.entity';
 import { PlatformInterest } from './platform-interest/platform-interest.entity';
 import { PointsConversion } from './points-conversion/points-conversion.entity';
+import { Language } from '../user/language/language.entity';
 import { ThirdPartyInterest } from './third-party-interest/third-party-interest.entity';
+import { ManagementController } from './management.controller';
+import { ManagementService } from './management.service';
 
 @Module({
   imports: [
@@ -25,6 +28,7 @@ import { ThirdPartyInterest } from './third-party-interest/third-party-interest.
       PlatformInterest,
       PointsConversion,
       ThirdPartyInterest,
+      Language,
     ]),
   ],
   providers: [
@@ -33,6 +37,7 @@ import { ThirdPartyInterest } from './third-party-interest/third-party-interest.
     PlatformInterestService,
     PointsConversionService,
     ThirdPartyInterestService,
+    ManagementService,
   ],
   exports: [
     StateService,
@@ -42,5 +47,6 @@ import { ThirdPartyInterest } from './third-party-interest/third-party-interest.
     PointsConversionService,
     ThirdPartyInterestService,
   ],
+  controllers: [ManagementController],
 })
 export class ManagementModule {}

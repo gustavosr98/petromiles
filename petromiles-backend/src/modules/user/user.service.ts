@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { getManager } from 'typeorm';
+import { Injectable, Inject } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { getManager, getConnection, Repository } from 'typeorm';
 
 import { Role as RoleEnum } from 'src/modules/management/role/role.enum';
 
 import { ClientPoints } from './user-client/user-points.entity';
+import { UserClient } from './user-client/user-client.entity';
+import { Language } from './language/language.entity';
+import { UserDetails } from './user-details/user-details.entity';
 
 import { UserClientService } from './user-client/user-client.service';
 import { UserAdministratorService } from './user-administrator/user-administrator.service';
@@ -12,6 +17,10 @@ import { UserDetailsService } from './user-details/user-details.service';
 @Injectable()
 export class UserService {
   constructor(
+    @InjectRepository(UserClient)
+    private userClientRepository: Repository<UserClient>,
+    @InjectRepository(UserDetails)
+    private userDetailsRepository: Repository<UserDetails>,
     private userClientService: UserClientService,
     private userAdministratorService: UserAdministratorService,
     private userDetailsService: UserDetailsService,
@@ -69,5 +78,21 @@ export class UserService {
       points.points = 0;
     }
     return points;
+  }
+
+  async changeUserLanguage(email: string, language: string) {
+    const userClient = await this.userClientRepository.findOne({ email });
+
+    const languageFound = await getConnection()
+      .getRepository(Language)
+      .findOne({ name: language });
+
+    const userDetails = await this.userDetailsRepository.findOne({
+      userClient,
+    });
+    userDetails.language = languageFound;
+    await this.userDetailsRepository.save(userDetails);
+
+    return languageFound;
   }
 }

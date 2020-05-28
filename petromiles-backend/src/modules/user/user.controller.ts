@@ -6,6 +6,8 @@ import {
   Param,
   Inject,
   UseGuards,
+  Patch,
+  Body,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -28,10 +30,8 @@ import { UserClientService } from './user-client/user-client.service';
 
 const baseEndpoint = Object.freeze('user');
 @UseGuards(AuthGuard('jwt'))
-@Controller(baseEndpoint)
 @UseInterceptors(ClassSerializerInterceptor)
-@UseGuards(AuthGuard('jwt'))
-@Controller('user')
+@Controller(baseEndpoint)
 export class UserController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
@@ -60,5 +60,13 @@ export class UserController {
   @Get('client/details')
   async getDetail(@GetUser() user) {
     return await this.userClientService.getClient(user.email);
+  }
+
+  @Patch('language')
+  changeUserLanguage(@GetUser() user, @Body('language') language) {
+    this.logger.http(
+      `[${ApiModules.USER}] (${HttpRequest.PATCH}) ${user?.email} asks /${baseEndpoint}/language`,
+    );
+    return this.userService.changeUserLanguage(user.email, language);
   }
 }

@@ -11,7 +11,6 @@ export const mutations = {
     state.user = {
       email: userData.email,
       details: userData.userDetails,
-      language: userData.language,
       role: userData.role,
       authToken: userData.token,
     };
@@ -21,7 +20,14 @@ export const mutations = {
       JSON.stringify(state.user)
     );
   },
+  changeLang(state, language) {
+    state.user.details.language = language;
 
+    localStorage.setItem(
+      authConstants.USER_LOCAL_STORAGE,
+      JSON.stringify(state.user)
+    );
+  },
   loadUserToken(state) {
     const user = JSON.parse(
       localStorage.getItem(authConstants.USER_LOCAL_STORAGE)
@@ -70,6 +76,10 @@ export const actions = {
     httpClient.get("/auth/checkToken").catch((e) => {
       commit("logout");
     });
+  },
+  async changeLang({ commit }, language) {
+    await httpClient.patch("user/language", { language: language.bdName });
+    commit("changeLang", language);
   },
 };
 
