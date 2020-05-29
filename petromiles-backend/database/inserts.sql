@@ -85,4 +85,22 @@ INSERT INTO THIRD_PARTY_INTEREST
 VALUES
     ('STRIPE', 'Transaction Interest', 75);
 
+--PASSWORD: test1234
+INSERT INTO user_administrator
+    (email,password,salt)
+VALUES
+    ('admin@petromiles.com', '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW', '$2b$10$iUCj0m4iW03/7csR8XdYDe');
 
+INSERT INTO state_user
+    ("initialDate",fk_state, fk_user_administrator)
+VALUES
+    ('2020/05/29', 1, 1);
+
+INSERT INTO user_role
+    (fk_user_administrator, fk_role)
+VALUES
+    (1, 1);
+
+insert into user_details
+    ("firstName", "lastName", fk_language,fk_user_administrator)
+values('petro', 'miles', 1, 1);

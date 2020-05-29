@@ -218,9 +218,9 @@ export default {
         });
     },
     async loadRate() {
-      this.onePointToDollars = await this.$http.get(
-        "/payments/one-point-to-dollars"
-      );
+      this.onePointToDollars = (
+        await this.$http.get("/payments/one-point-to-dollars")
+      ).onePointEqualsDollars;
     },
     async loadInterests() {
       this.interests = await this.$http.get("/payments/interests/deposit");

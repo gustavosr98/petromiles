@@ -1,7 +1,7 @@
 export enum PlatformInterest {
-  PREMIUM_EXTRA = 'PREMIUM_EXTRA',
-  GOLD_EXTRA = 'GOLD_EXTRA',
-  VERIFICATION = 'VERIFICATION',
-  BUY = 'BUY',
-  WITHDRAWAL = 'WITHDRAWAL',
+  PREMIUM_EXTRA = 'premium',
+  GOLD_EXTRA = 'gold',
+  VERIFICATION = 'verification',
+  BUY = 'buy',
+  WITHDRAWAL = 'Withdrawal',
 }

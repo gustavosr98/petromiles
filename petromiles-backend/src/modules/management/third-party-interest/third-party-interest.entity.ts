@@ -5,6 +5,7 @@ import {
   Column,
   OneToMany,
 } from 'typeorm';
+import { Transform } from 'class-transformer';
 
 // ENTITIES
 import { TransactionInterest } from '@/modules/transaction/transaction-interest/transaction-interest.entity';
@@ -33,6 +34,7 @@ export class ThirdPartyInterest extends BaseEntity {
   })
   paymentProvider: string;
 
+  @Transform(amount => amount / 100)
   @Column({ nullable: true })
   amountDollarCents: number;
 

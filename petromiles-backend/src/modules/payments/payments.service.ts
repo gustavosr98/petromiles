@@ -21,6 +21,7 @@ import { Transaction } from '../transaction/transaction/transaction.entity';
 import { UserService } from '../user/user.service';
 import { PlatformInterest } from '../management/platform-interest/platform-interest.enum';
 import { UserClient } from '../user/user-client/user-client.entity';
+import { PointsConversion } from '../management/points-conversion/points-conversion.entity';
 
 // INTERFACES
 import { Suscription } from '../suscription/suscription/suscription.enum';
@@ -44,9 +45,9 @@ export class PaymentsService {
     private configService: ConfigService,
   ) {}
 
-  async getOnePointToDollars(): Promise<number> {
+  async getOnePointToDollars(): Promise<PointsConversion> {
     const mostRecentRate = await this.pointsConversionService.getRecentPointsConversion();
-    return mostRecentRate.onePointEqualsDollars;
+    return mostRecentRate;
   }
 
   async getInterests(trasactionType: TransactionType): Promise<Interest[]> {
@@ -197,7 +198,7 @@ export class PaymentsService {
       dynamic_template_data: { user: userClient.userDetails.firstName },
       attachments: [
         {
-          filename: `PetroMiles[invoce]-${new Date().toLocaleDateString()}`,
+          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}`,
           type: file.mimetype,
           content: file.buffer.toString('base64'),
         },

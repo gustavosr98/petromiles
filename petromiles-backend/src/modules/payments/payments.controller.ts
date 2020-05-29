@@ -20,11 +20,13 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { PaymentsService } from './payments.service';
 
+import { PointsConversion } from '../management/points-conversion/points-conversion.entity';
+import { Transaction } from '../transaction/transaction/transaction.entity';
+
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
 import { TransactionType } from '@/modules/transaction/transaction/transaction.enum';
 import { CreatePaymentDTO } from './dto/create-payment.dto';
-import { Transaction } from '../transaction/transaction/transaction.entity';
 
 const baseEndpoint = 'payments';
 
@@ -71,7 +73,7 @@ export class PaymentsController {
   }
 
   @Get('one-point-to-dollars')
-  async getOnePointToDollars(@GetUser() user): Promise<number> {
+  async getOnePointToDollars(@GetUser() user): Promise<PointsConversion> {
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/one-point-to-dollars`,
     );

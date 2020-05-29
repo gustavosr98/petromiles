@@ -5,7 +5,13 @@
         <v-card class="elevation-12">
           <v-window>
             <auth-window title="Welcome back" msg="Nice to see you again">
-              <login-form />
+              <login-form
+                title="Or login with"
+                :showClientElement="true"
+                :signUpRoute="clientRoutes"
+                :dashboardRoute="dashboardRoute"
+                :role="role"
+              />
             </auth-window>
           </v-window>
         </v-card>
@@ -17,10 +23,20 @@
 <script>
 import AuthWindow from "@/modules/Auth/components/AuthWindow";
 import LoginForm from "@/modules/Auth/components/LoginForm";
+import authConstants from "@/modules/Auth/authConstants";
+import clientRoutes from "@/router/clientRoutes";
+
 export default {
   components: {
     "auth-window": AuthWindow,
     "login-form": LoginForm,
+  },
+  data() {
+    return {
+      clientRoutes: clientRoutes.SIGN_UP.name,
+      dashboardRoute: clientRoutes.DASHBOARD.name,
+      role: authConstants.CLIENT,
+    };
   },
 };
 </script>

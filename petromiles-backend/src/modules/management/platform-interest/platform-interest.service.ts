@@ -18,4 +18,10 @@ export class PlatformInterestService {
       finalDate: null,
     });
   }
+
+  async getInterests(): Promise<PlatformInterest[]> {
+    return await this.platformInterestRepository.find({
+      finalDate: null,
+    });
+  }
 }

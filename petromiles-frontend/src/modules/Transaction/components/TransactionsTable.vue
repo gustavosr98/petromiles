@@ -39,10 +39,7 @@ export default {
     },
     getTransactionAmount(transaction) {
       if (transaction.type === Transaction.BANK_ACCOUNT_VERIFICATION) {
-        return (
-          parseInt(transaction.transactionInterest[0].platformInterest.amount) /
-          100
-        );
+        return transaction.transactionInterest[0].platformInterest.amount;
       }
 
       return (
