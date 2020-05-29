@@ -1,3 +1,4 @@
+import { StateDescription } from './../management/state/state.enum';
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -14,8 +15,12 @@ import { ClientBankAccount } from './client-bank-account/client-bank-account.ent
 
 import { ApiModules } from '@/logger/api-modules.enum';
 import americanRoutingNumbers from '@/constants/americanRoutingNumbers';
-import { StateName, StateDescription } from '../management/state/state.enum';
+import { StateName } from '../management/state/state.enum';
 import { PaymentProviderService } from '../payment-provider/payment-provider.service';
+import { TransactionService } from '@/modules/transaction/transaction.service';
+
+import { PaymentProvider } from '@/modules/payment-provider/payment-provider.enum';
+import { TransactionType } from '@/modules/transaction/transaction/transaction.enum';
 
 @Injectable()
 export class BankAccountService {
@@ -25,6 +30,7 @@ export class BankAccountService {
     private userDetailsService: UserDetailsService,
     private stateBankAccountService: StateBankAccountService,
     private paymentProviderService: PaymentProviderService,
+    private transactionService: TransactionService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
@@ -56,7 +62,7 @@ export class BankAccountService {
       this.logger.error(
         `[${ApiModules.BANK_ACCOUNT}] Invalid Routing Number ${bankAccountCreateParams.routingNumber}`,
       );
-      throw new BadRequestException('Bank account already exists');
+      throw new BadRequestException('error-messages.invalidRoutingNumber');
     }
 
     //  Verify if the account is of a Petromiles User. If it isn't, create the person in the entity UserDetails
@@ -109,7 +115,7 @@ export class BankAccountService {
   ): Promise<ClientBankAccount> {
     const bankAccount = await getConnection()
       .getRepository(ClientBankAccount)
-      .findOne({
+      .findOneOrFail({
         where: `userClient.idUserClient = ${idUserClient} AND bankAccount.idBankAccount = ${idBankAccount}`,
         join: {
           alias: 'clientBankAccount',
@@ -128,6 +134,16 @@ export class BankAccountService {
       idBankAccount,
     );
 
+    const hasPendingTransaction = await this.hasPendingTransaction(
+      clientBankAccount,
+    );
+    if (hasPendingTransaction) {
+      this.logger.error(
+        `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: ${clientBankAccount.idClientBankAccount} cannot be deleted yet`,
+      );
+      throw new BadRequestException('error-messages.pendingTransactions');
+    }
+
     await this.stateBankAccountService.updateStateBankAccount(
       StateName.CANCELLED,
       clientBankAccount,
@@ -139,5 +155,38 @@ export class BankAccountService {
       clientBankAccount.chargeId,
       email,
     );
+
+    this.logger.silly(
+      `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: ${clientBankAccount.idClientBankAccount} was deleted`,
+    );
+  }
+
+  private async hasPendingTransaction(
+    clientBankAccount: ClientBankAccount,
+  ): Promise<boolean> {
+    const pendingValidations = await this.transactionService.getAllFiltered(
+      [StateName.VERIFYING],
+      [TransactionType.BANK_ACCOUNT_VALIDATION],
+      [PaymentProvider.STRIPE],
+      clientBankAccount.idClientBankAccount,
+      true,
+    );
+
+    if (pendingValidations.length > 0) return true;
+
+    const pendingTransactions = await this.transactionService.getAllFiltered(
+      [StateName.VERIFYING],
+      [
+        TransactionType.DEPOSIT,
+        TransactionType.WITHDRAWAL,
+        TransactionType.SUSCRIPTION_PAYMENT,
+      ],
+      [PaymentProvider.STRIPE],
+      clientBankAccount.idClientBankAccount,
+    );
+
+    if (pendingTransactions.length > 0) return true;
+
+    return false;
   }
 }

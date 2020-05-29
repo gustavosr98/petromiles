@@ -6,21 +6,12 @@
         <v-row justify="center" align="center">
           <!-- Phrase -->
           <v-col cols="12">
-            <h3 class="text-center">
-              {{ $t("buy-points-form.letsEarnPoints") }}
-            </h3>
+            <h3 class="text-center">{{ $t("buy-points-form.letsEarnPoints") }}</h3>
           </v-col>
 
           <!-- Image -->
 
-          <v-col
-            xs="10"
-            sm="10"
-            md="4"
-            justify="center"
-            align="center"
-            class="pt-lg-12"
-          >
+          <v-col xs="10" sm="10" md="4" justify="center" align="center" class="pt-lg-12">
             <v-img :src="piggyImage" alt="Piggy coins savings" />
           </v-col>
 
@@ -78,8 +69,7 @@
                       class="primary"
                       :loading="loading"
                       dark
-                      >{{ $t("buy-points-form.getPoints") }}</v-btn
-                    >
+                    >{{ $t("buy-points-form.getPoints") }}</v-btn>
                   </v-col>
                 </v-row>
               </v-form>
@@ -91,17 +81,23 @@
         <v-row justify="center">
           <v-dialog v-model="dialog" persistent max-width="50%">
             <v-card>
-              <v-card-title class="headline">{{
+              <v-card-title class="headline">
+                {{
                 $t("buy-points-form.thanksForBuying")
-              }}</v-card-title>
-              <v-card-text>{{
+                }}
+              </v-card-title>
+              <v-card-text>
+                {{
                 $t("buy-points-form.transactionToValidate")
-              }}</v-card-text>
+                }}
+              </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">{{
+                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">
+                  {{
                   $t("common.ok")
-                }}</v-btn>
+                  }}
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -111,17 +107,23 @@
         <v-row justify="center">
           <v-dialog v-model="areYouSureDialog" persistent max-width="50%">
             <v-card>
-              <v-card-title class="headline">{{
+              <v-card-title class="headline">
+                {{
                 $t("common.areYouSure")
-              }}</v-card-title>
+                }}
+              </v-card-title>
               <v-card-actions>
                 <v-spacer />
-                <v-btn color="error" dark @click="areYouSureDialog = false">{{
+                <v-btn color="error" dark @click="areYouSureDialog = false">
+                  {{
                   $t("common.cancel")
-                }}</v-btn>
-                <v-btn color="success" dark @click="buyPoints">{{
+                  }}
+                </v-btn>
+                <v-btn color="success" dark @click="buyPoints">
+                  {{
                   $t("common.yes")
-                }}</v-btn>
+                  }}
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -210,6 +212,9 @@ export default {
         .then(res => {
           this.transaction = res;
           this.paymentIsReady = true;
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
     async loadRate() {

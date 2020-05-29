@@ -11,7 +11,6 @@ import { ERROR } from '@/exceptions/error-messages';
 export class StripeFilter<T> implements ExceptionFilter {
   @Inject(WINSTON_MODULE_PROVIDER)
   private logger: Logger;
-
   catch(exception: Stripe.StripeError, host: ArgumentsHost) {
     const ctx: HttpArgumentsHost = host.switchToHttp();
     const response = ctx.getResponse();

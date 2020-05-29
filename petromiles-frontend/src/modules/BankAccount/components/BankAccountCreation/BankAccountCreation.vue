@@ -3,8 +3,12 @@
     <v-col cols="12" md="8">
       <v-stepper v-model="e1">
         <v-col align="center">
-          <h4 class="mb-1 mt-3 headline">{{ $t("bank-account-creation.createBankAccountTitle") }}</h4>
-          <h4 class="overline mb-2">{{ $t("bank-account-creation.createBankAccountSubtitle") }}</h4>
+          <h4 class="mb-1 mt-3 headline">
+            {{ $t("bank-account-creation.createBankAccountTitle") }}
+          </h4>
+          <h4 class="overline mb-2">
+            {{ $t("bank-account-creation.createBankAccountSubtitle") }}
+          </h4>
         </v-col>
         <v-stepper-header class="accent">
           <v-stepper-step
@@ -13,12 +17,17 @@
             :key="index"
             :complete="e1 > parseInt(step.number)"
             :step="step.number"
-          >{{ step.name }}</v-stepper-step>
+            >{{ step.name }}</v-stepper-step
+          >
         </v-stepper-header>
 
         <v-stepper-items>
           <owner-details @nextStep="nextStep" step="1" />
-          <bank-account-details @backStep="backStep" @nextStep="nextStep" step="2" />
+          <bank-account-details
+            @backStep="backStep"
+            @nextStep="nextStep"
+            step="2"
+          />
           <confirm-verification @finish="finish" step="3" :message="message" />
         </v-stepper-items>
       </v-stepper>

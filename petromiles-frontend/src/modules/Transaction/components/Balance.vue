@@ -3,11 +3,19 @@
     <v-row>
       <v-col class="py-1 mb-5">
         <div class="d-flex justify-center">
-          <balance-option :header="$t('user-balance.myPoints')" :value="points.points" type />
+          <balance-option
+            :header="$t('user-balance.myPoints')"
+            :value="points.points"
+            type
+          />
           <div class="mr-5">
             <v-icon color="secondary">sync_alt</v-icon>
           </div>
-          <balance-option :header="$t('user-balance.equivalent')" :value="points.dollars" type="$" />
+          <balance-option
+            :header="$t('user-balance.equivalent')"
+            :value="points.dollars"
+            type="$"
+          />
         </div>
       </v-col>
     </v-row>

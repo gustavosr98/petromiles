@@ -29,15 +29,15 @@ export default {
     return {
       items: [
         {
-          label: this.$tc("navbar.bankAccount"),
+          label: "navbar.bankAccount",
           icon: "mdi-cash",
         },
         {
-          label: this.$tc("bank-account-creation.newBankAccount"),
+          label: "bank-account-creation.newBankAccount",
           icon: "mdi-plus",
         },
         {
-          label: this.$tc("bank-account-creation.bankAccountVerification"),
+          label: "bank-account-creation.bankAccountVerification",
           icon: "mdi-wrench",
         },
       ],

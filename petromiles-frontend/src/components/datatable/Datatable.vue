@@ -19,9 +19,11 @@
       :search="search"
     >
       <template #item.state="{value}">
-        <v-chip outlined class="overline" :color="getColor(value)" label dark>{{
-          value
-        }}</v-chip>
+        <v-chip outlined class="overline" :color="getColor(value.name)" label dark>
+          {{
+          value.translated
+          }}
+        </v-chip>
       </template>
       <template #item.details="{item}">
         <v-btn color="secondary" x-small :to="createLink(item.id)">
@@ -29,26 +31,30 @@
         </v-btn>
       </template>
       <template #item.cancel="{item}">
-        <v-icon @click="confirmDeleteAction(item.idBankAccount)">
-          mdi-delete
-        </v-icon>
+        <v-icon @click="confirmDeleteAction(item.idBankAccount)">mdi-delete</v-icon>
       </template>
     </v-data-table>
     <!-- Dialog to confirm delete action -->
     <v-row justify="center">
       <v-dialog v-model="eliminateDialog" persistent max-width="50%">
         <v-card>
-          <v-card-title class="headline">{{
+          <v-card-title class="headline">
+            {{
             $t("common.areYouSure")
-          }}</v-card-title>
+            }}
+          </v-card-title>
           <v-card-actions>
             <v-spacer />
-            <v-btn color="error" dark @click="eliminateDialog = false">{{
+            <v-btn color="error" dark @click="eliminateDialog = false">
+              {{
               $t("common.cancel")
-            }}</v-btn>
-            <v-btn color="success" dark @click="eliminateItem">{{
+              }}
+            </v-btn>
+            <v-btn color="success" dark @click="eliminateItem">
+              {{
               $t("common.yes")
-            }}</v-btn>
+              }}
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

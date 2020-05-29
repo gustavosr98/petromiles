@@ -51,6 +51,8 @@ export class TransactionService {
     stateNames: StateName[],
     transactionsTypes: TransactionType[],
     paymentProviders: PaymentProvider[],
+    idClientBankAccount?: number,
+    isVerification?: boolean,
   ): Promise<Transaction[]> {
     const transactions: Transaction[] = await this.transactionRepository.query(
       `
@@ -66,8 +68,15 @@ export class TransactionService {
         -- conditions
         AND STATE_TRANSACTION."finalDate" IS NULL
         AND STATE.name = ANY($1)
-        AND TRANSACTION."paymentProviderTransactionId" IS NOT NULL
+        AND TRANSACTION."paymentProviderTransactionId" IS ${
+          isVerification ? '' : 'NOT'
+        } NULL
         AND TRANSACTION."type" = ANY($2)
+        ${
+          !idClientBankAccount
+            ? ''
+            : `AND CLIENT_BANK_ACCOUNT."idClientBankAccount" = ${idClientBankAccount}`
+        }
         AND CLIENT_BANK_ACCOUNT."paymentProvider" = ANY($3);
     `,
       [stateNames, transactionsTypes, paymentProviders],
@@ -102,14 +111,14 @@ export class TransactionService {
 
   async getTransactions(email: string) {
     const transactions = await this.transactionRepository.find({
-      where: `userClient.email = '${email}' AND stateTransaction.finalDate is null AND transaction.transaction is null`,
+      where: `userClient.email = '${email}' AND stateTransaction.finalDate is null AND trans.transaction is null`,
       join: {
-        alias: 'transaction',
+        alias: 'trans',
         innerJoinAndSelect: {
-          clientBankAccount: 'transaction.clientBankAccount',
-          stateTransaction: 'transaction.stateTransaction',
+          clientBankAccount: 'trans.clientBankAccount',
+          stateTransaction: 'trans.stateTransaction',
           state: 'stateTransaction.state',
-          transactionInterest: 'transaction.transactionInterest',
+          transactionInterest: 'trans.transactionInterest',
           platformInterest: 'transactionInterest.platformInterest',
           userClient: 'clientBankAccount.userClient',
         },
@@ -220,9 +229,11 @@ export class TransactionService {
     );
 
     this.logger.verbose(
-      `[${
-        ApiModules.TRANSACTION
-      }] Random amounts for each transaction are: [${randomAmounts[0] /
+      `[${ApiModules.TRANSACTION}] id: ${
+        clientBankAccount.idClientBankAccount
+      } | last4: ${clientBankAccount.bankAccount.accountNumber.substr(
+        -4,
+      )} Random amounts for each transaction are: [${randomAmounts[0] /
         100}, ${randomAmounts[1] / 100}]`,
     );
 

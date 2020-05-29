@@ -1,6 +1,6 @@
 <template>
   <div class="mr-4">
-    <div class="caption grey--text lighten-4">{{header}}</div>
+    <div class="caption grey--text lighten-4">{{ header }}</div>
     <p class="mb-0 font-weight-bold">
       {{ value }}
       <span class="black--text caption">{{ type }}</span>

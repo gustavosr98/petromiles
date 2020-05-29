@@ -9,50 +9,50 @@
           <v-img :src="require('../../../assets/perfil.jpg')" />
         </div>
       </figure>
-      <h1 class="perfil-name">{{firstName}} {{lastName}}</h1>
+      <h1 class="perfil-name">{{ firstName }} {{ lastName }}</h1>
     </div>
-    <h2>{{$t('user-details.yourProfile')}}</h2>
+    <h2>{{ $t("user-details.yourProfile") }}</h2>
     <div class="user-details">
       <div class="detail">
-        <b>{{$t('user-details.firstName')}}</b>
+        <b>{{ $t("user-details.firstName") }}</b>
         <br />
-        {{firstName}}
+        {{ firstName }}
         <hr />
         <br />
-        <b>{{$t('user-details.middleName')}}</b>
+        <b>{{ $t("user-details.middleName") }}</b>
         <br />
-        {{middleName}}
+        {{ middleName }}
         <hr />
         <br />
-        <b>{{$t('user-details.email')}}</b>
+        <b>{{ $t("user-details.email") }}</b>
         <br />
-        {{email}}
+        {{ email }}
         <hr />
         <br />
-        <b>{{$t('user-details.phone')}}</b>
+        <b>{{ $t("user-details.phone") }}</b>
         <br />
-        {{phone}}
+        {{ phone }}
         <hr />
       </div>
       <div class="detail">
-        <b>{{$t('user-details.lastName')}}</b>
+        <b>{{ $t("user-details.lastName") }}</b>
         <br />
-        {{lastName}}
+        {{ lastName }}
         <hr />
         <br />
-        <b>{{$t('user-details.secondLastName')}}</b>
+        <b>{{ $t("user-details.secondLastName") }}</b>
         <br />
-        {{secondLastName}}
+        {{ secondLastName }}
         <hr />
         <br />
-        <b>{{$t('user-details.address')}}</b>
+        <b>{{ $t("user-details.address") }}</b>
         <br />
-        {{addres}}
+        {{ addres }}
         <hr />
         <br />
-        <b>{{$t('user-details.dateOfBirth')}} (DD/MM/YYYY)</b>
+        <b>{{ $t("user-details.dateOfBirth") }} (DD/MM/YYYY)</b>
         <br />
-        {{birthdate}}
+        {{ birthdate }}
         <hr />
         <br />
       </div>
@@ -60,7 +60,7 @@
   </div>
 </template>
 
-<script >
+<script>
 import { mapState } from "vuex";
 
 export default {

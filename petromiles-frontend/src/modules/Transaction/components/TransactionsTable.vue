@@ -91,9 +91,13 @@ export default {
     },
     mungedData() {
       return this.fetchedData.map(data => {
-        const state = this.$tc(
-          `state-name.${data.stateTransaction[0].state.name}`
-        );
+        const state = {
+          name: data.stateTransaction[0].state.name,
+          translated: this.$tc(
+            `state-name.${data.stateTransaction[0].state.name}`
+          ),
+        };
+
         return {
           ...data,
           state,

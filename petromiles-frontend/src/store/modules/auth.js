@@ -54,14 +54,14 @@ export const mutations = {
 
 export const actions = {
   async signUp({ commit }, credentials) {
-    httpClient.post("/auth/signup", credentials).then((data) => {
+    httpClient.post("/auth/signup", credentials).then(data => {
       commit("setUserLocalStorage", data);
       commit("loadUserToken");
       location.reload();
     });
   },
   async logIn({ commit }, credentials) {
-    httpClient.post("/auth/login", credentials).then((data) => {
+    httpClient.post("/auth/login", credentials).then(data => {
       commit("setUserLocalStorage", data);
       commit("loadUserToken");
       location.reload();
@@ -73,7 +73,7 @@ export const actions = {
   async checkUserToken({ commit }) {
     commit("loadUserToken");
 
-    httpClient.get("/auth/checkToken").catch((e) => {
+    httpClient.get("/auth/checkToken", { errorHandle: false }).catch(e => {
       commit("logout");
     });
   },

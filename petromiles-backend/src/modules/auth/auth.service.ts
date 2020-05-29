@@ -82,16 +82,14 @@ export class AuthService {
         this.logger.error(
           `[${ApiModules.AUTH}] {${email}} Email or password incorrect`,
         );
-        throw new UnauthorizedException('Email or password incorrect');
+        throw new UnauthorizedException('error-messages.loginIncorrect');
       }
     }
 
     this.logger.error(
       `[${ApiModules.AUTH}] {${email}} The user was not found or user is not active`,
     );
-    throw new UnauthorizedException(
-      'The user was not found or user is not active',
-    );
+    throw new UnauthorizedException('error-messages.userNotFound');
   }
 
   private createToken(email: string, role: Role) {
@@ -114,7 +112,7 @@ export class AuthService {
       this.logger.error(
         `[${ApiModules.AUTH}] The user is a federated user, so needs a password`,
       );
-      throw new UnauthorizedException('Email or password incorrect');
+      throw new UnauthorizedException('error-messages.loginIncorrect');
     }
 
     return bcrypt.hash(password, salt);

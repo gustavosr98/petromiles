@@ -11,7 +11,6 @@ export const ERROR = Object.freeze<ErrorCollection>({
   }),
   STRIPE: Object.freeze<ErrorContent>({
     statusCode: 500,
-    message:
-      'Internal Server Error: Problem with payment provider processor Stripe',
+    message: 'error-messages.errorStripe',
   }),
 });

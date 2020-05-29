@@ -92,6 +92,10 @@ export class BankAccountController {
     this.logger.http(
       `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.PUT}) ${user.email} asks /${baseEndpoint}/cancel/${idBankAccount}`,
     );
-    this.bankAccountService.cancelBankAccount(id, idBankAccount, email);
+    return await this.bankAccountService.cancelBankAccount(
+      id,
+      idBankAccount,
+      email,
+    );
   }
 }

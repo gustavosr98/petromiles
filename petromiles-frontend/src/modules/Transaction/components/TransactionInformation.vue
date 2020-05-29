@@ -1,8 +1,8 @@
 <template>
-  <v-card class="mx-auto  my-9 pb-6" max-width="550" tile>
+  <v-card class="mx-auto my-9 pb-6" max-width="550" tile>
     <v-subheader>
       <div class="title">
-        <span class="font-weight-bold ">Transaction</span>
+        <span class="font-weight-bold">{{ $tc("transaction.transaction")}}</span>
         #{{ transaction.id }}
       </div>
     </v-subheader>
@@ -21,26 +21,20 @@
         <v-list-item three-line>
           <v-list-item-content>
             <v-list-item-title>
-              <span class="font-weight-medium">
-                {{ $tc("navbar.bankAccount", 0) }}:
-              </span>
-              <span class="ml-2 font-weight-light caption">
-                XXXX - {{ transaction.bankAccount }}
-              </span>
+              <span class="font-weight-medium">{{ $tc("navbar.bankAccount", 0) }}:</span>
+              <span class="ml-2 font-weight-light caption">XXXX - {{ transaction.bankAccount }}</span>
             </v-list-item-title>
 
             <v-list-item-title>
-              <span class="font-weight-medium "> {{ $t("common.type") }}:</span>
-              <span class="ml-2 caption text-uppercase font-weight-light">
-                {{ type }}</span
-              >
+              <span class="font-weight-medium">{{ $t("common.type") }}:</span>
+              <span class="ml-2 caption text-uppercase font-weight-light">{{ type }}</span>
             </v-list-item-title>
 
             <v-list-item-title>
-              <span class="font-weight-medium"> {{ $t("common.state") }}:</span>
-              <span class="ml-2 caption text-uppercase font-weight-light">
-                {{ $t(`state-name.${transaction.state}`) }}</span
-              >
+              <span class="font-weight-medium">{{ $t("common.state") }}:</span>
+              <span
+                class="ml-2 caption text-uppercase font-weight-light"
+              >{{ $t(`state-name.${transaction.state}`) }}</span>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -54,19 +48,17 @@
           <td>{{ $t("payments.points") }}</td>
           <td>
             <v-chip
-              class=" px-5 py-0"
+              class="px-5 py-0"
               color="secondary"
               text-color="white"
               label
               @click.stop="dialog = true"
-            >
-              {{ transaction.equivalent / 100 }}</v-chip
-            >
+            >{{ transaction.equivalent / 100 }}</v-chip>
           </td>
         </tr>
         <!-- For all type of transactions -->
 
-        <tr class="text-center ">
+        <tr class="text-center">
           <td class="font-weight-bold">{{ $tc("common.amount", 0) }}</td>
           <td>{{ amount }} $</td>
         </tr>
@@ -86,9 +78,11 @@
     <!-- Modal for points conversion -->
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
-        <v-card-title class="headline">{{
+        <v-card-title class="headline">
+          {{
           $tc("transaction.pointsConversion")
-        }}</v-card-title>
+          }}
+        </v-card-title>
         <v-divider></v-divider>
         <v-card-text class="mt-2" align="center">
           <v-alert dense text color="primary" v-if="paymentTransaction">

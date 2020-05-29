@@ -1,10 +1,17 @@
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { Injectable, Inject, UseFilters } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  UseFilters,
+  BadRequestException,
+} from '@nestjs/common';
 import Stripe from 'stripe';
 
 import { StripeFilter } from '@/modules/payment-provider/stripe/filters/stripe.filter';
 import { StripeBankAccountStatus } from './bank-account-status.enum';
+
+import { ApiSubmodules } from '@/logger/api-modules.enum';
 
 @Injectable()
 @UseFilters(new StripeFilter())
@@ -13,6 +20,12 @@ export class StripeService {
     @Inject('STRIPE') private stripe: Stripe,
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
   ) {}
+
+  private errorHandler(err, res) {
+    this.logger.error(`[${ApiSubmodules.STRIPE}] ${err.type}`);
+    throw new BadRequestException(`error-messages.stripe_${err.raw.code}`);
+    return null;
+  }
 
   // BANKS
   async getBankAccount({
@@ -35,14 +48,18 @@ export class StripeService {
   async createBankAccountByToken(
     bankAccount: Stripe.TokenCreateParams,
   ): Promise<Stripe.Token> {
-    const bankAccountToken = await this.stripe.tokens.create(bankAccount);
+    const bankAccountToken = await this.stripe.tokens
+      .create(bankAccount)
+      .catch(e => this.errorHandler(e, null));
     return bankAccountToken;
   }
 
   async createBankAccountBySource(
     bankAccount: Stripe.SourceCreateParams,
   ): Promise<Stripe.Source> {
-    const bankAccountSource = await this.stripe.sources.create(bankAccount);
+    const bankAccountSource = await this.stripe.sources
+      .create(bankAccount)
+      .catch(e => this.errorHandler(e, null));
     return bankAccountSource;
   }
 
@@ -68,10 +85,9 @@ export class StripeService {
     customerId: string,
     bankAccountToken: string,
   ): Promise<Stripe.CustomerSource> {
-    const bankAsociatedToCustomed = await this.stripe.customers.createSource(
-      customerId,
-      { source: bankAccountToken },
-    );
+    const bankAsociatedToCustomed = await this.stripe.customers
+      .createSource(customerId, { source: bankAccountToken })
+      .catch(e => this.errorHandler(e, null));
     return bankAsociatedToCustomed;
   }
 
@@ -84,7 +100,9 @@ export class StripeService {
   async createCharge(
     chargeCreateParams: Stripe.ChargeCreateParams,
   ): Promise<Stripe.Charge> {
-    const charge = await this.stripe.charges.create(chargeCreateParams);
+    const charge = await this.stripe.charges
+      .create(chargeCreateParams)
+      .catch(e => this.errorHandler(e, null));
     return charge;
   }
 
@@ -92,7 +110,9 @@ export class StripeService {
   async createPayout(
     payoutCreateParams: Stripe.PayoutCreateParams,
   ): Promise<Stripe.Payout> {
-    const payout = await this.stripe.payouts.create(payoutCreateParams);
+    const payout = await this.stripe.payouts
+      .create(payoutCreateParams)
+      .catch(e => this.errorHandler(e, null));
     return payout;
   }
 
@@ -100,7 +120,9 @@ export class StripeService {
   async createAccount(
     accountCreateParams: Stripe.AccountCreateParams,
   ): Promise<Stripe.Account> {
-    const account = await this.stripe.accounts.create(accountCreateParams);
+    const account = await this.stripe.accounts
+      .create(accountCreateParams)
+      .catch(e => this.errorHandler(e, null));
     return account;
   }
 
@@ -108,22 +130,25 @@ export class StripeService {
     accountId: string,
     bankAccountId: string,
   ): Promise<Stripe.BankAccount | Stripe.Card> {
-    const asociatedBankAccount = await this.stripe.accounts.createExternalAccount(
-      accountId,
-      { external_account: bankAccountId },
-    );
+    const asociatedBankAccount = await this.stripe.accounts
+      .createExternalAccount(accountId, { external_account: bankAccountId })
+      .catch(e => this.errorHandler(e, null));
     return asociatedBankAccount;
   }
 
   async deleteBankAccount(customerId: string, bankAccountId: string) {
-    await this.stripe.customers.deleteSource(customerId, bankAccountId);
+    await this.stripe.customers
+      .deleteSource(customerId, bankAccountId)
+      .catch(e => this.errorHandler(e, null));
   }
 
   // TRANSFERS
   async createTransfer(
     transferCreateParams: Stripe.TransferCreateParams,
   ): Promise<Stripe.Transfer> {
-    const transfer = await this.stripe.transfers.create(transferCreateParams);
+    const transfer = await this.stripe.transfers
+      .create(transferCreateParams)
+      .catch(e => this.errorHandler(e, null));
     return transfer;
   }
 

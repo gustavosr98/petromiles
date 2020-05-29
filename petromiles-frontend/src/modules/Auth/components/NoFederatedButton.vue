@@ -48,9 +48,6 @@ export default {
           };
           // console.log("este es el user", profile.picture);
           event.$emit(event.type, user);
-        })
-        .catch(function(error) {
-          console.log(error);
         });
     },
   },

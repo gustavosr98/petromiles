@@ -1,26 +1,7 @@
 <template>
   <v-stepper-content :step="step" justify="center">
     <v-row justify="center">
-      <v-col cols="6">
-        <v-alert
-          v-if="error"
-          dismissible
-          dense
-          outlined
-          type="error"
-          class="my-4"
-        >
-          <strong>{{
-            $t("bank-account-creation.errorMessageBankAccountCreation")
-          }}</strong>
-        </v-alert>
-      </v-col>
-    </v-row>
-
-    <v-row justify="center">
-      <header class="font-weight-light">
-        {{ $t("bank-account-creation.bankAccountFormTitle") }}
-      </header>
+      <header class="font-weight-light">{{ $t("bank-account-creation.bankAccountFormTitle") }}</header>
     </v-row>
 
     <!-- Form for account details -->
@@ -74,16 +55,17 @@
     <!-- Actions -->
 
     <v-row justify="space-between" class="ma-1 mt-8">
-      <v-btn text @click="backStep">{{
+      <v-btn text @click="backStep">
+        {{
         $t("bank-account-creation-form.cancel")
-      }}</v-btn>
+        }}
+      </v-btn>
       <v-btn
         color="primary"
         @click="nextStep"
         :loading="processing"
         :disable="processing"
-        >{{ $t("bank-account-creation-form.continueButton") }}</v-btn
-      >
+      >{{ $t("bank-account-creation-form.continueButton") }}</v-btn>
     </v-row>
   </v-stepper-content>
 </template>
@@ -126,15 +108,11 @@ export default {
       this.$v.$touch();
       if (!this.$v.$invalid) {
         this.processing = true;
-        await this.setBankAccount(bankAccount)
-          .then(() => {
-            this.$emit("nextStep", parseInt(this.step) + 1);
-          })
-          .catch(error => {
-            console.log(`Failed to associate bank account because: ${error}`);
-            this.error = true;
-          });
-        this.processing = false;
+        await this.setBankAccount(bankAccount).finally(() => {
+          this.processing = false;
+        });
+
+        this.$emit("nextStep", parseInt(this.step) + 1);
       }
     },
     backStep() {

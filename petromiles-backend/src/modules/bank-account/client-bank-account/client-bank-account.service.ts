@@ -1,3 +1,4 @@
+import { State } from '@/modules/management/state/state.entity';
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -11,6 +12,7 @@ import { BankAccountService } from '@/modules/bank-account/bank-account.service'
 import { StateBankAccountService } from '@/modules/bank-account/state-bank-account/state-bank-account.service';
 import { UserClientService } from '@/modules/user/user-client/user-client.service';
 import { TransactionService } from '@/modules/transaction/transaction.service';
+import { StateTransactionService } from '@/modules/transaction/state-transaction/state-transaction.service';
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
 
 // ENTITIES
@@ -25,6 +27,7 @@ import {
   StateName,
   StateDescription,
 } from '@/modules/management/state/state.enum';
+import { TransactionType } from '@/modules/transaction/transaction/transaction.enum';
 
 @Injectable()
 export class ClientBankAccountService {
@@ -33,7 +36,7 @@ export class ClientBankAccountService {
     private bankAccountService: BankAccountService,
     @InjectRepository(ClientBankAccount)
     private clientBankAccountRepository: Repository<ClientBankAccount>,
-
+    private stateTransactionService: StateTransactionService,
     private stateBankAccountService: StateBankAccountService,
     private userClientService: UserClientService,
     private transactionService: TransactionService,
@@ -100,7 +103,7 @@ export class ClientBankAccountService {
     ) {
       const message = `[${ApiModules.BANK_ACCOUNT}] Invalid verification amounts for the client bank account ID ${clientBankAccount.idClientBankAccount}`;
       this.logger.error(message);
-      throw new BadRequestException(message);
+      throw new BadRequestException('error-messages.invalidVerification');
     }
 
     const verification = await this.paymentProviderService.verifyBankAccount({
@@ -114,6 +117,24 @@ export class ClientBankAccountService {
       clientBankAccount,
       StateDescription.BANK_ACCOUNT_VALIDATION,
     );
+
+    const verificationTransactions = await this.transactionService.getAllFiltered(
+      [StateName.VERIFYING],
+      [TransactionType.BANK_ACCOUNT_VALIDATION],
+      [PaymentProvider.STRIPE],
+      clientBankAccount.idClientBankAccount,
+      true,
+    );
+
+    await this.stateTransactionService.update(
+      StateName.VALID,
+      verificationTransactions[0],
+    );
+    await this.stateTransactionService.update(
+      StateName.VALID,
+      verificationTransactions[1],
+    );
+
     return verification;
   }
 
@@ -197,6 +218,7 @@ export class ClientBankAccountService {
         AND STATE_USER.fk_state = STATE_U."idState" 
         AND USER_DETAILS.fk_user_client = USER_CLIENT."idUserClient"
         -- Conditions
+        AND STATE_BANK_ACCOUNT."finalDate" IS NULL
         AND STATE_U.name = 'active'
         AND STATE_BA.name = ANY($1)    
     `,

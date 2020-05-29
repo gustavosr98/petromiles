@@ -80,14 +80,9 @@ export default {
       this.login(user);
     },
     login(user) {
-      store
-        .dispatch("auth/logIn", user)
-        .then(() => {
-          this.$router.push({ name: clientRoutes.DASHBOARD.name });
-        })
-        .catch(err => {
-          console.log(err.response.data.message);
-        });
+      store.dispatch("auth/logIn", user).then(() => {
+        this.$router.push({ name: clientRoutes.DASHBOARD.name });
+      });
     },
   },
 };

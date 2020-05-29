@@ -2,15 +2,20 @@
   <v-app>
     <v-content>
       <router-view></router-view>
+      <error-modal />
     </v-content>
   </v-app>
 </template>
 
 <script>
 import metaInfo from "@/plugins/vue-meta";
+import ErrorModal from "@/components/ErrorModal/ErrorModal";
 
 export default {
   name: "App",
+  components: {
+    "error-modal": ErrorModal,
+  },
   metaInfo,
 };
 </script>

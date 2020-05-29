@@ -99,12 +99,24 @@ export class PaymentsService {
       currentUserSuscription.suscription.name,
     );
 
-    return await this.transactionService.createDeposit(
+    const deposit = await this.transactionService.createDeposit(
       clientBankAccount,
       extraPointsType,
       amount,
       charge.id,
     );
+
+    this.logger.silly(
+      `[${ApiModules.PAYMENTS}] Bank account {client: ${
+        clientBankAccount.userClient.email
+      } | id: ${idClientBankAccount} | last4: ${clientBankAccount.bankAccount.accountNumber.substr(
+        -4,
+      )}} charged with USD [raw ${(amount / 100).toFixed(2)}| total ${(
+        amountToCharge / 100
+      ).toFixed(2)}]`,
+    );
+
+    return deposit;
   }
 
   async withdrawPoints(

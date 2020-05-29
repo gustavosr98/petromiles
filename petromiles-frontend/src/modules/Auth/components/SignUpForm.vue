@@ -169,14 +169,9 @@ export default {
     },
 
     signUp(user) {
-      store
-        .dispatch("auth/signUp", user)
-        .then(() => {
-          this.$router.push({ name: clientRoutes.DASHBOARD.name });
-        })
-        .catch(err => {
-          console.log(err.response.data.message);
-        });
+      store.dispatch("auth/signUp", user).then(() => {
+        this.$router.push({ name: clientRoutes.DASHBOARD.name });
+      });
     },
   },
 };

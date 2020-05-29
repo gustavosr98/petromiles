@@ -63,9 +63,12 @@ export default {
     },
     mungedData() {
       return this.fetchedData.map(data => {
-        const state = this.$tc(
-          `state-name.${data.clientBankAccount[0].stateBankAccount[0].state.name}`
-        );
+        const state = {
+          name: data.clientBankAccount[0].stateBankAccount[0].state.name,
+          translated: this.$tc(
+            `state-name.${data.clientBankAccount[0].stateBankAccount[0].state.name}`
+          ),
+        };
         const bankAccountType = this.$tc(
           `bank-account-properties.${data.type.toLowerCase()}`
         );
@@ -78,8 +81,8 @@ export default {
     },
   },
   methods: {
-    deleteItem(id) {
-      this.$http.delete(`/bank-account/cancel/${id}`);
+    async deleteItem(id) {
+      await this.$http.delete(`/bank-account/cancel/${id}`);
       const bankAccount = this.fetchedData.find(
         bankAccount => bankAccount.idBankAccount === id
       );
