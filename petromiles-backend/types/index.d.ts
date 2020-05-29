@@ -16,6 +16,7 @@ declare namespace App {
       userDetails: object;
       token: string;
       role: import('../src/modules/management/role/role.enum').Role;
+      id: number;
     }
 
     interface LoginRequest {
@@ -54,11 +55,25 @@ declare namespace App {
       stateTransactionDescription: string;
       promotion?: import('../src/modules/management/promotion/promotion.entity').Promotion;
       platformInterestExtraPoints?: import('../src/modules/management/platform-interest/platform-interest.entity').PlatformInterest;
+      operation?: number;
+      paymentProviderTransactionId?: string;
     }
     interface TransactionInterests {
       platformInterestType: import('../src/modules/management/platform-interest/platform-interest.enum').PlatformInterest;
       platformInterestExtraPointsType: import('../src/modules/management/platform-interest/platform-interest.enum').PlatformInterest;
-      thirdPartyInterestType: import('../src/modules/management/third-party-interest/third-party-interest.enum').ThirdPartyInterest;
+      thirdPartyInterestType: import('./../src/modules/payment-provider/payment-provider.enum').PaymentProvider;
+    }
+
+    interface TransactionInformation {
+      id: number;
+      date: string;
+      type: import('../src/modules/transaction/transaction/transaction.enum').TransactionType;
+      bankAccount: string;
+      equivalent: number;
+      conversion: number;
+      state: string;
+      amount: number;
+      interest: number;
     }
   }
 }

@@ -2,6 +2,7 @@ enum ApiModules {
   AUTH = 'AUTH',
   BANK_ACCOUNT = 'BANK_ACCOUNT',
   CLIENT = 'CLIENT',
+  CRON = 'CRON',
   EXAMPLE = 'EXAMPLE',
   LANGUAGE = 'LANGUAGE',
   PAYMENT_PROVIDER = 'PAYMENT_PROVIDER',
@@ -9,6 +10,7 @@ enum ApiModules {
   TRANSACTION = 'TRANSACTION',
   MAILS = 'MAILS',
   USER = 'USER',
+  PAYMENTS = 'PAYMENTS',
 }
 
 enum ApiSubmodules {

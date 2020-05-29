@@ -107,6 +107,9 @@ STRIPE_API_VERSION=
 SENDGRID_API_KEY=
 SENDGRID_FROM=
 SENDGRID_WELCOME_TEMPLATE=
+SENDGRID_WELCOME_INVOICE_EN_TEMPLATE=
+SENDGRID_WELCOME_INVOICE_ES_TEMPLATE=
+
 
 # JWT
 JWT_SECRET=
@@ -117,6 +120,8 @@ JWT_EXPIRES_IN=
 POEDITOR_API_KEY=
 POEDITOR_PROJECT_ID=
 
+# CRON - Default mode ON
+CRON_INCLUDE=true
 ```
 
 Please contact [developers of team #2](#team-#2) to provide you with the enviroment variable corresponding files
@@ -140,7 +145,7 @@ For futher information on PostgreSQL management please check the [official Postg
 
 ### Frontend project installation
 
-Just as in the [backend project installation](#backend-project installation), open a terminal inside the project root directory and excecute the following commands if you are on Linux or Windows
+Just as in the [backend project installation](#backend-project-installation), open a terminal inside the project root directory and excecute the following commands if you are on Linux or Windows
 
 ```bash
 cd petromiles-backend/ # Move to backend project directory
@@ -156,8 +161,8 @@ Create two files inside **petromiles-frontend/** folder named `.env` and `.env.d
 These files will have the following structure
 
 ```bash
-# API
-VUE_APP_PETROMILES_API=
+# API - Default route
+VUE_APP_PETROMILES_API=http://localhost:3000/api/v1
 
 # FIREBASE
 VUE_APP_FIREBASE_APIKEY=
@@ -168,10 +173,9 @@ VUE_APP_FIREBASE_MESSAGING_SENDER_ID=
 VUE_APP_FIREBASE_APP_ID=
 VUE_APP_FIREBASE_AUTH=
 
-# I18N
-VUE_APP_I18N_LOCALE=
-VUE_APP_I18N_FALLBACK_LOCALE=
-
+# I18N - Default lang
+VUE_APP_I18N_LOCALE=en
+VUE_APP_I18N_FALLBACK_LOCALE=en
 
 ```
 

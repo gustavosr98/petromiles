@@ -1,37 +1,55 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { StateBankAccount } from './state-bank-account.entity';
-import { getConnection } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { StateService } from '../../management/state/state.service';
 import { ClientBankAccount } from '../client-bank-account/client-bank-account.entity';
 import { StateName } from '../../management/state/state.enum';
+import { ApiModules } from '@/logger/api-modules.enum';
 
 @Injectable()
 export class StateBankAccountService {
   constructor(
     private stateService: StateService,
+    @InjectRepository(StateBankAccount)
+    private stateBankAccountRepository: Repository<StateBankAccount>,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  async createStateBankAccount(
+  async updateStateBankAccount(
     stateName: StateName,
     clientBankAccount: ClientBankAccount,
-    description,
+    description?,
   ) {
-    const state = await this.stateService.getState(stateName);
+    if (clientBankAccount.stateBankAccount)
+      await this.endLastState(clientBankAccount);
+
     const stateBankAccount = new StateBankAccount();
     stateBankAccount.clientBankAccount = clientBankAccount;
     stateBankAccount.description = description;
-    stateBankAccount.state = state;
+    stateBankAccount.state = await this.stateService.getState(stateName);
 
     this.logger.silly(
-      `[BANK_ACCOUNT] State of the bank account ID: ${clientBankAccount.bankAccount.idBankAccount} is ${stateName}`,
+      `[${ApiModules.BANK_ACCOUNT}] ID: ${clientBankAccount.idClientBankAccount} updated to state: (${stateName})`,
     );
     return await getConnection()
       .getRepository(StateBankAccount)
       .save(stateBankAccount);
+  }
+
+  private async endLastState(clientBankAccount: ClientBankAccount) {
+    let currentStateBankAccount = await this.stateBankAccountRepository.findOne(
+      {
+        clientBankAccount,
+        finalDate: null,
+      },
+    );
+
+    currentStateBankAccount.finalDate = new Date();
+    await this.stateBankAccountRepository.save(currentStateBankAccount);
   }
 }

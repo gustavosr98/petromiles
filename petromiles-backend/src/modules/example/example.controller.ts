@@ -10,8 +10,8 @@ import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ExampleService } from './example.service';
 
 // Controller for authenticated users.
-@UseGuards(AuthGuard('jwt'))
 @Controller('example')
+@UseGuards(AuthGuard('jwt'))
 export class ExampleController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,

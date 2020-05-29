@@ -1,5 +1,3 @@
-import { ClientBankAccount } from '../client-bank-account/client-bank-account.entity';
-import { UserDetails } from '../../user/user-details/user-details.entity';
 import {
   BaseEntity,
   Entity,
@@ -8,14 +6,18 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
-  OneToOne,
 } from 'typeorm';
+import { Transform } from 'class-transformer';
+
+import { ClientBankAccount } from '../client-bank-account/client-bank-account.entity';
+import { UserDetails } from '../../user/user-details/user-details.entity';
 
 @Entity()
 export class BankAccount extends BaseEntity {
   @PrimaryGeneratedColumn()
   idBankAccount: number;
 
+  @Transform(accountNumber => `${accountNumber.substr(-4)}`)
   @Column()
   accountNumber: string;
 

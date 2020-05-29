@@ -1,3 +1,4 @@
+import { ApiModules } from '@/logger/api-modules.enum';
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -9,11 +10,13 @@ import { Logger } from 'winston';
 import { CreateUserDTO } from '../dto/create-user.dto';
 import { StateName } from '../../management/state/state.enum';
 import { Role } from '../../management/role/role.enum';
+import { Language } from '../language/language.enum';
 
 // SERVICES
 import { StateUserService } from '../state-user/state-user.service';
 import { UserRoleService } from '../user-role/user-role.service';
 import { UserDetailsService } from '../user-details/user-details.service';
+import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
 
 //  ENTITIES
 import { UserClient } from './user-client.entity';
@@ -29,13 +32,14 @@ export class UserClientService {
     private stateUserService: StateUserService,
     private userRoleService: UserRoleService,
     private userDetailsService: UserDetailsService,
+    private paymentProviderService: PaymentProviderService,
   ) {}
 
   async findAll() {
     return await this.userClientRepository.find();
   }
 
-  async createUser(credentials: CreateUserDTO): Promise<App.Auth.UserClient> {
+  async createUser(createUserDTO: CreateUserDTO): Promise<App.Auth.UserClient> {
     const {
       firstName,
       lastName,
@@ -46,10 +50,28 @@ export class UserClientService {
       phone,
       photo,
       ...user
-    } = credentials;
+    } = createUserDTO;
 
-    if (await this.getClient(user.email))
-      throw new BadRequestException('User already in use');
+    if (await this.getClient(user.email)) {
+      this.logger.error(
+        `[${ApiModules.USER}] {${user.email}} Email already in use`,
+      );
+      throw new BadRequestException('Email already in use');
+    }
+
+    const paymentProviderCustomer = await this.paymentProviderService.createCustomer(
+      {
+        email: user.email,
+        name: `${firstName} ${lastName}`,
+      },
+    );
+
+    const paymentProviderAccount = await this.paymentProviderService.createAccount(
+      {
+        email: user.email,
+        customerId: paymentProviderCustomer.id,
+      },
+    );
 
     const userClient = await this.userClientRepository.save(user);
 
@@ -64,13 +86,15 @@ export class UserClientService {
         address,
         phone,
         photo,
-        language: await this.userDetailsService.getLanguage('en'),
+        language: await this.userDetailsService.getLanguage(Language.ENGLISH),
         userClient,
+        customerId: paymentProviderCustomer.id,
+        accountId: paymentProviderAccount.id,
       },
     );
 
     this.logger.silly(
-      `[AUTH] Client with ID: ${userClient.idUserClient} is successfully registered`,
+      `[${ApiModules.USER}] Client with ID: ${userClient.idUserClient} was successfully registered`,
     );
     return userClientDetails;
   }

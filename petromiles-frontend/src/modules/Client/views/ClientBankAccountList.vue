@@ -1,15 +1,18 @@
 <template>
   <client-layout>
     <sub-navbar :items="items" @changeComponent="changeComponent" />
-    <!-- Put here the component for the account list-->
+    <bank-account-table v-if="active === 0" />
     <bank-account-creation @finish="finish" v-if="active === 1" />
-    <!-- Put here the component for the account verification-->
+    <bank-account-verification @finish="finish" v-if="active === 2" />
   </client-layout>
 </template>
 
 <script>
 import ClientLayout from "@/modules/Client/components/ClientLayout";
-import BankAccountCreation from "@/modules/BankAccount/BankAccountCreation/components/BankAccountCreation";
+import BankAccountCreation from "@/modules/BankAccount/components/BankAccountCreation/BankAccountCreation";
+import BankAccountsTable from "@/modules/BankAccount/components/BankAccountList/BankAccountsTable";
+import BankAccountVerification from "@/modules/BankAccount/components/BankAccountVerification/BankAccountVerification";
+
 import SubNavBar from "@/components/SubNavBar";
 import clientRoutes from "@/router/clientRoutes";
 
@@ -18,21 +21,23 @@ export default {
   components: {
     "client-layout": ClientLayout,
     "bank-account-creation": BankAccountCreation,
+    "bank-account-table": BankAccountsTable,
+    "bank-account-verification": BankAccountVerification,
     "sub-navbar": SubNavBar,
   },
   data() {
     return {
       items: [
         {
-          label: this.$tc("navbar.bankAccount"),
+          label: "navbar.bankAccount",
           icon: "mdi-cash",
         },
         {
-          label: this.$tc("bank-account-creation.newBankAccount"),
+          label: "bank-account-creation.newBankAccount",
           icon: "mdi-plus",
         },
         {
-          label: this.$tc("bank-account-creation.bankAccountVerification"),
+          label: "bank-account-creation.bankAccountVerification",
           icon: "mdi-wrench",
         },
       ],

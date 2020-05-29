@@ -4,6 +4,7 @@ export const namespaced = true;
 export const state = {
   userDetails: null,
   bankAccount: null,
+  bankAccounts: null,
 };
 
 export const mutations = {
@@ -14,17 +15,14 @@ export const mutations = {
   SET_BANK_ACCOUNT(state, bankAccount) {
     state.bankAccount = bankAccount;
   },
+  SET_BANK_ACCOUNTS(state, bankAccounts) {
+    state.bankAccounts = bankAccounts;
+  },
 };
 
 export const actions = {
-  setUserDetails({ commit, rootState }, userDetailsData) {
-    if (rootState.auth.user !== null) {
-      if (userDetailsData.email !== rootState.auth.user.email) {
-        commit("SET_USER_DETAILS", userDetailsData);
-      }
-    } else {
-      commit("SET_USER_DETAILS", userDetailsData);
-    }
+  setUserDetails({ commit }, userDetailsData) {
+    commit("SET_USER_DETAILS", userDetailsData);
   },
   async setBankAccount({ commit, state }, bankAccount) {
     commit("SET_BANK_ACCOUNT", bankAccount);

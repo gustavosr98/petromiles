@@ -5,6 +5,8 @@ import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
+import { ApiModules } from '@/logger/api-modules.enum';
+
 @Injectable()
 export class MailsService {
   public constructor(
@@ -13,23 +15,16 @@ export class MailsService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  async sendEmail(email, subject, template, data) {
+  async sendEmail(msg) {
+    const from = this.sendGridConfig.emailFrom;
     try {
-      const msg: App.SendGrid.Mail = {
-        to: email,
-        from: this.sendGridConfig.emailFrom,
-        subject: subject,
-        templateId: template,
-        dynamic_template_data: data,
-      };
-
-      await this.sendGridClient.send(msg);
+      await this.sendGridClient.send({ ...msg, from });
       this.logger.verbose(
-        `[MAILS] An email with the subject "${subject}" has been sent to ${email}`,
+        `[${ApiModules.MAILS}] {${msg.to}} An email with the subject "${msg.subject}" has been sent`,
       );
     } catch (err) {
-      this.logger.verbose(
-        `[MAILS] Problem sending email. Reason: ${err.message}`,
+      this.logger.error(
+        `[${ApiModules.MAILS}] {${msg.to}} Problem sending email. Reason: ${err.message}`,
       );
     }
   }

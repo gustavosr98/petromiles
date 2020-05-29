@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '../user/user.module';
 import { TransactionModule } from '../transaction/transaction.module';
 import { ManagementModule } from '../management/management.module';
+import { PaymentProviderModule } from '@/modules/payment-provider/payment-provider.module';
 
 // CONTROLLER
 import { BankAccountController } from './bank-account.controller';
@@ -27,6 +28,7 @@ import { ClientBankAccount } from './client-bank-account/client-bank-account.ent
       StateBankAccount,
       ClientBankAccount,
     ]),
+    PaymentProviderModule,
     ManagementModule,
     TransactionModule,
     UserModule,

@@ -1,5 +1,5 @@
 <template>
-  <datatable :title="title" :headers="headers" data-url="/user/CLIENT" />
+  <datatable :title="title" :headers="headers" :fetchedData="mungedData" />
 </template>
 
 <script>
@@ -13,6 +13,8 @@ export default {
   data() {
     return {
       title: this.$tc("navbar.user", 1),
+      fetchedData: [],
+
       headers: [
         {
           text: "ID",
@@ -31,8 +33,30 @@ export default {
           text: this.$tc("user-details.lastName"),
           value: "userDetails.lastName",
         },
+        {
+          text: this.$tc("common.state"),
+          value: "state",
+        },
       ],
     };
+  },
+  async mounted() {
+    this.fetchedData = await this.$http.get("/user/CLIENT");
+  },
+  computed: {
+    mungedData() {
+      return this.fetchedData.map(data => {
+        const state = {
+          name: data.stateUser[0].state.name,
+          translated: this.$tc(`state-name.${data.stateUser[0].state.name}`),
+        };
+
+        return {
+          ...data,
+          state,
+        };
+      });
+    },
   },
 };
 </script>

@@ -1,5 +1,4 @@
-import { Suscription } from '../../suscription/suscription/suscription.entity';
-import { TransactionInterest } from '../../transaction/transaction-interest/transaction-interest.entity';
+import { Transform } from 'class-transformer';
 import {
   BaseEntity,
   Entity,
@@ -9,6 +8,8 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
+import { Suscription } from '../../suscription/suscription/suscription.entity';
+import { TransactionInterest } from '../../transaction/transaction-interest/transaction-interest.entity';
 
 @Entity()
 export class PlatformInterest extends BaseEntity {
@@ -18,11 +19,13 @@ export class PlatformInterest extends BaseEntity {
   @Column()
   name: string;
 
-  @Column('decimal', { nullable: true, precision: 8, scale: 2 })
-  amount: number;
+  @Transform(amount => amount / 100)
+  @Column({ nullable: true })
+  amount: string;
 
-  @Column('decimal', { nullable: true, precision: 8, scale: 2 })
-  percentage: number;
+  @Transform(percentage => percentage * 100)
+  @Column({ nullable: true })
+  percentage: string;
 
   @Column({ default: () => 'CURRENT_DATE' })
   initialDate: Date;
@@ -33,10 +36,10 @@ export class PlatformInterest extends BaseEntity {
   @ManyToOne(
     type => Suscription,
     suscription => suscription.idSuscription,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_suscription' })
-  suscription = Suscription;
+  suscription: Suscription;
 
   @OneToMany(
     type => TransactionInterest,

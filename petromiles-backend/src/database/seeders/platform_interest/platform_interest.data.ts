@@ -5,30 +5,30 @@
 export const PLATAFORM_INTERESTS = [
   {
     idPlatformInterest: 1,
-    name: 'PREMIUM',
-    percentage: 20,
+    name: 'premium',
+    percentage: '0.20',
   },
   {
     idPlatformInterest: 2,
-    name: 'GOLD_EXTRA',
-    percentage: 20,
-    amount: 5000,
+    name: 'gold',
+    percentage: '0.2',
+    amount: '500',
   },
   {
     idPlatformInterest: 3,
-    name: 'VERIFICATION',
-    amount: 250,
+    name: 'verification',
+    amount: '250',
   },
 
   {
     idPlatformInterest: 4,
-    name: 'BUY',
-    percentage: 1.5,
+    name: 'buy',
+    percentage: '0.015',
   },
 
   {
     idPlatformInterest: 5,
-    name: 'WITHDRAWAL',
-    percentage: 5,
+    name: 'Withdrawal',
+    percentage: '0.05',
   },
 ];

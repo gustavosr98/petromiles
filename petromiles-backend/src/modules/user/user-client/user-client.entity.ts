@@ -36,37 +36,33 @@ export class UserClient extends BaseEntity {
   @Exclude()
   password: string;
 
-  @OneToMany(
-    type => StateUser,
-    stateUser => stateUser.userClient,
-    { nullable: true, eager: true },
-  )
+  @OneToMany((type) => StateUser, (stateUser) => stateUser.userClient, {
+    nullable: true,
+    eager: true,
+  })
   stateUser: StateUser[];
 
-  @OneToMany(
-    type => UserRole,
-    userRole => userRole.userClient,
-    { nullable: true },
-  )
+  @OneToMany((type) => UserRole, (userRole) => userRole.userClient, {
+    nullable: true,
+  })
   userRole: UserRole[];
 
-  @OneToOne(
-    type => UserDetails,
-    userDetails => userDetails.userClient,
-    { nullable: true, eager: true },
-  )
-  userDetails: UserDetails[];
+  @OneToOne((type) => UserDetails, (userDetails) => userDetails.userClient, {
+    nullable: true,
+    eager: true,
+  })
+  userDetails: UserDetails;
 
   @OneToMany(
-    type => UserSuscription,
-    userSuscription => userSuscription.userClient,
+    (type) => UserSuscription,
+    (userSuscription) => userSuscription.userClient,
     { nullable: false, eager: true },
   )
   userSuscription: UserSuscription[];
 
   @OneToMany(
-    type => ClientBankAccount,
-    clientBankAccount => clientBankAccount.userClient,
+    (type) => ClientBankAccount,
+    (clientBankAccount) => clientBankAccount.userClient,
     { nullable: true },
   )
   clientBankAccount: ClientBankAccount[];

@@ -15,6 +15,9 @@ export class Language extends BaseEntity {
   @Column()
   name: string;
 
+  @Column()
+  shortname: string;
+
   @OneToMany(
     type => UserDetails,
     userDetails => userDetails.language,

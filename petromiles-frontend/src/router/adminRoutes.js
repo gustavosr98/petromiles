@@ -6,6 +6,9 @@ const adminRoutesRaw = Object.freeze({
       import(
         /* webpackChunkName: "admin-login" */ "@/modules/Admin/views/AdminLogin.vue"
       ),
+    meta: {
+      adminGuest: true,
+    },
   },
   DASHBOARD: {
     path: "/admin/dashboard",
@@ -14,6 +17,9 @@ const adminRoutesRaw = Object.freeze({
       import(
         /* webpackChunkName: "admin-dashboard" */ "@/modules/Admin/views/AdminDashboard"
       ),
+    meta: {
+      requiresAdminAuth: true,
+    },
   },
   USER_LIST: {
     path: "/admin/users",
@@ -22,6 +28,9 @@ const adminRoutesRaw = Object.freeze({
       import(
         /* webpackChunkName: "admin-user-list" */ "@/modules/User/views/AdminUserList"
       ),
+    meta: {
+      requiresAdminAuth: true,
+    },
   },
   PLATFORM_CONFIG: {
     path: "/admin/platform-config",
@@ -30,6 +39,9 @@ const adminRoutesRaw = Object.freeze({
       import(
         /* webpackChunkName: "admin-platform-config" */ "@/modules/Admin/views/AdminPlatformConfig"
       ),
+    meta: {
+      requiresAdminAuth: true,
+    },
   },
   BANK_ACCOUNT_LIST: {
     path: "/admin/bank-accounts",
@@ -38,6 +50,9 @@ const adminRoutesRaw = Object.freeze({
       import(
         /* webpackChunkName: "admin-bank-account-list" */ "@/modules/Admin/views/AdminBankAccountList"
       ),
+    meta: {
+      requiresAdminAuth: true,
+    },
   },
   TRANSACTION_LIST: {
     path: "/admin/transactions",
@@ -46,6 +61,9 @@ const adminRoutesRaw = Object.freeze({
       import(
         /* webpackChunkName: "admin-transaction-list" */ "@/modules/Admin/views/AdminTransactionList"
       ),
+    meta: {
+      requiresAdminAuth: true,
+    },
   },
 });
 

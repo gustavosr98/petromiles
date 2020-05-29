@@ -2,13 +2,15 @@
   <admin-layout>
     <v-tabs fixed-tabs background-color="secondary">
       <!-- CLIENTS TAB -->
-      <v-tab key="clients">{{this.$tc('role.client', 1)}}</v-tab>
+      <v-tab key="clients">{{ this.$tc("role.client", 1) }}</v-tab>
       <v-tab-item key="clients">
         <clients-table />
       </v-tab-item>
 
       <!-- ADMINISTRATORS TAB -->
-      <v-tab key="administrators">{{this.$tc('role.administrator', 1)}}</v-tab>
+      <v-tab key="administrators">{{
+        this.$tc("role.administrator", 1)
+      }}</v-tab>
       <v-tab-item key="administrators">
         <administrators-table />
       </v-tab-item>

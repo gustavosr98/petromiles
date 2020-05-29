@@ -15,12 +15,12 @@ export class CreateBankAccountDTO {
   @IsNotEmpty()
   routingNumber: string;
 
-  @IsOptional()
-  userDetails: UserDetails;
-
   @IsNotEmpty()
   checkNumber: number;
 
   @IsNotEmpty()
   type: string;
+
+  @IsOptional()
+  userDetails?: UserDetails;
 }

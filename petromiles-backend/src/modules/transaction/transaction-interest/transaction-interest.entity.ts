@@ -19,7 +19,7 @@ export class TransactionInterest extends BaseEntity {
   @ManyToOne(
     type => PlatformInterest,
     platformInterest => platformInterest.idPlatformInterest,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_platform_interest' })
   platformInterest: PlatformInterest;
@@ -27,7 +27,7 @@ export class TransactionInterest extends BaseEntity {
   @ManyToOne(
     type => PlatformInterest,
     platformInterest => platformInterest.idPlatformInterest,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_platform_interest_extra_points' })
   platformInterestExtraPoints: PlatformInterest;
@@ -43,7 +43,9 @@ export class TransactionInterest extends BaseEntity {
   @ManyToOne(
     type => Promotion,
     promotion => promotion.idPromotion,
-    { nullable: true },
+    {
+      nullable: true,
+    },
   )
   @JoinColumn({ name: 'fk_promotion' })
   promotion: Promotion;

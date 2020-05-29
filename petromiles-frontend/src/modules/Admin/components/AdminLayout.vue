@@ -18,27 +18,27 @@ export default {
     return {
       navigationModules: [
         {
-          name: this.$tc("navbar.dashboard"),
+          name: "navbar.dashboard",
           mdiIcon: "mdi-home",
           route: adminRoutes.DASHBOARD,
         },
         {
-          name: this.$tc("navbar.user"),
+          name: "navbar.user",
           mdiIcon: "mdi-account-multiple",
           route: adminRoutes.USER_LIST,
         },
         {
-          name: this.$tc("navbar.bankAccount"),
+          name: "navbar.bankAccount",
           mdiIcon: "mdi-bank",
           route: adminRoutes.BANK_ACCOUNT_LIST,
         },
         {
-          name: this.$tc("navbar.transaction"),
+          name: "navbar.transaction",
           mdiIcon: "mdi-repeat",
           route: adminRoutes.TRANSACTION_LIST,
         },
         {
-          name: this.$tc("navbar.platformConfig"),
+          name: "navbar.platformConfig",
           mdiIcon: "mdi-settings",
           route: adminRoutes.PLATFORM_CONFIG,
         },

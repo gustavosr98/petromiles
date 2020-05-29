@@ -32,6 +32,7 @@ export class StateTransaction extends BaseEntity {
     state => state.idState,
     {
       nullable: false,
+      eager: true,
     },
   )
   @JoinColumn({ name: 'fk_state' })

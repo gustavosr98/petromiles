@@ -8,6 +8,8 @@ import {
   OneToOne,
   OneToMany,
 } from 'typeorm';
+import { Transform } from 'class-transformer';
+
 import { TransactionType } from './transaction.enum';
 import { UserSuscription } from '../../user-suscription/user-suscription.entity';
 import { PointsConversion } from '../../management/points-conversion/points-conversion.entity';
@@ -20,17 +22,24 @@ export class Transaction extends BaseEntity {
   @PrimaryGeneratedColumn()
   idTransaction: number;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Transform(date => date.toLocaleDateString())
+  @Column({ default: () => 'CURRENT_DATE' })
   initialDate: Date;
 
-  @Column('decimal', { precision: 8, scale: 3 })
+  @Column('decimal', { precision: 12, scale: 3 })
   rawAmount: number;
 
-  @Column('decimal', { precision: 8, scale: 3 })
+  @Column('decimal', { precision: 12, scale: 3 })
   totalAmountWithInterest: number;
 
   @Column()
   type: TransactionType;
+
+  @Column({ nullable: true })
+  operation?: number;
+
+  @Column({ nullable: true })
+  paymentProviderTransactionId?: string;
 
   @ManyToOne(
     type => Transaction,
@@ -50,21 +59,21 @@ export class Transaction extends BaseEntity {
   @OneToMany(
     type => StateTransaction,
     stateTransaction => stateTransaction.transaction,
-    { nullable: false },
+    { nullable: false, eager: true },
   )
   stateTransaction: StateTransaction[];
 
   @OneToMany(
     type => TransactionInterest,
     transactionInterest => transactionInterest.transaction,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   transactionInterest: TransactionInterest[];
 
   @ManyToOne(
     type => PointsConversion,
     pointsConversion => pointsConversion.idPointsConversion,
-    { nullable: false },
+    { nullable: false, eager: true },
   )
   @JoinColumn({ name: 'fk_points_conversion' })
   pointsConversion: PointsConversion;
@@ -72,7 +81,7 @@ export class Transaction extends BaseEntity {
   @ManyToOne(
     type => ClientBankAccount,
     clientBankAccount => clientBankAccount.idClientBankAccount,
-    { nullable: false },
+    { nullable: false, eager: true },
   )
   @JoinColumn({ name: 'fk_client_bank_account' })
   clientBankAccount: ClientBankAccount;

@@ -5,7 +5,14 @@ import {
   Column,
   OneToMany,
 } from 'typeorm';
-import { TransactionInterest } from '../../transaction/transaction-interest/transaction-interest.entity';
+import { Transform } from 'class-transformer';
+
+// ENTITIES
+import { TransactionInterest } from '@/modules/transaction/transaction-interest/transaction-interest.entity';
+
+// INTERFACES
+import { PaymentProvider } from '@/modules/payment-provider/payment-provider.enum';
+import { TransactionType } from '@/modules/transaction/transaction/transaction.enum';
 
 @Entity()
 export class ThirdPartyInterest extends BaseEntity {
@@ -15,9 +22,19 @@ export class ThirdPartyInterest extends BaseEntity {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'enum',
+    enum: TransactionType,
+  })
+  transactionType: string;
+
+  @Column({
+    type: 'enum',
+    enum: PaymentProvider,
+  })
   paymentProvider: string;
 
+  @Transform(amount => amount / 100)
   @Column({ nullable: true })
   amountDollarCents: number;
 

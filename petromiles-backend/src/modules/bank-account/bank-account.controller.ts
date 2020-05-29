@@ -4,50 +4,98 @@ import {
   ValidationPipe,
   Body,
   UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  Inject,
+  Get,
+  Param,
+  ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
-import { Inject } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { CreateBankAccountDTO } from './bank-account/dto/createBankAccount.dto';
-import { ClientBankAccountService } from './client-bank-account/client-bank-account.service';
+import { Role } from '../management/role/role.enum';
+import { HttpRequest } from 'src/logger/http-requests.enum';
+import { ApiModules } from '@/logger/api-modules.enum';
 import { GetUser } from '../auth/decorators/get-user.decorator';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../auth/guards/roles.guard';
+
+import { BankAccountService } from './bank-account.service';
+import { ClientBankAccountService } from './client-bank-account/client-bank-account.service';
+
+const baseEndpoint = Object.freeze('bank-account');
 
 @UseGuards(AuthGuard('jwt'))
-@Controller('bank-account')
+@Controller(baseEndpoint)
+@UseInterceptors(ClassSerializerInterceptor)
 export class BankAccountController {
   constructor(
-    private clientBankAccountService: ClientBankAccountService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    private clientBankAccountService: ClientBankAccountService,
+    private bankAccountService: BankAccountService,
   ) {}
 
-  @Roles()
-  @UseGuards(RolesGuard)
   @Post()
   async createClientBankAccount(
-    @Body(ValidationPipe) bankAccount: CreateBankAccountDTO,
+    @Body(ValidationPipe) bankAccountCreateParams: CreateBankAccountDTO,
     @GetUser() user,
   ) {
     this.logger.http(
-      '[BANK_ACCOUNT] Creating bank account for the user: %s',
-      user.email,
+      `[${ApiModules.BANK_ACCOUNT}] {${user.email}} Creating bank account to the client`,
     );
 
     const clientBankAccount = await this.clientBankAccountService.createClientBankAccount(
-      user.email,
-      bankAccount,
-    );
-
-    this.logger.http(
-      '[BANK_ACCOUNT] Bank account successfully created',
-      user.email,
+      {
+        ...bankAccountCreateParams,
+        email: user.email,
+      },
     );
 
     const { bankAccount: bankAccountCreated } = clientBankAccount;
     return bankAccountCreated;
+  }
+
+  @Post('verify')
+  async verifyBankAccount(
+    @Body()
+    verificationRequest: {
+      clientBankAccountId: number;
+      amounts: number[];
+    },
+  ) {
+    const verification = await this.clientBankAccountService.verifyBankAccount(
+      verificationRequest,
+    );
+    return verification;
+  }
+
+  @Get()
+  async getClientBankAccounts(@GetUser() user) {
+    this.logger.http(
+      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ${user.email} asks /${baseEndpoint}/${user.role}`,
+    );
+    if (user.role === Role.CLIENT)
+      return await this.bankAccountService.getClientBankAccounts(user.id);
+
+    return await this.bankAccountService.getBankAccounts();
+  }
+
+  @Delete('cancel/:id')
+  async cancelBankAccount(
+    @GetUser() user,
+    @Param('id', ParseIntPipe) idBankAccount,
+  ) {
+    const { email, id } = user;
+    this.logger.http(
+      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.PUT}) ${user.email} asks /${baseEndpoint}/cancel/${idBankAccount}`,
+    );
+    return await this.bankAccountService.cancelBankAccount(
+      id,
+      idBankAccount,
+      email,
+    );
   }
 }

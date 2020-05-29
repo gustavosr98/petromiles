@@ -1,19 +1,17 @@
 <template>
   <v-col cols="12" md="5">
     <v-card-text class="mt-12">
-      <!--   <h4 class="text-center mt-4 subtitle-2">Log in with your PetroMiles account</h4>-->
-      <v-row>
+      <v-row v-if="showClientElement">
         <no-federeded-button
           v-for="provider in providers"
           :key="`${provider.name}`"
           :provider="provider"
           @login="login"
           type="login"
-          >Continue with {{ provider.name }}</no-federeded-button
-        >
+        >Continue with {{ provider.name }}</no-federeded-button>
       </v-row>
-      <h4 class="text-center mt-4 caption">Or login with</h4>
-      <v-form ref="signUpForm">
+      <h4 class="text-center mt-3 mb-5 caption">{{ title }}</h4>
+      <v-form>
         <v-text-field
           label="Email"
           name="Email"
@@ -34,11 +32,11 @@
       </v-form>
     </v-card-text>
     <v-row class="text-center">
-      <v-col cols="6">
+      <v-col :cols="showClientElement ? '6' : '12'">
         <h5 class="caption">Forgot your password?</h5>
         <v-spacer />
       </v-col>
-      <v-col cols="6">
+      <v-col cols="6" v-if="showClientElement">
         <h5 class="caption">
           New here?
           <router-link :to="{ name: routeNameSignUp }">Sign Up</router-link>
@@ -64,11 +62,18 @@ export default {
     "no-federeded-button": NoFederatedButton,
   },
 
+  props: {
+    title: { required: true, type: String },
+    signUpRoute: { type: String },
+    dashboardRoute: { required: true, type: String },
+    showClientElement: { required: true, type: Boolean },
+    role: { required: true, type: String },
+  },
   data() {
     return {
       email: "",
       password: "",
-      routeNameSignUp: clientRoutes.SIGN_UP.name,
+      routeNameSignUp: this.signUpRoute,
     };
   },
   methods: {
@@ -76,19 +81,15 @@ export default {
       const user = {
         email: this.email,
         password: this.password,
-        role: "CLIENT",
+        role: this.role,
       };
       this.login(user);
     },
+
     login(user) {
-      store
-        .dispatch("auth/logIn", user)
-        .then(() => {
-          this.$router.push({ name: clientRoutes.DASHBOARD.name });
-        })
-        .catch(err => {
-          console.log(err.response.data.message);
-        });
+      store.dispatch("auth/logIn", user).then(() => {
+        this.$router.push({ name: this.dashboardRoute });
+      });
     },
   },
 };

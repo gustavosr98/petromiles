@@ -8,6 +8,7 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 // ENTITIES
 import { UserClient } from '../user-client/user-client.entity';
@@ -45,42 +46,43 @@ export class UserDetails extends BaseEntity {
   @Column({ nullable: true })
   photo?: string;
 
-  @OneToOne(
-    type => UserClient,
-    userClient => userClient.idUserClient,
-    { nullable: true },
-  )
+  @Column({ nullable: true })
+  @Exclude()
+  customerId?: string;
+
+  @Column({ nullable: true })
+  @Exclude()
+  accountId?: string;
+
+  @OneToOne((type) => UserClient, (userClient) => userClient.idUserClient, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'fk_user_client' })
   userClient?: UserClient;
 
   @OneToOne(
-    type => UserAdministrator,
-    userAdministrator => userAdministrator.idUserAdministrator,
+    (type) => UserAdministrator,
+    (userAdministrator) => userAdministrator.idUserAdministrator,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_user_administrator' })
   userAdministrator?: UserAdministrator;
 
-  @ManyToOne(
-    type => Language,
-    language => language.idLanguage,
-    { nullable: true, eager: true },
-  )
+  @ManyToOne((type) => Language, (language) => language.idLanguage, {
+    nullable: true,
+    eager: true,
+  })
   @JoinColumn({ name: 'fk_language' })
   language?: Language;
 
-  @ManyToOne(
-    type => Country,
-    country => country.idCountry,
-    { nullable: true },
-  )
+  @ManyToOne((type) => Country, (country) => country.idCountry, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'fk_country' })
   country?: Country;
 
-  @OneToMany(
-    type => BankAccount,
-    bankAccount => bankAccount.userDetails,
-    { nullable: true },
-  )
+  @OneToMany((type) => BankAccount, (bankAccount) => bankAccount.userDetails, {
+    nullable: true,
+  })
   bankAccount?: BankAccount[];
 }

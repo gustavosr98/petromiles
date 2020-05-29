@@ -27,27 +27,23 @@ export class UserSuscription extends BaseEntity {
   @Column({ nullable: true })
   finalDate: Date;
 
-  @ManyToOne(
-    type => UserClient,
-    userClient => userClient.idUserClient,
-    { nullable: false },
-  )
+  @ManyToOne((type) => UserClient, (userClient) => userClient.idUserClient, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'fk_user_client' })
   userClient: UserClient;
 
   @ManyToOne(
-    type => Suscription,
-    suscription => suscription.idSuscription,
-    { nullable: false },
+    (type) => Suscription,
+    (suscription) => suscription.idSuscription,
+    { nullable: false, eager: true },
   )
   @JoinColumn({ name: 'fk_suscription' })
   suscription: Suscription;
 
-  @OneToOne(
-    type => Transaction,
-    transaction => transaction.idTransaction,
-    { nullable: true },
-  )
+  @OneToOne((type) => Transaction, (transaction) => transaction.idTransaction, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'fk_transaction' })
   transaction: Transaction;
 }
