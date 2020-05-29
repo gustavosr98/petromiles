@@ -100,14 +100,13 @@ export class AuthService {
   }
 
   private async createWelcomeEmail(email, name) {
-    await this.mailsService.sendEmail(
-      email,
-      MailsSubject.WELCOME,
-      this.configService.get('mails.sendgrid.templates.welcome'),
-      {
-        user: name,
-      },
-    );
+    const message = {
+      to: email,
+      subject: MailsSubject.WELCOME,
+      templateId: this.configService.get('mails.sendgrid.templates.welcome'),
+      dynamic_template_data: { user: name },
+    };
+    await this.mailsService.sendEmail(message);
   }
 
   async hashPassword(password: string, salt: string): Promise<string> {

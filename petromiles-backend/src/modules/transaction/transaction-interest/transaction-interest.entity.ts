@@ -17,38 +17,42 @@ export class TransactionInterest extends BaseEntity {
   idTransactionInterest: number;
 
   @ManyToOne(
-    (type) => PlatformInterest,
-    (platformInterest) => platformInterest.idPlatformInterest,
+    type => PlatformInterest,
+    platformInterest => platformInterest.idPlatformInterest,
     { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_platform_interest' })
   platformInterest: PlatformInterest;
 
   @ManyToOne(
-    (type) => PlatformInterest,
-    (platformInterest) => platformInterest.idPlatformInterest,
-    { nullable: true },
+    type => PlatformInterest,
+    platformInterest => platformInterest.idPlatformInterest,
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_platform_interest_extra_points' })
   platformInterestExtraPoints: PlatformInterest;
 
   @ManyToOne(
-    (type) => ThirdPartyInterest,
-    (thirdPartyInterest) => thirdPartyInterest.idThirdPartyInterest,
+    type => ThirdPartyInterest,
+    thirdPartyInterest => thirdPartyInterest.idThirdPartyInterest,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_third_party_interest' })
   thirdPartyInterest: ThirdPartyInterest;
 
-  @ManyToOne((type) => Promotion, (promotion) => promotion.idPromotion, {
-    nullable: true,
-  })
+  @ManyToOne(
+    type => Promotion,
+    promotion => promotion.idPromotion,
+    {
+      nullable: true,
+    },
+  )
   @JoinColumn({ name: 'fk_promotion' })
   promotion: Promotion;
 
   @ManyToOne(
-    (type) => Transaction,
-    (transaction) => transaction.idTransaction,
+    type => Transaction,
+    transaction => transaction.idTransaction,
     { nullable: false },
   )
   @JoinColumn({ name: 'fk_transaction' })

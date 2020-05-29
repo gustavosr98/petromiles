@@ -16,6 +16,9 @@ import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { HttpRequest } from '@/logger/http-requests.enum';
 import { TransactionService } from './transaction.service';
+import { Param } from '@nestjs/common';
+import { MailsService } from '../mails/mails.service';
+import { ConfigService } from '@nestjs/config';
 
 const baseEndpoint = Object.freeze('transaction');
 
@@ -34,5 +37,16 @@ export class TransactionController {
       `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}`,
     );
     return this.transactionService.getTransactions(user.email);
+  }
+
+  @Get(':idTransaction')
+  getTransaction(
+    @Param('idTransaction') idTransaction,
+    @GetUser() user,
+  ): Promise<App.Transaction.TransactionInformation> {
+    this.logger.http(
+      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET})  ${user?.email} asks /${baseEndpoint}/${idTransaction}`,
+    );
+    return this.transactionService.getTransaction(idTransaction);
   }
 }

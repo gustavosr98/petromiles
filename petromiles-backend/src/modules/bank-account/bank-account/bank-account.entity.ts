@@ -17,7 +17,7 @@ export class BankAccount extends BaseEntity {
   @PrimaryGeneratedColumn()
   idBankAccount: number;
 
-  @Transform((accountNumber) => `${accountNumber.substr(-4)}`)
+  @Transform(accountNumber => `${accountNumber.substr(-4)}`)
   @Column()
   accountNumber: string;
 
@@ -34,15 +34,15 @@ export class BankAccount extends BaseEntity {
   routingNumber: number;
 
   @OneToMany(
-    (type) => ClientBankAccount,
-    (clientBankAccount) => clientBankAccount.bankAccount,
-    { nullable: true, eager: true },
+    type => ClientBankAccount,
+    clientBankAccount => clientBankAccount.bankAccount,
+    { nullable: true },
   )
   clientBankAccount: ClientBankAccount[];
 
   @ManyToOne(
-    (type) => UserDetails,
-    (userDetails) => userDetails.idUserDetails,
+    type => UserDetails,
+    userDetails => userDetails.idUserDetails,
     { nullable: true },
   )
   @JoinColumn({ name: 'fk_person_details' })

@@ -63,5 +63,17 @@ declare namespace App {
       platformInterestExtraPointsType: import('../src/modules/management/platform-interest/platform-interest.enum').PlatformInterest;
       thirdPartyInterestType: import('./../src/modules/payment-provider/payment-provider.enum').PaymentProvider;
     }
+
+    interface TransactionInformation {
+      id: number;
+      date: string;
+      type: import('../src/modules/transaction/transaction/transaction.enum').TransactionType;
+      bankAccount: string;
+      equivalent: number;
+      conversion: number;
+      state: string;
+      amount: number;
+      interest: number;
+    }
   }
 }

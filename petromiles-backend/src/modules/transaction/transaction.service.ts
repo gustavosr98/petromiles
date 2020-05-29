@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { WINSTON_MODULE_PROVIDER, WinstonModuleOptions } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { Repository } from 'typeorm';
@@ -117,6 +117,42 @@ export class TransactionService {
     });
 
     return transactions;
+  }
+
+  async getTransaction(
+    idTransaction,
+  ): Promise<App.Transaction.TransactionInformation> {
+    const transaction = await this.transactionRepository.findOne(idTransaction);
+    return this.transformTransactionInformation(transaction);
+  }
+
+  private transformTransactionInformation(
+    transaction: Transaction,
+  ): App.Transaction.TransactionInformation {
+    const state = transaction.stateTransaction.find(state => !state.finalDate)
+      .state.name;
+
+    const amount =
+      transaction.rawAmount == 0
+        ? parseFloat(
+            transaction.transactionInterest[0].platformInterest.amount,
+          ) / 100
+        : transaction.rawAmount;
+    const interest =
+      transaction.rawAmount == 0 ? 0 : transaction.totalAmountWithInterest;
+    return {
+      id: transaction.idTransaction,
+      date: transaction.initialDate.toLocaleDateString(),
+      type: transaction.type,
+      bankAccount: transaction.clientBankAccount.bankAccount.accountNumber.substr(
+        -4,
+      ),
+      equivalent: amount / transaction.pointsConversion.onePointEqualsDollars,
+      conversion: 1 / transaction.pointsConversion.onePointEqualsDollars,
+      state,
+      amount,
+      interest,
+    };
   }
 
   async createTransaction(

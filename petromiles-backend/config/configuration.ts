@@ -37,6 +37,8 @@ export default () => ({
       emailFrom: process.env.SENDGRID_FROM,
       templates: {
         welcome: process.env.SENDGRID_WELCOME_TEMPLATE,
+        invoiceEn: process.env.SENDGRID_WELCOME_INVOICE_EN_TEMPLATE,
+        invoiceEs: process.env.SENDGRID_WELCOME_INVOICE_ES_TEMPLATE,
       },
     },
   },

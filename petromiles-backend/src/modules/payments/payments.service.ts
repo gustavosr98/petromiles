@@ -2,6 +2,9 @@ import { Interest } from './interest.interface';
 import { TransactionType } from './../transaction/transaction/transaction.enum';
 import { PointsConversionService } from '@/modules/management/points-conversion/points-conversion.service';
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+import { getConnection } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -11,16 +14,20 @@ import { TransactionService } from '../transaction/transaction.service';
 import { ThirdPartyInterestService } from '../management/third-party-interest/third-party-interest.service';
 import { PlatformInterestService } from '../management/platform-interest/platform-interest.service';
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
+import { MailsService } from '../mails/mails.service';
 
 // ENTITIES
 import { Transaction } from '../transaction/transaction/transaction.entity';
 import { UserService } from '../user/user.service';
 import { PlatformInterest } from '../management/platform-interest/platform-interest.enum';
+import { UserClient } from '../user/user-client/user-client.entity';
 
 // INTERFACES
 import { Suscription } from '../suscription/suscription/suscription.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { PaymentProvider } from './../payment-provider/payment-provider.enum';
+import { MailsSubject, MailsTemplate } from '../mails/mails.enum';
+import { Language } from '../user/language/language.enum';
 
 @Injectable()
 export class PaymentsService {
@@ -33,6 +40,8 @@ export class PaymentsService {
     private userService: UserService,
     private pointsConversionService: PointsConversionService,
     private paymentProviderService: PaymentProviderService,
+    private mailsService: MailsService,
+    private configService: ConfigService,
   ) {}
 
   async getOnePointToDollars(): Promise<number> {
@@ -150,5 +159,37 @@ export class PaymentsService {
     if (dollars * 100 >= interests) return true;
 
     return false;
+  }
+
+  async sendInvoiceEmail(user, file) {
+    let userClient = await getConnection()
+      .getRepository(UserClient)
+      .findOne({ email: user.email });
+
+    const template =
+      userClient.userDetails.language.name === Language.ENGLISH
+        ? MailsTemplate.INVOICE_EN
+        : MailsTemplate.INVOICE_ES;
+
+    const subject =
+      userClient.userDetails.language.name === Language.ENGLISH
+        ? MailsSubject.INVOICE_EN
+        : MailsSubject.INVOICE_ES;
+
+    this.mailsService.sendEmail({
+      to: userClient.email,
+      subject: subject,
+      templateId: this.configService.get(
+        `mails.sendgrid.templates.${template}`,
+      ),
+      dynamic_template_data: { user: userClient.userDetails.firstName },
+      attachments: [
+        {
+          filename: `PetroMiles[invoce]-${new Date().toLocaleDateString()}`,
+          type: file.mimetype,
+          content: file.buffer.toString('base64'),
+        },
+      ],
+    });
   }
 }

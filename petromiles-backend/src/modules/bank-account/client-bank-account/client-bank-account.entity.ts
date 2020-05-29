@@ -48,7 +48,7 @@ export class ClientBankAccount extends BaseEntity {
   @ManyToOne(
     type => BankAccount,
     bankAccount => bankAccount.idBankAccount,
-    { nullable: false },
+    { nullable: false, eager: true },
   )
   @JoinColumn({ name: 'fk_bank_account' })
   bankAccount: BankAccount;

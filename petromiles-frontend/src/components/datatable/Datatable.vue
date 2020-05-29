@@ -31,9 +31,10 @@
 </template>
 
 <script>
-import { statesArray } from "@/constants/state.js";
+import { getColor } from "@/mixins/getColor.js";
 export default {
   name: "datatable",
+  mixins: [getColor],
   props: {
     title: {
       type: String,
@@ -58,15 +59,6 @@ export default {
   methods: {
     createLink(id) {
       return `${this.linkTo}/${id}`;
-    },
-    getColor(state) {
-      let color = "";
-      statesArray.map(s => {
-        if (s.state === state) {
-          color = s.color;
-        }
-      });
-      return color;
     },
   },
 };

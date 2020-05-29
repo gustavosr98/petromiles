@@ -73,7 +73,7 @@ export class Transaction extends BaseEntity {
   @ManyToOne(
     type => PointsConversion,
     pointsConversion => pointsConversion.idPointsConversion,
-    { nullable: false },
+    { nullable: false, eager: true },
   )
   @JoinColumn({ name: 'fk_points_conversion' })
   pointsConversion: PointsConversion;

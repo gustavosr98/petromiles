@@ -48,7 +48,7 @@ export default {
       return (
         parseInt(transaction.rawAmount) / 100 +
         parseInt(transaction.totalAmountWithInterest) / 100
-      );
+      ).toFixed(3);
     },
   },
   computed: {

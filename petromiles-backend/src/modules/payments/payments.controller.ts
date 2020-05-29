@@ -8,8 +8,11 @@ import {
   Inject,
   Get,
   Param,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -21,6 +24,7 @@ import { PaymentsService } from './payments.service';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { TransactionType } from '@/modules/transaction/transaction/transaction.enum';
 import { CreatePaymentDTO } from './dto/create-payment.dto';
+import { Transaction } from '../transaction/transaction/transaction.entity';
 
 const baseEndpoint = 'payments';
 
@@ -36,7 +40,7 @@ export class PaymentsController {
   async buyPoints(
     @GetUser() user,
     @Body(ValidationPipe) paymentProperties: CreatePaymentDTO,
-  ) {
+  ): Promise<Transaction> {
     const { idClientBankAccount, amount, amountToCharge } = paymentProperties;
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/buy-points`,
@@ -85,5 +89,11 @@ export class PaymentsController {
     );
     const interests = await this.paymentsService.getInterests(transactionType);
     return interests;
+  }
+
+  @Post('invoice')
+  @UseInterceptors(FileInterceptor('file'))
+  sendInvoiceEmail(@UploadedFile() file, @GetUser() user) {
+    this.paymentsService.sendInvoiceEmail(user, file);
   }
 }
