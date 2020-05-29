@@ -115,6 +115,10 @@ export class StripeService {
     return asociatedBankAccount;
   }
 
+  async deleteBankAccount(customerId: string, bankAccountId: string) {
+    await this.stripe.customers.deleteSource(customerId, bankAccountId);
+  }
+
   // TRANSFERS
   async createTransfer(
     transferCreateParams: Stripe.TransferCreateParams,

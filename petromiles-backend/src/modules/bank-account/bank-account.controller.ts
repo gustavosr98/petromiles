@@ -8,6 +8,9 @@ import {
   ClassSerializerInterceptor,
   Inject,
   Get,
+  Param,
+  ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -19,9 +22,7 @@ import { Role } from '../management/role/role.enum';
 import { HttpRequest } from 'src/logger/http-requests.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { GetUser } from '../auth/decorators/get-user.decorator';
-import { Roles } from '../auth/decorators/roles.decorator';
 
-import { RolesGuard } from '../auth/guards/roles.guard';
 import { BankAccountService } from './bank-account.service';
 import { ClientBankAccountService } from './client-bank-account/client-bank-account.service';
 
@@ -80,5 +81,17 @@ export class BankAccountController {
       return await this.bankAccountService.getClientBankAccounts(user.id);
 
     return await this.bankAccountService.getBankAccounts();
+  }
+
+  @Delete('cancel/:id')
+  async cancelBankAccount(
+    @GetUser() user,
+    @Param('id', ParseIntPipe) idBankAccount,
+  ) {
+    const { email, id } = user;
+    this.logger.http(
+      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.PUT}) ${user.email} asks /${baseEndpoint}/cancel/${idBankAccount}`,
+    );
+    this.bankAccountService.cancelBankAccount(id, idBankAccount, email);
   }
 }

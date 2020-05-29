@@ -6,6 +6,7 @@ import { Logger } from 'winston';
 import { Repository, getConnection } from 'typeorm';
 
 import { UserDetailsService } from '../user/user-details/user-details.service';
+import { StateBankAccountService } from './state-bank-account/state-bank-account.service';
 
 import { BankAccount } from './bank-account/bank-account.entity';
 import { UserDetails } from '../user/user-details/user-details.entity';
@@ -13,6 +14,8 @@ import { ClientBankAccount } from './client-bank-account/client-bank-account.ent
 
 import { ApiModules } from '@/logger/api-modules.enum';
 import americanRoutingNumbers from '@/constants/americanRoutingNumbers';
+import { StateName, StateDescription } from '../management/state/state.enum';
+import { PaymentProviderService } from '../payment-provider/payment-provider.service';
 
 @Injectable()
 export class BankAccountService {
@@ -20,6 +23,8 @@ export class BankAccountService {
     @InjectRepository(BankAccount)
     private bankAccountRepository: Repository<BankAccount>,
     private userDetailsService: UserDetailsService,
+    private stateBankAccountService: StateBankAccountService,
+    private paymentProviderService: PaymentProviderService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
@@ -27,7 +32,7 @@ export class BankAccountService {
     return await getConnection()
       .getRepository(BankAccount)
       .find({
-        where: `"userClient"."idUserClient" ='${idUserClient}' and "stateBankAccount"."finalDate" is null`,
+        where: `"userClient"."idUserClient" ='${idUserClient}' and "stateBankAccount"."finalDate" is null and state.name != '${StateName.CANCELLED}'`,
         join: {
           alias: 'bankAccount',
           innerJoinAndSelect: {
@@ -41,7 +46,9 @@ export class BankAccountService {
   }
 
   async getBankAccounts(): Promise<BankAccount[]> {
-    return await getConnection().getRepository(BankAccount).find();
+    return await getConnection()
+      .getRepository(BankAccount)
+      .find();
   }
 
   async createBankAccount(bankAccountCreateParams): Promise<BankAccount> {
@@ -83,7 +90,7 @@ export class BankAccountService {
   // Only validates American bank routing numbers
   private isRoutingNumberListed(routingNumber: string): boolean {
     let isListed = false;
-    americanRoutingNumbers.map((arm) => {
+    americanRoutingNumbers.map(arm => {
       if (arm == routingNumber) isListed = true;
     });
     return isListed;
@@ -102,7 +109,7 @@ export class BankAccountService {
   ): Promise<ClientBankAccount> {
     const bankAccount = await getConnection()
       .getRepository(ClientBankAccount)
-      .find({
+      .findOne({
         where: `userClient.idUserClient = ${idUserClient} AND bankAccount.idBankAccount = ${idBankAccount}`,
         join: {
           alias: 'clientBankAccount',
@@ -112,6 +119,25 @@ export class BankAccountService {
           },
         },
       });
-    return bankAccount[0];
+    return bankAccount;
+  }
+
+  async cancelBankAccount(idUserClient, idBankAccount, email) {
+    const clientBankAccount = await this.getClientBankAccount(
+      idUserClient,
+      idBankAccount,
+    );
+
+    await this.stateBankAccountService.updateStateBankAccount(
+      StateName.CANCELLED,
+      clientBankAccount,
+      StateDescription.BANK_ACCOUNT_CANCELLED,
+    );
+    const customerId = clientBankAccount.userClient.userDetails.customerId;
+    await this.paymentProviderService.deleteBankAccount(
+      customerId,
+      clientBankAccount.chargeId,
+      email,
+    );
   }
 }

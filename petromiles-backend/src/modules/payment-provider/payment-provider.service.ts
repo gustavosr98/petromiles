@@ -133,6 +133,17 @@ export class PaymentProviderService {
     return account;
   }
 
+  async deleteBankAccount(
+    customerId: string,
+    bankAccountId: string,
+    email: string,
+  ) {
+    await this.stripeService.deleteBankAccount(customerId, bankAccountId);
+    this.logger.verbose(
+      `[${ApiModules.PAYMENT_PROVIDER}] {${email}} deleteBankAccount(): ${bankAccountId}`,
+    );
+  }
+
   // TRANSFERS
   async createTransfer(transferCreateParams) {
     const transfer = await this.stripeService.createAccount(

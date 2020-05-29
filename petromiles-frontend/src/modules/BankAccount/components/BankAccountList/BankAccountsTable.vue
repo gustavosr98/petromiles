@@ -1,7 +1,12 @@
 <template>
   <v-row align="center" justify="center" class="mx-auto">
     <v-col cols="12" md="8">
-      <datatable :title="title" :headers="headers" :fetchedData="mungedData"></datatable>
+      <datatable
+        :title="title"
+        :headers="headers"
+        :fetchedData="mungedData"
+        @deleteItem="deleteItem"
+      ></datatable>
     </v-col>
   </v-row>
 </template>
@@ -49,6 +54,11 @@ export default {
           align: "center",
           value: "state",
         },
+        {
+          text: this.$tc("common.cancel"),
+          align: "center",
+          value: "cancel",
+        },
       ];
     },
     mungedData() {
@@ -65,6 +75,16 @@ export default {
           state,
         };
       });
+    },
+  },
+  methods: {
+    deleteItem(id) {
+      this.$http.delete(`/bank-account/cancel/${id}`);
+      const bankAccount = this.fetchedData.find(
+        bankAccount => bankAccount.idBankAccount === id
+      );
+
+      this.fetchedData.splice(this.fetchedData.indexOf(bankAccount), 1);
     },
   },
 };
