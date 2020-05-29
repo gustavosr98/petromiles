@@ -45,7 +45,14 @@ export default {
           value: "type",
         },
         {
-          text: this.$tc("bank-account-properties.lastFourDigits"),
+          text: this.$tc("bank-account-properties.routingNumber"),
+          align: "center",
+          value: "routingNumber",
+        },
+        {
+          text: `${this.$tc(
+            "bank-account-properties.accountNumber"
+          )} (${this.$tc("bank-account-properties.lastFourDigits")})`,
           align: "center",
           value: "accountNumber",
         },

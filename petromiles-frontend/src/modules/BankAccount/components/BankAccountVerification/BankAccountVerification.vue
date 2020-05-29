@@ -5,20 +5,19 @@
       <!-- Show alert if the user doesn't have bank accounts to validate-->
       <information-alert v-if="bankAccountsToVerify.length == 0">
         <template>
-          <h3 class="subtitle-1 font-weight-bold font-italic">
-            {{ $t("bank-account-validation.everythingIsFine") }}
-          </h3>
-          <div class="font-weight-light">
-            {{ $t("bank-account-validation.nothingToVerifyMessage") }}
-          </div>
+          <h3
+            class="subtitle-1 font-weight-bold font-italic"
+          >{{ $t("bank-account-validation.everythingIsFine") }}</h3>
+          <div class="font-weight-light">{{ $t("bank-account-validation.nothingToVerifyMessage") }}</div>
         </template>
       </information-alert>
       <!-- Show list with bank accounts available to validate -->
 
       <v-list v-else>
-        <div class="primary white--text py-2 overline" align="center">
-          {{ $t("bank-account-validation.bankAccountsToVerify") }}
-        </div>
+        <div
+          class="primary white--text py-2 overline"
+          align="center"
+        >{{ $t("bank-account-validation.bankAccountsToVerify") }}</div>
         <v-divider />
         <v-list-item-group>
           <template v-for="(account, index) in bankAccountsToVerify">
@@ -30,21 +29,39 @@
               <v-list-item-content class="text--primary subtitle-2">
                 <p>
                   {{ $t("common.code") }}:
-                  <span class="subtitle-2 font-weight-light">{{
+                  <span class="subtitle-2 font-weight-light">
+                    {{
                     account.idBankAccount
-                  }}</span>
+                    }}
+                  </span>
+                </p>
+                <p>
+                  {{ $t("bank-account-properties.routingNumber") }}:
+                  <span
+                    class="subtitle-2 font-weight-light"
+                  >
+                    {{
+                    account.routingNumber
+                    }}
+                  </span>
                 </p>
                 <p>
                   {{ $t("bank-account-properties.lastFourDigits") }}:
-                  <span class="subtitle-2 font-weight-light">{{
+                  <span
+                    class="subtitle-2 font-weight-light"
+                  >
+                    {{
                     account.accountNumber
-                  }}</span>
+                    }}
+                  </span>
                 </p>
                 <p>
                   {{ $t("common.type") }}:
-                  <span class="subtitle-2 font-weight-light">{{
+                  <span class="subtitle-2 font-weight-light">
+                    {{
                     account.type
-                  }}</span>
+                    }}
+                  </span>
                 </p>
               </v-list-item-content>
 
@@ -54,14 +71,10 @@
                   dark
                   small
                   @click="startValidation(account)"
-                  >{{ $t("bank-account-validation.verify") }}</v-btn
-                >
+                >{{ $t("bank-account-validation.verify") }}</v-btn>
               </v-list-item-action>
             </v-list-item>
-            <v-divider
-              v-if="index + 1 < bankAccountsToVerify.length"
-              :key="index"
-            ></v-divider>
+            <v-divider v-if="index + 1 < bankAccountsToVerify.length" :key="index"></v-divider>
           </template>
         </v-list-item-group>
       </v-list>

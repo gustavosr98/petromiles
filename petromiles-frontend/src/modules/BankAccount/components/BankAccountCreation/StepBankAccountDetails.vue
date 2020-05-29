@@ -16,7 +16,7 @@
         </v-col>
         <v-col cols="12" md="5">
           <v-text-field
-            prepend-icon="check"
+            prepend-icon="mdi-bank"
             v-model="routingNumber"
             :label="$t('bank-account-properties.routingNumber')"
             type="text"
@@ -40,7 +40,7 @@
         </v-col>
         <v-col cols="12" md="5">
           <v-text-field
-            prepend-icon="check"
+            prepend-icon="mdi-numeric"
             v-model="accountNumber"
             :label="$t('bank-account-properties.accountNumber')"
             type="text"

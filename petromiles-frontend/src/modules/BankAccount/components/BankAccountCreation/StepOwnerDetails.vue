@@ -2,9 +2,7 @@
   <v-stepper-content :step="step">
     <!-- Subtitle -->
     <v-row justify="center">
-      <header class="font-weight-light">
-        {{ $t("bank-account-creation.ownerDetailsFormTitle") }}
-      </header>
+      <header class="font-weight-light">{{ $t("bank-account-creation.ownerDetailsFormTitle") }}</header>
     </v-row>
 
     <!-- Form for owner of the account -->
@@ -12,7 +10,7 @@
       <v-row class="ma-5" justify="center">
         <v-col cols="12" md="5">
           <v-text-field
-            prepend-icon="person"
+            prepend-icon="face"
             v-model="firstName"
             :label="$t('user-details.firstName')"
             type="text"
@@ -23,7 +21,7 @@
         </v-col>
         <v-col cols="12" md="5">
           <v-text-field
-            prepend-icon="face"
+            prepend-icon="people"
             v-model="lastName"
             :label="$t('user-details.lastName')"
             type="text"
@@ -49,7 +47,7 @@
       </v-col>
       <v-col cols="12" md="5">
         <v-text-field
-          prepend-icon="place"
+          prepend-icon="mail"
           v-model="email"
           :label="$t('user-details.email')"
           type="text"
@@ -62,9 +60,11 @@
 
     <!-- Actions -->
     <v-row justify="end" class="ma-1 mt-8">
-      <v-btn color="primary" @click="nextStep()">{{
+      <v-btn color="primary" @click="nextStep()">
+        {{
         $t("bank-account-creation-form.continueButton")
-      }}</v-btn>
+        }}
+      </v-btn>
     </v-row>
   </v-stepper-content>
 </template>

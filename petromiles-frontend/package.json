@@ -7,6 +7,7 @@
     "serve": "vue-cli-service serve",
     "prebuild": "npm run i18n:load",
     "build": "vue-cli-service build",
+    "serve:build": "live-server dist/",
     "lint": "vue-cli-service lint",
     "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'",
     "i18n:load": "node -r esm ./src/locales/load-i18n.js"
@@ -22,6 +23,7 @@
     "html2canvas": "^1.0.0-rc.5",
     "html2pdf.js": "^0.9.1",
     "jspdf": "^1.5.3",
+    "live-server": "^1.2.1",
     "lodash": "^4.17.15",
     "minify-css-string": "^1.0.0",
     "register-service-worker": "^1.7.1",
