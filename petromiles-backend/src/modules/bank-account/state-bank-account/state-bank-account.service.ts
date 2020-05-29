@@ -34,15 +34,15 @@ export class StateBankAccountService {
     stateBankAccount.state = await this.stateService.getState(stateName);
 
     this.logger.silly(
-      `[${ApiModules.BANK_ACCOUNT}] New state:  (${stateName})`,
+      `[${ApiModules.BANK_ACCOUNT}] ID: ${clientBankAccount.idClientBankAccount} updated to state: (${stateName})`,
     );
     return await getConnection()
       .getRepository(StateBankAccount)
       .save(stateBankAccount);
   }
 
-  async endLastState(clientBankAccount: ClientBankAccount) {
-    const currentStateBankAccount = await this.stateBankAccountRepository.findOne(
+  private async endLastState(clientBankAccount: ClientBankAccount) {
+    let currentStateBankAccount = await this.stateBankAccountRepository.findOne(
       {
         clientBankAccount,
         finalDate: null,

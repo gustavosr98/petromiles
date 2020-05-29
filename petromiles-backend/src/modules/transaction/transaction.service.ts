@@ -1,4 +1,3 @@
-import { PaymentProvider } from '@/modules/payment-provider/payment-provider.enum';
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -25,6 +24,7 @@ import { PlatformInterest } from '../management/platform-interest/platform-inter
 import { TransactionType } from './transaction/transaction.enum';
 import { StateName, StateDescription } from '../management/state/state.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
+import { PaymentProvider } from '@/modules/payment-provider/payment-provider.enum';
 
 @Injectable()
 export class TransactionService {
@@ -36,7 +36,6 @@ export class TransactionService {
     private thirdPartyInterestService: ThirdPartyInterestService,
     private transactionInterestService: TransactionInterestService,
     private stateTransactionService: StateTransactionService,
-    private paymentProviderService: PaymentProviderService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
@@ -46,6 +45,35 @@ export class TransactionService {
       idTransaction,
     });
     return transaction;
+  }
+
+  async getAllFiltered(
+    stateNames: StateName[],
+    transactionsTypes: TransactionType[],
+    paymentProviders: PaymentProvider[],
+  ): Promise<Transaction[]> {
+    const transactions: Transaction[] = await this.transactionRepository.query(
+      `
+      SELECT 
+        TRANSACTION.* 
+      FROM
+        TRANSACTION, STATE_TRANSACTION, STATE, CLIENT_BANK_ACCOUNT
+      WHERE
+        -- relations
+        STATE_TRANSACTION."fk_transaction" = TRANSACTION."idTransaction"
+        AND STATE_TRANSACTION."fk_state" = STATE."idState"
+        AND TRANSACTION."fk_client_bank_account" = CLIENT_BANK_ACCOUNT."idClientBankAccount"
+        -- conditions
+        AND STATE_TRANSACTION."finalDate" IS NULL
+        AND STATE.name = ANY($1)
+        AND TRANSACTION."paymentProviderTransactionId" IS NOT NULL
+        AND TRANSACTION."type" = ANY($2)
+        AND CLIENT_BANK_ACCOUNT."paymentProvider" = ANY($3);
+    `,
+      [stateNames, transactionsTypes, paymentProviders],
+    );
+
+    return transactions;
   }
 
   async getTransactionInterests(options: App.Transaction.TransactionInterests) {

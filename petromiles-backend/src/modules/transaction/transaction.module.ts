@@ -16,13 +16,18 @@ import { StateTransactionService } from './state-transaction/state-transaction.s
 // ENTITIES
 import { Transaction } from './transaction/transaction.entity';
 import { TransactionInterest } from './transaction-interest/transaction-interest.entity';
+import { StateTransaction } from './state-transaction/state-transaction.entity';
 
 @Module({
   imports: [
     PaymentProviderModule,
     ManagementModule,
     PaymentProviderModule,
-    TypeOrmModule.forFeature([Transaction, TransactionInterest]),
+    TypeOrmModule.forFeature([
+      Transaction,
+      TransactionInterest,
+      StateTransaction,
+    ]),
   ],
   providers: [
     TransactionService,
@@ -33,7 +38,6 @@ import { TransactionInterest } from './transaction-interest/transaction-interest
     TransactionService,
     TransactionInterestService,
     StateTransactionService,
-    TypeOrmModule.forFeature([Transaction, TransactionInterest]),
   ],
   controllers: [TransactionController],
 })

@@ -1,3 +1,5 @@
+import { TransactionType } from './../transaction/transaction/transaction.enum';
+import { PaymentProvider } from './../payment-provider/payment-provider.enum';
 import { Injectable, Inject } from '@nestjs/common';
 import { SchedulerRegistry, Timeout, Interval } from '@nestjs/schedule';
 
@@ -11,6 +13,7 @@ import { Repository } from 'typeorm';
 import { StripeService } from '@/modules/payment-provider/stripe/stripe.service';
 import { ClientBankAccountService } from '@/modules/bank-account/client-bank-account/client-bank-account.service';
 import { TransactionService } from '@/modules/transaction/transaction.service';
+import { StateTransactionService } from '@/modules/transaction/state-transaction/state-transaction.service';
 
 // ENTITIES
 import { Task } from '@/modules/management/task/task.entity';
@@ -19,11 +22,11 @@ import { Task } from '@/modules/management/task/task.entity';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { CronJobs } from './cron-jobs.enum';
 import { StateName } from '@/modules/management/state/state.enum';
-import { StripeBankAccountStatus } from '../payment-provider/stripe/bank-account-status.enum';
+import { StripeBankAccountStatus } from '@/modules/payment-provider/stripe/bank-account-status.enum';
+import { StripeChargeStatus } from '@/modules/payment-provider/stripe/stripe-charge-status.enum';
 
 @Injectable()
 export class CronService {
-  // @collapse
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     private schedulerRegistry: SchedulerRegistry,
@@ -32,6 +35,7 @@ export class CronService {
     private stripeService: StripeService,
     private clientBankAccountService: ClientBankAccountService,
     private transactionService: TransactionService,
+    private stateTransactionService: StateTransactionService,
   ) {}
 
   @Timeout(1000)
@@ -45,6 +49,13 @@ export class CronService {
       this.adjustJob(CronJobs.BANK_ACCOUNT_STATUS_STRIPE, null, async () => {
         await this.bankAccountStatusStripe();
       });
+      this.adjustJob(
+        CronJobs.TRANSACTION_CHARGE_STATUS_STRIPE,
+        null,
+        async () => {
+          await this.transactionChargeStatusStripe();
+        },
+      );
     }
   }
 
@@ -90,7 +101,31 @@ export class CronService {
 
   @Interval(CronJobs.TRANSACTION_CHARGE_STATUS_STRIPE, 99999999)
   async transactionChargeStatusStripe() {
-    this.logger.info(`[${ApiModules.CRON}] transactionChargeStatusStripe()`);
+    const unverifiedTransactions = await this.transactionService.getAllFiltered(
+      [StateName.VERIFYING],
+      [TransactionType.DEPOSIT],
+      [PaymentProvider.STRIPE],
+    );
+    this.logger.info(
+      `[${ApiModules.CRON}] transactionChargeStatusStripe( ${unverifiedTransactions.length} )`,
+    );
+
+    unverifiedTransactions.map(async unverifiedTransaction => {
+      const charge = await this.stripeService.getCharge(
+        unverifiedTransaction.paymentProviderTransactionId,
+      );
+      if (charge.status === StripeChargeStatus.SUCCEEDED) {
+        await this.stateTransactionService.update(
+          StateName.VALID,
+          unverifiedTransaction,
+        );
+      } else if (charge.status === StripeChargeStatus.FAILED) {
+        await this.stateTransactionService.update(
+          StateName.INVALID,
+          unverifiedTransaction,
+        );
+      }
+    });
   }
 
   @Interval(CronJobs.TRANSACTION_TRANSFER_STATUS_STRIPE, 99999999)
