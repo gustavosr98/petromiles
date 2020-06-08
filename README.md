@@ -232,59 +232,80 @@ Please wait for futher instructions. Production build guide to be defined.
 
 ## Authors and acknowledgment
 
-### Team #2
-
 <p>
-  <img
-    alt="Michelle Alleyne Github Avatar" 
-    width="80" 
-    src="https://github.com/michellealleyne.png?size=80">
-    <img
-      alt="Alejandro Jauregui Github Avatar" 
-    width="80" 
-    src="https://github.com/alejjb.png?size=80">
     <img
       alt="Gustavo Sánchez Github Avatar" 
-    width="80" 
-    src="https://github.com/gustavosr98.png?size=80">
+      width="80" 
+      src="https://github.com/gustavosr98.png?size=80"
+    >
+    <img
+      alt="michellealleyne Github Avatar" 
+      width="80" 
+      src="https://github.com/michellealleyne.png?size=80"
+    >
+    <img
+      alt="alejjb Github Avatar" 
+      width="80" 
+      src="https://github.com/alejjb.png?size=80"
+    >
+    <img
+      alt="RafaelMendezUCAB Github Avatar" 
+      width="80" 
+      src="https://github.com/RafaelMendezUCAB.png?size=80"
+    >
+    <img
+      alt="christianneiraUCAB Github Avatar" 
+      width="80" 
+      src="https://github.com/christianneiraUCAB.png?size=80"
+    >
+    <img
+      alt="GabTovarUCAB Github Avatar" 
+      width="80" 
+      src="https://github.com/GabTovarUCAB.png?size=80"
+    >
+    <img
+      alt="JAA1998 Github Avatar" 
+      width="80" 
+      src="https://github.com/JAA1998.png?size=80"
+    >
+    <img
+      alt="mecoccaro Github Avatar" 
+      width="80" 
+      src="https://github.com/mecoccaro.png?size=80"
+    >
+    <img
+      alt="DiorfelisMedina Github Avatar" 
+      width="80" 
+      src="https://github.com/DiorfelisMedina.png?size=80"
+    >
 </p>
 
-Michelle Alleyne [@michellealleyne](https://github.com/michellealleyne)  
-Alejandro Jauregui [@alejjb](https://github.com/alejjb)  
-Gustavo Sánchez [@gustavosr98](https://github.com/gustavosr98)
+### Product Owner
 
-### Colaborators from Consortium #2
+- Gustavo Sánchez [@gustavosr98](https://github.com/gustavosr98)
 
-<p>
-  <img
-    alt="Angel Sucasas Github Avatar" 
-    width="40" 
-    src="https://github.com/angelsucasas.png?size=40">
-    <img
-    alt="Gabriel Ortega Github Avatar" 
-    width="40" 
-    src="https://github.com/GabrielOrtegaUCAB.png?size=40">
-    <img
-    alt="Andrea Da Github Avatar" 
-    width="40" 
-    src="https://github.com/avdasilvab25.png?size=40">
-    <img
-    alt="Diego Gutierrez Github Avatar" 
-    width="40" 
-    src="https://github.com/Dagutierrez14.png?size=40">
-    <img
-    alt="Luis Fuentes Github Avatar" 
-    width="40" 
-    src="https://github.com/LuisRFuentes.png?size=40">
-    <img
-    alt="Anthony Rodríguez Github Avatar" 
-    width="40" 
-    src="https://github.com/thonygrz.png?size=40">
-</p>
+### Team Leader
 
-Angel Sucasas [@angelsucasas](https://github.com/angelsucasas)  
-Gabriel Ortega [@GabrielOrtegaUCAB](https://github.com/GabrielOrtegaUCAB)  
-Andrea Da Silva [@avdasilvab25](https://github.com/avdasilvab25)  
-Diego Gutierrez [@Dagutierrez14](https://github.com/Dagutierrez14)  
-Luis Fuentes [@LuisRFuentes](https://github.com/LuisRFuentes)  
-Anthony Rodríguez [@thonygrz](https://github.com/thonygrz)
+- Michelle Alleyne [@michellealleyne](https://github.com/michellealleyne)
+
+### Frontend Team
+
+- Rafael Mendez [@RafaelMendezUCAB](https://github.com/RafaelMendezUCAB)
+- Gabriel Tovar [@GabTovarUCAB](https://github.com/GabTovarUCAB)
+- Alejandro Jauregui [@alejjb](https://github.com/alejjb)
+- Diorfelis Medina [@DiorfelisMedina](https://github.com/DiorfelisMedina)
+
+### Backend Team
+
+- Michelle Alleyne [@michellealleyne](https://github.com/michellealleyne)
+- Javier Andrade [@JAA1998](https://github.com/JAA1998)
+- Miguel Coccaro [@mecoccaro](https://github.com/mecoccaro)
+- Christian Neira [@christianneiraUCAB](https://github.com/christianneiraUCAB)
+
+### DevOps
+
+- Gustavo Sánchez [@gustavosr98](https://github.com/gustavosr98)
+
+### QA
+
+- Rafael Mendez [@RafaelMendezUCAB](https://github.com/RafaelMendezUCAB)
