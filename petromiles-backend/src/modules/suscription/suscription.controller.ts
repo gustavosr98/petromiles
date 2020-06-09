@@ -4,7 +4,7 @@ import {
   UseGuards,
   Body,
   ParseIntPipe,
-  Inject,
+  Inject, Get,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -18,6 +18,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { SuscriptionService } from './suscription.service';
 import { ApiModules } from 'src/logger/api-modules.enum';
 import { HttpRequest } from 'src/logger/http-requests.enum';
+import {Suscription} from "@/modules/suscription/suscription/suscription.entity";
 
 const baseEndpoint = 'suscription';
 @UseGuards(AuthGuard('jwt'))
@@ -42,5 +43,13 @@ export class SuscriptionController {
       user.email,
       idBankAccount,
     );
+  }
+
+  @Get('actual')
+  getActualSuscription(@GetUser() user): Promise<Suscription>{
+    this.logger.http(
+        `[${ApiModules.USER}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/suscription/actual`,
+    );
+    return this.suscriptionService.getActualSuscription(user.email);
   }
 }

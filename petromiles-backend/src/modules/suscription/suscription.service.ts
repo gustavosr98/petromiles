@@ -1,6 +1,6 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 
-import { getConnection, getRepository } from 'typeorm';
+import {getConnection, getManager, getRepository, Repository} from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -14,11 +14,16 @@ import { UserClientService } from '../user/user-client/user-client.service';
 import { TransactionService } from '../transaction/transaction.service';
 import { BankAccountService } from '../bank-account/bank-account.service';
 import { ApiModules } from 'src/logger/api-modules.enum';
+import {InjectRepository} from "@nestjs/typeorm";
 
 @Injectable()
 export class SuscriptionService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectRepository(UserClient)
+    private userClientRepository: Repository<UserClient>,
+    @InjectRepository(Suscription)
+    private suscriptionRepository: Repository<Suscription>,
     private userClientService: UserClientService,
     private bankAccountService: BankAccountService,
     private transactionService: TransactionService,
@@ -89,5 +94,19 @@ export class SuscriptionService {
       SuscriptionType.PREMIUM,
       transaction,
     );
+  }
+
+  async getActualSuscription(email: string): Promise<Suscription> {
+    const userId = await this.userClientRepository.findOne( {email} )
+    const actualSuscription = await getManager()
+        .createQueryBuilder()
+        .select('suscription.name')
+        .from(Suscription, 'suscription')
+        .innerJoin(UserSuscription,
+            'user_suscription',
+            'suscription."idSuscription"= user_suscription.fk_suscription')
+        .where(`user_suscription.fk_user_client= '${userId.idUserClient}'`)
+        .getOne();
+    return actualSuscription;
   }
 }

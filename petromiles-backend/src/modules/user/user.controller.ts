@@ -25,7 +25,6 @@ import { UserService } from './user.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserClientService } from './user-client/user-client.service';
-import {Suscription} from '../suscription/suscription/suscription.entity'
 
 // Needs endpoint role protection
 
@@ -71,11 +70,4 @@ export class UserController {
     return this.userService.changeUserLanguage(user.email, language);
   }
 
-  @Get('client/suscription')
-  getSuscription(@GetUser() user): Promise<Suscription>{
-    this.logger.http(
-        `[${ApiModules.USER}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/client/suscription`,
-    );
-    return this.userService.getSuscription(user.email);
-  }
 }

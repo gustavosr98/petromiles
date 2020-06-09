@@ -37,7 +37,6 @@ import {UserSuscription} from "@/modules/user-suscription/user-suscription.entit
       State,
       UserClient,
       UserAdministrator,
-      Suscription,
     ]),
   ],
   controllers: [UserController],
