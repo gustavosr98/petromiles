@@ -23,6 +23,8 @@ import { UserDetails } from '@/modules/user/user-details/user-details.entity';
 import { Language } from '@/modules/user/language/language.entity';
 import { UserClient } from '@/modules/user/user-client/user-client.entity';
 import { UserAdministrator } from '@/modules/user/user-administrator/user-administrator.entity';
+import {Suscription} from "@/modules/suscription/suscription/suscription.entity";
+import {UserSuscription} from "@/modules/user-suscription/user-suscription.entity";
 
 @Module({
   imports: [
@@ -35,6 +37,7 @@ import { UserAdministrator } from '@/modules/user/user-administrator/user-admini
       State,
       UserClient,
       UserAdministrator,
+      Suscription,
     ]),
   ],
   controllers: [UserController],

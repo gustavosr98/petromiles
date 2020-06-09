@@ -15,6 +15,8 @@ import { UserDetails } from './user-details/user-details.entity';
 
 // INTERFACES
 import { Role as RoleEnum } from 'src/modules/management/role/role.enum';
+import {Suscription} from "@/modules/suscription/suscription/suscription.entity";
+import {UserSuscription} from "@/modules/user-suscription/user-suscription.entity";
 
 @Injectable()
 export class UserService {
@@ -23,6 +25,8 @@ export class UserService {
     private userClientRepository: Repository<UserClient>,
     @InjectRepository(UserDetails)
     private userDetailsRepository: Repository<UserDetails>,
+    @InjectRepository(Suscription)
+    private suscriptionRepository: Repository<Suscription>,
     private userClientService: UserClientService,
     private userAdministratorService: UserAdministratorService,
     private userDetailsService: UserDetailsService,
@@ -100,5 +104,19 @@ export class UserService {
     await this.userDetailsRepository.save(userDetails);
 
     return languageFound;
+  }
+
+  async getSuscription(email: string): Promise<Suscription> {
+    const userId = await this.userClientRepository.findOne( {email} )
+    const actualSuscription = await getManager()
+        .createQueryBuilder()
+        .select('suscription.name')
+        .from(Suscription, 'suscription')
+        .innerJoin(UserSuscription,
+            'user_suscription',
+            'suscription."idSuscription"= user_suscription.fk_suscription')
+        .where(`user_suscription.fk_user_client= '${userId.idUserClient}'`)
+        .getOne();
+    return actualSuscription;
   }
 }
