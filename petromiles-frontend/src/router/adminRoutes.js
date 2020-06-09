@@ -4,7 +4,7 @@ const adminRoutesRaw = Object.freeze({
     name: "AdminLogin",
     component: () =>
       import(
-        /* webpackChunkName: "admin-login" */ "@/modules/Admin/views/AdminLogin.vue"
+        /* webpackChunkName: "admin-login" */ "@/views/Admin/Login/AdminLogin.view"
       ),
     meta: {
       adminGuest: true,
@@ -15,7 +15,7 @@ const adminRoutesRaw = Object.freeze({
     name: "AdminDashboard",
     component: () =>
       import(
-        /* webpackChunkName: "admin-dashboard" */ "@/modules/Admin/views/AdminDashboard"
+        /* webpackChunkName: "admin-dashboard" */ "@/views/Admin/Dashboard/AdminDashboard.view"
       ),
     meta: {
       requiresAdminAuth: true,
@@ -26,7 +26,7 @@ const adminRoutesRaw = Object.freeze({
     name: "AdminUserList",
     component: () =>
       import(
-        /* webpackChunkName: "admin-user-list" */ "@/modules/User/views/AdminUserList"
+        /* webpackChunkName: "admin-user-list" */ "@/views/Admin/Users/AdminUserList.view"
       ),
     meta: {
       requiresAdminAuth: true,
@@ -37,7 +37,7 @@ const adminRoutesRaw = Object.freeze({
     name: "AdminPlatformConfig",
     component: () =>
       import(
-        /* webpackChunkName: "admin-platform-config" */ "@/modules/Admin/views/AdminPlatformConfig"
+        /* webpackChunkName: "admin-platform-config" */ "@/views/Admin/PlatformConfiguration/AdminPlatformConfig.view"
       ),
     meta: {
       requiresAdminAuth: true,
@@ -48,7 +48,7 @@ const adminRoutesRaw = Object.freeze({
     name: "AdminBankAccountList",
     component: () =>
       import(
-        /* webpackChunkName: "admin-bank-account-list" */ "@/modules/Admin/views/AdminBankAccountList"
+        /* webpackChunkName: "admin-bank-account-list" */ "@/views/Admin/BankAccounts/AdminBankAccountList.view"
       ),
     meta: {
       requiresAdminAuth: true,
@@ -59,7 +59,7 @@ const adminRoutesRaw = Object.freeze({
     name: "AdminTransactionList",
     component: () =>
       import(
-        /* webpackChunkName: "admin-transaction-list" */ "@/modules/Admin/views/AdminTransactionList"
+        /* webpackChunkName: "admin-transaction-list" */ "@/views/Admin/Transactions/AdminTransactionList.view"
       ),
     meta: {
       requiresAdminAuth: true,

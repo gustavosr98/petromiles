@@ -1,4 +1,0 @@
-BankAccount
-
-- components/
-- views/

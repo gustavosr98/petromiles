@@ -4,7 +4,7 @@ const clientRoutesRaw = Object.freeze({
     name: "ClientLogin",
     component: () =>
       import(
-        /* webpackChunkName: "client-login" */ "@/modules/Client/views/ClientLogin.vue"
+        /* webpackChunkName: "client-login" */ "@/views/Client/Login/ClientLogin.view.vue"
       ),
     meta: {
       clientGuest: true,
@@ -15,7 +15,7 @@ const clientRoutesRaw = Object.freeze({
     name: "ClientSignUp",
     component: () =>
       import(
-        /* webpackChunkName: "client-sign-up" */ "@/modules/Auth/views/SignUp.vue"
+        /* webpackChunkName: "client-sign-up" */ "@/views/Client/Login/SignUp.view.vue"
       ),
     meta: {
       clientGuest: true,
@@ -26,7 +26,7 @@ const clientRoutesRaw = Object.freeze({
     name: "ClientDashboard",
     component: () =>
       import(
-        /* webpackChunkName: "client-dashboard" */ "@/modules/Client/views/ClientDashboard"
+        /* webpackChunkName: "client-dashboard" */ "@/views/Client/Dashboard/ClientDashboard.view"
       ),
     meta: {
       requiresClientAuth: true,
@@ -37,7 +37,7 @@ const clientRoutesRaw = Object.freeze({
     name: "ClientProfile",
     component: () =>
       import(
-        /* webpackChunkName: "profile" */ "@/modules/Client/views/ClientProfile"
+        /* webpackChunkName: "profile" */ "@/views/Client/Profile/ClientProfile.view"
       ),
     meta: {
       requiresClientAuth: true,
@@ -48,7 +48,7 @@ const clientRoutesRaw = Object.freeze({
     name: "ClientBankAccountList",
     component: () =>
       import(
-        /* webpackChunkName: "client-bank-account-list" */ "@/modules/Client/views/ClientBankAccountList"
+        /* webpackChunkName: "client-bank-account-list" */ "@/views/Client/BankAccounts/ClientBankAccountList.view"
       ),
     meta: {
       requiresClientAuth: true,
@@ -60,7 +60,7 @@ const clientRoutesRaw = Object.freeze({
     name: "ClientTransactionList",
     component: () =>
       import(
-        /* webpackChunkName: "client-transaction-list" */ "@/modules/Client/views/ClientTransactionList"
+        /* webpackChunkName: "client-transaction-list" */ "@/views/Client/Transactions/ClientTransactionList.view"
       ),
     meta: {
       requiresClientAuth: true,
@@ -72,7 +72,7 @@ const clientRoutesRaw = Object.freeze({
     props: true,
     component: () =>
       import(
-        /* webpackChunkName: "client-transaction-details" */ "@/modules/Transaction/views/TransactionDetails"
+        /* webpackChunkName: "client-transaction-details" */ "@/views/Client/Transactions/ClientTransactionDetails.view"
       ),
     meta: {
       requiresClientAuth: true,
@@ -83,7 +83,7 @@ const clientRoutesRaw = Object.freeze({
     name: "ClientBuyPoints",
     component: () =>
       import(
-        /* webpackChunkName: "client-buy-points" */ "@/modules/Payments/Points/views/ClientBuyPoints"
+        /* webpackChunkName: "client-buy-points" */ "@/views/Client/Payments/ClientBuyPoints.view"
       ),
     meta: {
       requiresClientAuth: true,
@@ -94,7 +94,7 @@ const clientRoutesRaw = Object.freeze({
     name: "ClientSellPoints",
     component: () =>
       import(
-        /* webpackChunkName: "client-sell-points" */ "@/modules/Client/views/ClientSellPoints"
+        /* webpackChunkName: "client-sell-points" */ "@/views/Client/Withdrawals/ClientSellPoints.view"
       ),
     meta: {
       requiresClientAuth: true,
@@ -104,13 +104,13 @@ const clientRoutesRaw = Object.freeze({
 
 // To be used in Vue Router
 const clientRoutesArray = Object.keys(clientRoutesRaw).map(
-  (cr) => clientRoutesRaw[cr]
+  cr => clientRoutesRaw[cr]
 );
 
 // To be used inside componentes
 let clientRoutes = {};
 Object.keys(clientRoutesRaw).map(
-  (cr) =>
+  cr =>
     (clientRoutes[cr] = {
       ...clientRoutesRaw[cr],
       component: null,

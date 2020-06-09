@@ -9,7 +9,7 @@
 
 <script>
 import metaInfo from "@/plugins/vue-meta";
-import ErrorModal from "@/components/ErrorModal/ErrorModal";
+import ErrorModal from "@/components/General/Modals/ErrorModal/ErrorModal";
 
 export default {
   name: "App",
