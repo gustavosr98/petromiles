@@ -1,13 +1,19 @@
 import { Module } from '@nestjs/common';
-import { PaymentsController } from './payments.controller';
-import { PaymentsService } from './payments.service';
-import { TransactionModule } from '../transaction/transaction.module';
-import { BankAccountModule } from '../bank-account/bank-account.module';
-import { SuscriptionModule } from '../suscription/suscription.module';
-import { UserModule } from '../user/user.module';
-import { ManagementModule } from '../management/management.module';
-import { PaymentProviderModule } from './../payment-provider/payment-provider.module';
-import { MailsModule } from '../mails/mails.module';
+
+// MODULES
+import { TransactionModule } from '@/modules/transaction/transaction.module';
+import { BankAccountModule } from '@/modules/bank-account/bank-account.module';
+import { SuscriptionModule } from '@/modules/suscription/suscription.module';
+import { UserModule } from '@/modules/user/user.module';
+import { ManagementModule } from '@/modules/management/management.module';
+import { PaymentProviderModule } from '@/modules/payment-provider/payment-provider.module';
+import { MailsModule } from '@/modules/mails/mails.module';
+
+// CONTROLLER
+import { PaymentsController } from '@/modules/payments/controller/payments.controller';
+
+// SERVICES
+import { PaymentsService } from '@/modules/payments/services/payments.service';
 
 @Module({
   imports: [

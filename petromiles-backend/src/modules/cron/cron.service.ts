@@ -1,5 +1,5 @@
-import { TransactionType } from './../transaction/transaction/transaction.enum';
-import { PaymentProvider } from './../payment-provider/payment-provider.enum';
+import { TransactionType } from '../../enums/transaction.enum';
+import { PaymentProvider } from '../../enums/payment-provider.enum';
 import { Injectable, Inject } from '@nestjs/common';
 import { SchedulerRegistry, Timeout, Interval } from '@nestjs/schedule';
 
@@ -11,17 +11,17 @@ import { Repository } from 'typeorm';
 
 // SERVICES
 import { StripeService } from '@/modules/payment-provider/stripe/stripe.service';
-import { ClientBankAccountService } from '@/modules/bank-account/client-bank-account/client-bank-account.service';
-import { TransactionService } from '@/modules/transaction/transaction.service';
-import { StateTransactionService } from '@/modules/transaction/state-transaction/state-transaction.service';
+import { ClientBankAccountService } from '@/modules/bank-account/services/client-bank-account.service';
+import { TransactionService } from '@/modules/transaction/services/transaction.service';
+import { StateTransactionService } from '@/modules/transaction/services/state-transaction.service';
 
 // ENTITIES
-import { Task } from '@/modules/management/task/task.entity';
+import { Task } from '@/entities/task.entity';
 
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
 import { CronJobs } from './cron-jobs.enum';
-import { StateName } from '@/modules/management/state/state.enum';
+import { StateName } from '@/enums/state.enum';
 import { StripeBankAccountStatus } from '@/modules/payment-provider/stripe/bank-account-status.enum';
 import { StripeChargeStatus } from '@/modules/payment-provider/stripe/stripe-charge-status.enum';
 

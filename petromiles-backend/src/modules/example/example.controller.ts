@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Role } from '../management/role/role.enum';
+import { Role } from '../../enums/role.enum';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ExampleService } from './example.service';
 

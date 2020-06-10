@@ -6,16 +6,18 @@ import * as bcrypt from 'bcrypt';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
-import { Role } from 'src/modules/management/role/role.enum';
-import { MailsSubject } from '../mails/mails.enum';
-import { CreateUserDTO } from '../user/dto/create-user.dto';
-import { UserClientService } from '../user/user-client/user-client.service';
-import { MailsService } from '../mails/mails.service';
-import { UserService } from '../user/user.service';
-import { SuscriptionService } from '../suscription/suscription.service';
-import { Suscription } from '../suscription/suscription/suscription.enum';
-
+// INTERFACES
+import { Role } from '@/enums/role.enum';
+import { MailsSubject } from '@/enums/mails.enum';
+import { Suscription } from '@/enums/suscription.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
+import { CreateUserDTO } from '@/modules/user/dto/create-user.dto';
+
+// SERVICES
+import { UserClientService } from '@/modules/user/services/user-client.service';
+import { MailsService } from '@/modules/mails/mails.service';
+import { UserService } from '@/modules/user/services/user.service';
+import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +32,7 @@ export class AuthService {
   ) {}
 
   async createUserClient(user: CreateUserDTO): Promise<App.Auth.Response> {
-    const createdUser = await this.userClientService.createUser(user);
+    const createdUser = await this.userClientService.create(user);
 
     const token = this.createToken(createdUser.user.email, Role.CLIENT);
 
@@ -58,7 +60,7 @@ export class AuthService {
     credentials: App.Auth.LoginRequest,
   ): Promise<App.Auth.Response> {
     const { email, password, role } = credentials;
-    const info = await this.userService.getUserByEmail(credentials);
+    const info = await this.userService.getActive(credentials);
 
     if (info) {
       const { user, userDetails } = info;

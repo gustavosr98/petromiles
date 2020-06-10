@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
 /* MONEY IS REPRESENTED IN CENTS, $25 = 2500 cents*/
-import { Suscription } from '../../../modules/suscription/suscription/suscription.enum';
+import { Suscription } from '../../../enums/suscription.enum';
 
 export const SUSCRIPTIONS = [
   {

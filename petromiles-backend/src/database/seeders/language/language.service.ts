@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, InsertResult } from 'typeorm';
 
 import { LANGUAGES } from './language.data';
-import { Language } from '../../../modules/user/language/language.entity';
+import { Language } from '../../../entities/language.entity';
 
 @Injectable()
 export class LanguageSeederService {

@@ -6,17 +6,20 @@ import { PaymentProviderModule } from '@/modules/payment-provider/payment-provid
 import { ManagementModule } from '@/modules/management/management.module';
 
 // CONTROLLER
-import { UserController } from './user.controller';
+import { UserController } from './controllers/user.controller';
 
 // SERVICES
-import { StateUserService } from '@/modules/user/state-user/state-user.service';
-import { UserDetailsService } from '@/modules/user/user-details/user-details.service';
-import { UserRoleService } from '@/modules/user/user-role/user-role.service';
-import { UserService } from '@/modules/user/user.service';
-import { UserAdministratorService } from '@/modules/user/user-administrator/user-administrator.service';
-import { UserClientService } from '@/modules/user/user-client/user-client.service';
+import { UserService } from '@/modules/user/services/user.service';
+import { UserAdministratorService } from '@/modules/user/services/user-administrator.service';
+import { UserClientService } from '@/modules/user/services/user-client.service';
 
 // ENTITIES
+import { State } from '@/entities/state.entity';
+import { StateUser } from '@/entities/state-user.entity';
+import { UserDetails } from '@/entities/user-details.entity';
+import { Language } from '@/entities/language.entity';
+import { UserClient } from '@/entities/user-client.entity';
+import { UserAdministrator } from '@/entities/user-administrator.entity';
 import { State } from '@/modules/management/state/state.entity';
 import { StateUser } from '@/modules/user/state-user/state-user.entity';
 import { UserDetails } from '@/modules/user/user-details/user-details.entity';
@@ -40,22 +43,7 @@ import {UserSuscription} from "@/modules/user-suscription/user-suscription.entit
     ]),
   ],
   controllers: [UserController],
-  providers: [
-    UserAdministrator,
-    StateUserService,
-    UserDetailsService,
-    UserRoleService,
-    UserService,
-    UserAdministratorService,
-    UserClientService,
-  ],
-  exports: [
-    StateUserService,
-    UserDetailsService,
-    UserRoleService,
-    UserService,
-    UserAdministratorService,
-    UserClientService,
-  ],
+  providers: [UserService, UserAdministratorService, UserClientService],
+  exports: [UserService, UserAdministratorService, UserClientService],
 })
 export class UserModule {}

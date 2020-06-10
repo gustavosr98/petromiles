@@ -1,6 +1,6 @@
-import { PaymentProvider } from './../../../modules/payment-provider/payment-provider.enum';
+import { PaymentProvider } from '../../../enums/payment-provider.enum';
 /* eslint-disable @typescript-eslint/camelcase */
-import { TransactionType } from '@/modules/transaction/transaction/transaction.enum';
+import { TransactionType } from '@/enums/transaction.enum';
 
 export const THIRD_PARTY_INTEREST = [
   {

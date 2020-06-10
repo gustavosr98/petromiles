@@ -5,7 +5,7 @@ const baseDomain = process.env.VUE_APP_PETROMILES_API;
 
 const httpClient = axios.create({
   baseURL: baseDomain || "http://localhost:3000/api/v1",
-  timeout: 6000,
+  timeout: process.env.VUE_APP_PETROMILES_API_TIMEOUT || 30000,
 });
 
 httpClient.interceptors.response.use(

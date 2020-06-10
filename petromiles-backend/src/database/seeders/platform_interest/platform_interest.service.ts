@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, InsertResult } from 'typeorm';
 
 import { PLATAFORM_INTERESTS } from './platform_interest.data';
-import { PlatformInterest } from '../../../modules/management/platform-interest/platform-interest.entity';
+import { PlatformInterest } from '../../../entities/platform-interest.entity';
 
 @Injectable()
 export class PlatformInterestSeederService {

@@ -8,10 +8,6 @@ import { StripeService } from '@/modules/payment-provider/stripe/stripe.service'
 
 // INTERFACES
 import {
-  CreateBankAccountParams,
-  BankAccount,
-} from '@/modules/transaction/interfaces/bank-account.interface';
-import {
   ChargeCreateParams,
   Charge,
 } from '@/modules/transaction/interfaces/charge.interface';

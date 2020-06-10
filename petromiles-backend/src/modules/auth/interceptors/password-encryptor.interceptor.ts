@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import * as bcrypt from 'bcrypt';
-import { AuthService } from '../auth.service';
+import { AuthService } from '@/modules/auth/auth.service';
 
 export interface Response<T> {
   data: T;
