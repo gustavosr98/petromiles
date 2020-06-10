@@ -22,6 +22,8 @@ export class Transaction extends BaseEntity {
   @PrimaryGeneratedColumn()
   idTransaction: number;
 
+  idUserClient?: number;
+
   @Transform(date => date.toLocaleDateString())
   @Column({ default: () => 'CURRENT_DATE' })
   initialDate: Date;

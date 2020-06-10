@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
 /* MONEY IS REPRESENTED IN CENTS, $25 = 2500 cents*/
-import { Suscription } from '../../../enums/suscription.enum';
+import { Suscription } from '@/enums/suscription.enum';
 
 export const SUSCRIPTIONS = [
   {
@@ -21,7 +21,7 @@ export const SUSCRIPTIONS = [
     idSuscription: 3,
     name: Suscription.GOLD,
     cost: 0,
-    upgraded_amount: 15000,
+    upgradedAmount: 15000,
     description:
       'This suscription is active when the user has spend an amount greater or equal to upgraded_amount',
   },

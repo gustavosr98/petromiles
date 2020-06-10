@@ -14,6 +14,7 @@ import { StripeService } from '@/modules/payment-provider/stripe/stripe.service'
 import { ClientBankAccountService } from '@/modules/bank-account/services/client-bank-account.service';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 import { StateTransactionService } from '@/modules/transaction/services/state-transaction.service';
+import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
 
 // ENTITIES
 import { Task } from '@/entities/task.entity';
@@ -36,6 +37,7 @@ export class CronService {
     private clientBankAccountService: ClientBankAccountService,
     private transactionService: TransactionService,
     private stateTransactionService: StateTransactionService,
+    private suscriptionService: SuscriptionService,
   ) {}
 
   @Timeout(1000)
@@ -118,6 +120,11 @@ export class CronService {
         await this.stateTransactionService.update(
           StateName.VALID,
           unverifiedTransaction,
+        );
+
+        this.suscriptionService.upgradeSubscriptionIfIsPossible(
+          unverifiedTransaction.idUserClient,
+          unverifiedTransaction.type,
         );
       } else if (charge.status === StripeChargeStatus.FAILED) {
         await this.stateTransactionService.update(

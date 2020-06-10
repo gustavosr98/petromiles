@@ -56,7 +56,7 @@ export class TransactionService {
     const transactions: Transaction[] = await this.transactionRepository.query(
       `
       SELECT 
-        TRANSACTION.* 
+        TRANSACTION.*, CLIENT_BANK_ACCOUNT.fk_user_client AS "idUserClient"
       FROM
         TRANSACTION, STATE_TRANSACTION, STATE, CLIENT_BANK_ACCOUNT
       WHERE
@@ -308,12 +308,16 @@ export class TransactionService {
     });
   }
 
-  private calculateExtraPoints(extraPoints, amount) {
+  private calculateExtraPoints(extraPoints, amount: number) {
     if (!extraPoints) return amount;
+    const extra = 1 + parseFloat(extraPoints.percentage);
+
     if (extraPoints.name === PlatformInterest.PREMIUM_EXTRA)
-      return amount * extraPoints.percentage + amount;
-    if (extraPoints.name === PlatformInterest.GOLD_EXTRA)
-      return amount * extraPoints.percentage + amount + extraPoints.amount;
+      return extra * amount;
+
+    if (extraPoints.name === PlatformInterest.GOLD_EXTRA) {
+      return amount * extra + parseFloat(extraPoints.amount);
+    }
   }
 
   // WITHDRAWAL TRANSACTION

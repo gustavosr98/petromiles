@@ -1,14 +1,19 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-import {getConnection, getManager, getRepository, Repository} from 'typeorm';
+import { getConnection, getManager, getRepository, Repository } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import {InjectRepository} from "@nestjs/typeorm";
+import { InjectRepository } from '@nestjs/typeorm';
 
 // INTERFACES
 import { Suscription as SuscriptionType } from '@/enums/suscription.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
-import { UpdateSubscriptionDTO } from '@/modules/suscription/dto/update-subscription.dto';
+import { StateName } from '@/enums/state.enum';
+import { PlatformInterest } from '@/enums/platform-interest.enum';
+import { TransactionType } from '@/enums/transaction.enum';
+import { Language } from '@/enums/language.enum';
+import { MailsTemplate, MailsSubject } from '@/enums/mails.enum';
 
 // ENTITIES
 import { UserClient } from '@/entities/user-client.entity';
@@ -20,7 +25,9 @@ import { UserSuscription } from '@/entities/user-suscription.entity';
 import { UserClientService } from '@/modules/user/services/user-client.service';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 import { ClientBankAccountService } from '@/modules/bank-account/services/client-bank-account.service';
-
+import { PointsConversionService } from '@/modules/management/services/points-conversion.service';
+import { PlatformInterestService } from '@/modules/management/services/platform-interest.service';
+import { MailsService } from '@/modules/mails/mails.service';
 
 @Injectable()
 export class SuscriptionService {
@@ -33,6 +40,10 @@ export class SuscriptionService {
     private userClientService: UserClientService,
     private clientBankAccountService: ClientBankAccountService,
     private transactionService: TransactionService,
+    private pointsConversionService: PointsConversionService,
+    private platformInterestService: PlatformInterestService,
+    private mailsService: MailsService,
+    private configService: ConfigService,
   ) {}
   async get(suscriptionType: SuscriptionType): Promise<Suscription> {
     return await getConnection()
@@ -40,10 +51,16 @@ export class SuscriptionService {
       .findOne({ name: suscriptionType });
   }
 
+  async getUserSuscription(userClient: UserClient): Promise<UserSuscription> {
+    return await getConnection()
+      .getRepository(UserSuscription)
+      .findOne({ userClient, finalDate: null });
+  }
+
   async createUserSuscription(
     userClient: UserClient,
     suscriptionType: SuscriptionType,
-    transaction: Transaction,
+    transaction?: Transaction,
   ) {
     if (suscriptionType !== SuscriptionType.BASIC) {
       await this.changeCurrentUserSuscription(userClient);
@@ -82,7 +99,7 @@ export class SuscriptionService {
     email: string,
     idBankAccount: number,
   ): Promise<UserSuscription> {
-    const userClient = await this.userClientService.get(email);
+    const userClient = await this.userClientService.get({ email });
     const suscription = await this.get(SuscriptionType.PREMIUM);
 
     const clientBankAccount = await this.clientBankAccountService.getOne(
@@ -102,14 +119,96 @@ export class SuscriptionService {
     );
   }
 
+  async isAbleToUpgradeToGold(userClient: UserClient): Promise<boolean> {
+    const currentUserSuscription = await this.getUserSuscription(userClient);
+
+    if (currentUserSuscription.suscription.name === SuscriptionType.PREMIUM) {
+      const goldSuscription = await this.get(SuscriptionType.GOLD);
+
+      const interests = await getConnection()
+        .getRepository(Transaction)
+        .createQueryBuilder('transaction')
+        .select(
+          'SUM(transaction.totalAmountWithInterest - thirdPartyInterest.amountDollarCents)',
+          'totalInterests',
+        )
+        .innerJoin('transaction.transactionInterest', 'transactionInterest')
+        .innerJoin(
+          'transactionInterest.thirdPartyInterest',
+          'thirdPartyInterest',
+        )
+        .innerJoin('transaction.clientBankAccount', 'clientBankAccount')
+        .innerJoin('clientBankAccount.userClient', 'userClient')
+        .innerJoin('transaction.stateTransaction', 'stateTransaction')
+        .innerJoin('stateTransaction.state', 'state')
+        .where(`userClient.idUserClient = ${userClient.idUserClient}`)
+        .andWhere(`state.name = '${StateName.VALID}'`)
+        .getRawOne();
+
+      if (
+        parseFloat(interests.totalInterests) >= goldSuscription.upgradedAmount
+      )
+        return true;
+    }
+    return false;
+  }
+
+  async sendGoldSubscriptionUpgradeEmail(userClient: UserClient) {
+    const pointsConversion = await this.pointsConversionService.getRecentPointsConversion();
+    const platformInterestService = await this.platformInterestService.getInterestByName(
+      PlatformInterest.GOLD_EXTRA,
+    );
+
+    const extraPoints =
+      parseFloat(platformInterestService.amount) /
+      (100 * pointsConversion.onePointEqualsDollars);
+
+    const template =
+      userClient.userDetails.language.name === Language.ENGLISH
+        ? MailsTemplate.UPGRADE_TO_GOLD_EN
+        : MailsTemplate.UPGRADE_TO_GOLD_ES;
+
+    const subject =
+      userClient.userDetails.language.name === Language.ENGLISH
+        ? MailsSubject.UPGRADE_TO_GOLD_EN
+        : MailsSubject.UPGRADE_TO_GOLD_ES;
+
+    const msg = {
+      to: userClient.email,
+      subject: subject,
+      templateId: this.configService.get<string>(
+        `mails.sendgrid.templates.${template}`,
+      ),
+      dynamic_template_data: {
+        user: userClient.userDetails.firstName,
+        extraPoints,
+      },
+    };
+    this.mailsService.sendEmail(msg);
+  }
+
+  async upgradeSubscriptionIfIsPossible(
+    idUserClient: number,
+    transactionType: TransactionType,
+  ) {
+    const userClient = await this.userClientService.get({ idUserClient });
+
+    //--- Put here the upgrade  if the transaction is a transaction to upgrade to PREMIUM
+
+    if (await this.isAbleToUpgradeToGold(userClient)) {
+      await this.createUserSuscription(userClient, SuscriptionType.GOLD);
+      await this.sendGoldSubscriptionUpgradeEmail(userClient);
+    }
+  }
+
   async getActualSubscription(email: string): Promise<Suscription> {
-    const userId = await this.userClientRepository.findOne( {email} )
+    const userId = await this.userClientRepository.findOne({ email });
     const actualSubscription = await this.suscriptionRepository
-        .createQueryBuilder('subscription')
-        .innerJoin('subscription.userSuscription', 'us')
-        .where(`us.fk_user_client = :id`, { id: userId.idUserClient })
-        .andWhere('us."finalDate" is null')
-        .getOne();
+      .createQueryBuilder('subscription')
+      .innerJoin('subscription.userSuscription', 'us')
+      .where(`us.fk_user_client = :id`, { id: userId.idUserClient })
+      .andWhere('us."finalDate" is null')
+      .getOne();
     return actualSubscription;
   }
 }

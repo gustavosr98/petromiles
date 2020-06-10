@@ -44,7 +44,7 @@ export class ClientBankAccountService {
     let userClient = await this.userClientService.getActive(
       bankAccountCreateParams.email,
     );
-    userClient = await this.userClientService.get(userClient.email);
+    userClient = await this.userClientService.get({ email: userClient.email });
 
     const bankAccount = await this.bankAccountService.create(
       bankAccountCreateParams,

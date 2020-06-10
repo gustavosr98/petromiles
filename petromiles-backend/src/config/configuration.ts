@@ -39,6 +39,8 @@ export default () => ({
         welcome: process.env.SENDGRID_WELCOME_TEMPLATE,
         invoiceEn: process.env.SENDGRID_WELCOME_INVOICE_EN_TEMPLATE,
         invoiceEs: process.env.SENDGRID_WELCOME_INVOICE_ES_TEMPLATE,
+        upgradeToGoldEn: process.env.SENDGRID_UPGRADE_TO_GOLD_EN_TEMPLATE,
+        upgradeToGoldEs: process.env.SENDGRID_UPGRADE_TO_GOLD_ES_TEMPLATE,
       },
     },
   },

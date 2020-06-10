@@ -54,7 +54,7 @@ export class UserClientService {
       ...user
     } = createUserDTO;
 
-    if (await this.get(user.email)) {
+    if (await this.get({ email: user.email })) {
       this.logger.error(
         `[${ApiModules.USER}] {${user.email}} Email already in use`,
       );
@@ -165,7 +165,13 @@ export class UserClientService {
       .getOne();
   }
 
-  async get(email: string): Promise<UserClient> {
+  async get(credentials: {
+    email?: string;
+    idUserClient?: number;
+  }): Promise<UserClient> {
+    const { email, idUserClient } = credentials;
+    if (idUserClient)
+      return await this.userClientRepository.findOne({ idUserClient });
     return await this.userClientRepository.findOne({ email });
   }
 
