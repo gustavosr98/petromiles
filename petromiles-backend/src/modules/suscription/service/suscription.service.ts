@@ -3,6 +3,7 @@ import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import {getConnection, getManager, getRepository, Repository} from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import {InjectRepository} from "@nestjs/typeorm";
 
 // INTERFACES
 import { Suscription as SuscriptionType } from '@/enums/suscription.enum';
@@ -19,15 +20,7 @@ import { UserSuscription } from '@/entities/user-suscription.entity';
 import { UserClientService } from '@/modules/user/services/user-client.service';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 import { ClientBankAccountService } from '@/modules/bank-account/services/client-bank-account.service';
-import { UserClient } from '../user/user-client/user-client.entity';
-import { Transaction } from '../transaction/transaction/transaction.entity';
-import { Suscription } from './suscription/suscription.entity';
-import { UserSuscription } from '../user-suscription/user-suscription.entity';
-import { UserClientService } from '../user/user-client/user-client.service';
-import { TransactionService } from '../transaction/transaction.service';
-import { BankAccountService } from '../bank-account/bank-account.service';
-import { ApiModules } from 'src/logger/api-modules.enum';
-import {InjectRepository} from "@nestjs/typeorm";
+
 
 @Injectable()
 export class SuscriptionService {
@@ -109,17 +102,17 @@ export class SuscriptionService {
     );
   }
 
-  async getActualSuscription(email: string): Promise<Suscription> {
+  async getActualSubscription(email: string): Promise<Suscription> {
     const userId = await this.userClientRepository.findOne( {email} )
-    const actualSuscription = await getManager()
+    const actualSubscription = await getManager()
         .createQueryBuilder()
-        .select('suscription.name')
+        .select('subscription.name')
         .from(Suscription, 'suscription')
         .innerJoin(UserSuscription,
-            'user_suscription',
-            'suscription."idSuscription"= user_suscription.fk_suscription')
-        .where(`user_suscription.fk_user_client= '${userId.idUserClient}'`)
+            'user_susbcription',
+            'subscription."idSuscription"= user_subscription.fk_suscription')
+        .where(`user_subscription.fk_user_client= '${userId.idUserClient}'`)
         .getOne();
-    return actualSuscription;
+    return actualSubscription;
   }
 }

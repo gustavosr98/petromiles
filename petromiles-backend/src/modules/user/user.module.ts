@@ -20,14 +20,7 @@ import { UserDetails } from '@/entities/user-details.entity';
 import { Language } from '@/entities/language.entity';
 import { UserClient } from '@/entities/user-client.entity';
 import { UserAdministrator } from '@/entities/user-administrator.entity';
-import { State } from '@/modules/management/state/state.entity';
-import { StateUser } from '@/modules/user/state-user/state-user.entity';
-import { UserDetails } from '@/modules/user/user-details/user-details.entity';
-import { Language } from '@/modules/user/language/language.entity';
-import { UserClient } from '@/modules/user/user-client/user-client.entity';
-import { UserAdministrator } from '@/modules/user/user-administrator/user-administrator.entity';
-import {Suscription} from "@/modules/suscription/suscription/suscription.entity";
-import {UserSuscription} from "@/modules/user-suscription/user-suscription.entity";
+
 
 @Module({
   imports: [

@@ -4,7 +4,8 @@ import {
   UseGuards,
   Body,
   ParseIntPipe,
-  Inject, Get,
+  Inject,
+  Get,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -21,11 +22,7 @@ import { HttpRequest } from '@/logger/http-requests.enum';
 
 // SERVICES
 import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { SuscriptionService } from './suscription.service';
-import { ApiModules } from 'src/logger/api-modules.enum';
-import { HttpRequest } from 'src/logger/http-requests.enum';
-import {Suscription} from "@/modules/suscription/suscription/suscription.entity";
+import {Suscription} from "@/entities/suscription.entity";
 
 const baseEndpoint = 'suscription';
 @UseGuards(AuthGuard('jwt'))
@@ -54,6 +51,6 @@ export class SuscriptionController {
     this.logger.http(
         `[${ApiModules.USER}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/suscription/actual`,
     );
-    return this.suscriptionService.getActualSuscription(user.email);
+    return this.suscriptionService.getActualSubscription(user.email);
   }
 }
