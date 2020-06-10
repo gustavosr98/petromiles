@@ -104,14 +104,11 @@ export class SuscriptionService {
 
   async getActualSubscription(email: string): Promise<Suscription> {
     const userId = await this.userClientRepository.findOne( {email} )
-    const actualSubscription = await getManager()
-        .createQueryBuilder()
-        .select('subscription.name')
-        .from(Suscription, 'subscription')
-        .innerJoin(UserSuscription,
-            'user_susbcription',
-            'subscription."idSuscription"= user_subscription.fk_suscription')
-        .where(`user_subscription.fk_user_client= '${userId.idUserClient}'`)
+    const actualSubscription = await this.suscriptionRepository
+        .createQueryBuilder('subscription')
+        .innerJoin('subscription.userSuscription', 'us')
+        .where(`us.fk_user_client = :id`, { id: userId.idUserClient })
+        .andWhere('us."finalDate" is null')
         .getOne();
     return actualSubscription;
   }
