@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PlatformInterestSeederService } from './platform_interest.service';
-import { PlatformInterest } from '../../../modules/management/platform-interest/platform-interest.entity';
+import { PlatformInterest } from '../../../entities/platform-interest.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PlatformInterest])],

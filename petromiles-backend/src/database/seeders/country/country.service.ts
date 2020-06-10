@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Repository, InsertResult } from 'typeorm';
 import { COUNTRIES } from './country.data';
-import { Country } from '../../../modules/management/country/country.entity';
+import { Country } from '../../../entities/country.entity';
 
 @Injectable()
 export class CountrySeederService {

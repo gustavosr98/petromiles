@@ -9,7 +9,7 @@ import { BankAccountModule } from '@/modules/bank-account/bank-account.module';
 import { TransactionModule } from './../transaction/transaction.module';
 
 // ENTITIES
-import { Task } from '@/modules/management/task/task.entity';
+import { Task } from '@/entities/task.entity';
 
 @Module({
   imports: [

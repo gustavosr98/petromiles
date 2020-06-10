@@ -18,7 +18,7 @@ import { CreateUserDTO } from '../user/dto/create-user.dto';
 import { GetUser } from './decorators/get-user.decorator';
 import { Roles } from './decorators/roles.decorator';
 import { ApiModules } from '@/logger/api-modules.enum';
-import { HttpRequest } from './../../logger/http-requests.enum';
+import { HttpRequest } from '@/logger/http-requests.enum';
 
 import { PasswordEncryptorInterceptor } from './interceptors/password-encryptor.interceptor';
 import { RolesGuard } from './guards/roles.guard';

@@ -1,7 +1,7 @@
 import { Module, Logger } from '@nestjs/common';
 
 import { ConfigModule } from '@nestjs/config';
-import configuration from 'config/configuration';
+import configuration from '@/config/configuration';
 
 import { DatabaseModule } from './../database.module';
 import { Seeder } from './seeder';

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Role } from './../../../modules/management/role/role.enum';
+import { Role } from '../../../enums/role.enum';
 
 export const ROLES = [
   {

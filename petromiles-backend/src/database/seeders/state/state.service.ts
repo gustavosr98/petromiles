@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, InsertResult } from 'typeorm';
 
 import { STATES } from './state.data';
-import { State } from '../../../modules/management/state/state.entity';
+import { State } from '../../../entities/state.entity';
 
 @Injectable()
 export class StateSeederService {

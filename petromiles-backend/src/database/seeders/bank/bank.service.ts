@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, InsertResult } from 'typeorm';
 
 import { BANK } from './bank.data';
-import { Bank } from 'src/modules/bank-account/bank/bank.entity';
+import { Bank } from '@/entities/bank.entity';
 
 @Injectable()
 export class BankSeederService {

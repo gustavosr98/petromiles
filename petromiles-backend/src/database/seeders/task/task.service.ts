@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, InsertResult } from 'typeorm';
 
 import { TASKS } from './task.data';
-import { Task } from '@/modules/management/task/task.entity';
+import { Task } from '@/entities/task.entity';
 
 @Injectable()
 export class TaskSeederService {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Bank } from '../../../modules/bank-account/bank/bank.entity';
+import { Bank } from '../../../entities/bank.entity';
 import { BankSeederService } from './bank.service';
 
 @Module({

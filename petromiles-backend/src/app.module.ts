@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 // CONFIGURATION
-import configuration from 'config/configuration';
+import configuration from '@/config/configuration';
 
 // LOGGER
 import { WinstonModule } from 'nest-winston';

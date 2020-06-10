@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TaskSeederService } from './task.service';
-import { Task } from '@/modules/management/task/task.entity';
+import { Task } from '@/entities/task.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Task])],

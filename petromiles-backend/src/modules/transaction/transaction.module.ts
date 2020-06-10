@@ -2,21 +2,21 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 // CONTROLLER
-import { TransactionController } from './transaction.controller';
+import { TransactionController } from '@/modules/transaction/controllers/transaction.controller';
 
 // MODULES
-import { ManagementModule } from '../management/management.module';
+import { ManagementModule } from '@/modules/management/management.module';
 import { PaymentProviderModule } from '@/modules/payment-provider/payment-provider.module';
 
 // SERVICES
-import { TransactionService } from './transaction.service';
-import { TransactionInterestService } from './transaction-interest/transaction-interest.service';
-import { StateTransactionService } from './state-transaction/state-transaction.service';
+import { TransactionService } from '@/modules/transaction/services/transaction.service';
+import { TransactionInterestService } from '@/modules/transaction/services/transaction-interest.service';
+import { StateTransactionService } from '@/modules/transaction/services/state-transaction.service';
 
 // ENTITIES
-import { Transaction } from './transaction/transaction.entity';
-import { TransactionInterest } from './transaction-interest/transaction-interest.entity';
-import { StateTransaction } from './state-transaction/state-transaction.entity';
+import { Transaction } from '@/entities/transaction.entity';
+import { TransactionInterest } from '@/entities/transaction-interest.entity';
+import { StateTransaction } from '@/entities/state-transaction.entity';
 
 @Module({
   imports: [

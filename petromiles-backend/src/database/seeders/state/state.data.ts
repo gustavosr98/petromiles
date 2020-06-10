@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { StateName } from './../../../modules/management/state/state.enum';
+import { StateName } from '../../../enums/state.enum';
 
 export const STATES = [
   {

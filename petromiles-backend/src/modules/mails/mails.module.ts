@@ -1,8 +1,8 @@
 import { Module, HttpModule } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { MailsService } from './mails.service';
-import { SendGridConfig } from './sendGrid.config';
+import { MailsService } from '@/modules/mails/mails.service';
+import { SendGridConfig } from '@/modules/mails/sendGrid.config';
 
 @Module({
   imports: [SendGridConfig],
