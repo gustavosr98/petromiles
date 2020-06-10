@@ -70,4 +70,5 @@ export class UserController {
     );
     return this.userClientService.changeDefaultLanguage(user.email, language);
   }
+
 }

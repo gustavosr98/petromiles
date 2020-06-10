@@ -10,9 +10,16 @@ import { TransactionModule } from '@/modules/transaction/transaction.module';
 
 //CONTROLLER
 import { SuscriptionController } from '@/modules/suscription/controller/suscription.controller';
+import {Suscription} from "@/entities/suscription.entity";
+import {UserClient} from "@/entities/user-client.entity";
+import {TypeOrmModule} from "@nestjs/typeorm";
 
 @Module({
-  imports: [UserModule, BankAccountModule, TransactionModule],
+  imports: [UserModule, BankAccountModule, TransactionModule,
+    TypeOrmModule.forFeature([
+        Suscription,
+        UserClient,
+    ])],
   providers: [SuscriptionService],
   exports: [SuscriptionService],
   controllers: [SuscriptionController],
