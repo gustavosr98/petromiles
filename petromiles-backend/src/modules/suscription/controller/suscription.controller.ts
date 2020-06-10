@@ -49,7 +49,7 @@ export class SuscriptionController {
   @Get('actual')
   getActualSuscription(@GetUser() user): Promise<Suscription>{
     this.logger.http(
-        `[${ApiModules.USER}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/actual`,
+        `[${ApiModules.SUSCRIPTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/actual`,
     );
     return this.suscriptionService.getActualSubscription(user.email);
   }
