@@ -107,7 +107,7 @@ export class SuscriptionService {
     const actualSubscription = await getManager()
         .createQueryBuilder()
         .select('subscription.name')
-        .from(Suscription, 'suscription')
+        .from(Suscription, 'subscription')
         .innerJoin(UserSuscription,
             'user_susbcription',
             'subscription."idSuscription"= user_subscription.fk_suscription')
