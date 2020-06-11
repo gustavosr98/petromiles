@@ -28,6 +28,7 @@ import { ClientBankAccountService } from '@/modules/bank-account/services/client
 import { PointsConversionService } from '@/modules/management/services/points-conversion.service';
 import { PlatformInterestService } from '@/modules/management/services/platform-interest.service';
 import { MailsService } from '@/modules/mails/mails.service';
+import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
 
 @Injectable()
 export class SuscriptionService {
@@ -44,6 +45,7 @@ export class SuscriptionService {
     private platformInterestService: PlatformInterestService,
     private mailsService: MailsService,
     private configService: ConfigService,
+    private paymentProviderService: PaymentProviderService,
   ) {}
   async get(suscriptionType: SuscriptionType): Promise<Suscription> {
     return await getConnection()
@@ -98,7 +100,7 @@ export class SuscriptionService {
   async upgradeToPremium(
     email: string,
     idBankAccount: number,
-  ): Promise<UserSuscription> {
+  ): Promise<Transaction> {
     const userClient = await this.userClientService.get({ email });
     const suscription = await this.get(SuscriptionType.PREMIUM);
 
@@ -107,16 +109,32 @@ export class SuscriptionService {
       idBankAccount,
     );
 
+    const paymentProviderCharge = await this.paymentProviderService.createCharge(
+      {
+        customer: clientBankAccount.userClient.userDetails.customerId,
+        source: clientBankAccount.chargeId,
+        currency: 'usd',
+        amount: suscription.cost,
+      },
+    );
+
     const transaction = await this.transactionService.createUpgradeSuscriptionTransaction(
       clientBankAccount,
       suscription,
+      paymentProviderCharge.id,
     );
 
-    return await this.createUserSuscription(
-      userClient,
-      SuscriptionType.PREMIUM,
-      transaction,
+    this.logger.silly(
+      `[${ApiModules.PAYMENTS}] Bank account {client: ${
+        clientBankAccount.userClient.email
+      } | id: ${
+        clientBankAccount.idClientBankAccount
+      } | last4: ${clientBankAccount.bankAccount.accountNumber.substr(
+        -4,
+      )}} charged with USD [${(suscription.cost / 100).toFixed(2)}]`,
     );
+
+    return transaction;
   }
 
   async isAbleToUpgradeToGold(userClient: UserClient): Promise<boolean> {
@@ -189,11 +207,16 @@ export class SuscriptionService {
 
   async upgradeSubscriptionIfIsPossible(
     idUserClient: number,
-    transactionType: TransactionType,
+    transaction: Transaction,
   ) {
     const userClient = await this.userClientService.get({ idUserClient });
 
-    //--- Put here the upgrade  if the transaction is a transaction to upgrade to PREMIUM
+    if (transaction.type === TransactionType.SUSCRIPTION_PAYMENT)
+      await this.createUserSuscription(
+        userClient,
+        SuscriptionType.PREMIUM,
+        transaction,
+      );
 
     if (await this.isAbleToUpgradeToGold(userClient)) {
       await this.createUserSuscription(userClient, SuscriptionType.GOLD);

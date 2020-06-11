@@ -38,14 +38,6 @@ export class TransactionService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  // ANY TYPE OF TRANSACTION
-  async get(idTransaction: number): Promise<Transaction> {
-    const transaction = await this.transactionRepository.findOne({
-      idTransaction,
-    });
-    return transaction;
-  }
-
   async getAllFiltered(
     stateNames: StateName[],
     transactionsTypes: TransactionType[],
@@ -127,27 +119,24 @@ export class TransactionService {
     return transactions;
   }
 
-  async getTransaction(
-    idTransaction,
+  async get(
+    idTransaction: number,
   ): Promise<App.Transaction.TransactionInformation> {
     const transaction = await this.transactionRepository.findOne(idTransaction);
-    return this.transformTransactionInformation(transaction);
-  }
-
-  private transformTransactionInformation(
-    transaction: Transaction,
-  ): App.Transaction.TransactionInformation {
     const state = transaction.stateTransaction.find(state => !state.finalDate)
       .state.name;
 
-    const amount =
-      transaction.rawAmount == 0
-        ? parseFloat(
-            transaction.transactionInterest[0].platformInterest.amount,
-          ) / 100
-        : transaction.rawAmount;
-    const interest =
-      transaction.rawAmount == 0 ? 0 : transaction.totalAmountWithInterest;
+    let details;
+
+    if (transaction.type == TransactionType.BANK_ACCOUNT_VALIDATION)
+      details = this.getVerificationDetails(transaction);
+    if (transaction.type == TransactionType.SUSCRIPTION_PAYMENT)
+      details = this.getSubscriptionDetails(transaction);
+    if (transaction.type == TransactionType.DEPOSIT)
+      details = this.getDepositDetails(transaction);
+    if (transaction.type == TransactionType.WITHDRAWAL)
+      details = this.getWithdrawalDetails(transaction);
+
     return {
       id: transaction.idTransaction,
       date: transaction.initialDate.toLocaleDateString(),
@@ -155,12 +144,53 @@ export class TransactionService {
       bankAccount: transaction.clientBankAccount.bankAccount.accountNumber.substr(
         -4,
       ),
-      equivalent: amount / transaction.pointsConversion.onePointEqualsDollars,
-      conversion: 1 / transaction.pointsConversion.onePointEqualsDollars,
+      pointsConversion: 1 / transaction.pointsConversion.onePointEqualsDollars,
+      ...details,
       state,
-      amount,
-      interest,
     };
+  }
+
+  private getVerificationDetails(transaction: Transaction) {
+    const verificationInterest =
+      parseFloat(transaction.transactionInterest[0].platformInterest.amount) /
+      100;
+
+    return {
+      amount: verificationInterest,
+      interest: 0,
+      total: verificationInterest,
+    };
+  }
+
+  private getSubscriptionDetails(transaction: Transaction) {
+    const subscriptionCost = transaction.totalAmountWithInterest / 100;
+    return {
+      amount: subscriptionCost,
+      interest: 0,
+      total: subscriptionCost,
+    };
+  }
+
+  private getDepositDetails(transaction: Transaction) {
+    const amount = parseFloat((transaction.rawAmount / 100).toFixed(2));
+    const interest = parseFloat(
+      (transaction.totalAmountWithInterest / 100).toFixed(2),
+    );
+    const total = amount + interest;
+    const pointsEquivalent =
+      amount / transaction.pointsConversion.onePointEqualsDollars;
+    return { amount, interest, total, pointsEquivalent };
+  }
+
+  private getWithdrawalDetails(transaction: Transaction) {
+    const amount = parseFloat((transaction.rawAmount / 100).toFixed(2));
+    const interest = parseFloat(
+      (transaction.totalAmountWithInterest / 100).toFixed(2),
+    );
+    const total = amount + interest;
+    const pointsEquivalent =
+      amount / transaction.pointsConversion.onePointEqualsDollars;
+    return { amount, interest, total, pointsEquivalent };
   }
 
   async createTransaction(
@@ -258,6 +288,7 @@ export class TransactionService {
   async createUpgradeSuscriptionTransaction(
     clientBankAccount: ClientBankAccount,
     suscription: Suscription,
+    paymentProviderTransactionId: string,
   ): Promise<Transaction> {
     const options = await this.getTransactionInterests({
       platformInterestType: PlatformInterest.PREMIUM_EXTRA,
@@ -275,6 +306,7 @@ export class TransactionService {
       thirdPartyInterest: options.thirdPartyInterest,
       platformInterest: options.interest,
       stateTransactionDescription: StateDescription.SUSCRIPTION_UPGRADE,
+      paymentProviderTransactionId,
     });
   }
 

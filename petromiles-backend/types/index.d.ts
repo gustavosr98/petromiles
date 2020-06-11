@@ -69,11 +69,12 @@ declare namespace App {
       date: string;
       type: import('../src/enums/transaction.enum').TransactionType;
       bankAccount: string;
-      equivalent: number;
-      conversion: number;
       state: string;
       amount: number;
       interest: number;
+      pointsEquivalent?: number;
+      pointsConversion: number;
+      total: number;
     }
   }
 }

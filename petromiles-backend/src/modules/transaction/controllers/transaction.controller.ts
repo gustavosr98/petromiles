@@ -48,6 +48,6 @@ export class TransactionController {
     this.logger.http(
       `[${ApiModules.TRANSACTION}] (${HttpRequest.GET})  ${user?.email} asks /${baseEndpoint}/${idTransaction}`,
     );
-    return this.transactionService.getTransaction(idTransaction);
+    return this.transactionService.get(idTransaction);
   }
 }
