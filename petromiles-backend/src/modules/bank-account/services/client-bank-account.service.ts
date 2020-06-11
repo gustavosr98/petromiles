@@ -1,5 +1,6 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 
 import { Repository, getConnection } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -12,8 +13,10 @@ import { TransactionService } from '@/modules/transaction/services/transaction.s
 import { StateTransactionService } from '@/modules/transaction/services/state-transaction.service';
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
 import { ManagementService } from '@/modules/management/services/management.service';
+import { MailsService } from '@/modules/mails/mails.service';
 
 // ENTITIES
+import { Bank } from '@/entities/bank.entity';
 import { ClientBankAccount } from '@/entities/client-bank-account.entity';
 import { StateBankAccount } from '@/entities/state-bank-account.entity';
 import { BankAccount } from '@/entities/bank-account.entity';
@@ -23,6 +26,8 @@ import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { StateName, StateDescription } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
+import { MailsTemplate, MailsSubject } from '@/enums/mails.enum';
+import { Language } from '@/enums/language.enum';
 
 @Injectable()
 export class ClientBankAccountService {
@@ -38,6 +43,9 @@ export class ClientBankAccountService {
     private transactionService: TransactionService,
     private paymentProviderService: PaymentProviderService,
     private managementService: ManagementService,
+    private mailsService: MailsService,
+    private configService: ConfigService,
+    private bank: Bank,
   ) {}
 
   async create(bankAccountCreateParams): Promise<ClientBankAccount> {
@@ -248,9 +256,42 @@ export class ClientBankAccountService {
     stateBankAccount.description = description;
     stateBankAccount.state = await this.managementService.getState(stateName);
 
+    console.log(stateName);
+
     this.logger.silly(
       `[${ApiModules.BANK_ACCOUNT}] ID: ${clientBankAccount.idClientBankAccount} updated to state: (${stateName})`,
     );
+
+    if (stateName === 'verifying') {
+
+      const template =
+      clientBankAccount.userClient.userDetails.language.name === Language.ENGLISH
+        ? MailsTemplate.BANK_A_REGISTRATION_EN
+        : MailsTemplate.BANK_A_REGISTRATION_ES;
+
+      const subject =
+      clientBankAccount.userClient.userDetails.language.name === Language.ENGLISH
+        ? MailsSubject.BANK_A_REGISTRATION_EN
+        : MailsSubject.BANK_A_REGISTRATION_ES;
+
+      const msg = {
+        to: clientBankAccount.userClient.email,
+        subject: subject,
+        templateId: this.configService.get<string>(
+          `mails.sendgrid.templates.${template}`,
+        ),
+        dynamic_template_data: {
+          user: clientBankAccount.userClient.userDetails.firstName,
+          bank: this.bank.name,
+          accountHolderName: clientBankAccount.userClient.userDetails.firstName + clientBankAccount.userClient.userDetails.lastName,
+          accountRoutingNumber: clientBankAccount.bankAccount.routingNumber,
+          accountNumber: clientBankAccount.bankAccount.accountNumber,
+        },
+      };
+      this.mailsService.sendEmail(msg);
+
+    } 
+
     return await getConnection()
       .getRepository(StateBankAccount)
       .save(stateBankAccount);

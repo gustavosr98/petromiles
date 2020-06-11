@@ -4,6 +4,14 @@ export enum MailsSubject {
   INVOICE_ES = 'Su transacción está siendo procesada',
   UPGRADE_TO_GOLD_EN = 'Thank you for your loyalty!',
   UPGRADE_TO_GOLD_ES = 'Gracias por su lealtad!',
+  BANK_A_REGISTRATION_EN = 'Bank Account Registration',
+  BANK_A_REGISTRATION_ES = 'Registro de Cuenta Bancaria',
+  BANK_A_VERIFIED_EN = 'Bank Account Verification',
+  BANK_A_VERIFIED_ES = 'Verificación de Cuenta Bancaria',
+  BANK_A_UNVERIFIED_EN = 'Unverified bank account',
+  BANK_A_UNVERIFIED_ES = 'Sin verificar cuenta de banco',
+  BANK_A_DELETION_EN = 'Bank account deleted',
+  BANK_A_DELETION_ES = 'Se elimino la cuenta bancaria',
 }
 
 export enum MailsTemplate {
@@ -11,4 +19,12 @@ export enum MailsTemplate {
   INVOICE_ES = 'invoiceEs',
   UPGRADE_TO_GOLD_EN = 'upgradeToGoldEn',
   UPGRADE_TO_GOLD_ES = 'upgradeToGoldEs',
+  BANK_A_REGISTRATION_EN = 'bankARegistrationEn',
+  BANK_A_REGISTRATION_ES = 'bankARegistrationEs',
+  BANK_A_VERIFIED_EN = 'bankAVerifiedEn',
+  BANK_A_VERIFIED_ES = 'bankAVerifiedEs',
+  BANK_A_UNVERIFIED_EN = 'bankAUnverifiedEn',
+  BANK_A_UNVERIFIED_ES = 'bankAUnverifiedEs',
+  BANK_A_DELETION_EN = 'bankADeletionEn',
+  BANK_A_DELETION_ES = 'bankADeletionEs',
 }
