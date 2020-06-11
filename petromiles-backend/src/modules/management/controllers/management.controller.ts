@@ -4,10 +4,13 @@ import {
   Put,
   Body,
   Param,
+    Post,
   ClassSerializerInterceptor,
   UseInterceptors,
-  ValidationPipe,
+  ValidationPipe, Inject,
 } from '@nestjs/common';
+
+
 
 // SERVICES
 import { ManagementService } from '@/modules/management/services/management.service';
@@ -20,9 +23,14 @@ import { ThirdPartyInterestService } from '@/modules/management/services/third-p
 import { UpdateSubscriptionDTO } from '@/modules/suscription/dto/update-subscription.dto';
 import { CreatePlatformInterestDTO } from '@/modules/management/dto/create-platform-interest.dto';
 import { CreateThirdPartyInterestDTO } from '@/modules/management/dto/create-third-party-interest.dto';
+import {UpdateUserStateDTO} from "@/modules/management/dto/update-user-state.dto";
 
 // ENTITIES
 import { ThirdPartyInterest } from '@/entities/third-party-interest.entity';
+import {State} from "@/entities/state.entity";
+import {ApiModules} from "@/logger/api-modules.enum";
+import {HttpRequest} from "@/logger/http-requests.enum";
+import {StateUser} from "@/entities/state-user.entity";
 
 @Controller('management')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -60,7 +68,7 @@ export class ManagementController {
     );
   }
 
-  @Put('platform-interest/:id')
+  @Post('platform-interest/:id')
   updatePlatformInterest(
     @Param('id') idPlatformInterest: number,
     @Body(ValidationPipe) createPlatformInterest: CreatePlatformInterestDTO,
@@ -91,5 +99,11 @@ export class ManagementController {
       idthirdPartyInterest,
       createThirdPartyInterestDTO,
     );
+  }
+
+  @Post('state/:id')
+  updateUserState(@Param('id') userId: number,
+                  @Body() updateUserStateDTO: UpdateUserStateDTO): Promise<StateUser>{
+    return this.managementService.updateUserState(updateUserStateDTO.state, userId);
   }
 }

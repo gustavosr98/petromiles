@@ -7,12 +7,15 @@ import { Repository, getConnection } from 'typeorm';
 import { Language } from '@/entities/language.entity';
 import { State } from '@/entities/state.entity';
 import { Role } from '@/entities/role.entity';
+import {StateUser} from "@/entities/state-user.entity";
+import {UserClient} from "@/entities/user-client.entity";
+import { Suscription } from '../../../entities/suscription.entity';
 
 // INTERFACES
 import { StateName } from '@/enums/state.enum';
 import { Role as RoleEnum } from '@/enums/role.enum';
 import { UpdateSubscriptionDTO } from '../../suscription/dto/update-subscription.dto';
-import { Suscription } from '../../../entities/suscription.entity';
+
 
 @Injectable()
 export class ManagementService {
@@ -23,6 +26,10 @@ export class ManagementService {
     private stateRepository: Repository<State>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
+    @InjectRepository(UserClient)
+    private userClientRepository: Repository<UserClient>,
+    @InjectRepository(StateUser)
+    private stateUserRepository: Repository<StateUser>,
   ) {}
 
   async getLanguages(): Promise<Language[]> {
@@ -51,5 +58,26 @@ export class ManagementService {
       .set({ ...updateSubscriptionDTO })
       .where('idSuscription = :idSuscription', { idSuscription })
       .execute();
+  }
+
+  async updateUserState(state: StateName, id: number): Promise<StateUser>{
+    // await getConnection()
+    //     .createQueryBuilder()
+    //     .update(StateUser)
+    //     .set({finalDate: 'now()'})
+    //     .where(`fk_user_client = :id`, {id: id})
+    //     .execute()
+
+    const userId = await this.userClientRepository.findOne(id);
+    const stateus = await this.stateUserRepository.findOne(userId.idUserClient);
+    console.log(stateus.userClient);
+
+    const newState = new StateUser();
+    newState.initialDate = new Date();
+    newState.state = await this.getState(state)
+    newState.userClient = userId;
+    return await getConnection()
+        .getRepository(StateUser)
+        .save(newState);
   }
 }
