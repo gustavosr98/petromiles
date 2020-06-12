@@ -100,15 +100,11 @@ export class ManagementService {
       newState.userAdministrator = adminId
     }
 
-    return await getConnection()
-        .getRepository(StateUser)
-        .save(newState);
+    return await this.stateUserRepository.save(newState)
   }
 
   async updateLastState(state: StateUser): Promise<StateUser>{
     state.finalDate = new Date();
-    return await getConnection()
-        .getRepository(StateUser)
-        .save(state)
+    return await this.stateUserRepository.save(state)
   }
 }
