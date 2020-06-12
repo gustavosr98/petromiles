@@ -1,4 +1,4 @@
-export const mailsSubjets = {
+export const mailsSubjets = Object.freeze({
 	welcome: 'Welcome To PetroMiles',
 	invoice: {
 		english: 'Your transaction is being processed',
@@ -8,16 +8,16 @@ export const mailsSubjets = {
 		english: 'Thank you for your loyalty!',
 		spanish: 'Gracias por su lealtad!',
 	},
-	bank_a_registration: {
+	bank_account_registration: {
 		english: 'Bank Account Registration',
 		spanish: 'Registro de Cuenta Bancaria',
 	},
-	bank_a_verified: {
+	bank_account_verified: {
 		english: 'Bank Account Verification',
 		spanish: 'Verificación de Cuenta Bancaria',
 	},
-	bank_a_deletion: {
+	bank_account_deletion: {
 		english: 'Bank account deleted',
 		spanish: 'Se elimino la cuenta bancaria',
 	},
-};
+});

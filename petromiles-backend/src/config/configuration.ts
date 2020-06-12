@@ -45,15 +45,15 @@ export default () => ({
            english:process.env.SENDGRID_UPGRADE_TO_GOLD_EN_TEMPLATE,
            spanish:process.env.SENDGRID_UPGRADE_TO_GOLD_ES_TEMPLATE,
         },
-        bankARegistration: {
+        bankAccountRegistration: {
            english:process.env.SENDGRID_BANK_REGISTRATION_EN_TEMPLATE,
            spanish:process.env.SENDGRID_BANK_REGISTRATION_ES_TEMPLATE,
         },
-        bankAVerified: {
+        bankAccountVerified: {
            english:process.env.SENDGRID_BANK_VERIFIED_EN_TEMPLATE,
            spanish:process.env.SENDGRID_BANK_VERIFIED_ES_TEMPLATE,
         },
-        bankADeletion: {
+        bankAccountDeletion: {
            english:process.env.SENDGRID_BANK_DELETION_EN_TEMPLATE,
            spanish:process.env.SENDGRID_BANK_DELETION_ES_TEMPLATE,
         },

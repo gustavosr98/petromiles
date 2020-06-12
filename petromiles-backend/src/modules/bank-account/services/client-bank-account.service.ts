@@ -19,7 +19,6 @@ import { ManagementService } from '@/modules/management/services/management.serv
 import { MailsService } from '@/modules/mails/mails.service';
 
 // ENTITIES
-//import { Bank } from '@/entities/bank.entity';
 import { ClientBankAccount } from '@/entities/client-bank-account.entity';
 import { StateBankAccount } from '@/entities/state-bank-account.entity';
 import { BankAccount } from '@/entities/bank-account.entity';
@@ -46,7 +45,6 @@ export class ClientBankAccountService {
     private managementService: ManagementService,
     private mailsService: MailsService,
     private configService: ConfigService,
-    //private bank: Bank,
   ) {}
 
   async create(bankAccountCreateParams): Promise<ClientBankAccount> {
@@ -250,9 +248,6 @@ export class ClientBankAccountService {
     description?,
   ) {
 
-    const lastNumbersBankAccount = 4;
-    const languageMails = clientBankAccount.userClient.userDetails.language.name;
-
     if (clientBankAccount.stateBankAccount)
       await this.endLastState(clientBankAccount);
 
@@ -265,13 +260,26 @@ export class ClientBankAccountService {
       `[${ApiModules.BANK_ACCOUNT}] ID: ${clientBankAccount.idClientBankAccount} updated to state: (${stateName})`,
     );
 
-    // Mailings
+    await this.sendStatusBankAccount(stateName,clientBankAccount);
 
-    if (stateName === 'verifying') {
+    return await getConnection()
+      .getRepository(StateBankAccount)
+      .save(stateBankAccount);
+  }
 
-      const template = `bankARegistration[${languageMails}]`;
+  sendStatusBankAccount(
+    bankAccountStatus: StateName,
+    clientBankAccount: ClientBankAccount,
+    ) {
 
-      const subject =  mailsSubjets.bank_a_registration[languageMails];
+    const lastNumbersBankAccount = 4;
+    const languageMails = clientBankAccount.userClient.userDetails.language.name;
+
+    if (bankAccountStatus === 'verifying') {
+
+      const template = `bankAccountRegistration[${languageMails}]`;
+
+      const subject =  mailsSubjets.bank_account_registration[languageMails];
 
       const msg = {
         to: clientBankAccount.userClient.email,
@@ -283,18 +291,18 @@ export class ClientBankAccountService {
           user: clientBankAccount.userClient.userDetails.firstName,
           bank: 'bankName',
           accountHolderName: 
-            clientBankAccount.userClient.userDetails.firstName + ' ' + 
-            clientBankAccount.userClient.userDetails.lastName,
+            clientBankAccount.bankAccount.userDetails.firstName + ' ' + 
+            clientBankAccount.bankAccount.userDetails.lastName,
           accountNumber: clientBankAccount.bankAccount.accountNumber.slice(-lastNumbersBankAccount),
         },
       };
       this.mailsService.sendEmail(msg);
 
-    } else if (stateName === 'active') {
+    } else if (bankAccountStatus === 'active') {
+      
+      const template = `bankAccountVerified[${languageMails}]`;
 
-      const template = `bankAVerified[${languageMails}]`;
-
-      const subject = mailsSubjets.bank_a_verified[languageMails];
+      const subject = mailsSubjets.bank_account_verified[languageMails];
 
       const msg = {
         to: clientBankAccount.userClient.email,
@@ -310,11 +318,11 @@ export class ClientBankAccountService {
       };
       this.mailsService.sendEmail(msg);
       
-    } else if (stateName === 'cancelled') {
+    } else if (bankAccountStatus === 'cancelled') {
 
-      const template = `bankADeletion[${languageMails}]`;
+      const template = `bankAccountDeletion[${languageMails}]`;
 
-      const subject = mailsSubjets.bank_a_deletion[languageMails];
+      const subject = mailsSubjets.bank_account_deletion[languageMails];
 
       const msg = {
         to: clientBankAccount.userClient.email,
@@ -324,16 +332,12 @@ export class ClientBankAccountService {
         ),
         dynamic_template_data: {
           user: clientBankAccount.userClient.userDetails.firstName,
+          accountNumber: clientBankAccount.bankAccount.accountNumber.slice(-lastNumbersBankAccount),
         },
       };
       this.mailsService.sendEmail(msg);
-
     }
-
-    return await getConnection()
-      .getRepository(StateBankAccount)
-      .save(stateBankAccount);
-  }
+  } 
 
   private async endLastState(clientBankAccount: ClientBankAccount) {
     let currentStateBankAccount = await this.stateBankAccountRepository.findOne(
