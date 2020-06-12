@@ -113,6 +113,6 @@ export class ManagementController {
     this.logger.http(
         `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) ${user?.email} changing state /${baseEndpoint}/state/${userId}`,
     );
-    return this.managementService.updateUserState(updateUserStateDTO.state, userId, user.id);
+    return this.managementService.updateUserState(updateUserStateDTO.role, updateUserStateDTO.state, userId, user.id);
   }
 }

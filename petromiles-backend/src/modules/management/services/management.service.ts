@@ -17,6 +17,7 @@ import {UserRole} from "@/entities/user-role.entity";
 import { StateName } from '@/enums/state.enum';
 import { Role as RoleEnum } from '@/enums/role.enum';
 import { UpdateSubscriptionDTO } from '../../suscription/dto/update-subscription.dto';
+import {UpdateUserStateDTO} from "@/modules/management/dto/update-user-state.dto";
 
 
 
@@ -67,13 +68,11 @@ export class ManagementService {
       .execute();
   }
 
-  async updateUserState(state: StateName, id: number, adminId: UserAdministrator): Promise<StateUser>{
+  async updateUserState(role: RoleEnum, state: StateName, id: number, adminId: UserAdministrator): Promise<StateUser>{
 
     const roleName = await this.roleRepository
         .createQueryBuilder('role')
-        .innerJoin('user_role', 'ur','ur.fk_role= role."idRole"')
-        .where('ur.fk_user_client= :id', {id: id})
-        .orWhere('ur.fk_user_administrator= :id',{id: id})
+        .where('role.name = :role', {role: role})
         .getOne()
 
     let userId,stateus
