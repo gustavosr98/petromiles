@@ -9,6 +9,7 @@ import { BankAccountModule } from '@/modules/bank-account/bank-account.module';
 import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { MailsModule } from '@/modules/mails/mails.module';
 import { ManagementModule } from '@/modules/management/management.module';
+import { PaymentProviderModule } from '@/modules/payment-provider/payment-provider.module';
 
 //CONTROLLER
 import { SuscriptionController } from '@/modules/suscription/controller/suscription.controller';
@@ -23,6 +24,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TransactionModule,
     MailsModule,
     ManagementModule,
+    PaymentProviderModule,
     TypeOrmModule.forFeature([Suscription, UserClient]),
   ],
   providers: [SuscriptionService],

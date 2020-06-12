@@ -53,24 +53,24 @@
               text-color="white"
               label
               @click.stop="dialog = true"
-            >{{ transaction.equivalent / 100 }}</v-chip>
+            >{{ transaction.pointsEquivalent }}</v-chip>
           </td>
         </tr>
         <!-- For all type of transactions -->
 
         <tr class="text-center">
           <td class="font-weight-bold">{{ $tc("common.amount", 0) }}</td>
-          <td>{{ amount }} $</td>
+          <td>{{ transaction.amount }} $</td>
         </tr>
 
         <tr class="text-center">
           <td class="font-weight-bold">{{ $t("invoice.taxes") }}</td>
-          <td>{{ transaction.interest / 100 }} $</td>
+          <td>{{ transaction.interest }} $</td>
         </tr>
 
         <tr class="text-center total-item">
           <td class="font-weight-bold">Total</td>
-          <td>{{ total }} $</td>
+          <td>{{ transaction.total }} $</td>
         </tr>
       </tbody>
     </v-simple-table>
@@ -87,11 +87,11 @@
         <v-card-text class="mt-2" align="center">
           <v-alert dense text color="primary" v-if="paymentTransaction">
             1 USD =
-            {{ transaction.conversion }} {{ $t("payments.points") }}
+            {{ transaction.pointsConversion }} {{ $t("payments.points") }}
             <br />
             <strong>
-              {{ transaction.amount / 100 }} USD =
-              {{ transaction.equivalent / 100 }}
+              {{ transaction.amount }} USD =
+              {{ transaction.pointsEquivalent }}
               {{ $t("payments.points") }}
               <br />
             </strong>
@@ -119,19 +119,6 @@ export default {
     );
   },
   computed: {
-    amount: function() {
-      if (this.transaction.type == Transactions.BANK_ACCOUNT_VERIFICATION)
-        return this.transaction.amount;
-      return this.transaction.amount / 100;
-    },
-    total: function() {
-      if (this.transaction.type == Transactions.BANK_ACCOUNT_VERIFICATION)
-        return this.transaction.amount;
-      return (
-        this.transaction.amount / 100 +
-        this.transaction.interest / 100
-      ).toFixed(3);
-    },
     type: function() {
       if (this.transaction.type) {
         return this.$tc(`transaction-type.${this.transaction.type}`);
@@ -139,9 +126,12 @@ export default {
       return "";
     },
     paymentTransaction: function() {
-      if (this.transaction.type !== Transactions.BANK_ACCOUNT_VERIFICATION)
-        return true;
-      return false;
+      if (
+        this.transaction.type === Transactions.BANK_ACCOUNT_VERIFICATION ||
+        this.transaction.type === Transactions.SUBSCRIPTION_PAYMENT
+      )
+        return false;
+      return true;
     },
   },
 };
