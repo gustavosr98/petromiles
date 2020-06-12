@@ -9,7 +9,8 @@ import {
   UseInterceptors,
   ValidationPipe, Inject,
 } from '@nestjs/common';
-
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 
 // SERVICES
@@ -31,8 +32,8 @@ import {State} from "@/entities/state.entity";
 import {ApiModules} from "@/logger/api-modules.enum";
 import {HttpRequest} from "@/logger/http-requests.enum";
 import {StateUser} from "@/entities/state-user.entity";
-
-@Controller('management')
+const baseEndpoint = 'management';
+@Controller(baseEndpoint)
 @UseInterceptors(ClassSerializerInterceptor)
 export class ManagementController {
   constructor(
@@ -40,6 +41,7 @@ export class ManagementController {
     private platformInterestService: PlatformInterestService,
     private pointsConversionService: PointsConversionService,
     private thirdPartyInterestService: ThirdPartyInterestService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   @Get('languages')
@@ -104,6 +106,9 @@ export class ManagementController {
   @Post('state/:id')
   updateUserState(@Param('id') userId: number,
                   @Body() updateUserStateDTO: UpdateUserStateDTO): Promise<StateUser>{
+    this.logger.http(
+        `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) asks /${baseEndpoint}/state/${userId}`,
+    );
     return this.managementService.updateUserState(updateUserStateDTO.state, userId);
   }
 }

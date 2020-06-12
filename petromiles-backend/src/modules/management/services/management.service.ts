@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {BadRequestException, Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository, getConnection } from 'typeorm';
@@ -63,7 +63,10 @@ export class ManagementService {
   async updateUserState(state: StateName, id: number): Promise<StateUser>{
 
     const userId = await this.userClientRepository.findOne(id);
-    const stateus = await this.stateUserRepository.findOne({where: [{userClient: userId.idUserClient}]});
+    if (userId.idUserClient === null){
+      throw new BadRequestException('Cannot change the state to an administrator');
+    }
+    const stateus = await this.stateUserRepository.findOne({where: [{userClient: userId.idUserClient, finalDate: null}]});
 
     await this.updateLastState(stateus);
 
