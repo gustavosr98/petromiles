@@ -37,18 +37,26 @@ export default () => ({
       emailFrom: process.env.SENDGRID_FROM,
       templates: {
         welcome: process.env.SENDGRID_WELCOME_TEMPLATE,
-        invoiceEn: process.env.SENDGRID_WELCOME_INVOICE_EN_TEMPLATE,
-        invoiceEs: process.env.SENDGRID_WELCOME_INVOICE_ES_TEMPLATE,
-        upgradeToGoldEn: process.env.SENDGRID_UPGRADE_TO_GOLD_EN_TEMPLATE,
-        upgradeToGoldEs: process.env.SENDGRID_UPGRADE_TO_GOLD_ES_TEMPLATE,
-        bankARegistrationEn:process.env.SENDGRID_BANK_REGISTRATION_EN_TEMPLATE,
-        bankARegistrationEs:process.env.SENDGRID_BANK_REGISTRATION_ES_TEMPLATE,
-        bankAVerifiedEn:process.env.SENDGRID_BANK_VERIFIED_EN_TEMPLATE,
-        bankAVerifiedEs:process.env.SENDGRID_BANK_VERIFIED_ES_TEMPLATE,
-        bankAUnverifiedEn:process.env.SENDGRID_BANK_UNVERIFIED_EN_TEMPLATE,
-        bankAUnverifiedEs:process.env.SENDGRID_BANK_UNVERIFIED_ES_TEMPLATE,
-        bankADeletionEn:process.env.SENDGRID_BANK_DELETION_EN_TEMPLATE,
-        bankADeletionEs:process.env.SENDGRID_BANK_DELETION_ES_TEMPLATE,
+        invoice: {
+           english:process.env.SENDGRID_WELCOME_INVOICE_EN_TEMPLATE,
+           spanish:process.env.SENDGRID_WELCOME_INVOICE_ES_TEMPLATE,
+        },
+        upgradeToGold: {
+           english:process.env.SENDGRID_UPGRADE_TO_GOLD_EN_TEMPLATE,
+           spanish:process.env.SENDGRID_UPGRADE_TO_GOLD_ES_TEMPLATE,
+        },
+        bankARegistration: {
+           english:process.env.SENDGRID_BANK_REGISTRATION_EN_TEMPLATE,
+           spanish:process.env.SENDGRID_BANK_REGISTRATION_ES_TEMPLATE,
+        },
+        bankAVerified: {
+           english:process.env.SENDGRID_BANK_VERIFIED_EN_TEMPLATE,
+           spanish:process.env.SENDGRID_BANK_VERIFIED_ES_TEMPLATE,
+        },
+        bankADeletion: {
+           english:process.env.SENDGRID_BANK_DELETION_EN_TEMPLATE,
+           spanish:process.env.SENDGRID_BANK_DELETION_ES_TEMPLATE,
+        },
       },
     },
   },

@@ -15,16 +15,16 @@ export enum MailsSubject {
 }
 
 export enum MailsTemplate {
-  INVOICE_EN = 'invoiceEn',
-  INVOICE_ES = 'invoiceEs',
-  UPGRADE_TO_GOLD_EN = 'upgradeToGoldEn',
-  UPGRADE_TO_GOLD_ES = 'upgradeToGoldEs',
-  BANK_A_REGISTRATION_EN = 'bankARegistrationEn',
-  BANK_A_REGISTRATION_ES = 'bankARegistrationEs',
-  BANK_A_VERIFIED_EN = 'bankAVerifiedEn',
-  BANK_A_VERIFIED_ES = 'bankAVerifiedEs',
-  BANK_A_UNVERIFIED_EN = 'bankAUnverifiedEn',
-  BANK_A_UNVERIFIED_ES = 'bankAUnverifiedEs',
-  BANK_A_DELETION_EN = 'bankADeletionEn',
-  BANK_A_DELETION_ES = 'bankADeletionEs',
+  INVOICE_EN = 'invoice[english]',
+  INVOICE_ES = 'invoice[spanish]',
+  UPGRADE_TO_GOLD_EN = 'upgradeToGold[english]',
+  UPGRADE_TO_GOLD_ES = 'upgradeToGold[spanish]',
+  BANK_A_REGISTRATION_EN = 'bankARegistration[english]',
+  BANK_A_REGISTRATION_ES = 'bankARegistration[spanish]',
+  BANK_A_VERIFIED_EN = 'bankAVerified[english]',
+  BANK_A_VERIFIED_ES = 'bankAVerified[spanish]',
+  BANK_A_UNVERIFIED_EN = 'bankAUnverified[english]',
+  BANK_A_UNVERIFIED_ES = 'bankAUnverified[spanish]',
+  BANK_A_DELETION_EN = 'bankADeletion[english]',
+  BANK_A_DELETION_ES = 'bankADeletion[spanish]',
 }

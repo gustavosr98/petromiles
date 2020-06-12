@@ -6,6 +6,9 @@ import { Repository, getConnection } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
+// CONSTANTS
+import { mailsSubjets } from '@/constants/mailsSubjectConst';
+
 // SERVICES
 import { BankAccountService } from '@/modules/bank-account/services/bank-account.service';
 import { UserClientService } from '@/modules/user/services/user-client.service';
@@ -16,7 +19,7 @@ import { ManagementService } from '@/modules/management/services/management.serv
 import { MailsService } from '@/modules/mails/mails.service';
 
 // ENTITIES
-import { Bank } from '@/entities/bank.entity';
+//import { Bank } from '@/entities/bank.entity';
 import { ClientBankAccount } from '@/entities/client-bank-account.entity';
 import { StateBankAccount } from '@/entities/state-bank-account.entity';
 import { BankAccount } from '@/entities/bank-account.entity';
@@ -26,8 +29,6 @@ import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { StateName, StateDescription } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
-import { MailsTemplate, MailsSubject } from '@/enums/mails.enum';
-import { Language } from '@/enums/language.enum';
 
 @Injectable()
 export class ClientBankAccountService {
@@ -45,7 +46,7 @@ export class ClientBankAccountService {
     private managementService: ManagementService,
     private mailsService: MailsService,
     private configService: ConfigService,
-    private bank: Bank,
+    //private bank: Bank,
   ) {}
 
   async create(bankAccountCreateParams): Promise<ClientBankAccount> {
@@ -248,6 +249,10 @@ export class ClientBankAccountService {
     clientBankAccount: ClientBankAccount,
     description?,
   ) {
+
+    const lastNumbersBankAccount = 4;
+    const languageMails = clientBankAccount.userClient.userDetails.language.name;
+
     if (clientBankAccount.stateBankAccount)
       await this.endLastState(clientBankAccount);
 
@@ -256,23 +261,17 @@ export class ClientBankAccountService {
     stateBankAccount.description = description;
     stateBankAccount.state = await this.managementService.getState(stateName);
 
-    console.log(stateName);
-
     this.logger.silly(
       `[${ApiModules.BANK_ACCOUNT}] ID: ${clientBankAccount.idClientBankAccount} updated to state: (${stateName})`,
     );
 
+    // Mailings
+
     if (stateName === 'verifying') {
 
-      const template =
-      clientBankAccount.userClient.userDetails.language.name === Language.ENGLISH
-        ? MailsTemplate.BANK_A_REGISTRATION_EN
-        : MailsTemplate.BANK_A_REGISTRATION_ES;
+      const template = `bankARegistration[${languageMails}]`;
 
-      const subject =
-      clientBankAccount.userClient.userDetails.language.name === Language.ENGLISH
-        ? MailsSubject.BANK_A_REGISTRATION_EN
-        : MailsSubject.BANK_A_REGISTRATION_ES;
+      const subject =  mailsSubjets.bank_a_registration[languageMails];
 
       const msg = {
         to: clientBankAccount.userClient.email,
@@ -282,15 +281,54 @@ export class ClientBankAccountService {
         ),
         dynamic_template_data: {
           user: clientBankAccount.userClient.userDetails.firstName,
-          bank: this.bank.name,
-          accountHolderName: clientBankAccount.userClient.userDetails.firstName + clientBankAccount.userClient.userDetails.lastName,
-          accountRoutingNumber: clientBankAccount.bankAccount.routingNumber,
-          accountNumber: clientBankAccount.bankAccount.accountNumber,
+          bank: 'bankName',
+          accountHolderName: 
+            clientBankAccount.userClient.userDetails.firstName + ' ' + 
+            clientBankAccount.userClient.userDetails.lastName,
+          accountNumber: clientBankAccount.bankAccount.accountNumber.slice(-lastNumbersBankAccount),
         },
       };
       this.mailsService.sendEmail(msg);
 
-    } 
+    } else if (stateName === 'active') {
+
+      const template = `bankAVerified[${languageMails}]`;
+
+      const subject = mailsSubjets.bank_a_verified[languageMails];
+
+      const msg = {
+        to: clientBankAccount.userClient.email,
+        subject: subject,
+        templateId: this.configService.get<string>(
+          `mails.sendgrid.templates.${template}`,
+        ),
+        dynamic_template_data: {
+          user: clientBankAccount.userClient.userDetails.firstName,
+          bank: 'bankName',
+          accountNumber: clientBankAccount.bankAccount.accountNumber.slice(-lastNumbersBankAccount),
+        },
+      };
+      this.mailsService.sendEmail(msg);
+      
+    } else if (stateName === 'cancelled') {
+
+      const template = `bankADeletion[${languageMails}]`;
+
+      const subject = mailsSubjets.bank_a_deletion[languageMails];
+
+      const msg = {
+        to: clientBankAccount.userClient.email,
+        subject: subject,
+        templateId: this.configService.get<string>(
+          `mails.sendgrid.templates.${template}`,
+        ),
+        dynamic_template_data: {
+          user: clientBankAccount.userClient.userDetails.firstName,
+        },
+      };
+      this.mailsService.sendEmail(msg);
+
+    }
 
     return await getConnection()
       .getRepository(StateBankAccount)

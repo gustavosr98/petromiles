@@ -6,6 +6,7 @@ import { UserModule } from '@/modules/user/user.module';
 import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { ManagementModule } from '@/modules/management/management.module';
 import { PaymentProviderModule } from '@/modules/payment-provider/payment-provider.module';
+import { MailsModule } from '@/modules/mails/mails.module'
 
 // CONTROLLER
 import { BankAccountController } from '@/modules/bank-account/controllers/bank-account.controller';
@@ -30,6 +31,7 @@ import { ClientBankAccount } from '@/entities/client-bank-account.entity';
     ManagementModule,
     TransactionModule,
     UserModule,
+    MailsModule,
   ],
   providers: [BankAccountService, ClientBankAccountService],
   exports: [BankAccountService, ClientBankAccountService],

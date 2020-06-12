@@ -5,6 +5,9 @@ import { getConnection } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
+// CONSTANTS
+import { mailsSubjets } from '@/constants/mailsSubjectConst';
+
 // SERVICES
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 import { ThirdPartyInterestService } from '@/modules/management/services/third-party-interest.service';
@@ -24,9 +27,7 @@ import { PointsConversion } from '@/entities/points-conversion.entity';
 import { Suscription } from '@/enums/suscription.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
-import { MailsSubject, MailsTemplate } from '@/enums/mails.enum';
 import { PlatformInterest } from '@/enums/platform-interest.enum';
-import { Language } from '@/enums/language.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { Interest } from '@/modules/payments/interest.interface';
 
@@ -179,15 +180,11 @@ export class PaymentsService {
       .getRepository(UserClient)
       .findOne({ email: user.email });
 
-    const template =
-      userClient.userDetails.language.name === Language.ENGLISH
-        ? MailsTemplate.INVOICE_EN
-        : MailsTemplate.INVOICE_ES;
+    const languageMails = userClient.userDetails.language.name;
 
-    const subject =
-      userClient.userDetails.language.name === Language.ENGLISH
-        ? MailsSubject.INVOICE_EN
-        : MailsSubject.INVOICE_ES;
+    const template = `invoice[${languageMails}]`;
+
+    const subject = mailsSubjets.invoice[languageMails];
 
     this.mailsService.sendEmail({
       to: userClient.email,
