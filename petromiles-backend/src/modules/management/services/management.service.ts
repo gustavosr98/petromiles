@@ -76,12 +76,12 @@ export class ManagementService {
         .orWhere('ur.fk_user_administrator= :id',{id: id})
         .getOne()
 
-    let userId,stateus,admin
-    if(roleName.name === 'CLIENT'){
+    let userId,stateus
+    if(roleName.isClient()){
        userId = await this.userClientRepository.findOne(id);
        stateus = await this.stateUserRepository.findOne({where: [{userClient: userId.idUserClient, finalDate: null}]});
     }
-    if(roleName.name === 'ADMINISTRATOR'){
+    if(roleName.isAdministrator()){
        stateus = await this.stateUserRepository.findOne({where: [{userClient: adminId, finalDate: null}]});
     }
 
@@ -94,9 +94,9 @@ export class ManagementService {
     const newState = new StateUser();
     newState.initialDate = new Date();
     newState.state = await this.getState(state)
-    if(roleName.name === 'CLIENT'){
+    if(roleName.isClient()){
       newState.userClient = userId;
-    }else if(roleName.name === 'ADMINISTRATOR'){
+    }else if(roleName.isAdministrator()){
       newState.userAdministrator = adminId
     }
 

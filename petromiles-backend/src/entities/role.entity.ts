@@ -1,4 +1,5 @@
 import { UserRole } from './user-role.entity';
+import {Role as Roles} from '@/enums/role.enum'
 import {
   BaseEntity,
   Entity,
@@ -21,4 +22,12 @@ export class Role extends BaseEntity {
     { nullable: true },
   )
   userRole?: UserRole[];
+
+  isClient() {
+    return this.name === Roles.CLIENT;
+  }
+
+  isAdministrator(){
+    return this.name === Roles.ADMINISTRATOR;
+  }
 }
