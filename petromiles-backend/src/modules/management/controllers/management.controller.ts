@@ -107,7 +107,7 @@ export class ManagementController {
   updateUserState(@Param('id') userId: number,
                   @Body() updateUserStateDTO: UpdateUserStateDTO): Promise<StateUser>{
     this.logger.http(
-        `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) asks /${baseEndpoint}/state/${userId}`,
+        `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) changing state /${baseEndpoint}/state/${userId}`,
     );
     return this.managementService.updateUserState(updateUserStateDTO.state, userId);
   }
