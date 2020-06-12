@@ -61,16 +61,11 @@ export class ManagementService {
   }
 
   async updateUserState(state: StateName, id: number): Promise<StateUser>{
-    // await getConnection()
-    //     .createQueryBuilder()
-    //     .update(StateUser)
-    //     .set({finalDate: 'now()'})
-    //     .where(`fk_user_client = :id`, {id: id})
-    //     .execute()
 
     const userId = await this.userClientRepository.findOne(id);
-    const stateus = await this.stateUserRepository.findOne(userId.idUserClient);
-    console.log(stateus.userClient);
+    const stateus = await this.stateUserRepository.findOne({where: [{userClient: userId.idUserClient}]});
+
+    await this.updateLastState(stateus);
 
     const newState = new StateUser();
     newState.initialDate = new Date();
@@ -79,5 +74,12 @@ export class ManagementService {
     return await getConnection()
         .getRepository(StateUser)
         .save(newState);
+  }
+
+  async updateLastState(state: StateUser): Promise<StateUser>{
+    state.finalDate = new Date();
+    return await getConnection()
+        .getRepository(StateUser)
+        .save(state)
   }
 }
