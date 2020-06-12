@@ -19,6 +19,8 @@ import {UserClient} from "@/entities/user-client.entity";
 
 // CONTROLLER
 import { ManagementController } from './controllers/management.controller';
+import {UserAdministrator} from "@/entities/user-administrator.entity";
+import {UserRole} from "@/entities/user-role.entity";
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { ManagementController } from './controllers/management.controller';
       Language,
       StateUser,
       UserClient,
+      UserAdministrator,
+      UserRole,
     ]),
   ],
   providers: [

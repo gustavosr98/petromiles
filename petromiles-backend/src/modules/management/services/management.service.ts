@@ -1,7 +1,7 @@
 import {BadRequestException, Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository, getConnection } from 'typeorm';
+import {Repository, getConnection, getManager} from 'typeorm';
 
 // ENTITIES
 import { Language } from '@/entities/language.entity';
@@ -10,11 +10,14 @@ import { Role } from '@/entities/role.entity';
 import {StateUser} from "@/entities/state-user.entity";
 import {UserClient} from "@/entities/user-client.entity";
 import { Suscription } from '../../../entities/suscription.entity';
+import {UserAdministrator} from "@/entities/user-administrator.entity";
+import {UserRole} from "@/entities/user-role.entity";
 
 // INTERFACES
 import { StateName } from '@/enums/state.enum';
 import { Role as RoleEnum } from '@/enums/role.enum';
 import { UpdateSubscriptionDTO } from '../../suscription/dto/update-subscription.dto';
+
 
 
 @Injectable()
@@ -30,6 +33,10 @@ export class ManagementService {
     private userClientRepository: Repository<UserClient>,
     @InjectRepository(StateUser)
     private stateUserRepository: Repository<StateUser>,
+    @InjectRepository(UserAdministrator)
+    private userAdministratorRepository: Repository<UserAdministrator>,
+    @InjectRepository(UserRole)
+    private userRoleRepository: Repository<UserRole>,
   ) {}
 
   async getLanguages(): Promise<Language[]> {
@@ -60,20 +67,39 @@ export class ManagementService {
       .execute();
   }
 
-  async updateUserState(state: StateName, id: number): Promise<StateUser>{
+  async updateUserState(state: StateName, id: number, adminId: UserAdministrator): Promise<StateUser>{
 
-    const userId = await this.userClientRepository.findOne(id);
-    if (userId.idUserClient === null){
-      throw new BadRequestException('Cannot change the state to an administrator');
+    const roleName = await this.roleRepository
+        .createQueryBuilder('role')
+        .innerJoin('user_role', 'ur','ur.fk_role= role."idRole"')
+        .where('ur.fk_user_client= :id', {id: id})
+        .orWhere('ur.fk_user_administrator= :id',{id: id})
+        .getOne()
+
+    let userId,stateus,admin
+    if(roleName.name === 'CLIENT'){
+       userId = await this.userClientRepository.findOne(id);
+       stateus = await this.stateUserRepository.findOne({where: [{userClient: userId.idUserClient, finalDate: null}]});
     }
-    const stateus = await this.stateUserRepository.findOne({where: [{userClient: userId.idUserClient, finalDate: null}]});
+    if(roleName.name === 'ADMINISTRATOR'){
+       stateus = await this.stateUserRepository.findOne({where: [{userClient: adminId, finalDate: null}]});
+    }
+
+    if (stateus.userAdministrator === adminId){
+      throw new BadRequestException('Cannot change your state');
+    }
 
     await this.updateLastState(stateus);
 
     const newState = new StateUser();
     newState.initialDate = new Date();
     newState.state = await this.getState(state)
-    newState.userClient = userId;
+    if(roleName.name === 'CLIENT'){
+      newState.userClient = userId;
+    }else if(roleName.name === 'ADMINISTRATOR'){
+      newState.userAdministrator = adminId
+    }
+
     return await getConnection()
         .getRepository(StateUser)
         .save(newState);

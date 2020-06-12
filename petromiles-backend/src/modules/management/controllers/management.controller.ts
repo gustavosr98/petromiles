@@ -4,14 +4,15 @@ import {
   Put,
   Body,
   Param,
-    Post,
+  Post,
   ClassSerializerInterceptor,
   UseInterceptors,
-  ValidationPipe, Inject,
+  ValidationPipe, Inject, UseGuards,
 } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-
+import {GetUser} from "@/modules/auth/decorators/get-user.decorator";
+import { AuthGuard } from '@nestjs/passport';
 
 // SERVICES
 import { ManagementService } from '@/modules/management/services/management.service';
@@ -32,7 +33,9 @@ import {State} from "@/entities/state.entity";
 import {ApiModules} from "@/logger/api-modules.enum";
 import {HttpRequest} from "@/logger/http-requests.enum";
 import {StateUser} from "@/entities/state-user.entity";
+
 const baseEndpoint = 'management';
+@UseGuards(AuthGuard('jwt'))
 @Controller(baseEndpoint)
 @UseInterceptors(ClassSerializerInterceptor)
 export class ManagementController {
@@ -105,10 +108,11 @@ export class ManagementController {
 
   @Post('state/:id')
   updateUserState(@Param('id') userId: number,
-                  @Body() updateUserStateDTO: UpdateUserStateDTO): Promise<StateUser>{
+                  @Body() updateUserStateDTO: UpdateUserStateDTO,
+                  @GetUser() user): Promise<StateUser>{
     this.logger.http(
-        `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) changing state /${baseEndpoint}/state/${userId}`,
+        `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) ${user?.email} changing state /${baseEndpoint}/state/${userId}`,
     );
-    return this.managementService.updateUserState(updateUserStateDTO.state, userId);
+    return this.managementService.updateUserState(updateUserStateDTO.state, userId, user.id);
   }
 }
