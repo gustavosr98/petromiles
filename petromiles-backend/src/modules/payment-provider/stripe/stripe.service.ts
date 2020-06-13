@@ -72,7 +72,7 @@ export class StripeService {
     bankAccountId: string;
     amounts: number[];
   }) {
-    if (process.env.NODE_ENV === 'development') amounts = [32, 45];
+    if (process.env.PETROMILES_ENV === 'development') amounts = [32, 45];
     const verification = await this.stripe.customers.verifySource(
       customerId,
       bankAccountId,
