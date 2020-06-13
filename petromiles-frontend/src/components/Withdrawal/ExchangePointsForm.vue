@@ -6,21 +6,12 @@
         <v-row justify="center" align="center">
           <!-- Phrase -->
           <v-col cols="12">
-            <h3 class="text-center">
-              {{ $t("exchange-points-form.letsEarnDollars") }}
-            </h3>
+            <h3 class="text-center">{{ $t("exchange-points-form.letsEarnDollars") }}</h3>
           </v-col>
 
           <!-- Image -->
 
-          <v-col
-            xs="10"
-            sm="10"
-            md="4"
-            justify="center"
-            align="center"
-            class="pt-lg-12"
-          >
+          <v-col xs="10" sm="10" md="4" justify="center" align="center" class="pt-lg-12">
             <v-img :src="makeItRainImage" alt="Change points for money" />
           </v-col>
 
@@ -34,9 +25,8 @@
                       :value="totalPointsRest"
                       :label="$t('payments.totalPoints')"
                       append-icon="account_balance_wallet"
-                      :disabled="true"
-                      return-masked-value
-                      mask="###.###.###-##"
+                      :readonly="true"
+                      @change="$v.totalPointsRest.$touch()"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -75,8 +65,8 @@
                       :items="bankAccounts"
                       item-text="last4"
                       item-value="idClientBankAccount"
-                      @change="$v.points.$touch()"
-                      @blur="$v.points.$touch()"
+                      @change="$v.selectedBankAccount.$touch()"
+                      @blur="$v.selectedBankAccount.$touch()"
                       :error-messages="selectedBankAccountErrors"
                       :loading="loadingBankAccounts"
                       :disabled="loadingBankAccounts || loading"
@@ -90,8 +80,7 @@
                       class="primary"
                       :loading="loading"
                       dark
-                      >{{ $t("buy-points-form.getPoints") }}</v-btn
-                    >
+                    >{{ $t("buy-points-form.getPoints") }}</v-btn>
                   </v-col>
                 </v-row>
               </v-form>
@@ -103,17 +92,11 @@
         <v-row justify="center">
           <v-dialog v-model="dialog" persistent max-width="50%">
             <v-card>
-              <v-card-title class="headline">
-                {{ $t("exchange-points-form.successfulWithdrawal") }}
-              </v-card-title>
-              <v-card-text>
-                {{ $t("exchange-points-form.withdrawalToValidate") }}
-              </v-card-text>
+              <v-card-title class="headline">{{ $t("exchange-points-form.successfulWithdrawal") }}</v-card-title>
+              <v-card-text>{{ $t("exchange-points-form.withdrawalToValidate") }}</v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">
-                  {{ $t("common.ok") }}
-                </v-btn>
+                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">{{ $t("common.ok") }}</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -123,17 +106,15 @@
         <v-row justify="center">
           <v-dialog v-model="areYouSureDialog" persistent max-width="50%">
             <v-card>
-              <v-card-title class="headline">
-                {{ $t("common.areYouSure") }}
-              </v-card-title>
+              <v-card-title class="headline">{{ $t("common.areYouSure") }}</v-card-title>
               <v-card-actions>
                 <v-spacer />
-                <v-btn color="error" dark @click="areYouSureDialog = false">
-                  {{ $t("common.cancel") }}
-                </v-btn>
-                <v-btn color="success" dark @click="exchangePoints">
-                  {{ $t("common.yes") }}
-                </v-btn>
+                <v-btn
+                  color="error"
+                  dark
+                  @click="areYouSureDialog = false"
+                >{{ $t("common.cancel") }}</v-btn>
+                <v-btn color="success" dark @click="exchangePoints">{{ $t("common.yes") }}</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -191,7 +172,7 @@ export default {
     },
     totalPointsRest() {
       if (this.points) return this.totalPoints - this.points;
-      return this.totalPoints;
+      else return this.totalPoints;
     },
   },
   async mounted() {
@@ -224,7 +205,9 @@ export default {
         });
     },
     async loadPoints() {
-      this.totalPoints = await this.$http.get("/user/points/conversion").points;
+      this.totalPoints = (
+        await this.$http.get("/user/points/conversion")
+      ).points;
     },
     async loadRate() {
       this.onePointToDollars = (
