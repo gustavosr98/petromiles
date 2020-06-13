@@ -50,7 +50,10 @@ export class PaymentsService {
     return mostRecentRate;
   }
 
-  async getInterests(trasactionType: TransactionType): Promise<Interest[]> {
+  async getInterests(
+    trasactionType: TransactionType,
+    platformInterestType,
+  ): Promise<Interest[]> {
     let interests: Interest[] = [];
     const thirdPartyInterest = await this.thirdPartyInterestService.get(
       PaymentProvider.STRIPE,
@@ -63,7 +66,7 @@ export class PaymentsService {
     });
 
     const platformInterest = await this.platformInterestService.getInterestByName(
-      PlatformInterest.BUY,
+      platformInterestType,
     );
     interests.push({
       operation: 1,

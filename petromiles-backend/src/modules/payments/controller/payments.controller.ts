@@ -84,15 +84,19 @@ export class PaymentsController {
     return onePointToDollars;
   }
 
-  @Get('interests/:transactionType')
+  @Get('interests/:transactionType/:platformInterestType')
   async getInterest(
     @GetUser() user,
     @Param('transactionType') transactionType: TransactionType,
+    @Param('platformInterestType') platformInterestType,
   ): Promise<Interest[]> {
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/interests/${transactionType}`,
     );
-    const interests = await this.paymentsService.getInterests(transactionType);
+    const interests = await this.paymentsService.getInterests(
+      transactionType,
+      platformInterestType,
+    );
     return interests;
   }
 

@@ -223,7 +223,7 @@ export default {
       ).onePointEqualsDollars;
     },
     async loadInterests() {
-      this.interests = await this.$http.get("/payments/interests/deposit");
+      this.interests = await this.$http.get("/payments/interests/deposit/buy");
     },
     async loadBankAccounts() {
       const bankAccounts = await this.$http.get("/bank-account");

@@ -25,7 +25,7 @@
                       :value="totalPointsRest"
                       :label="$t('payments.totalPoints')"
                       append-icon="account_balance_wallet"
-                      :readonly="true"
+                      :disabled="true"
                       @change="$v.totalPointsRest.$touch()"
                     ></v-text-field>
                   </v-col>
@@ -165,7 +165,7 @@ export default {
         let result = parseFloat(this.rawCost);
         this.interests.map(i => {
           result =
-            result + parseFloat(this.rawCost) * i.percentage + i.amount / 100;
+            result - (parseFloat(this.rawCost) * i.percentage + i.amount / 100);
         });
         return result.toFixed(2);
       } else return "0.00";
@@ -213,9 +213,13 @@ export default {
       this.onePointToDollars = (
         await this.$http.get("/payments/one-point-to-dollars")
       ).onePointEqualsDollars;
+      console.log(this.onePointToDollars);
     },
     async loadInterests() {
-      this.interests = await this.$http.get("/payments/interests/withdrawal");
+      this.interests = await this.$http.get(
+        "/payments/interests/withdrawal/Withdrawal"
+      );
+      console.log(this.interests);
     },
     async loadBankAccounts() {
       const bankAccounts = await this.$http.get("/bank-account");
