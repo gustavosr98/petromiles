@@ -6,14 +6,15 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { InjectRepository } from '@nestjs/typeorm';
 
+// CONSTANTS
+import { mailsSubjets } from '@/constants/mailsSubjectConst';
+
 // INTERFACES
 import { Suscription as SuscriptionType } from '@/enums/suscription.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { StateName } from '@/enums/state.enum';
 import { PlatformInterest } from '@/enums/platform-interest.enum';
 import { TransactionType } from '@/enums/transaction.enum';
-import { Language } from '@/enums/language.enum';
-import { MailsTemplate, MailsSubject } from '@/enums/mails.enum';
 
 // ENTITIES
 import { UserClient } from '@/entities/user-client.entity';
@@ -177,19 +178,15 @@ export class SuscriptionService {
       PlatformInterest.GOLD_EXTRA,
     );
 
+    const languageMails = userClient.userDetails.language.name;
+
     const extraPoints =
       parseFloat(platformInterestService.amount) /
       (100 * pointsConversion.onePointEqualsDollars);
 
-    const template =
-      userClient.userDetails.language.name === Language.ENGLISH
-        ? MailsTemplate.UPGRADE_TO_GOLD_EN
-        : MailsTemplate.UPGRADE_TO_GOLD_ES;
+    const template = `upgradeToGold[${languageMails}]`;
 
-    const subject =
-      userClient.userDetails.language.name === Language.ENGLISH
-        ? MailsSubject.UPGRADE_TO_GOLD_EN
-        : MailsSubject.UPGRADE_TO_GOLD_ES;
+    const subject = mailsSubjets.upgrade_to_gold[languageMails];
 
     const msg = {
       to: userClient.email,
