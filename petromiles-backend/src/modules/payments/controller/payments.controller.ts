@@ -63,7 +63,7 @@ export class PaymentsController {
     @GetUser() user,
     @Body(ValidationPipe) paymentProperties: CreatePaymentDTO,
   ) {
-    const { idClientBankAccount, amount } = paymentProperties;
+    const { idClientBankAccount, amount, amountToCharge } = paymentProperties;
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/withdraw-points`,
     );
@@ -72,6 +72,7 @@ export class PaymentsController {
       user,
       idClientBankAccount,
       amount,
+      amountToCharge,
     );
   }
 

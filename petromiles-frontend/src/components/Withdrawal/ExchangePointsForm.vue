@@ -195,6 +195,7 @@ export default {
         .post("/payments/withdraw-points", {
           idClientBankAccount: this.selectedBankAccount,
           amount: (this.rawCost * 100).toFixed(2),
+          amountToCharge: this.costWithInterests * 100,
         })
         .then(res => {
           this.transaction = res;

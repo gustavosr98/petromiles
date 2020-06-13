@@ -127,6 +127,7 @@ export class PaymentsService {
     user,
     idClientBankAccount,
     amount,
+    amountToCharge,
   ): Promise<Transaction> {
     const { id, email } = user;
     const clientBankAccount = await this.clientBankAccountService.getOne(
@@ -135,9 +136,18 @@ export class PaymentsService {
     );
 
     if (await this.verifyEnoughPoints(email, amount)) {
+      const transfer = await this.paymentProviderService.createTransfer({
+        destination: clientBankAccount.userClient.userDetails.accountId,
+        source: clientBankAccount.transferId,
+        currency: 'usd',
+        amount: amountToCharge,
+        source_type: 'bank_account',
+      });
+
       return this.transactionService.createWithdrawalTransaction(
         clientBankAccount,
         amount,
+        transfer.id,
       );
     }
 

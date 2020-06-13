@@ -324,6 +324,8 @@ export class TransactionService {
   async createWithdrawalTransaction(
     clientBankAccount: ClientBankAccount,
     amount: number,
+    paymentProviderTransactionId: string,
+
   ): Promise<Transaction> {
     const options = await this.getTransactionInterests({
       platformInterestType: PlatformInterest.WITHDRAWAL,
@@ -343,6 +345,7 @@ export class TransactionService {
       platformInterest: options.interest,
       stateTransactionDescription: StateDescription.WITHDRAWAL,
       operation: -1,
+      paymentProviderTransactionId,
     });
   }
 }
