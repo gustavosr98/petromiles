@@ -1,23 +1,23 @@
 <template>
-  <v-card class="mx-auto my-9 pb-6" max-width="550" tile>
+  <v-card>
     <v-subheader>
-      <div class="title">
-        <span class="font-weight-bold">{{ $tc("transaction.transaction")}}</span>
+      <div class="title my-2 mx-2">
+        <span class="font-weight-bold">{{ $tc("transaction.transaction",0)}}</span>
         #{{ transaction.id }}
       </div>
     </v-subheader>
 
     <v-divider></v-divider>
 
-    <v-list-item>
-      <v-col cols="12" md="5" class="pl-0">
+    <v-list-item class="pb-0">
+      <v-col cols="12" md="5" class="pl-3">
         <span class="font-weight-medium">{{ $t("common.date") }}:</span>
         <span class="ml-2 font-weight-light">{{ transaction.date }}</span>
       </v-col>
     </v-list-item>
 
-    <v-row>
-      <v-col cols="12" justify="center" class="ml-1">
+    <v-row class="mx-0 pt-0">
+      <v-col cols="12" class="pt-0" justify="center">
         <v-list-item three-line>
           <v-list-item-content>
             <v-list-item-title>
@@ -53,24 +53,24 @@
               text-color="white"
               label
               @click.stop="dialog = true"
-            >{{ transaction.equivalent / 100 }}</v-chip>
+            >{{ $t("common.see") }}</v-chip>
           </td>
         </tr>
         <!-- For all type of transactions -->
 
         <tr class="text-center">
           <td class="font-weight-bold">{{ $tc("common.amount", 0) }}</td>
-          <td>{{ amount }} $</td>
+          <td>{{ transaction.amount }} $</td>
         </tr>
 
         <tr class="text-center">
           <td class="font-weight-bold">{{ $t("invoice.taxes") }}</td>
-          <td>{{ transaction.interest / 100 }} $</td>
+          <td>{{ transaction.interest }} $</td>
         </tr>
 
         <tr class="text-center total-item">
-          <td class="font-weight-bold">Total</td>
-          <td>{{ total }} $</td>
+          <td class="font-weight-bold">{{ $t("common.total") }}</td>
+          <td>{{ transaction.total }} $</td>
         </tr>
       </tbody>
     </v-simple-table>
@@ -78,23 +78,39 @@
     <!-- Modal for points conversion -->
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
-        <v-card-title class="headline">
-          {{
-          $tc("transaction.pointsConversion")
-          }}
-        </v-card-title>
+        <v-card-title class="headline">{{ $t("common.yourPoints") }}</v-card-title>
         <v-divider></v-divider>
-        <v-card-text class="mt-2" align="center">
+        <v-card-text class="mt-2 px-8">
           <v-alert dense text color="primary" v-if="paymentTransaction">
             1 USD =
-            {{ transaction.conversion }} {{ $t("payments.points") }}
+            {{ transaction.pointsConversion }} {{ $t("payments.points") }}
             <br />
-            <strong>
-              {{ transaction.amount / 100 }} USD =
-              {{ transaction.equivalent / 100 }}
-              {{ $t("payments.points") }}
-              <br />
-            </strong>
+
+            <v-row>
+              <v-col>
+                <div class="d-flex justify-end align-center">
+                  <p class="mb-1 mr-4 font-weight-bold">{{ $t("payments.points") }}</p>
+                </div>
+                <div class="d-flex justify-space-between align-center">
+                  <p class="mb-1">{{typeLabel}}</p>
+                  <p class="mr-4 mb-1">{{ transaction.pointsEquivalent}}</p>
+                </div>
+                <div
+                  class="d-flex justify-space-between align-center"
+                  v-if="transaction.type == transactionsType.DEPOSIT"
+                >
+                  <p class="mb-1">{{ $t("transaction.subscriptionExtra") }}</p>
+                  <p class="mr-4 mb-1">{{ transaction.extra}}</p>
+                </div>
+                <v-divider></v-divider>
+                <div class="d-flex justify-space-between align-center mt-2">
+                  <p class="mb-1 font-weight-bold">{{ $t("common.total") }}</p>
+                  <p
+                    class="mr-4 mb-1 font-weight-bold"
+                  >{{ transaction.extra + transaction.pointsEquivalent}}</p>
+                </div>
+              </v-col>
+            </v-row>
           </v-alert>
         </v-card-text>
       </v-card>
@@ -105,43 +121,43 @@
 import Transactions from "@/constants/transaction.js";
 export default {
   props: {
-    idTransaction: { type: String, required: true },
+    idTransaction: { type: Number, required: true },
   },
   data() {
     return {
       transaction: {},
       dialog: false,
+      transactionsType: Transactions,
     };
   },
   async mounted() {
     this.transaction = await this.$http.get(
-      `/transaction/${parseInt(this.idTransaction)}`
+      `/transaction/${this.idTransaction}`
     );
   },
   computed: {
-    amount: function() {
-      if (this.transaction.type == Transactions.BANK_ACCOUNT_VERIFICATION)
-        return this.transaction.amount;
-      return this.transaction.amount / 100;
-    },
-    total: function() {
-      if (this.transaction.type == Transactions.BANK_ACCOUNT_VERIFICATION)
-        return this.transaction.amount;
-      return (
-        this.transaction.amount / 100 +
-        this.transaction.interest / 100
-      ).toFixed(3);
-    },
     type: function() {
       if (this.transaction.type) {
         return this.$tc(`transaction-type.${this.transaction.type}`);
       }
       return "";
     },
+
+    typeLabel: function() {
+      const label =
+        this.transaction.type === Transactions.DEPOSIT
+          ? this.$tc("transaction.yourPurchase")
+          : this.$tc("transaction.yourWithdrawal");
+      return label;
+    },
+
     paymentTransaction: function() {
-      if (this.transaction.type !== Transactions.BANK_ACCOUNT_VERIFICATION)
-        return true;
-      return false;
+      if (
+        this.transaction.type === Transactions.BANK_ACCOUNT_VERIFICATION ||
+        this.transaction.type === Transactions.SUBSCRIPTION_PAYMENT
+      )
+        return false;
+      return true;
     },
   },
 };

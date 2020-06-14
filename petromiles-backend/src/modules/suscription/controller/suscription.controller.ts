@@ -22,7 +22,7 @@ import { HttpRequest } from '@/logger/http-requests.enum';
 
 // SERVICES
 import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
-import {Suscription} from "@/entities/suscription.entity";
+import { Suscription } from '@/entities/suscription.entity';
 
 const baseEndpoint = 'suscription';
 @UseGuards(AuthGuard('jwt'))
@@ -35,21 +35,21 @@ export class SuscriptionController {
 
   @Roles()
   @UseGuards(RolesGuard)
-  @Post('premium')
+  @Post('upgrade-to-premium')
   async upgradeToPremiumSuscription(
     @GetUser() user,
     @Body('idBankAccount', ParseIntPipe) idBankAccount,
   ) {
     this.logger.http(
-      `[${ApiModules.SUSCRIPTION}] (${HttpRequest.POST})  ${user?.email} asks /${baseEndpoint}`,
+      `[${ApiModules.SUSCRIPTION}] (${HttpRequest.POST})  ${user?.email} asks /${baseEndpoint}/upgrade-to-premium`,
     );
     await this.suscriptionService.upgradeToPremium(user.email, idBankAccount);
   }
 
   @Get('actual')
-  getActualSuscription(@GetUser() user): Promise<Suscription>{
+  getActualSuscription(@GetUser() user): Promise<Suscription> {
     this.logger.http(
-        `[${ApiModules.SUSCRIPTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/actual`,
+      `[${ApiModules.SUSCRIPTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/actual`,
     );
     return this.suscriptionService.getActualSubscription(user.email);
   }

@@ -6,9 +6,11 @@ import * as bcrypt from 'bcrypt';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
+// CONSTANTS
+import { mailsSubjets } from '@/constants/mailsSubjectConst';
+
 // INTERFACES
 import { Role } from '@/enums/role.enum';
-import { MailsSubject } from '@/enums/mails.enum';
 import { Suscription } from '@/enums/suscription.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { CreateUserDTO } from '@/modules/user/dto/create-user.dto';
@@ -102,7 +104,7 @@ export class AuthService {
   private async createWelcomeEmail(email, name) {
     const message = {
       to: email,
-      subject: MailsSubject.WELCOME,
+      subject: mailsSubjets.welcome,
       templateId: this.configService.get('mails.sendgrid.templates.welcome'),
       dynamic_template_data: { user: name },
     };

@@ -4,10 +4,15 @@ import {
   Put,
   Body,
   Param,
+  Post,
   ClassSerializerInterceptor,
   UseInterceptors,
-  ValidationPipe,
+  ValidationPipe, Inject, UseGuards,
 } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+import {GetUser} from "@/modules/auth/decorators/get-user.decorator";
+import { AuthGuard } from '@nestjs/passport';
 
 // SERVICES
 import { ManagementService } from '@/modules/management/services/management.service';
@@ -20,11 +25,18 @@ import { ThirdPartyInterestService } from '@/modules/management/services/third-p
 import { UpdateSubscriptionDTO } from '@/modules/suscription/dto/update-subscription.dto';
 import { CreatePlatformInterestDTO } from '@/modules/management/dto/create-platform-interest.dto';
 import { CreateThirdPartyInterestDTO } from '@/modules/management/dto/create-third-party-interest.dto';
+import {UpdateUserStateDTO} from "@/modules/management/dto/update-user-state.dto";
 
 // ENTITIES
 import { ThirdPartyInterest } from '@/entities/third-party-interest.entity';
+import {State} from "@/entities/state.entity";
+import {ApiModules} from "@/logger/api-modules.enum";
+import {HttpRequest} from "@/logger/http-requests.enum";
+import {StateUser} from "@/entities/state-user.entity";
 
-@Controller('management')
+const baseEndpoint = 'management';
+@UseGuards(AuthGuard('jwt'))
+@Controller(baseEndpoint)
 @UseInterceptors(ClassSerializerInterceptor)
 export class ManagementController {
   constructor(
@@ -32,6 +44,7 @@ export class ManagementController {
     private platformInterestService: PlatformInterestService,
     private pointsConversionService: PointsConversionService,
     private thirdPartyInterestService: ThirdPartyInterestService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   @Get('languages')
@@ -60,7 +73,7 @@ export class ManagementController {
     );
   }
 
-  @Put('platform-interest/:id')
+  @Post('platform-interest/:id')
   updatePlatformInterest(
     @Param('id') idPlatformInterest: number,
     @Body(ValidationPipe) createPlatformInterest: CreatePlatformInterestDTO,
@@ -91,5 +104,15 @@ export class ManagementController {
       idthirdPartyInterest,
       createThirdPartyInterestDTO,
     );
+  }
+
+  @Post('state/:id')
+  updateUserState(@Param('id') userId: number,
+                  @Body() updateUserStateDTO: UpdateUserStateDTO,
+                  @GetUser() user): Promise<StateUser>{
+    this.logger.http(
+        `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) ${user?.email} changing state /${baseEndpoint}/state/${userId}`,
+    );
+    return this.managementService.updateUserState(updateUserStateDTO.role, updateUserStateDTO.state, userId, user.id);
   }
 }

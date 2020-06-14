@@ -105,7 +105,7 @@ export class CronService {
   async transactionChargeStatusStripe() {
     const unverifiedTransactions = await this.transactionService.getAllFiltered(
       [StateName.VERIFYING],
-      [TransactionType.DEPOSIT],
+      [TransactionType.DEPOSIT, TransactionType.SUSCRIPTION_PAYMENT],
       [PaymentProvider.STRIPE],
     );
     this.logger.info(
@@ -124,7 +124,7 @@ export class CronService {
 
         this.suscriptionService.upgradeSubscriptionIfIsPossible(
           unverifiedTransaction.idUserClient,
-          unverifiedTransaction.type,
+          unverifiedTransaction,
         );
       } else if (charge.status === StripeChargeStatus.FAILED) {
         await this.stateTransactionService.update(

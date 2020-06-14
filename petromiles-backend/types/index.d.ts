@@ -64,16 +64,17 @@ declare namespace App {
       thirdPartyInterestType: import('../src/enums/payment-provider.enum').PaymentProvider;
     }
 
-    interface TransactionInformation {
+    interface TransactionDetails {
       id: number;
       date: string;
       type: import('../src/enums/transaction.enum').TransactionType;
       bankAccount: string;
-      equivalent: number;
-      conversion: number;
       state: string;
       amount: number;
       interest: number;
+      pointsEquivalent?: number;
+      pointsConversion: number;
+      total: number;
     }
   }
 }

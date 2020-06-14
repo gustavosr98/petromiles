@@ -87,4 +87,104 @@ export class Transaction extends BaseEntity {
   )
   @JoinColumn({ name: 'fk_client_bank_account' })
   clientBankAccount: ClientBankAccount;
+
+  calculateDetails(): App.Transaction.TransactionDetails {
+    const state = this.stateTransaction.find(state => !state.finalDate).state
+      .name;
+    let details;
+
+    if (this.type == TransactionType.BANK_ACCOUNT_VALIDATION)
+      details = this.calculateVerificationDetails();
+    if (this.type == TransactionType.SUSCRIPTION_PAYMENT)
+      details = this.calculateSubscriptionDetails();
+    if (this.type == TransactionType.DEPOSIT)
+      details = this.calculateDepositDetails();
+    if (this.type == TransactionType.WITHDRAWAL)
+      details = this.calculateWithdrawalDetails();
+
+    return {
+      id: this.idTransaction,
+      date: this.initialDate.toLocaleDateString(),
+      type: this.type,
+      bankAccount: this.clientBankAccount.bankAccount.accountNumber.substr(-4),
+      pointsConversion: 1 / this.pointsConversion.onePointEqualsDollars,
+      ...details,
+      state,
+    };
+  }
+
+  private calculateVerificationDetails() {
+    const verificationInterest =
+      parseFloat(this.transactionInterest[0].platformInterest.amount) / 100;
+
+    return {
+      amount: verificationInterest,
+      interest: 0,
+      total: verificationInterest,
+    };
+  }
+
+  private calculateSubscriptionDetails() {
+    const subscriptionCost = this.totalAmountWithInterest / 100;
+    const thirdPartyInterest =
+      this.transactionInterest[0].thirdPartyInterest.amountDollarCents / 100;
+    return {
+      amount: subscriptionCost - thirdPartyInterest,
+      interest: thirdPartyInterest,
+      total: subscriptionCost,
+    };
+  }
+
+  private calculateDepositDetails() {
+    const amount = parseFloat((this.rawAmount / 100).toFixed(2));
+    const details = {
+      amount,
+      pointsEquivalent: Math.round(
+        amount / this.pointsConversion.onePointEqualsDollars,
+      ),
+      interest:
+        Math.round(
+          parseFloat((this.totalAmountWithInterest / 100).toFixed(2)) * 100,
+        ) / 100,
+      extra: 0,
+    };
+
+    const extraPoints = this.transactionInterest[0].platformInterestExtraPoints;
+
+    // If user has premium or gold subscription
+    if (extraPoints) {
+      // Amount purchased by the client
+      let rawAmount = extraPoints.amount
+        ? amount - parseFloat(extraPoints.amount) / 100
+        : amount;
+
+      rawAmount = rawAmount / (1 + parseFloat(extraPoints.percentage));
+
+      details.amount = Math.round(rawAmount * 100) / 100;
+
+      details.extra = Math.round(
+        (amount - rawAmount) / this.pointsConversion.onePointEqualsDollars,
+      );
+
+      details.pointsEquivalent = Math.round(
+        details.amount / this.pointsConversion.onePointEqualsDollars,
+      );
+    }
+
+    const total = Math.round((details.amount + details.interest) * 100) / 100;
+
+    return { ...details, total };
+  }
+
+  private calculateWithdrawalDetails() {
+    const amount = parseFloat((this.rawAmount / 100).toFixed(2));
+    const interest = parseFloat(
+      (this.totalAmountWithInterest / 100).toFixed(2),
+    );
+    const total = Math.round((amount + interest) * 100) / 100;
+    const pointsEquivalent = Math.round(
+      amount / this.pointsConversion.onePointEqualsDollars,
+    );
+    return { amount, interest, total, pointsEquivalent };
+  }
 }

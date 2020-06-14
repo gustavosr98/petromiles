@@ -38,14 +38,6 @@ export class TransactionService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  // ANY TYPE OF TRANSACTION
-  async get(idTransaction: number): Promise<Transaction> {
-    const transaction = await this.transactionRepository.findOne({
-      idTransaction,
-    });
-    return transaction;
-  }
-
   async getAllFiltered(
     stateNames: StateName[],
     transactionsTypes: TransactionType[],
@@ -108,59 +100,38 @@ export class TransactionService {
     };
   }
 
-  async getTransactions(email: string) {
+  async getTransactions(
+    email: string,
+  ): Promise<App.Transaction.TransactionDetails[]> {
     const transactions = await this.transactionRepository.find({
       where: `userClient.email = '${email}' AND stateTransaction.finalDate is null AND trans.transaction is null`,
       join: {
         alias: 'trans',
-        innerJoinAndSelect: {
+        leftJoinAndSelect: {
           clientBankAccount: 'trans.clientBankAccount',
+          bankAccount: 'clientBankAccount.bankAccount',
           stateTransaction: 'trans.stateTransaction',
           state: 'stateTransaction.state',
           transactionInterest: 'trans.transactionInterest',
+          thirdPartyInterest: 'transactionInterest.thirdPartyInterest',
           platformInterest: 'transactionInterest.platformInterest',
+          platformInterestExtraPoints:
+            'transactionInterest.platformInterestExtraPoints',
           userClient: 'clientBankAccount.userClient',
         },
       },
     });
 
-    return transactions;
+    return transactions.map(transaction => {
+      return transaction.calculateDetails();
+    });
   }
 
-  async getTransaction(
-    idTransaction,
-  ): Promise<App.Transaction.TransactionInformation> {
+  async get(
+    idTransaction: number,
+  ): Promise<App.Transaction.TransactionDetails> {
     const transaction = await this.transactionRepository.findOne(idTransaction);
-    return this.transformTransactionInformation(transaction);
-  }
-
-  private transformTransactionInformation(
-    transaction: Transaction,
-  ): App.Transaction.TransactionInformation {
-    const state = transaction.stateTransaction.find(state => !state.finalDate)
-      .state.name;
-
-    const amount =
-      transaction.rawAmount == 0
-        ? parseFloat(
-            transaction.transactionInterest[0].platformInterest.amount,
-          ) / 100
-        : transaction.rawAmount;
-    const interest =
-      transaction.rawAmount == 0 ? 0 : transaction.totalAmountWithInterest;
-    return {
-      id: transaction.idTransaction,
-      date: transaction.initialDate.toLocaleDateString(),
-      type: transaction.type,
-      bankAccount: transaction.clientBankAccount.bankAccount.accountNumber.substr(
-        -4,
-      ),
-      equivalent: amount / transaction.pointsConversion.onePointEqualsDollars,
-      conversion: 1 / transaction.pointsConversion.onePointEqualsDollars,
-      state,
-      amount,
-      interest,
-    };
+    return transaction.calculateDetails();
   }
 
   async createTransaction(
@@ -262,6 +233,7 @@ export class TransactionService {
   async createUpgradeSuscriptionTransaction(
     clientBankAccount: ClientBankAccount,
     suscription: Suscription,
+    paymentProviderTransactionId: string,
   ): Promise<Transaction> {
     const options = await this.getTransactionInterests({
       platformInterestType: PlatformInterest.PREMIUM_EXTRA,
@@ -280,6 +252,7 @@ export class TransactionService {
         thirdPartyInterest: options.thirdPartyInterest,
         platformInterest: options.interest,
         stateTransactionDescription: StateDescription.SUSCRIPTION_UPGRADE,
+        paymentProviderTransactionId,
       },
       StateName.VERIFYING,
     );

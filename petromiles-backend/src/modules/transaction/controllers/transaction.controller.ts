@@ -44,10 +44,10 @@ export class TransactionController {
   getTransaction(
     @Param('idTransaction') idTransaction,
     @GetUser() user,
-  ): Promise<App.Transaction.TransactionInformation> {
+  ): Promise<App.Transaction.TransactionDetails> {
     this.logger.http(
       `[${ApiModules.TRANSACTION}] (${HttpRequest.GET})  ${user?.email} asks /${baseEndpoint}/${idTransaction}`,
     );
-    return this.transactionService.getTransaction(idTransaction);
+    return this.transactionService.get(idTransaction);
   }
 }
