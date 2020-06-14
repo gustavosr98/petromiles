@@ -16,6 +16,9 @@ export default {
     totalPointsRest: {
       numeric,
     },
+    costWithInterests: {
+      minValue: minValue(0),
+    },
   },
   computed: {
     // Error stacks
@@ -27,6 +30,7 @@ export default {
       !this.$v.points.numeric && errors.push(this.shouldBeNumber);
       !this.$v.points.minValue && errors.push(this.minValue);
       !this.$v.totalPointsRest.numeric && errors.push(this.minValueRest);
+      !this.$v.costWithInterests.minValue && errors.push(this.minCostTotal);
       return errors;
     },
     selectedBankAccountErrors() {
@@ -50,6 +54,9 @@ export default {
     },
     minValueRest() {
       return this.$t("error-messages.minValueRest");
+    },
+    minCostTotal() {
+      return this.$t("error-messages.minCostTotal");
     },
   },
 };
