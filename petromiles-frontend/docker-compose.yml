@@ -1,0 +1,13 @@
+version: "3"
+services:
+  frontend:
+    env_file:
+      - ./.env.development
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 8080:8080
+    volumes:
+      - /app/node_modules
+      - .:/app
