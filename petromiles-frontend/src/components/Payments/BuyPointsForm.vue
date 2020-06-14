@@ -207,7 +207,7 @@ export default {
         .post("/payments/buy-points", {
           idClientBankAccount: this.selectedBankAccount,
           amount: (this.rawCost * 100).toFixed(2),
-          amountToCharge: this.costWithInterests * 100,
+          amountToCharge: (this.costWithInterests * 100).toFixed(0),
         })
         .then(res => {
           this.transaction = res;
