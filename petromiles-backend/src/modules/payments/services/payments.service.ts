@@ -136,9 +136,16 @@ export class PaymentsService {
     );
 
     if (await this.verifyEnoughPoints(email, amount)) {
+      await this.paymentProviderService.updateBankAccountOfAnAccount(
+        clientBankAccount.userClient.userDetails.accountId,
+        clientBankAccount.transferId,
+        {
+          default_for_currency: true,
+        },
+      );
+
       const transfer = await this.paymentProviderService.createTransfer({
         destination: clientBankAccount.userClient.userDetails.accountId,
-        destination_payment: clientBankAccount.transferId,
         currency: 'usd',
         amount: amountToCharge,
         source_type: 'bank_account',

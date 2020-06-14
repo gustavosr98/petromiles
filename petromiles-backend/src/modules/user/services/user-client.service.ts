@@ -67,10 +67,11 @@ export class UserClientService {
         name: `${firstName} ${lastName}`,
       },
     );
-
     const paymentProviderAccount = await this.paymentProviderService.createAccount(
       {
         email: user.email,
+        name: firstName,
+        lastName,
         customerId: paymentProviderCustomer.id,
       },
     );

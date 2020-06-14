@@ -136,6 +136,17 @@ export class StripeService {
     return asociatedBankAccount;
   }
 
+  async updateBankAccountOfAnAccount(
+    accountId: string,
+    bankAccountId: string,
+    accountUpdateParams: Stripe.ExternalAccountUpdateParams,
+  ): Promise<Stripe.BankAccount | Stripe.Card> {
+    const udatedBankAccount = await this.stripe.accounts
+      .updateExternalAccount(accountId, bankAccountId, accountUpdateParams)
+      .catch(e => this.errorHandler(e, null));
+    return udatedBankAccount;
+  }
+
   async deleteBankAccount(customerId: string, bankAccountId: string) {
     await this.stripe.customers
       .deleteSource(customerId, bankAccountId)

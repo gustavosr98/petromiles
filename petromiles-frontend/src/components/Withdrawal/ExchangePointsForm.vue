@@ -51,6 +51,7 @@
                       :label="$t('payments.totalCost')"
                       append-icon="mdi-cash"
                       :disabled="true"
+                      @change="$v.costWithInterests.$touch()"
                       return-masked-value
                       mask="###.###.###-##"
                     ></v-text-field>
@@ -151,7 +152,6 @@ export default {
       dialog: false,
       areYouSureDialog: false,
       comeBackRoute: clientRoutes.TRANSACTION_LIST.name,
-      paymentIsReady: false,
       transaction: {},
       totalPoints: 0,
     };
@@ -199,9 +199,9 @@ export default {
         })
         .then(res => {
           this.transaction = res;
-          this.paymentIsReady = true;
         })
         .finally(() => {
+          this.dialog = true;
           this.loading = false;
         });
     },
