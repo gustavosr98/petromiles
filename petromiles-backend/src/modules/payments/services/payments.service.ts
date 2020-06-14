@@ -138,7 +138,7 @@ export class PaymentsService {
     if (await this.verifyEnoughPoints(email, amount)) {
       const transfer = await this.paymentProviderService.createTransfer({
         destination: clientBankAccount.userClient.userDetails.accountId,
-        source: clientBankAccount.transferId,
+        destination_payment: clientBankAccount.transferId,
         currency: 'usd',
         amount: amountToCharge,
         source_type: 'bank_account',

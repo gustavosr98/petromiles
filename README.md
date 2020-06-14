@@ -86,6 +86,9 @@ Create two files inside **petromiles-backend/** folder named `.env` and `.env.de
 These files will have the following structure
 
 ```bash
+# ENVIRONMENT
+PETROMILES_ENV=
+
 # API
 PORT=
 
@@ -291,6 +294,7 @@ Please wait for futher instructions. Production build guide to be defined.
 ### Frontend Team
 
 - Rafael Mendez [@RafaelMendezUCAB](https://github.com/RafaelMendezUCAB)
+- Javier Andrade [@JAA1998](https://github.com/JAA1998)
 - Gabriel Tovar [@GabTovarUCAB](https://github.com/GabTovarUCAB)
 - Alejandro Jauregui [@alejjb](https://github.com/alejjb)
 - Diorfelis Medina [@DiorfelisMedina](https://github.com/DiorfelisMedina)
