@@ -51,7 +51,10 @@ export class PaymentsService {
     return mostRecentRate;
   }
 
-  async getInterests(trasactionType: TransactionType): Promise<Interest[]> {
+  async getInterests(
+    trasactionType: TransactionType,
+    platformInterestType,
+  ): Promise<Interest[]> {
     let interests: Interest[] = [];
     const thirdPartyInterest = await this.thirdPartyInterestService.get(
       PaymentProvider.STRIPE,
@@ -64,7 +67,7 @@ export class PaymentsService {
     });
 
     const platformInterest = await this.platformInterestService.getInterestByName(
-      PlatformInterest.BUY,
+      platformInterestType,
     );
     interests.push({
       operation: 1,
@@ -125,6 +128,7 @@ export class PaymentsService {
     user,
     idClientBankAccount,
     amount,
+    amountToCharge,
   ): Promise<Transaction> {
     const { id, email } = user;
     const clientBankAccount = await this.clientBankAccountService.getOne(
@@ -133,9 +137,25 @@ export class PaymentsService {
     );
 
     if (await this.verifyEnoughPoints(email, amount)) {
+      await this.paymentProviderService.updateBankAccountOfAnAccount(
+        clientBankAccount.userClient.userDetails.accountId,
+        clientBankAccount.transferId,
+        {
+          default_for_currency: true,
+        },
+      );
+
+      const transfer = await this.paymentProviderService.createTransfer({
+        destination: clientBankAccount.userClient.userDetails.accountId,
+        currency: 'usd',
+        amount: amountToCharge,
+        source_type: 'bank_account',
+      });
+
       return this.transactionService.createWithdrawalTransaction(
         clientBankAccount,
         amount,
+        transfer.id,
       );
     }
 

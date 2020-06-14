@@ -41,7 +41,10 @@ export class UserClientService {
     return await this.userClientRepository.find();
   }
 
-  async create(createUserDTO: CreateUserDTO): Promise<App.Auth.UserClient> {
+  async create(
+    createUserDTO: CreateUserDTO,
+    ip: string,
+  ): Promise<App.Auth.UserClient> {
     const {
       firstName,
       lastName,
@@ -67,11 +70,13 @@ export class UserClientService {
         name: `${firstName} ${lastName}`,
       },
     );
-
     const paymentProviderAccount = await this.paymentProviderService.createAccount(
       {
         email: user.email,
+        name: firstName,
+        lastName,
         customerId: paymentProviderCustomer.id,
+        ip,
       },
     );
 
