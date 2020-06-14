@@ -39,13 +39,13 @@ export default {
     },
     getTransactionAmount(transaction) {
       if (transaction.type === Transaction.BANK_ACCOUNT_VERIFICATION) {
-        return transaction.transactionInterest[0].platformInterest.amount;
+        return `$ ${(transaction.transactionInterest[0].platformInterest.amount).toFixed(2)}`;
       }
 
-      return (
+      return `$ ${(
         parseInt(transaction.rawAmount) / 100 +
         parseInt(transaction.totalAmountWithInterest) / 100
-      ).toFixed(3);
+      ).toFixed(2)}`;
     },
   },
   computed: {
