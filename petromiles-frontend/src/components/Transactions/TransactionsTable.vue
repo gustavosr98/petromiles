@@ -90,7 +90,7 @@ export default {
 
         return {
           ...data,
-          transactionAmount: data.amount.toFixed(2) + " $",
+          transactionAmount: `$ ${data.amount.toFixed(2)}`,
           state,
           points: data.pointsEquivalent ? data.pointsEquivalent : "-",
           translatedType: this.$tc(`transaction-type.${data.type}`),
