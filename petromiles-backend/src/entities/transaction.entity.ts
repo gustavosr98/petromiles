@@ -10,6 +10,8 @@ import {
 } from 'typeorm';
 import { Transform } from 'class-transformer';
 
+import { TransactionDetails } from '@/modules/transaction/interfaces/transaction-details.interface';
+
 import { UserSuscription } from './user-suscription.entity';
 import { ClientBankAccount } from './client-bank-account.entity';
 import { StateTransaction } from './state-transaction.entity';
@@ -88,7 +90,7 @@ export class Transaction extends BaseEntity {
   @JoinColumn({ name: 'fk_client_bank_account' })
   clientBankAccount: ClientBankAccount;
 
-  calculateDetails(): App.Transaction.TransactionDetails {
+  calculateDetails(): TransactionDetails {
     const state = this.stateTransaction.find(state => !state.finalDate).state
       .name;
     let details;
