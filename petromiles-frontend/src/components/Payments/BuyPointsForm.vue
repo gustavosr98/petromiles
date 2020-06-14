@@ -144,13 +144,13 @@
 <script>
 import piggyImage from "@/assets/Transaction/BuyPoints.png";
 import buyPointsValidationMixin from "@/mixins/validation-forms/buy-points.mixin.js";
-import { states } from "@/constants/state";
+import bankAccountsMixin from "@/mixins/load/bank-accounts.mixin.js";
 import clientRoutes from "@/router/clientRoutes";
 import PaymentInvoice from "@/components/Payments/PaymentInvoice";
 
 export default {
   name: "buy-points-form",
-  mixins: [buyPointsValidationMixin],
+  mixins: [buyPointsValidationMixin, bankAccountsMixin],
   components: {
     "payments-invoice": PaymentInvoice,
   },
@@ -224,25 +224,6 @@ export default {
     },
     async loadInterests() {
       this.interests = await this.$http.get("/payments/interests/deposit/buy");
-    },
-    async loadBankAccounts() {
-      const bankAccounts = await this.$http.get("/bank-account");
-
-      this.bankAccounts = bankAccounts
-        .filter(b => {
-          const isActive = !!b?.clientBankAccount[0].stateBankAccount.find(
-            sba => !sba.finalDate && sba.state.name === states.ACTIVE.name
-          );
-          return isActive;
-        })
-        .map(b => {
-          return {
-            idClientBankAccount: b.clientBankAccount[0].idClientBankAccount,
-            last4: `XXXX-${b.accountNumber}`,
-          };
-        });
-
-      this.loadingBankAccounts = false;
     },
     pdfIsCreated() {
       this.dialog = true;

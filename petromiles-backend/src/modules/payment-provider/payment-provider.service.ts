@@ -116,6 +116,7 @@ export class PaymentProviderService {
     name: string;
     lastName: string;
     customerId: string;
+    ip: string;
   }) {
     const account = await this.stripeService.createAccount({
       type: 'custom',
@@ -132,7 +133,7 @@ export class PaymentProviderService {
         url: user.name.toLowerCase().replace(' ', '') + '.com',
       },
       tos_acceptance: {
-        ip: '192.168.0.1',
+        ip: user.ip,
         date: Math.round(new Date().getTime() / 1000),
       },
       metadata: {

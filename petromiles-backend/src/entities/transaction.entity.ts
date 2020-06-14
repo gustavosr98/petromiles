@@ -180,13 +180,13 @@ export class Transaction extends BaseEntity {
 
   private calculateWithdrawalDetails() {
     const amount = parseFloat((this.rawAmount / 100).toFixed(2));
-    const interest = parseFloat(
-      (this.totalAmountWithInterest / 100).toFixed(2),
-    );
+    const interest =
+      parseFloat((this.totalAmountWithInterest / 100).toFixed(2)) * -1;
     const total = Math.round((amount + interest) * 100) / 100;
     const pointsEquivalent = Math.round(
       amount / this.pointsConversion.onePointEqualsDollars,
     );
-    return { amount, interest, total, pointsEquivalent };
+    const extra = 0;
+    return { amount, interest, total, pointsEquivalent, extra };
   }
 }

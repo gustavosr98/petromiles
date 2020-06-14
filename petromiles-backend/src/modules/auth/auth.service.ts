@@ -33,8 +33,11 @@ export class AuthService {
     private suscriptionService: SuscriptionService,
   ) {}
 
-  async createUserClient(user: CreateUserDTO): Promise<App.Auth.Response> {
-    const createdUser = await this.userClientService.create(user);
+  async createUserClient(
+    user: CreateUserDTO,
+    ip: string,
+  ): Promise<App.Auth.Response> {
+    const createdUser = await this.userClientService.create(user, ip);
 
     const token = this.createToken(createdUser.user.email, Role.CLIENT);
 

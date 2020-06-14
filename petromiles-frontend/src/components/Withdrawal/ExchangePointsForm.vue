@@ -48,7 +48,7 @@
                   <v-col cols="8">
                     <v-text-field
                       :value="costWithInterests"
-                      :label="$t('payments.totalCost')"
+                      :label="$t('payments.totalDollars')"
                       append-icon="mdi-cash"
                       :disabled="true"
                       @change="$v.costWithInterests.$touch()"
@@ -81,7 +81,7 @@
                       class="primary"
                       :loading="loading"
                       dark
-                    >{{ $t("buy-points-form.getPoints") }}</v-btn>
+                    >{{ $t("exchange-points-form.getDollars") }}</v-btn>
                   </v-col>
                 </v-row>
               </v-form>
@@ -129,13 +129,13 @@
 import walletImage from "@/assets/Transaction/WithdrawsPoints.png";
 import MakeItRain from "@/assets/MakeItRain.png";
 import exchangePointsValidationMixin from "@/mixins/validation-forms/exchange-points.mixin.js";
-import { states } from "@/constants/state";
+import bankAccountsMixin from "@/mixins/load/bank-accounts.mixin.js";
 import clientRoutes from "@/router/clientRoutes";
 import PaymentInvoice from "@/components/Payments/PaymentInvoice";
 
 export default {
   name: "exchange-points-form",
-  mixins: [exchangePointsValidationMixin],
+  mixins: [exchangePointsValidationMixin, bankAccountsMixin],
   components: {},
   data: function() {
     return {
@@ -214,32 +214,11 @@ export default {
       this.onePointToDollars = (
         await this.$http.get("/payments/one-point-to-dollars")
       ).onePointEqualsDollars;
-      console.log(this.onePointToDollars);
     },
     async loadInterests() {
       this.interests = await this.$http.get(
         "/payments/interests/withdrawal/Withdrawal"
       );
-      console.log(this.interests);
-    },
-    async loadBankAccounts() {
-      const bankAccounts = await this.$http.get("/bank-account");
-
-      this.bankAccounts = bankAccounts
-        .filter(b => {
-          const isActive = !!b?.clientBankAccount[0].stateBankAccount.find(
-            sba => !sba.finalDate && sba.state.name === states.ACTIVE.name
-          );
-          return isActive;
-        })
-        .map(b => {
-          return {
-            idClientBankAccount: b.clientBankAccount[0].idClientBankAccount,
-            last4: `XXXX-${b.accountNumber}`,
-          };
-        });
-
-      this.loadingBankAccounts = false;
     },
   },
 };
