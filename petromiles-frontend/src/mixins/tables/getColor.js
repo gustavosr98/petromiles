@@ -6,7 +6,6 @@ export const getColor = {
     getColor(state) {
       let color = "";
       statesArray.map(s => {
-        console.log(state);
         if (s.state === upperFirst(state)) {
           color = s.color;
         }

@@ -35,7 +35,7 @@ export class TransactionInterest extends BaseEntity {
   @ManyToOne(
     type => ThirdPartyInterest,
     thirdPartyInterest => thirdPartyInterest.idThirdPartyInterest,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_third_party_interest' })
   thirdPartyInterest: ThirdPartyInterest;

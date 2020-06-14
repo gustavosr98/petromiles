@@ -100,97 +100,38 @@ export class TransactionService {
     };
   }
 
-  async getTransactions(email: string) {
+  async getTransactions(
+    email: string,
+  ): Promise<App.Transaction.TransactionDetails[]> {
     const transactions = await this.transactionRepository.find({
       where: `userClient.email = '${email}' AND stateTransaction.finalDate is null AND trans.transaction is null`,
       join: {
         alias: 'trans',
-        innerJoinAndSelect: {
+        leftJoinAndSelect: {
           clientBankAccount: 'trans.clientBankAccount',
+          bankAccount: 'clientBankAccount.bankAccount',
           stateTransaction: 'trans.stateTransaction',
           state: 'stateTransaction.state',
           transactionInterest: 'trans.transactionInterest',
+          thirdPartyInterest: 'transactionInterest.thirdPartyInterest',
           platformInterest: 'transactionInterest.platformInterest',
+          platformInterestExtraPoints:
+            'transactionInterest.platformInterestExtraPoints',
           userClient: 'clientBankAccount.userClient',
         },
       },
     });
 
-    return transactions;
+    return transactions.map(transaction => {
+      return transaction.calculateDetails();
+    });
   }
 
   async get(
     idTransaction: number,
-  ): Promise<App.Transaction.TransactionInformation> {
+  ): Promise<App.Transaction.TransactionDetails> {
     const transaction = await this.transactionRepository.findOne(idTransaction);
-    const state = transaction.stateTransaction.find(state => !state.finalDate)
-      .state.name;
-
-    let details;
-
-    if (transaction.type == TransactionType.BANK_ACCOUNT_VALIDATION)
-      details = this.getVerificationDetails(transaction);
-    if (transaction.type == TransactionType.SUSCRIPTION_PAYMENT)
-      details = this.getSubscriptionDetails(transaction);
-    if (transaction.type == TransactionType.DEPOSIT)
-      details = this.getDepositDetails(transaction);
-    if (transaction.type == TransactionType.WITHDRAWAL)
-      details = this.getWithdrawalDetails(transaction);
-
-    return {
-      id: transaction.idTransaction,
-      date: transaction.initialDate.toLocaleDateString(),
-      type: transaction.type,
-      bankAccount: transaction.clientBankAccount.bankAccount.accountNumber.substr(
-        -4,
-      ),
-      pointsConversion: 1 / transaction.pointsConversion.onePointEqualsDollars,
-      ...details,
-      state,
-    };
-  }
-
-  private getVerificationDetails(transaction: Transaction) {
-    const verificationInterest =
-      parseFloat(transaction.transactionInterest[0].platformInterest.amount) /
-      100;
-
-    return {
-      amount: verificationInterest,
-      interest: 0,
-      total: verificationInterest,
-    };
-  }
-
-  private getSubscriptionDetails(transaction: Transaction) {
-    const subscriptionCost = transaction.totalAmountWithInterest / 100;
-    return {
-      amount: subscriptionCost,
-      interest: 0,
-      total: subscriptionCost,
-    };
-  }
-
-  private getDepositDetails(transaction: Transaction) {
-    const amount = parseFloat((transaction.rawAmount / 100).toFixed(2));
-    const interest = parseFloat(
-      (transaction.totalAmountWithInterest / 100).toFixed(2),
-    );
-    const total = amount + interest;
-    const pointsEquivalent =
-      amount / transaction.pointsConversion.onePointEqualsDollars;
-    return { amount, interest, total, pointsEquivalent };
-  }
-
-  private getWithdrawalDetails(transaction: Transaction) {
-    const amount = parseFloat((transaction.rawAmount / 100).toFixed(2));
-    const interest = parseFloat(
-      (transaction.totalAmountWithInterest / 100).toFixed(2),
-    );
-    const total = amount + interest;
-    const pointsEquivalent =
-      amount / transaction.pointsConversion.onePointEqualsDollars;
-    return { amount, interest, total, pointsEquivalent };
+    return transaction.calculateDetails();
   }
 
   async createTransaction(

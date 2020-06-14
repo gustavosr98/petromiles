@@ -35,11 +35,11 @@ import { StateName } from '@/enums/state.enum';
       .groupBy('userClient.email'),
 })
 export class ClientPoints {
-  @Transform(dollars => parseInt(dollars).toFixed(2))
+  @Transform(dollars => parseFloat(dollars).toFixed(2))
   @ViewColumn()
   dollars: number;
 
-  @Transform(points => parseInt(points).toFixed(2))
+  @Transform(points => parseFloat(points).toFixed(2))
   @ViewColumn()
   points: number;
 
