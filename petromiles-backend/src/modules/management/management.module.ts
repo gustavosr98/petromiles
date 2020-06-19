@@ -17,10 +17,13 @@ import { PointsConversion } from '@/entities/points-conversion.entity';
 import {StateUser} from "@/entities/state-user.entity";
 import {UserClient} from "@/entities/user-client.entity";
 
+
 // CONTROLLER
 import { ManagementController } from './controllers/management.controller';
 import {UserAdministrator} from "@/entities/user-administrator.entity";
 import {UserRole} from "@/entities/user-role.entity";
+
+
 
 @Module({
   imports: [

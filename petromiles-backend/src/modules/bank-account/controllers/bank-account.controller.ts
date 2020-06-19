@@ -13,6 +13,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import {Roles} from "@/modules/auth/decorators/roles.decorator";
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -28,6 +29,7 @@ import { ApiModules } from '@/logger/api-modules.enum';
 // SERVICES
 import { ClientBankAccountService } from '../services/client-bank-account.service';
 import { BankAccountService } from '../services/bank-account.service';
+import {RolesGuard} from "@/modules/auth/guards/roles.guard";
 
 const baseEndpoint = Object.freeze('bank-account');
 
@@ -98,5 +100,25 @@ export class BankAccountController {
       idBankAccount,
       email,
     );
+  }
+
+  @Roles(Role.ADMINISTRATOR)
+  @UseGuards(RolesGuard)
+  @Get('accounts/:account')
+  accountInfo(@Param('account') accountId: number){
+    this.logger.http(
+        `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ask /${baseEndpoint}/account/${accountId}`
+    );
+    return this.bankAccountService.accountInfo(accountId)
+  }
+
+  @Roles(Role.ADMINISTRATOR)
+  @UseGuards(RolesGuard)
+  @Get('accounts')
+  allAccountInfo(){
+      this.logger.http(
+          `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ask /${baseEndpoint}/accounts all`
+      );
+      return this.bankAccountService.getAllAccounts();
   }
 }
