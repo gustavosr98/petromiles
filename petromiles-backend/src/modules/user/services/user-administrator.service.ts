@@ -45,6 +45,13 @@ export class UserAdministratorService {
   }
 
   async getDetails(userAdministrator: UserAdministrator): Promise<UserDetails> {
-    return await this.userDetailsRepository.findOne(userAdministrator);
+    if (userAdministrator)
+      return await this.userDetailsRepository.findOne({
+        where: {
+          fk_user_client: userAdministrator.idUserAdministrator,
+        },
+      });
+
+    return null;
   }
 }

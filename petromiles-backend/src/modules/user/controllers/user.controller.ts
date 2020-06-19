@@ -8,6 +8,8 @@ import {
   UseGuards,
   Patch,
   Body,
+  Put,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -21,6 +23,8 @@ import { Roles } from '@/modules/auth/decorators/roles.decorator';
 import { HttpRequest } from '@/logger/http-requests.enum';
 import { Role } from '@/enums/role.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
+import { UpdateDetailsDTO } from '@/modules/user/dto/update-details.dto';
+import { UpdatePasswordDTO } from '@/modules/user/dto/update-password.dto';
 
 // SERVICES
 import { UserService } from '@/modules/user/services/user.service';
@@ -28,6 +32,8 @@ import { UserClientService } from '@/modules/user/services/user-client.service';
 
 // ENTITIES
 import { ClientPoints } from '@/entities/user-points.entity';
+
+import { PasswordEncryptorInterceptor } from '@/interceptors/password-encryptor.interceptor';
 
 const baseEndpoint = Object.freeze('user');
 @UseGuards(AuthGuard('jwt'))
@@ -68,7 +74,29 @@ export class UserController {
     this.logger.http(
       `[${ApiModules.USER}] (${HttpRequest.PATCH}) ${user?.email} asks /${baseEndpoint}/language`,
     );
-    return this.userClientService.changeDefaultLanguage(user.email, language);
+    return this.userClientService.updateDefaultLanguage(user.email, language);
   }
 
+  @UseInterceptors(PasswordEncryptorInterceptor)
+  @Put('update-password')
+  updatePassword(
+    @GetUser() user,
+    @Body(ValidationPipe) credentials: UpdatePasswordDTO,
+  ) {
+    this.logger.http(
+      `[${ApiModules.USER}] (${HttpRequest.PUT}) ${user?.email} asks /${baseEndpoint}/update-password`,
+    );
+    return this.userClientService.updatePassword(user, credentials);
+  }
+
+  @Put('update-details')
+  updateDetails(
+    @GetUser() user,
+    @Body(ValidationPipe) details: UpdateDetailsDTO,
+  ) {
+    this.logger.http(
+      `[${ApiModules.USER}] (${HttpRequest.PUT}) ${user?.email} asks /${baseEndpoint}/update-details`,
+    );
+    return this.userClientService.updateDetails(user, details);
+  }
 }

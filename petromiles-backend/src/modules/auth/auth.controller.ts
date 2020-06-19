@@ -21,7 +21,7 @@ import { Roles } from './decorators/roles.decorator';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { HttpRequest } from '@/logger/http-requests.enum';
 
-import { PasswordEncryptorInterceptor } from './interceptors/password-encryptor.interceptor';
+import { PasswordEncryptorInterceptor } from '@/interceptors/password-encryptor.interceptor';
 import { RolesGuard } from './guards/roles.guard';
 import { AuthService } from './auth.service';
 

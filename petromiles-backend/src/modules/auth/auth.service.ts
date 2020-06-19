@@ -58,6 +58,7 @@ export class AuthService {
       role: Role.CLIENT,
       token,
       id: createdUser.user.idUserClient,
+      federated: user.password ? false : true,
     };
   }
 
@@ -75,6 +76,7 @@ export class AuthService {
         role,
         id: user.id,
         token: this.createToken(email, role),
+        federated: true,
       };
 
       // If the user didn't sign up with email and password
@@ -84,6 +86,7 @@ export class AuthService {
 
       const passHash = await this.hashPassword(password, user.salt);
       if (user && user.password === passHash) {
+        result.federated = false;
         return result;
       } else {
         this.logger.error(

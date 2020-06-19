@@ -17,6 +17,7 @@ declare namespace App {
       token: string;
       role: import('../src/enums/role.enum').Role;
       id: number;
+      federated: boolean;
     }
 
     interface LoginRequest {

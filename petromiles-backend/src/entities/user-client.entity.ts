@@ -6,7 +6,9 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
+
+import * as bcrypt from 'bcrypt';
 
 import { ClientBankAccount } from './client-bank-account.entity';
 import { StateUser } from './state-user.entity';
@@ -78,4 +80,9 @@ export class UserClient extends BaseEntity {
     { nullable: true },
   )
   clientBankAccount: ClientBankAccount[];
+
+  async isPasswordCorrect(password: string): Promise<boolean> {
+    const passwordHashed = await bcrypt.hash(password, this.salt);
+    return passwordHashed === this.password;
+  }
 }

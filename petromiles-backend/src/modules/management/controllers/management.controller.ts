@@ -51,6 +51,11 @@ export class ManagementController {
     return this.managementService.getLanguages();
   }
 
+  @Get('countries')
+  getCountries() {
+    return this.managementService.getCountries();
+  }
+
   @Get('platform-interest')
   getPlatformInterests() {
     return this.platformInterestService.getInterests();
