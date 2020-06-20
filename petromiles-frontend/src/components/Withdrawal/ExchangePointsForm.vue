@@ -6,12 +6,21 @@
         <v-row justify="center" align="center">
           <!-- Phrase -->
           <v-col cols="12">
-            <h3 class="text-center">{{ $t("exchange-points-form.letsEarnDollars") }}</h3>
+            <h3 class="text-center">
+              {{ $t("exchange-points-form.letsEarnDollars") }}
+            </h3>
           </v-col>
 
           <!-- Image -->
 
-          <v-col xs="10" sm="10" md="4" justify="center" align="center" class="pt-lg-12">
+          <v-col
+            xs="10"
+            sm="10"
+            md="4"
+            justify="center"
+            align="center"
+            class="pt-lg-12"
+          >
             <v-img :src="makeItRainImage" alt="Change points for money" />
           </v-col>
 
@@ -81,7 +90,8 @@
                       class="primary"
                       :loading="loading"
                       dark
-                    >{{ $t("exchange-points-form.getDollars") }}</v-btn>
+                      >{{ $t("exchange-points-form.getDollars") }}</v-btn
+                    >
                   </v-col>
                 </v-row>
               </v-form>
@@ -93,11 +103,17 @@
         <v-row justify="center">
           <v-dialog v-model="dialog" persistent max-width="50%">
             <v-card>
-              <v-card-title class="headline">{{ $t("exchange-points-form.successfulWithdrawal") }}</v-card-title>
-              <v-card-text>{{ $t("exchange-points-form.withdrawalToValidate") }}</v-card-text>
+              <v-card-title class="headline">{{
+                $t("exchange-points-form.successfulWithdrawal")
+              }}</v-card-title>
+              <v-card-text>{{
+                $t("exchange-points-form.withdrawalToValidate")
+              }}</v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">{{ $t("common.ok") }}</v-btn>
+                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">{{
+                  $t("common.ok")
+                }}</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -107,20 +123,31 @@
         <v-row justify="center">
           <v-dialog v-model="areYouSureDialog" persistent max-width="50%">
             <v-card>
-              <v-card-title class="headline">{{ $t("common.areYouSure") }}</v-card-title>
+              <v-card-title class="headline">{{
+                $t("common.areYouSure")
+              }}</v-card-title>
               <v-card-actions>
                 <v-spacer />
-                <v-btn
-                  color="error"
-                  dark
-                  @click="areYouSureDialog = false"
-                >{{ $t("common.cancel") }}</v-btn>
-                <v-btn color="success" dark @click="exchangePoints">{{ $t("common.yes") }}</v-btn>
+                <v-btn color="error" dark @click="areYouSureDialog = false">{{
+                  $t("common.cancel")
+                }}</v-btn>
+                <v-btn color="success" dark @click="exchangePoints">{{
+                  $t("common.yes")
+                }}</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </v-row>
       </v-col>
+    </v-row>
+    <!-- Pdf template -->
+    <v-row>
+      <payments-invoice
+        @pdfWasCreated="pdfWasCreated"
+        :transaction="transaction"
+        :typeInvoice="typeInvoice"
+        v-if="paymentIsReady"
+      />
     </v-row>
   </div>
 </template>
@@ -132,11 +159,14 @@ import exchangePointsValidationMixin from "@/mixins/validation-forms/exchange-po
 import bankAccountsMixin from "@/mixins/load/bank-accounts.mixin.js";
 import clientRoutes from "@/router/clientRoutes";
 import PaymentInvoice from "@/components/Payments/PaymentInvoice";
+import typeTransaction from "@/constants/transaction";
 
 export default {
   name: "exchange-points-form",
   mixins: [exchangePointsValidationMixin, bankAccountsMixin],
-  components: {},
+  components: {
+    "payments-invoice": PaymentInvoice,
+  },
   data: function() {
     return {
       makeItRainImage: MakeItRain,
@@ -152,8 +182,10 @@ export default {
       dialog: false,
       areYouSureDialog: false,
       comeBackRoute: clientRoutes.TRANSACTION_LIST.name,
+      paymentIsReady: false,
       transaction: {},
       totalPoints: 0,
+      typeInvoice: typeTransaction.WITHDRAWAL,
     };
   },
   computed: {
@@ -198,10 +230,11 @@ export default {
           amountToCharge: (this.costWithInterests * 100).toFixed(0),
         })
         .then(res => {
+          console.log(res);
           this.transaction = res;
+          this.paymentIsReady = true;
         })
         .finally(() => {
-          this.dialog = true;
           this.loading = false;
         });
     },
@@ -219,6 +252,10 @@ export default {
       this.interests = await this.$http.get(
         "/payments/interests/withdrawal/Withdrawal"
       );
+    },
+    pdfWasCreated() {
+      this.dialog = true;
+      this.loading = false;
     },
   },
 };

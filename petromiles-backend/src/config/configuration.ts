@@ -57,6 +57,10 @@ export default () => ({
            english:process.env.SENDGRID_BANK_DELETION_EN_TEMPLATE,
            spanish:process.env.SENDGRID_BANK_DELETION_ES_TEMPLATE,
         },
+        withdrawal: {
+          english: process.env.SENDGRID_WITHDRAWAL_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_WITHDRAWAL_ES_TEMPLATE,
+        },
       },
     },
   },

@@ -101,9 +101,20 @@ export class PaymentsController {
     return interests;
   }
 
-  @Post('invoice')
+  @Post('deposit/invoice/:points/:total')
   @UseInterceptors(FileInterceptor('file'))
-  sendInvoiceEmail(@UploadedFile() file, @GetUser() user) {
-    this.paymentsService.sendInvoiceEmail(user, file);
+  sendPaymentInvoiceEmail(@UploadedFile() file, @GetUser() user) {
+    this.paymentsService.sendPaymentInvoiceEmail(user, file);
+  }
+
+  @Post('withdrawal/invoice/:points/:total')
+  @UseInterceptors(FileInterceptor('file'))
+  sendWithdrawalInvoiceEmail(
+    @UploadedFile() file,
+    @GetUser() user,
+    @Param('points') points,
+    @Param('total') total,
+  ) {
+    this.paymentsService.sendWithdrawalInvoiceEmail(user, file, points, total);
   }
 }

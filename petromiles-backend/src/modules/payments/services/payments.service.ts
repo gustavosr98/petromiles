@@ -195,7 +195,7 @@ export class PaymentsService {
     return false;
   }
 
-  async sendInvoiceEmail(user, file) {
+  async sendPaymentInvoiceEmail(user, file) {
     let userClient = await getConnection()
       .getRepository(UserClient)
       .findOne({ email: user.email });
@@ -213,6 +213,38 @@ export class PaymentsService {
         `mails.sendgrid.templates.${template}`,
       ),
       dynamic_template_data: { user: userClient.userDetails.firstName },
+      attachments: [
+        {
+          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}`,
+          type: file.mimetype,
+          content: file.buffer.toString('base64'),
+        },
+      ],
+    });
+  }
+
+  async sendWithdrawalInvoiceEmail(user, file, points, total) {
+    let userClient = await getConnection()
+      .getRepository(UserClient)
+      .findOne({ email: user.email });
+
+    const languageMails = userClient.userDetails.language.name;
+
+    const template = `withdrawal[${languageMails}]`;
+
+    const subject = mailsSubjets.invoice[languageMails];
+
+    this.mailsService.sendEmail({
+      to: userClient.email,
+      subject: subject,
+      templateId: this.configService.get(
+        `mails.sendgrid.templates.${template}`,
+      ),
+      dynamic_template_data: {
+        user: userClient.userDetails.firstName,
+        numberPoints: points,
+        dollarWithdrawal: total,
+      },
       attachments: [
         {
           filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}`,

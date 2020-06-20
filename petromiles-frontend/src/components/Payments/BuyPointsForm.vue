@@ -6,12 +6,21 @@
         <v-row justify="center" align="center">
           <!-- Phrase -->
           <v-col cols="12">
-            <h3 class="text-center">{{ $t("buy-points-form.letsEarnPoints") }}</h3>
+            <h3 class="text-center">
+              {{ $t("buy-points-form.letsEarnPoints") }}
+            </h3>
           </v-col>
 
           <!-- Image -->
 
-          <v-col xs="10" sm="10" md="4" justify="center" align="center" class="pt-lg-12">
+          <v-col
+            xs="10"
+            sm="10"
+            md="4"
+            justify="center"
+            align="center"
+            class="pt-lg-12"
+          >
             <v-img :src="piggyImage" alt="Piggy coins savings" />
           </v-col>
 
@@ -69,7 +78,8 @@
                       class="primary"
                       :loading="loading"
                       dark
-                    >{{ $t("buy-points-form.getPoints") }}</v-btn>
+                      >{{ $t("buy-points-form.getPoints") }}</v-btn
+                    >
                   </v-col>
                 </v-row>
               </v-form>
@@ -82,21 +92,15 @@
           <v-dialog v-model="dialog" persistent max-width="50%">
             <v-card>
               <v-card-title class="headline">
-                {{
-                $t("buy-points-form.thanksForBuying")
-                }}
+                {{ $t("buy-points-form.thanksForBuying") }}
               </v-card-title>
               <v-card-text>
-                {{
-                $t("buy-points-form.transactionToValidate")
-                }}
+                {{ $t("buy-points-form.transactionToValidate") }}
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="secondary" dark :to="{ name: comeBackRoute }">
-                  {{
-                  $t("common.ok")
-                  }}
+                  {{ $t("common.ok") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -108,21 +112,15 @@
           <v-dialog v-model="areYouSureDialog" persistent max-width="50%">
             <v-card>
               <v-card-title class="headline">
-                {{
-                $t("common.areYouSure")
-                }}
+                {{ $t("common.areYouSure") }}
               </v-card-title>
               <v-card-actions>
                 <v-spacer />
                 <v-btn color="error" dark @click="areYouSureDialog = false">
-                  {{
-                  $t("common.cancel")
-                  }}
+                  {{ $t("common.cancel") }}
                 </v-btn>
                 <v-btn color="success" dark @click="buyPoints">
-                  {{
-                  $t("common.yes")
-                  }}
+                  {{ $t("common.yes") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -133,8 +131,9 @@
     <!-- Pdf template -->
     <v-row>
       <payments-invoice
-        @pdfIsCreated="pdfIsCreated"
+        @pdfWasCreated="pdfWasCreated"
         :transaction="transaction"
+        :typeInvoice="typeInvoice"
         v-if="paymentIsReady"
       />
     </v-row>
@@ -147,6 +146,7 @@ import buyPointsValidationMixin from "@/mixins/validation-forms/buy-points.mixin
 import bankAccountsMixin from "@/mixins/load/bank-accounts.mixin.js";
 import clientRoutes from "@/router/clientRoutes";
 import PaymentInvoice from "@/components/Payments/PaymentInvoice";
+import typeTransaction from "@/constants/transaction";
 
 export default {
   name: "buy-points-form",
@@ -171,6 +171,7 @@ export default {
       comeBackRoute: clientRoutes.TRANSACTION_LIST.name,
       paymentIsReady: false,
       transaction: {},
+      typeInvoice: typeTransaction.DEPOSIT,
     };
   },
   computed: {
@@ -225,7 +226,7 @@ export default {
     async loadInterests() {
       this.interests = await this.$http.get("/payments/interests/deposit/buy");
     },
-    pdfIsCreated() {
+    pdfWasCreated() {
       this.dialog = true;
       this.loading = false;
     },
