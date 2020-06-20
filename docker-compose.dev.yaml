@@ -1,0 +1,49 @@
+version: "3"
+services:
+  #PG DATABASE
+  db:
+    image: "postgres:latest"
+    ports:
+      - 5435:5432
+    environment:
+      - POSTGRES_DB=dbpetromiles
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+
+  # NESTJS BACKEND API
+  backend:
+    depends_on:
+      - db
+    env_file:
+      - ./petromiles-backend/.env
+    build:
+      context: ./petromiles-backend/
+      dockerfile: Dockerfile.dev
+      args:
+        - DATABASE_NAME=dbpetromiles
+        - DATABASE_PORT=5435
+        - DATABASE_HOST=db
+        - DATABASE_TYPE=postgres
+        - DATABASE_USER=postgres
+        - DATABASE_PASSWORD=password
+        - DATABASE_SYNCHRONIZE=true
+    ports:
+      - 3000:3000
+    volumes:
+      - /app/node_modules
+      - ./petromiles-backend:/app
+  # VUE FRONTEND
+  # frontend:
+  #   depends_on:
+  #     - db
+  #     - backend
+  #   env_file:
+  #     - ./petromiles-frontend/.env.development
+  #   build:
+  #     dockerfile: Dockerfile.dev
+  #     context: ./petromiles-frontend
+  #   ports:
+  #     - 8080:8080
+  #   volumes:
+  #     - /app/node_modules
+  #     - ./petromiles-frontend:/app
