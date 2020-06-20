@@ -1,3 +1,4 @@
+import { Role } from '@/entities/role.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 
@@ -34,12 +35,21 @@ export class Seeder {
   }
 
   async seed() {
-    const rowsInserted = {
-      initialRows: await this.seedInitial(),
-    };
+    const databaseHasSomething = await getConnection()
+      .getRepository(Role)
+      .count();
 
-    this.logger.verbose('Database rows inserted');
-    this.logger.verbose(rowsInserted);
+    console.log(databaseHasSomething);
+
+    if (!!databaseHasSomething) {
+    } else {
+      const rowsInserted = {
+        initialRows: await this.seedInitial(),
+      };
+
+      this.logger.verbose('Database rows inserted');
+      this.logger.verbose(rowsInserted);
+    }
   }
 
   async seedInitial() {

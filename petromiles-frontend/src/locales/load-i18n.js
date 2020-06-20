@@ -1,12 +1,20 @@
 const axios = require("axios");
 const fs = require("fs");
 
+const baseDomain = process.env.VUE_APP_PETROMILES_API_URL;
+const suffix = "api/v1";
+const port = process.env.VUE_APP_PETROMILES_API_PORT;
+
+console.log(baseDomain);
+
 // Don't forget to add your tags
 // IMPORTANT! Each tag must have the name of the component
 const LANGS = ["en", "es"];
 
 const httpClient = axios.create({
-  baseURL: process.env.VUE_APP_PETROMILES_API || "http://localhost:3000/api/v1",
+  baseURL:
+    (!!baseDomain && `http://${baseDomain}:${port}/${suffix}`) ||
+    "http://localhost:3000/api/v1",
   timeout: process.env.VUE_APP_PETROMILES_API_TIMEOUT || 30000,
 });
 httpClient.interceptors.response.use(response => response.data);
