@@ -8,6 +8,7 @@ import { StripeModule } from '@/modules/payment-provider/stripe/stripe.module';
 import { BankAccountModule } from '@/modules/bank-account/bank-account.module';
 import { TransactionModule } from './../transaction/transaction.module';
 import { SuscriptionModule } from '../suscription/suscription.module';
+import { MailsModule } from '@/modules/mails/mails.module';
 
 // ENTITIES
 import { Task } from '@/entities/task.entity';
@@ -20,6 +21,7 @@ import { Task } from '@/entities/task.entity';
     StripeModule,
     TransactionModule,
     SuscriptionModule,
+    MailsModule,
   ],
   providers: [CronService],
   exports: [ScheduleModule.forRoot(), CronService],

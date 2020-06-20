@@ -159,6 +159,7 @@ export class TransactionService {
     this.logger.silly(
       `[${ApiModules.TRANSACTION}] Transaction ID: ${transaction.idTransaction} was created`,
     );
+
     return transaction;
   }
 
