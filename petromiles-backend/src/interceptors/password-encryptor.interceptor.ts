@@ -3,11 +3,9 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-  Inject,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import * as bcrypt from 'bcrypt';
-import { AuthService } from '@/modules/auth/auth.service';
 
 export interface Response<T> {
   data: T;
@@ -16,7 +14,7 @@ export interface Response<T> {
 @Injectable()
 export class PasswordEncryptorInterceptor<T>
   implements NestInterceptor<T, Response<T>> {
-  constructor(@Inject(AuthService) private authService: AuthService) {}
+  constructor() {}
   async intercept(
     context: ExecutionContext,
     next: CallHandler,
@@ -27,7 +25,8 @@ export class PasswordEncryptorInterceptor<T>
     if (req.body.password !== undefined) {
       const salt = await bcrypt.genSalt();
       const password = req.body.password;
-      req.body.password = await this.authService.hashPassword(password, salt);
+
+      req.body.password = await bcrypt.hash(password, salt);
       req.body.salt = salt;
     }
     return next.handle().pipe();

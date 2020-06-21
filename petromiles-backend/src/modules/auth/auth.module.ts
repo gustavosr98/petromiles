@@ -1,20 +1,21 @@
 import { Module } from '@nestjs/common';
-
-// MODULES
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { ManagementModule } from '../management/management.module';
+
+// MODULES
+import { ManagementModule } from '@/modules/management/management.module';
+import { MailsModule } from '@/modules/mails/mails.module';
+import { UserModule } from '@/modules/user/user.module';
+import { SuscriptionModule } from '@/modules/suscription/suscription.module';
 
 // CONTROLLER
-import { AuthController } from './auth.controller';
-import { MailsModule } from '../mails/mails.module';
-import { UserModule } from '../user/user.module';
+import { AuthController } from '@/modules/auth/auth.controller';
 
 // SERVICES
-import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
-import { SuscriptionModule } from '../suscription/suscription.module';
+import { AuthService } from '@/modules/auth/auth.service';
+
+import { JwtStrategy } from '@/modules/auth/jwt.strategy';
 
 @Module({
   imports: [

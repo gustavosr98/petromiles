@@ -88,6 +88,7 @@ export class UserDetails extends BaseEntity {
     country => country.idCountry,
     {
       nullable: true,
+      eager: true,
     },
   )
   @JoinColumn({ name: 'fk_country' })

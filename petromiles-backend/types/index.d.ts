@@ -17,6 +17,7 @@ declare namespace App {
       token: string;
       role: import('../src/enums/role.enum').Role;
       id: number;
+      federated: boolean;
     }
 
     interface LoginRequest {
@@ -64,7 +65,7 @@ declare namespace App {
       thirdPartyInterestType: import('../src/enums/payment-provider.enum').PaymentProvider;
     }
 
-    interface TransactionInformation {
+    interface TransactionDetails {
       id: number;
       date: string;
       type: import('../src/enums/transaction.enum').TransactionType;

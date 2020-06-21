@@ -14,13 +14,17 @@ import { PlatformInterest } from '@/entities/platform-interest.entity';
 import { Language } from '@/entities/language.entity';
 import { ThirdPartyInterest } from '@/entities/third-party-interest.entity';
 import { PointsConversion } from '@/entities/points-conversion.entity';
+import { Country } from '@/entities/country.entity';
 import {StateUser} from "@/entities/state-user.entity";
 import {UserClient} from "@/entities/user-client.entity";
+
 
 // CONTROLLER
 import { ManagementController } from './controllers/management.controller';
 import {UserAdministrator} from "@/entities/user-administrator.entity";
 import {UserRole} from "@/entities/user-role.entity";
+
+
 
 @Module({
   imports: [
@@ -31,6 +35,7 @@ import {UserRole} from "@/entities/user-role.entity";
       PointsConversion,
       ThirdPartyInterest,
       Language,
+      Country,
       StateUser,
       UserClient,
       UserAdministrator,

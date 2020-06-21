@@ -1,152 +1,349 @@
 <template>
-  <div class="user">
-    <div class="perfil">
-      <figure class="perfil-circle">
-        <div v-if="photoUser">
-          <v-img :src="photoUser" />
-        </div>
-        <div v-else>
-          <v-img :src="profileImg" />
-        </div>
-      </figure>
-      <h1 class="perfil-name">{{ firstName }} {{ lastName }}</h1>
-    </div>
-    <h2>{{ $t("user-details.yourProfile") }}</h2>
-    <div class="user-details">
-      <div class="detail">
-        <b>{{ $t("user-details.firstName") }}</b>
-        <br />
-        {{ firstName }}
-        <hr />
-        <br />
-        <b>{{ $t("user-details.middleName") }}</b>
-        <br />
-        {{ middleName }}
-        <hr />
-        <br />
-        <b>{{ $t("user-details.email") }}</b>
-        <br />
-        {{ email }}
-        <hr />
-        <br />
-        <b>{{ $t("user-details.phone") }}</b>
-        <br />
-        {{ phone }}
-        <hr />
-      </div>
-      <div class="detail">
-        <b>{{ $t("user-details.lastName") }}</b>
-        <br />
-        {{ lastName }}
-        <hr />
-        <br />
-        <b>{{ $t("user-details.secondLastName") }}</b>
-        <br />
-        {{ secondLastName }}
-        <hr />
-        <br />
-        <b>{{ $t("user-details.address") }}</b>
-        <br />
-        {{ addres }}
-        <hr />
-        <br />
-        <b>{{ $t("user-details.dateOfBirth") }} (DD/MM/YYYY)</b>
-        <br />
-        {{ birthdate }}
-        <hr />
-        <br />
-      </div>
-    </div>
+  <div>              
+    <v-divider></v-divider>
+    <br/>
+    <h3 class="text-center">{{ $t("profile.PersonalInformation") }}</h3>     
+    
+    <v-row
+      align="center"
+      justify="center"
+    >      
+      <v-col cols="11" lg="4" md="4" sm="4">                
+        <v-text-field
+          v-model="userData.details.firstName"
+          :label="$t('user-details.firstName')"
+          prepend-icon="person"
+          type="text"
+          color="light-blue darken-4"   
+          @change="$v.userData.details.firstName.$touch()"
+          @blur="$v.userData.details.firstName.$touch()"
+          :error-messages="firstNameErrors"  
+          v-on:keypress="validateMaxChars($event, userData.details.firstName)"               
+        ></v-text-field>     
+        <v-text-field
+          v-model="userData.details.middleName"
+          :label="$t('user-details.middleName')"
+          name="MiddleName"          
+          prepend-icon="person"
+          type="text"
+          color="light-blue darken-4"
+          v-on:keypress="validateMaxChars($event, userData.details.middleName)"                             
+        ></v-text-field>   
+        <v-text-field
+          v-model="userData.details.lastName"
+          :label="$t('user-details.lastName')"
+          name="Last Name"
+          prepend-icon="person"
+          type="text"
+          color="light-blue darken-4"
+          @change="$v.userData.details.lastName.$touch()"
+          @blur="$v.userData.details.lastName.$touch()"
+          :error-messages="lastNameErrors"    
+          v-on:keypress="validateMaxChars($event, userData.details.lastName)"                
+        ></v-text-field>   
+        <v-text-field
+          v-model="userData.details.secondLastName"
+          :label="$t('user-details.secondLastName')"
+          name="Last Name"
+          prepend-icon="person"
+          type="text"
+          color="light-blue darken-4"   
+          v-on:keypress="validateMaxChars($event, userData.details.secondLastName)"                 
+        ></v-text-field>      
+        <v-text-field
+          v-model="userData.email"
+          :label="$t('user-details.email')"
+          name="Email"          
+          prepend-icon="email"
+          type="text"
+          color="light-blue darken-4"
+          @change="$v.userDataemail.$touch()"
+          @blur="$v.userData.email.$touch()"
+          :error-messages="emailErrors"  
+          :disabled="true"                            
+        ></v-text-field>                
+      </v-col>
+
+      <v-col cols="11" lg="4" md="4" sm="4">                                                       
+        <v-text-field           
+          v-model="birthdate"
+          class="fontSize dateOfBirthPosition"
+          :label="$t('user-details.dateOfBirth')"
+          prepend-icon= "mdi-calendar-blank-outline"                        
+          type="date"          
+          :max="maxDate"
+          :min="minDate"
+        >
+        </v-text-field>
+        <v-text-field
+          v-model="userData.details.phone"
+          :label="$t('user-details.phone')"
+          name="Phone number"          
+          prepend-icon="mdi-cellphone-android"
+          type="number"
+          color="light-blue darken-4"  
+          v-on:keypress="restrictChars($event)"                            
+        ></v-text-field>   
+        <v-autocomplete  
+          return-object               
+          v-model="userData.details.country"          
+          :item-text="item => $t(`countries.${item.name}`)"
+          prepend-icon= "mdi-map-marker"
+          :label="$t('user-details.Country')"          
+          :items="countries"                                             
+          >
+        </v-autocomplete>
+        <v-text-field
+          v-model="userData.details.address"
+          :label="$t('user-details.address')"
+          name="Address"          
+          prepend-icon="home"
+          type="text"
+          color="light-blue darken-4"  
+          v-on:keypress="validateMaxChars($event, userData.details.address)"                            
+        ></v-text-field> 
+      </v-col>
+
+    </v-row>
+
+    <v-row
+      align="center"
+      justify="center"
+    >
+      <v-col class="text-center">
+        <v-btn
+          color="error"
+          style="margin-right: 1%"
+          @click="resetValues"
+          :disabled="loading"
+        >
+          {{ $t("profile.ResetValues") }}
+        </v-btn>            
+        <v-btn
+          color="primary"
+          @click="checkingValidForm"
+          :loading="loading"
+        >
+          {{ $t("common.Save") }}
+        </v-btn>        
+        <snackbar @close="closeSnackbar" :show="snackbar" :text="text"></snackbar>
+      </v-col>
+    </v-row>      
   </div>
+  
 </template>
 
 <script>
-import { mapState } from "vuex";
-
+import { createNamespacedHelpers, mapState } from "vuex";
+const { mapActions } = createNamespacedHelpers("auth");
 import ProfileImg from "@/assets/perfil.jpg";
-
+import { validationMixin } from "vuelidate";
+import Snackbar from "@/components/General/Snackbar/Snackbar.vue";
+import {
+  required,
+  maxLength,
+  email,
+  minLength,
+} from "vuelidate/lib/validators";
+import { type } from 'os';
 export default {
-  name: "user-detail",
+  name: "user-detail",  
+  mixins: [validationMixin],
+  components: {       
+    "snackbar": Snackbar
+  },
   data() {
-    return {
-      profileImg: ProfileImg,
-      firstName: "",
-      lastName: "",
-      middleName: "",
-      email: "",
-      secondLastName: "",
-      addres: "",
+    return { 
+      userData: {
+        details: {
+          address: "",
+          birthdate: "",
+          country: {},
+          firstName: "",
+          lastName: "",
+          middleName: "",
+          phone: "",
+          secondLastName: "",
+        },
+        email: "",        
+      },        
       birthdate: "",
-      phone: "",
+      showPassword: false,      
+      userCountry: {},
+      countries: [],
+      maxDate: this.getMaxDatePicker(),
+      minDate: "1950-01-01",
+      loading: false,
+      snackbar: false,
+      text: "",
+      timeout: 20000
     };
   },
-  props: {
-    msg: {
-      type: String,
-      required: true,
+  validations: {
+    userData: {
+      details: {
+        firstName: { required },
+        lastName: { required },
+      },
+      email: { required, email },
+    },        
+  },  
+  methods: {   
+    ...mapActions(["updateUserData"]),     
+    resetValues(){
+      if(this.user){        
+        const user = JSON.parse(JSON.stringify(this.user));
+        const { userClient, ...details } = user.details;
+        this.userData.details = details;
+        this.userData.email = this.user.email;
+        if(this.userData.details.birthdate !== null && this.userData.details.birthdate !== ""){
+          this.birthdate = this.userData.details.birthdate.split("T")[0];
+        }
+        else {
+          this.birthdate = null;
+        }
+      }      
+    },
+    checkingValidForm(){
+      this.$v.$touch();
+      if (!this.$v.$invalid && this.dataChanged()){
+        this.loading = true;
+        this.saveUserData();
+      }      
+    },
+    dataChanged(){
+      if(this.userData.details.address !== this.user.details.address || this.birthdateChanged() || this.countryChanged(this.userData.details.country, this.user.details.country) || this.userData.details.firstName !== this.user.details.firstName || this.userData.details.lastName !== this.user.details.lastName || this.userData.details.middleName !== this.user.details.middleName || this.userData.details.phone !== this.user.details.phone || this.userData.details.secondLastName !== this.user.details.secondLastName || this.userData.email !== this.user.email){
+        return true;
+      }
+      return false;
+    },
+    birthdateChanged(){
+      if(this.birthdate !== null && this.user.details.birthdate !== null && this.birthdate !== this.user.details.birthdate.split("T")[0]){       
+        return true;        
+      }
+      else if((this.birthdate !== null && this.user.details.birthdate === null) || (this.birthdate === null && this.user.details.birthdate !== null)){
+        return true;
+      }
+      return false;
+    },
+    countryChanged(newCountry, currentCountry){      ;
+      if((currentCountry === undefined && newCountry !== undefined) || (currentCountry === null && newCountry !== null)){
+        return true;
+      }
+      else if(((currentCountry !== undefined && newCountry !== undefined) && (currentCountry !== null && newCountry !== null)) && currentCountry.name !== newCountry.name){
+        return true;
+      }
+      return false;
+    },
+    async saveUserData(){ 
+      try {
+        if(this.birthdate !== ""){
+          this.userData.details.birthdate = this.birthdate;
+        }
+        await this.updateUserData(this.userData.details);
+        this.text = this.$tc("profile.UserSuccessfullyUpdated");      
+        this.snackbar = true;
+      } catch (error) {
+        console.log(error);
+      }
+      finally{
+        this.loading = false;
+        this.resetValues();
+      }                        
+    },    
+    getMaxDatePicker(){
+      const fecha = new Date();
+      fecha.setDate(fecha.getDate() - 1);
+      return fecha.getFullYear() + '-' + ('0' + (fecha.getMonth()+1)).slice(-2) + '-' + ('0' + fecha.getDate()).slice(-2);
+    },
+    closeSnackbar(){
+      this.snackbar = false;
+    },
+    getCountries() {
+      this.$http
+        .get("/management/countries")
+        .then(res => {
+          this.countries = res;
+        });
+    },  
+    restrictChars(event){
+      if(event.charCode < 48 || event.charCode > 57 || (this.userData.details.phone !== null && this.userData.details.phone.length === 15)){
+          event.preventDefault();
+      }        
+    },
+    validateMaxChars(event, input){
+      if(input !== null && input.length === 15){
+        event.preventDefault();
+      }
     },
   },
-  methods: {},
   mounted() {
-    if (this.user) {
-      this.firstName = this.user.details.firstName;
-      this.lastName = this.user.details.lastName;
-      this.middleName = this.user.details.middleName;
-      this.secondLastName = this.user.details.secondLastName;
-      this.phone = this.user.details.phone;
-      this.email = this.user.email;
-      this.addres = this.user.details.addres;
-      this.birthdate = this.user.details.birthdate;
-    }
-  },
+    this.getCountries();
+    this.resetValues();
+  },  
+  
   computed: {
-    ...mapState("auth", ["user"]),
-    photoUser() {
-      if (!this.user) return false;
-
-      return this.user.details.photo;
+    ...mapState("auth", ["user"]),       
+    emailErrors() {
+      const errors = [];
+      if (!this.$v.userData.email.$dirty) return errors;
+      !this.$v.userData.email.email && errors.push(
+        `${this.$tc(
+          "error-messages.ValidEmail"
+        )}`        
+      );
+      !this.$v.userData.email.required && errors.push(
+        `${this.$tc(
+          "error-messages.EmailRequired"
+        )}`        
+      );
+      return errors;
     },
+    firstNameErrors() {
+      const errors = [];
+      if (!this.$v.userData.details.firstName.$dirty) return errors;
+      !this.$v.userData.details.firstName.required && errors.push(
+        `${this.$tc(
+          "error-messages.FirstNameRequired"
+        )}`        
+      );
+      return errors;
+    },
+    lastNameErrors() {
+      const errors = [];
+      if (!this.$v.userData.details.lastName.$dirty) return errors;
+      !this.$v.userData.details.lastName.required && errors.push(
+        `${this.$tc(
+          "error-messages.LastNameRequired"
+        )}`        
+      );
+      return errors;
+    },               
   },
 };
 </script>
 
-<style lang="scss" scoped>
-.user {
-  box-sizing: border-box;
-}
-.perfil-circle {
-  border-radius: 50%;
-  width: 100px;
-  overflow: hidden;
-  margin: 0;
-  height: 100px;
-}
-.perfil-photo {
-  width: 100%;
-}
-.perfil-name {
-  font-size: 20px;
-  margin-left: 0.5em;
-  width: 250px;
+<style scoped>
+@media only screen and (max-width: 1263px) {    
+    .dateOfBirthPosition{
+      margin-top: -29.5%;
+    }
 }
 
-.perfil-name,
-.perfil-circle {
-  display: inline-block;
-  vertical-align: middle;
+@media only screen and (max-width: 959px) {
+    .dateOfBirthPosition{
+      margin-top: -31%;
+    }
 }
-.user-details {
-  margin-left: 35px;
-  padding: 1em;
-  display: table;
-}
-.detail {
-  display: table-cell;
 
-  padding-left: 100px;
+@media only screen and (max-width: 599px) {
+    .dateOfBirthPosition{
+      margin-top: -7%;
+    }
 }
-b,
-h2 {
-  color: blue;
+@media only screen and (min-width: 1264px) {
+    .dateOfBirthPosition{
+      margin-top: -15%;
+    }
 }
 </style>

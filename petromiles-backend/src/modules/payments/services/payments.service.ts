@@ -51,7 +51,10 @@ export class PaymentsService {
     return mostRecentRate;
   }
 
-  async getInterests(trasactionType: TransactionType): Promise<Interest[]> {
+  async getInterests(
+    trasactionType: TransactionType,
+    platformInterestType,
+  ): Promise<Interest[]> {
     let interests: Interest[] = [];
     const thirdPartyInterest = await this.thirdPartyInterestService.get(
       PaymentProvider.STRIPE,
@@ -64,7 +67,7 @@ export class PaymentsService {
     });
 
     const platformInterest = await this.platformInterestService.getInterestByName(
-      PlatformInterest.BUY,
+      platformInterestType,
     );
     interests.push({
       operation: 1,
@@ -125,6 +128,7 @@ export class PaymentsService {
     user,
     idClientBankAccount,
     amount,
+    amountToCharge,
   ): Promise<Transaction> {
     const { id, email } = user;
     const clientBankAccount = await this.clientBankAccountService.getOne(
@@ -133,9 +137,25 @@ export class PaymentsService {
     );
 
     if (await this.verifyEnoughPoints(email, amount)) {
+      await this.paymentProviderService.updateBankAccountOfAnAccount(
+        clientBankAccount.userClient.userDetails.accountId,
+        clientBankAccount.transferId,
+        {
+          default_for_currency: true,
+        },
+      );
+
+      const transfer = await this.paymentProviderService.createTransfer({
+        destination: clientBankAccount.userClient.userDetails.accountId,
+        currency: 'usd',
+        amount: amountToCharge,
+        source_type: 'bank_account',
+      });
+
       return this.transactionService.createWithdrawalTransaction(
         clientBankAccount,
         amount,
+        transfer.id,
       );
     }
 
@@ -175,7 +195,7 @@ export class PaymentsService {
     return false;
   }
 
-  async sendInvoiceEmail(user, file) {
+  async sendPaymentInvoiceEmail(user, file) {
     let userClient = await getConnection()
       .getRepository(UserClient)
       .findOne({ email: user.email });
@@ -193,6 +213,38 @@ export class PaymentsService {
         `mails.sendgrid.templates.${template}`,
       ),
       dynamic_template_data: { user: userClient.userDetails.firstName },
+      attachments: [
+        {
+          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}`,
+          type: file.mimetype,
+          content: file.buffer.toString('base64'),
+        },
+      ],
+    });
+  }
+
+  async sendWithdrawalInvoiceEmail(user, file, points, total) {
+    let userClient = await getConnection()
+      .getRepository(UserClient)
+      .findOne({ email: user.email });
+
+    const languageMails = userClient.userDetails.language.name;
+
+    const template = `withdrawal[${languageMails}]`;
+
+    const subject = mailsSubjets.invoice[languageMails];
+
+    this.mailsService.sendEmail({
+      to: userClient.email,
+      subject: subject,
+      templateId: this.configService.get(
+        `mails.sendgrid.templates.${template}`,
+      ),
+      dynamic_template_data: {
+        user: userClient.userDetails.firstName,
+        numberPoints: points,
+        dollarWithdrawal: total,
+      },
       attachments: [
         {
           filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}`,

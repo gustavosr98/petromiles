@@ -19,6 +19,10 @@ import { ClientBankAccountService } from './services/client-bank-account.service
 import { BankAccount } from '@/entities/bank-account.entity';
 import { StateBankAccount } from '@/entities/state-bank-account.entity';
 import { ClientBankAccount } from '@/entities/client-bank-account.entity';
+import {UserClientService} from "@/modules/user/services/user-client.service";
+import {UserClient} from "@/entities/user-client.entity";
+import {UserDetails} from "@/entities/user-details.entity";
+import {State} from "@/entities/state.entity";
 
 @Module({
   imports: [
@@ -26,6 +30,9 @@ import { ClientBankAccount } from '@/entities/client-bank-account.entity';
       BankAccount,
       StateBankAccount,
       ClientBankAccount,
+        UserClient,
+        UserDetails,
+        State,
     ]),
     PaymentProviderModule,
     ManagementModule,

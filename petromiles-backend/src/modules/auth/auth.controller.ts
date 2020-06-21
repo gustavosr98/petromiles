@@ -8,6 +8,7 @@ import {
   UseGuards,
   Get,
   ClassSerializerInterceptor,
+  Ip,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -20,7 +21,7 @@ import { Roles } from './decorators/roles.decorator';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { HttpRequest } from '@/logger/http-requests.enum';
 
-import { PasswordEncryptorInterceptor } from './interceptors/password-encryptor.interceptor';
+import { PasswordEncryptorInterceptor } from '@/interceptors/password-encryptor.interceptor';
 import { RolesGuard } from './guards/roles.guard';
 import { AuthService } from './auth.service';
 
@@ -34,11 +35,12 @@ export class AuthController {
 
   @UseInterceptors(PasswordEncryptorInterceptor)
   @Post('signup')
-  async signUpClient(@Body(ValidationPipe) user: CreateUserDTO) {
+  async signUpClient(@Ip() ip, @Body(ValidationPipe) user: CreateUserDTO) {
     this.logger.http(
       `[${ApiModules.AUTH}] {${user.email}} Client is starting the sign up process`,
     );
-    return await this.authService.createUserClient(user);
+
+    return await this.authService.createUserClient(user, ip);
   }
 
   @Post('login')

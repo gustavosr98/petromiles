@@ -17,7 +17,6 @@ import { AuthGuard } from '@nestjs/passport';
 // SERVICES
 import { ManagementService } from '@/modules/management/services/management.service';
 import { PlatformInterestService } from '@/modules/management/services/platform-interest.service';
-import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
 import { PointsConversionService } from '@/modules/management/services/points-conversion.service';
 import { ThirdPartyInterestService } from '@/modules/management/services/third-party-interest.service';
 
@@ -29,10 +28,10 @@ import {UpdateUserStateDTO} from "@/modules/management/dto/update-user-state.dto
 
 // ENTITIES
 import { ThirdPartyInterest } from '@/entities/third-party-interest.entity';
-import {State} from "@/entities/state.entity";
 import {ApiModules} from "@/logger/api-modules.enum";
 import {HttpRequest} from "@/logger/http-requests.enum";
 import {StateUser} from "@/entities/state-user.entity";
+;
 
 const baseEndpoint = 'management';
 @UseGuards(AuthGuard('jwt'))
@@ -50,6 +49,11 @@ export class ManagementController {
   @Get('languages')
   getLanguages() {
     return this.managementService.getLanguages();
+  }
+
+  @Get('countries')
+  getCountries() {
+    return this.managementService.getCountries();
   }
 
   @Get('platform-interest')
@@ -115,4 +119,5 @@ export class ManagementController {
     );
     return this.managementService.updateUserState(updateUserStateDTO.role, updateUserStateDTO.state, userId, user.id);
   }
+
 }

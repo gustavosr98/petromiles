@@ -2,12 +2,17 @@ import { TransactionType } from '../../enums/transaction.enum';
 import { PaymentProvider } from '../../enums/payment-provider.enum';
 import { Injectable, Inject } from '@nestjs/common';
 import { SchedulerRegistry, Timeout, Interval } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
 
+import { getConnection } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+// CONSTANTS
+import { mailsSubjets } from '@/constants/mailsSubjectConst';
 
 // SERVICES
 import { StripeService } from '@/modules/payment-provider/stripe/stripe.service';
@@ -15,9 +20,11 @@ import { ClientBankAccountService } from '@/modules/bank-account/services/client
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 import { StateTransactionService } from '@/modules/transaction/services/state-transaction.service';
 import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
+import { MailsService } from '@/modules/mails/mails.service';
 
 // ENTITIES
 import { Task } from '@/entities/task.entity';
+import { Transaction } from '@/entities/transaction.entity';
 
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
@@ -38,6 +45,8 @@ export class CronService {
     private transactionService: TransactionService,
     private stateTransactionService: StateTransactionService,
     private suscriptionService: SuscriptionService,
+    private mailsService: MailsService,
+    private configService: ConfigService,
   ) {}
 
   @Timeout(1000)
@@ -116,12 +125,38 @@ export class CronService {
       const charge = await this.stripeService.getCharge(
         unverifiedTransaction.paymentProviderTransactionId,
       );
+      
+      const transactionState = await getConnection()
+            .getRepository(Transaction)
+            .findOne({ idTransaction: unverifiedTransaction.idTransaction });
+
+      const languageMails = transactionState.clientBankAccount.userClient.userDetails.language.name;
+      const points = (transactionState.rawAmount / transactionState.pointsConversion.onePointEqualsDollars)/100;
+
       if (charge.status === StripeChargeStatus.SUCCEEDED) {
         await this.stateTransactionService.update(
           StateName.VALID,
           unverifiedTransaction,
         );
-
+        
+        //mail delivery when verification is valid for a payment
+        const template = `successfulPointsPayment[${languageMails}]`;    
+        const subject =  mailsSubjets.successful_points_payment[languageMails];
+        
+    
+        const msg = {
+          to: transactionState.clientBankAccount.userClient.email,
+          subject: subject,
+          templateId: this.configService.get<string>(
+            `mails.sendgrid.templates.${template}`,
+          ),
+          dynamic_template_data: {
+            user: transactionState.clientBankAccount.userClient.userDetails.firstName,
+            numberPoints: points,
+            },
+          };
+        this.mailsService.sendEmail(msg);
+        
         this.suscriptionService.upgradeSubscriptionIfIsPossible(
           unverifiedTransaction.idUserClient,
           unverifiedTransaction,
@@ -131,6 +166,22 @@ export class CronService {
           StateName.INVALID,
           unverifiedTransaction,
         );
+        
+        const template = `failedPointsPayment[${languageMails}]`;    
+        const subject =  mailsSubjets.failed_points_payment[languageMails];
+    
+        const msg = {
+          to: transactionState.clientBankAccount.userClient.email,
+          subject: subject,
+          templateId: this.configService.get<string>(
+            `mails.sendgrid.templates.${template}`,
+          ),
+          dynamic_template_data: {
+            user: transactionState.clientBankAccount.userClient.userDetails.firstName,
+            numberPoints: points,
+            },
+          };
+        this.mailsService.sendEmail(msg);
       }
     });
   }

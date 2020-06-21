@@ -37,16 +37,6 @@ export default {
     filterData(filteredData) {
       this.fetchedData = filteredData;
     },
-    getTransactionAmount(transaction) {
-      if (transaction.type === Transaction.BANK_ACCOUNT_VERIFICATION) {
-        return transaction.transactionInterest[0].platformInterest.amount;
-      }
-
-      return (
-        parseInt(transaction.rawAmount) / 100 +
-        parseInt(transaction.totalAmountWithInterest) / 100
-      ).toFixed(3);
-    },
   },
   computed: {
     title() {
@@ -57,22 +47,27 @@ export default {
         {
           text: this.$tc("common.code"),
           align: "center",
-          value: "idTransaction",
+          value: "id",
         },
         {
           text: this.$tc("common.date"),
           align: "center",
-          value: "initialDate",
-        },
-        {
-          text: this.$tc("common.total", 0) + " ( $ )",
-          align: "center",
-          value: "amount",
+          value: "date",
         },
         {
           text: this.$tc("common.type"),
           align: "center",
-          value: "type",
+          value: "translatedType",
+        },
+        {
+          text: this.$tc("common.total", 0) + " ( $ )",
+          align: "center",
+          value: "transactionAmount",
+        },
+        {
+          text: this.$t("payments.points"),
+          align: "center",
+          value: "points",
         },
         {
           text: this.$tc("common.state"),
@@ -89,18 +84,16 @@ export default {
     mungedData() {
       return this.fetchedData.map(data => {
         const state = {
-          name: data.stateTransaction[0].state.name,
-          translated: this.$tc(
-            `state-name.${data.stateTransaction[0].state.name}`
-          ),
+          name: data.state,
+          translated: this.$tc(`state-name.${data.state}`),
         };
 
         return {
           ...data,
+          transactionAmount: `$ ${data.total.toFixed(2)}`,
           state,
-          id: data.idTransaction,
-          amount: this.getTransactionAmount(data),
-          type: this.$tc(`transaction-type.${data.type}`),
+          points: data.pointsEquivalent ? data.pointsEquivalent : "-",
+          translatedType: this.$tc(`transaction-type.${data.type}`),
         };
       });
     },

@@ -20,4 +20,12 @@ export const mailsSubjets = Object.freeze({
 		english: 'Bank account deleted',
 		spanish: 'Se elimino la cuenta bancaria',
 	},
+	successful_points_payment: {
+		english: 'Purchase of points approved',
+		spanish: 'Compra de puntos aprobada',
+	},
+	failed_points_payment: {
+		english: 'Purchase of points rejected',
+		spanish: 'Compra de puntos rechazada',
+	},
 });

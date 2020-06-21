@@ -111,12 +111,31 @@ export class PaymentProviderService {
   }
 
   // ACCOUNTS
-  async createAccount(user: { email: string; customerId: string }) {
+  async createAccount(user: {
+    email: string;
+    name: string;
+    lastName: string;
+    customerId: string;
+    ip: string;
+  }) {
     const account = await this.stripeService.createAccount({
       type: 'custom',
       country: 'US',
       email: user.email,
       requested_capabilities: ['transfers'],
+      business_type: 'individual',
+      individual: {
+        first_name: user.name,
+        last_name: user.lastName,
+        email: user.email,
+      },
+      business_profile: {
+        url: user.name.toLowerCase().replace(' ', '') + '.com',
+      },
+      tos_acceptance: {
+        ip: user.ip,
+        date: Math.round(new Date().getTime() / 1000),
+      },
       metadata: {
         customerId: user.customerId,
       },
@@ -127,6 +146,19 @@ export class PaymentProviderService {
     );
 
     return account;
+  }
+
+  async updateBankAccountOfAnAccount(
+    accountId: string,
+    bankAccountId: string,
+    accountUpdateParams: { default_for_currency: boolean },
+  ) {
+    const updatedBankAccount = await this.stripeService.updateBankAccountOfAnAccount(
+      accountId,
+      bankAccountId,
+      accountUpdateParams,
+    );
+    return updatedBankAccount;
   }
 
   async deleteBankAccount(
@@ -142,7 +174,7 @@ export class PaymentProviderService {
 
   // TRANSFERS
   async createTransfer(transferCreateParams) {
-    const transfer = await this.stripeService.createAccount(
+    const transfer = await this.stripeService.createTransfer(
       transferCreateParams,
     );
     return transfer;

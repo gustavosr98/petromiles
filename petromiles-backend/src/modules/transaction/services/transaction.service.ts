@@ -100,101 +100,43 @@ export class TransactionService {
     };
   }
 
-  async getTransactions(email: string) {
+  async getTransactions(
+    email: string,
+  ): Promise<App.Transaction.TransactionDetails[]> {
     const transactions = await this.transactionRepository.find({
       where: `userClient.email = '${email}' AND stateTransaction.finalDate is null AND trans.transaction is null`,
       join: {
         alias: 'trans',
-        innerJoinAndSelect: {
+        leftJoinAndSelect: {
           clientBankAccount: 'trans.clientBankAccount',
+          bankAccount: 'clientBankAccount.bankAccount',
           stateTransaction: 'trans.stateTransaction',
           state: 'stateTransaction.state',
           transactionInterest: 'trans.transactionInterest',
+          thirdPartyInterest: 'transactionInterest.thirdPartyInterest',
           platformInterest: 'transactionInterest.platformInterest',
+          platformInterestExtraPoints:
+            'transactionInterest.platformInterestExtraPoints',
           userClient: 'clientBankAccount.userClient',
         },
       },
     });
 
-    return transactions;
+    return transactions.map(transaction => {
+      return transaction.calculateDetails();
+    });
   }
 
   async get(
     idTransaction: number,
-  ): Promise<App.Transaction.TransactionInformation> {
+  ): Promise<App.Transaction.TransactionDetails> {
     const transaction = await this.transactionRepository.findOne(idTransaction);
-    const state = transaction.stateTransaction.find(state => !state.finalDate)
-      .state.name;
-
-    let details;
-
-    if (transaction.type == TransactionType.BANK_ACCOUNT_VALIDATION)
-      details = this.getVerificationDetails(transaction);
-    if (transaction.type == TransactionType.SUSCRIPTION_PAYMENT)
-      details = this.getSubscriptionDetails(transaction);
-    if (transaction.type == TransactionType.DEPOSIT)
-      details = this.getDepositDetails(transaction);
-    if (transaction.type == TransactionType.WITHDRAWAL)
-      details = this.getWithdrawalDetails(transaction);
-
-    return {
-      id: transaction.idTransaction,
-      date: transaction.initialDate.toLocaleDateString(),
-      type: transaction.type,
-      bankAccount: transaction.clientBankAccount.bankAccount.accountNumber.substr(
-        -4,
-      ),
-      pointsConversion: 1 / transaction.pointsConversion.onePointEqualsDollars,
-      ...details,
-      state,
-    };
-  }
-
-  private getVerificationDetails(transaction: Transaction) {
-    const verificationInterest =
-      parseFloat(transaction.transactionInterest[0].platformInterest.amount) /
-      100;
-
-    return {
-      amount: verificationInterest,
-      interest: 0,
-      total: verificationInterest,
-    };
-  }
-
-  private getSubscriptionDetails(transaction: Transaction) {
-    const subscriptionCost = transaction.totalAmountWithInterest / 100;
-    return {
-      amount: subscriptionCost,
-      interest: 0,
-      total: subscriptionCost,
-    };
-  }
-
-  private getDepositDetails(transaction: Transaction) {
-    const amount = parseFloat((transaction.rawAmount / 100).toFixed(2));
-    const interest = parseFloat(
-      (transaction.totalAmountWithInterest / 100).toFixed(2),
-    );
-    const total = amount + interest;
-    const pointsEquivalent =
-      amount / transaction.pointsConversion.onePointEqualsDollars;
-    return { amount, interest, total, pointsEquivalent };
-  }
-
-  private getWithdrawalDetails(transaction: Transaction) {
-    const amount = parseFloat((transaction.rawAmount / 100).toFixed(2));
-    const interest = parseFloat(
-      (transaction.totalAmountWithInterest / 100).toFixed(2),
-    );
-    const total = amount + interest;
-    const pointsEquivalent =
-      amount / transaction.pointsConversion.onePointEqualsDollars;
-    return { amount, interest, total, pointsEquivalent };
+    return transaction.calculateDetails();
   }
 
   async createTransaction(
     options: App.Transaction.TransactionCreation,
+    state: StateName,
   ): Promise<Transaction> {
     const transaction: Transaction = await this.transactionRepository.save(
       options,
@@ -203,7 +145,7 @@ export class TransactionService {
     await this.stateTransactionService.createStateTransaction(
       transaction,
       options.stateTransactionDescription,
-      StateName.VERIFYING,
+      state,
     );
 
     await this.transactionInterestService.createTransactionInterest(
@@ -217,6 +159,7 @@ export class TransactionService {
     this.logger.silly(
       `[${ApiModules.TRANSACTION}] Transaction ID: ${transaction.idTransaction} was created`,
     );
+
     return transaction;
   }
 
@@ -268,18 +211,21 @@ export class TransactionService {
 
     let verificationTransaction: Transaction = null;
     for (let i = 0; i < randomAmounts.length; i++) {
-      verificationTransaction = await this.createTransaction({
-        totalAmountWithInterest: randomAmounts[i],
-        transaction: verificationTransaction,
-        rawAmount: 0,
-        type: TransactionType.BANK_ACCOUNT_VALIDATION,
-        pointsConversion: options.pointsConversion,
-        clientBankAccount: clientBankAccount,
-        thirdPartyInterest: options.thirdPartyInterest,
-        platformInterest: options.interest,
-        stateTransactionDescription:
-          StateDescription.VERIFICATION_TRANSACTION_CREATION,
-      });
+      verificationTransaction = await this.createTransaction(
+        {
+          totalAmountWithInterest: randomAmounts[i],
+          transaction: verificationTransaction,
+          rawAmount: 0,
+          type: TransactionType.BANK_ACCOUNT_VALIDATION,
+          pointsConversion: options.pointsConversion,
+          clientBankAccount: clientBankAccount,
+          thirdPartyInterest: options.thirdPartyInterest,
+          platformInterest: options.interest,
+          stateTransactionDescription:
+            StateDescription.VERIFICATION_TRANSACTION_CREATION,
+        },
+        StateName.VERIFYING,
+      );
     }
   }
 
@@ -296,18 +242,21 @@ export class TransactionService {
       thirdPartyInterestType: PaymentProvider.STRIPE,
     });
 
-    return await this.createTransaction({
-      totalAmountWithInterest:
-        suscription.cost + options.thirdPartyInterest.amountDollarCents,
-      rawAmount: 0,
-      type: TransactionType.SUSCRIPTION_PAYMENT,
-      pointsConversion: options.pointsConversion,
-      clientBankAccount: clientBankAccount,
-      thirdPartyInterest: options.thirdPartyInterest,
-      platformInterest: options.interest,
-      stateTransactionDescription: StateDescription.SUSCRIPTION_UPGRADE,
-      paymentProviderTransactionId,
-    });
+    return await this.createTransaction(
+      {
+        totalAmountWithInterest:
+          suscription.cost + options.thirdPartyInterest.amountDollarCents,
+        rawAmount: 0,
+        type: TransactionType.SUSCRIPTION_PAYMENT,
+        pointsConversion: options.pointsConversion,
+        clientBankAccount: clientBankAccount,
+        thirdPartyInterest: options.thirdPartyInterest,
+        platformInterest: options.interest,
+        stateTransactionDescription: StateDescription.SUSCRIPTION_UPGRADE,
+        paymentProviderTransactionId,
+      },
+      StateName.VERIFYING,
+    );
   }
 
   //POINT PURCHASE TRANSACTION
@@ -323,21 +272,24 @@ export class TransactionService {
       thirdPartyInterestType: PaymentProvider.STRIPE,
     });
 
-    return await this.createTransaction({
-      totalAmountWithInterest:
-        options.thirdPartyInterest.amountDollarCents +
-        parseFloat(options.interest.percentage) * amount,
-      rawAmount: this.calculateExtraPoints(options.extraPoints, amount),
-      type: TransactionType.DEPOSIT,
-      pointsConversion: options.pointsConversion,
-      clientBankAccount,
-      thirdPartyInterest: options.thirdPartyInterest,
-      platformInterest: options.interest,
-      stateTransactionDescription: StateDescription.DEPOSIT,
-      platformInterestExtraPoints: options.extraPoints,
-      operation: 1,
-      paymentProviderTransactionId,
-    });
+    return await this.createTransaction(
+      {
+        totalAmountWithInterest:
+          options.thirdPartyInterest.amountDollarCents +
+          parseFloat(options.interest.percentage) * amount,
+        rawAmount: this.calculateExtraPoints(options.extraPoints, amount),
+        type: TransactionType.DEPOSIT,
+        pointsConversion: options.pointsConversion,
+        clientBankAccount,
+        thirdPartyInterest: options.thirdPartyInterest,
+        platformInterest: options.interest,
+        stateTransactionDescription: StateDescription.DEPOSIT,
+        platformInterestExtraPoints: options.extraPoints,
+        operation: 1,
+        paymentProviderTransactionId,
+      },
+      StateName.VERIFYING,
+    );
   }
 
   private calculateExtraPoints(extraPoints, amount: number) {
@@ -356,6 +308,7 @@ export class TransactionService {
   async createWithdrawalTransaction(
     clientBankAccount: ClientBankAccount,
     amount: number,
+    paymentProviderTransactionId: string,
   ): Promise<Transaction> {
     const options = await this.getTransactionInterests({
       platformInterestType: PlatformInterest.WITHDRAWAL,
@@ -363,18 +316,22 @@ export class TransactionService {
       thirdPartyInterestType: PaymentProvider.STRIPE,
     });
 
-    return await this.createTransaction({
-      totalAmountWithInterest:
-        options.thirdPartyInterest.amountDollarCents +
-        parseFloat(options.interest.percentage) * amount,
-      rawAmount: amount,
-      type: TransactionType.WITHDRAWAL,
-      pointsConversion: options.pointsConversion,
-      clientBankAccount,
-      thirdPartyInterest: options.thirdPartyInterest,
-      platformInterest: options.interest,
-      stateTransactionDescription: StateDescription.WITHDRAWAL,
-      operation: -1,
-    });
+    return await this.createTransaction(
+      {
+        totalAmountWithInterest:
+          options.thirdPartyInterest.amountDollarCents +
+          parseFloat(options.interest.percentage) * amount,
+        rawAmount: amount,
+        type: TransactionType.WITHDRAWAL,
+        pointsConversion: options.pointsConversion,
+        clientBankAccount,
+        thirdPartyInterest: options.thirdPartyInterest,
+        platformInterest: options.interest,
+        stateTransactionDescription: StateDescription.WITHDRAWAL,
+        operation: -1,
+        paymentProviderTransactionId,
+      },
+      StateName.VALID,
+    );
   }
 }

@@ -79,4 +79,35 @@ export class BankAccountService {
   async existsBankAccount(accountNumber): Promise<BankAccount> {
     return await this.bankAccountRepository.findOne({ accountNumber });
   }
+
+  async getAllAccounts(){
+
+    const accounts = await this.bankAccountRepository
+        .createQueryBuilder('ba')
+        .select('ba."routingNumber", ba."accountNumber", ba."idBankAccount",uc.email ')
+        .distinct(true)
+        .leftJoin('ba.clientBankAccount', 'cba')
+        .leftJoin('ba.userDetails', 'ud')
+        .leftJoin('cba.userClient','uc')
+        .leftJoin('cba.stateBankAccount', 'sba')
+        .where('sba."finalDate" IS NULL')
+        .getRawMany()
+
+    return accounts
+  }
+
+  async accountInfo(accountId: number){
+    return await this.bankAccountRepository
+        .createQueryBuilder('ba')
+        .select('ba."routingNumber", ba."accountNumber",ba.type, ud."firstName", ud."lastName", uc.email, s.name as state, sba."initialDate"')
+        .distinct(true)
+        .leftJoin('ba.clientBankAccount','cba')
+        .leftJoin('ba.userDetails', 'ud')
+        .leftJoin('cba.userClient','uc')
+        .leftJoin('cba.stateBankAccount', 'sba')
+        .leftJoin('sba.state','s')
+        .where('ba."idBankAccount" = :id', {id: accountId})
+        .andWhere('sba."finalDate" IS NULL')
+        .execute()
+  }
 }

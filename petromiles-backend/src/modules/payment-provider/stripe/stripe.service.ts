@@ -72,7 +72,7 @@ export class StripeService {
     bankAccountId: string;
     amounts: number[];
   }) {
-    if (process.env.NODE_ENV !== 'production') amounts = [32, 45];
+    if (process.env.PETROMILES_ENV === 'development') amounts = [32, 45];
     const verification = await this.stripe.customers.verifySource(
       customerId,
       bankAccountId,
@@ -134,6 +134,17 @@ export class StripeService {
       .createExternalAccount(accountId, { external_account: bankAccountId })
       .catch(e => this.errorHandler(e, null));
     return asociatedBankAccount;
+  }
+
+  async updateBankAccountOfAnAccount(
+    accountId: string,
+    bankAccountId: string,
+    accountUpdateParams: Stripe.ExternalAccountUpdateParams,
+  ): Promise<Stripe.BankAccount | Stripe.Card> {
+    const udatedBankAccount = await this.stripe.accounts
+      .updateExternalAccount(accountId, bankAccountId, accountUpdateParams)
+      .catch(e => this.errorHandler(e, null));
+    return udatedBankAccount;
   }
 
   async deleteBankAccount(customerId: string, bankAccountId: string) {

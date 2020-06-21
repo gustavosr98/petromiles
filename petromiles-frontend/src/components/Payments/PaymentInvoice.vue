@@ -14,10 +14,7 @@
       @hasGenerated="hasGenerated($event)"
       ref="html2Pdf"
     >
-      <section
-        style="width: 100%; margin-top:100px; margin-left: 100px; margin-rigth:100px"
-        slot="pdf-content"
-      >
+      <section class="invoice-container" slot="pdf-content">
         <div class="invoice-box">
           <table cellpadding="0" cellspacing="0">
             <tr class="top">
@@ -26,19 +23,19 @@
                 <table>
                   <tr>
                     <td>
-                      <span style="font-weight:bold; font-size: 28px">
+                      <span class="invoice-title">
                         {{
                         $t("invoice.invoice")
                         }}
                       </span>
-                      <span style="font-size: 20px;">&nbsp; #{{ transaction.idTransaction }}</span>
+                      <span class="invoice-date">&nbsp; #{{ transaction.idTransaction }}</span>
                       <br />
                       {{ date }}
                       <br />
                     </td>
 
                     <td class="align-right">
-                      <img :src="icon" style="width:50%; max-width:70px;" />
+                      <img :src="icon" class="invoice-icon" />
                     </td>
                   </tr>
                 </table>
@@ -50,13 +47,13 @@
                 <table>
                   <tr>
                     <td>
-                      <span style="font-weight:bold;">{{ $tc("role.client", 0) }}:</span>
+                      <span class="invoice-name">{{ $tc("role.client", 0) }}:</span>
                       {{ userFullName }}
                       <br />
-                      <span style="font-weight:bold;">{{ $t("user-details.email") }}:</span>
+                      <span class="invoice-name">{{ $t("user-details.email") }}:</span>
                       {{ user.email }}
                       <br />
-                      <span style="font-weight:bold;">{{ $tc("navbar.bankAccount", 0) }}:</span>
+                      <span class="invoice-name">{{ $tc("navbar.bankAccount", 0) }}:</span>
                       xxxx- {{ bankAccount }}
                     </td>
 
@@ -79,26 +76,28 @@
                     <td>{{ $tc("common.amount", 0) }} ($)</td>
                   </tr>
 
-                  <tr class="item center-item" style="height: 50px; padding-top: 10px">
-                    <td style="text-transform: uppercase;">{{ transaction.type }}</td>
+                  <tr class="item center-item invoice-table-content">
+                    <td
+                      class="invoice-table-content-type"
+                    >{{ this.$tc(`transaction-type.${transaction.type}`) }}</td>
                     <td>{{ points }}</td>
-                    <td>{{ transaction.rawAmount / 100 }}</td>
+                    <td>{{ (transaction.rawAmount / 100).toFixed(2) }}</td>
                   </tr>
-                  <tr class="item center-item" style="height: 50px; padding-top: 10px">
+                  <tr class="item center-item invoice-table-content">
                     <td></td>
                     <td>Subtotal:</td>
-                    <td>{{ transaction.rawAmount / 100 }}</td>
+                    <td>{{ (transaction.rawAmount / 100).toFixed(2) }}</td>
                   </tr>
-                  <tr class="item center-item" style="height: 50px; padding-top: 10px">
+                  <tr class="item center-item invoice-table-content">
                     <td></td>
-                    <td>{{ $t("invoice.taxes") }} ({{ tax.toFixed(3) }}):</td>
+                    <td>{{ $t("invoice.taxes") }} ({{ tax.toFixed(2) }}):</td>
                     <td>{{ total }}</td>
                   </tr>
                   <tr class="total center-item">
                     <td></td>
                     <td></td>
                     <td>
-                      <span style="font-weight: bold;">{{ $t("common.total") }}:</span>
+                      <span class="invoice-name">{{ $t("common.total") }}:</span>
                       $ {{ total }}
                     </td>
                   </tr>
@@ -126,6 +125,7 @@ export default {
   },
   props: {
     transaction: { type: Object },
+    typeInvoice: String,
   },
   data() {
     return {
@@ -170,10 +170,13 @@ export default {
         this.transaction.platformInterest.percentage *
         this.transaction.rawAmount;
 
-      return (thirdPartyInterest + platformInterest) / 100;
+      return (
+        ((thirdPartyInterest + platformInterest) / 100) *
+        this.transaction.operation
+      );
     },
     total: function() {
-      return (this.transaction.rawAmount / 100 + this.tax).toFixed(3);
+      return (this.transaction.rawAmount / 100 + this.tax).toFixed(2);
     },
   },
   methods: {
@@ -182,14 +185,17 @@ export default {
     },
 
     hasGenerated(blob) {
-      this.$emit("pdfIsCreated");
+      this.$emit("pdfWasCreated");
       var formData = new FormData();
       formData.append(
         "file",
         blob,
         `petromiles[${this.$tc("invoice.invoice")}]-${this.date}`
       );
-      this.$http.post("/payments/invoice", formData);
+      this.$http.post(
+        `/payments/${this.typeInvoice}/invoice/${this.points}/${this.total}`,
+        formData
+      );
     },
   },
   mounted() {
@@ -199,6 +205,33 @@ export default {
 </script>
 
 <style scoped>
+.invoice-container {
+  width: 100%;
+  margin-top: 100px;
+  margin-left: 100px;
+  margin-right: 100px;
+}
+.invoice-title {
+  font-weight: bold;
+  font-size: 28px;
+}
+.invoice-date {
+  font-size: 20px;
+}
+.invoice-icon {
+  width: 50%;
+  max-width: 70px;
+}
+.invoice-name {
+  font-weight: bold;
+}
+.invoice-table-content {
+  height: 50px;
+  padding-top: 10px;
+}
+.invoice-table-content-type {
+  text-transform: uppercase;
+}
 .invoice-box {
   width: 100%;
   margin-left: 10%;

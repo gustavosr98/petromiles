@@ -13,6 +13,7 @@ export const mutations = {
       details: userData.userDetails,
       role: userData.role,
       authToken: userData.token,
+      federated: userData.federated,
     };
 
     localStorage.setItem(
@@ -22,6 +23,22 @@ export const mutations = {
   },
   changeLang(state, language) {
     state.user.details.language = language;
+
+    localStorage.setItem(
+      authConstants.USER_LOCAL_STORAGE,
+      JSON.stringify(state.user)
+    );
+  },
+  updateProfileImage(state, imageURL){
+    state.user.details.photo = imageURL;
+
+    localStorage.setItem(
+      authConstants.USER_LOCAL_STORAGE,
+      JSON.stringify(state.user)
+    );
+  },
+  updateUserData(state, userData){
+    state.user.details = userData;
 
     localStorage.setItem(
       authConstants.USER_LOCAL_STORAGE,
@@ -81,6 +98,24 @@ export const actions = {
     await httpClient.patch("user/language", { language: language.bdName });
     commit("changeLang", language);
   },
+  async updateProfileImage({ commit }, imageURL){
+    await httpClient.put("user/update-details", { photo : imageURL });
+    commit("updateProfileImage", imageURL);
+  },
+  async changePassword({ commit }, passwords){
+    await httpClient.put("user/update-password", {
+      currentPassword: passwords.currentPassword,
+      password: passwords.newPassword
+    });    
+  },
+  async updateUserData({ commit }, userData){
+    const data = JSON.parse(JSON.stringify(userData));
+    if(data.birthdate !== null){
+      data.birthdate = data.birthdate.replace("-", "/").replace("-", "/");
+    }    
+    await httpClient.put("user/update-details", data);
+    commit("updateUserData", userData);
+  }
 };
 
 export const getters = {

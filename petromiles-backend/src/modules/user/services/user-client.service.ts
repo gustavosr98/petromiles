@@ -1,16 +1,23 @@
 import { ApiModules } from '@/logger/api-modules.enum';
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository, getConnection } from 'typeorm';
+import { Repository, getConnection, UpdateResult } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 // INTERFACES
-import { CreateUserDTO } from '@/modules/user/dto/create-user.dto';
 import { StateName } from '@/enums/state.enum';
 import { Language as LanguageEnum } from '@/enums/language.enum';
 import { Role } from '@/enums/role.enum';
+import { UpdatePasswordDTO } from '@/modules/user/dto/update-password.dto';
+import { UpdateDetailsDTO } from '@/modules/user/dto/update-details.dto';
+import { CreateUserDTO } from '@/modules/user/dto/create-user.dto';
 
 // SERVICES
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
@@ -20,7 +27,6 @@ import { ManagementService } from '@/modules/management/services/management.serv
 import { UserClient } from '@/entities/user-client.entity';
 import { UserRole } from '@/entities/user-role.entity';
 import { StateUser } from '@/entities/state-user.entity';
-import { State } from '@/entities/state.entity';
 import { ClientPoints } from '@/entities/user-points.entity';
 import { UserDetails } from '@/entities/user-details.entity';
 import { Language } from '@/entities/language.entity';
@@ -41,7 +47,10 @@ export class UserClientService {
     return await this.userClientRepository.find();
   }
 
-  async create(createUserDTO: CreateUserDTO): Promise<App.Auth.UserClient> {
+  async create(
+    createUserDTO: CreateUserDTO,
+    ip: string,
+  ): Promise<App.Auth.UserClient> {
     const {
       firstName,
       lastName,
@@ -67,11 +76,13 @@ export class UserClientService {
         name: `${firstName} ${lastName}`,
       },
     );
-
     const paymentProviderAccount = await this.paymentProviderService.createAccount(
       {
         email: user.email,
+        name: firstName,
+        lastName,
         customerId: paymentProviderCustomer.id,
+        ip,
       },
     );
 
@@ -149,19 +160,13 @@ export class UserClientService {
   }
 
   async getActive(email: string): Promise<UserClient> {
-    return await getConnection()
-      .createQueryBuilder()
-      .select('client')
-      .from(UserClient, 'client')
-      .innerJoin(
-        StateUser,
-        'state_user',
-        'state_user.fk_user_client = client."idUserClient"',
-      )
-      .innerJoin(State, 'state', 'state."idState" = state_user.fk_state')
-      .where(`client.email = '${email}'`)
+    return await this.userClientRepository
+      .createQueryBuilder('userClient')
+      .innerJoin('userClient.stateUser', 'su')
+      .innerJoin('su.state', 'state')
+      .where(`userClient.email = '${email}'`)
       .andWhere(`state.name = '${StateName.ACTIVE}'`)
-      .andWhere('state_user."finalDate" is null')
+      .andWhere('su."finalDate" is null')
       .getOne();
   }
 
@@ -193,10 +198,16 @@ export class UserClientService {
   }
 
   async getDetails(userClient: UserClient): Promise<UserDetails> {
-    return await this.userDetailsRepository.findOne(userClient);
+    if (userClient)
+      return await this.userDetailsRepository.findOne({
+        where: {
+          fk_user_client: userClient.idUserClient,
+        },
+      });
+    return null;
   }
 
-  async changeDefaultLanguage(
+  async updateDefaultLanguage(
     email: string,
     language: string,
   ): Promise<Language> {
@@ -213,5 +224,38 @@ export class UserClientService {
     await this.userDetailsRepository.save(userDetails);
 
     return languageFound;
+  }
+
+  async updatePassword(user, credentials: UpdatePasswordDTO) {
+    const { password, currentPassword, salt } = credentials;
+    const userClient = await this.get({ idUserClient: user.id });
+
+    if (await userClient.isPasswordCorrect(currentPassword)) {
+      await this.userClientRepository
+        .createQueryBuilder()
+        .update(UserClient)
+        .set({ password, salt })
+        .where('idUserClient = :id', { id: userClient.idUserClient })
+        .execute();
+
+      this.logger.silly(
+        `[${ApiModules.USER}] {${user.email}} Password successfully updated`,
+      );
+      return userClient;
+    }
+
+    this.logger.error(
+      `[${ApiModules.USER}] {${user.email}}  Could not update password | Incorrect password`,
+    );
+    throw new UnauthorizedException('error-messages.incorrectPassword');
+  }
+
+  async updateDetails(user, details: UpdateDetailsDTO): Promise<UpdateResult> {
+    return await this.userDetailsRepository
+      .createQueryBuilder()
+      .update(UserDetails)
+      .set({ ...details })
+      .where('fk_user_client = :id', { id: user.id })
+      .execute();
   }
 }

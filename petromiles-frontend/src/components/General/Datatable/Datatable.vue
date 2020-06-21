@@ -26,7 +26,7 @@
         </v-chip>
       </template>
       <template #item.details="{item}">
-        <v-btn color="secondary" x-small :to="createLink(item.id)">
+        <v-btn color="secondary" @click="seeDetails(item.id)" x-small>
           <v-icon dark>mdi-plus</v-icon>
         </v-btn>
       </template>
@@ -59,14 +59,25 @@
         </v-card>
       </v-dialog>
     </v-row>
+
+    <v-row justify="center">
+      <v-dialog v-model="transactionDetails" max-width="450">
+        <transaction-information :idTransaction="elementId" v-if="transactionDetails" />
+      </v-dialog>
+    </v-row>
   </v-card>
 </template>
 
 <script>
 import { getColor } from "@/mixins/tables/getColor.js";
+import TransactionInformation from "@/components/Transactions/TransactionInformation";
+
 export default {
   name: "datatable",
   mixins: [getColor],
+  components: {
+    "transaction-information": TransactionInformation,
+  },
   props: {
     title: {
       type: String,
@@ -88,9 +99,15 @@ export default {
       isLoading: false,
       eliminateDialog: false,
       elementToDelete: null,
+      transactionDetails: false,
+      elementId: null,
     };
   },
   methods: {
+    seeDetails(id) {
+      this.elementId = id;
+      this.transactionDetails = true;
+    },
     createLink(id) {
       return `${this.linkTo}/${id}`;
     },

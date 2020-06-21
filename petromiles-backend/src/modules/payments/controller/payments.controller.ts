@@ -63,7 +63,7 @@ export class PaymentsController {
     @GetUser() user,
     @Body(ValidationPipe) paymentProperties: CreatePaymentDTO,
   ) {
-    const { idClientBankAccount, amount } = paymentProperties;
+    const { idClientBankAccount, amount, amountToCharge } = paymentProperties;
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/withdraw-points`,
     );
@@ -72,6 +72,7 @@ export class PaymentsController {
       user,
       idClientBankAccount,
       amount,
+      amountToCharge,
     );
   }
 
@@ -84,21 +85,36 @@ export class PaymentsController {
     return onePointToDollars;
   }
 
-  @Get('interests/:transactionType')
+  @Get('interests/:transactionType/:platformInterestType')
   async getInterest(
     @GetUser() user,
     @Param('transactionType') transactionType: TransactionType,
+    @Param('platformInterestType') platformInterestType,
   ): Promise<Interest[]> {
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/interests/${transactionType}`,
     );
-    const interests = await this.paymentsService.getInterests(transactionType);
+    const interests = await this.paymentsService.getInterests(
+      transactionType,
+      platformInterestType,
+    );
     return interests;
   }
 
-  @Post('invoice')
+  @Post('deposit/invoice/:points/:total')
   @UseInterceptors(FileInterceptor('file'))
-  sendInvoiceEmail(@UploadedFile() file, @GetUser() user) {
-    this.paymentsService.sendInvoiceEmail(user, file);
+  sendPaymentInvoiceEmail(@UploadedFile() file, @GetUser() user) {
+    this.paymentsService.sendPaymentInvoiceEmail(user, file);
+  }
+
+  @Post('withdrawal/invoice/:points/:total')
+  @UseInterceptors(FileInterceptor('file'))
+  sendWithdrawalInvoiceEmail(
+    @UploadedFile() file,
+    @GetUser() user,
+    @Param('points') points,
+    @Param('total') total,
+  ) {
+    this.paymentsService.sendWithdrawalInvoiceEmail(user, file, points, total);
   }
 }

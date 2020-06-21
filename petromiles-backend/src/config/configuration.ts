@@ -57,6 +57,18 @@ export default () => ({
            english:process.env.SENDGRID_BANK_DELETION_EN_TEMPLATE,
            spanish:process.env.SENDGRID_BANK_DELETION_ES_TEMPLATE,
         },
+        successfulPointsPayment: {
+           english:process.env.SENDGRID_SUCCESSFUL_POINTS_PAYMENT_EN_TEMPLATE,
+           spanish:process.env.SENDGRID_SUCCESSFUL_POINTS_PAYMENT_ES_TEMPLATE,  
+        },
+        failedPointsPayment: {
+           english:process.env.SENDGRID_FAILED_POINTS_PAYMENT_EN_TEMPLATE,
+           spanish:process.env.SENDGRID_FAILED_POINTS_PAYMENT_ES_TEMPLATE,
+        },
+        withdrawal: {
+          english: process.env.SENDGRID_WITHDRAWAL_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_WITHDRAWAL_ES_TEMPLATE,
+        },
       },
     },
   },
