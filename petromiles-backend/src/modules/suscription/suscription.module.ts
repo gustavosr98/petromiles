@@ -16,6 +16,7 @@ import { SuscriptionController } from '@/modules/suscription/controller/suscript
 import { Suscription } from '@/entities/suscription.entity';
 import { UserClient } from '@/entities/user-client.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import {PlatformInterest} from "@/entities/platform-interest.entity";
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     MailsModule,
     ManagementModule,
     PaymentProviderModule,
-    TypeOrmModule.forFeature([Suscription, UserClient]),
+    TypeOrmModule.forFeature([Suscription, UserClient, PlatformInterest]),
   ],
   providers: [SuscriptionService],
   exports: [SuscriptionService],

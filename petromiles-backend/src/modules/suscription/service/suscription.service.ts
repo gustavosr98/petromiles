@@ -21,6 +21,7 @@ import { UserClient } from '@/entities/user-client.entity';
 import { Transaction } from '@/entities/transaction.entity';
 import { Suscription } from '@/entities/suscription.entity';
 import { UserSuscription } from '@/entities/user-suscription.entity';
+import { PlatformInterest as PlatformInterestEntity} from '@/entities/platform-interest.entity';
 
 // SERVICES
 import { UserClientService } from '@/modules/user/services/user-client.service';
@@ -39,6 +40,8 @@ export class SuscriptionService {
     private userClientRepository: Repository<UserClient>,
     @InjectRepository(Suscription)
     private suscriptionRepository: Repository<Suscription>,
+    @InjectRepository(PlatformInterestEntity)
+    private platformInterestRepository: Repository<PlatformInterestEntity>,
     private userClientService: UserClientService,
     private clientBankAccountService: ClientBankAccountService,
     private transactionService: TransactionService,
@@ -230,5 +233,35 @@ export class SuscriptionService {
       .andWhere('us."finalDate" is null')
       .getOne();
     return actualSubscription;
+  }
+
+  async getSubscriptionPercentage(subscription: string){
+    const actualSubscription = await this.platformInterestRepository
+        .createQueryBuilder('pi')
+        .where('pi.name = :type', {type: subscription})
+        .andWhere('pi.finalDate IS NULL')
+        .getOne()
+
+    const pointsConversion = await this.pointsConversionService.getRecentPointsConversion();
+
+    if(actualSubscription.isGold()){
+      const points = parseFloat(actualSubscription.amount)/(100 * pointsConversion.onePointEqualsDollars);
+      const GoldInfo = await this.getGoldInfo();
+      const actualPercentage = parseFloat(actualSubscription.percentage) * 100;
+      return {points: points, amountUpgrade: GoldInfo, percentage: actualPercentage}
+    }
+    const actualPercentage = parseFloat(actualSubscription.percentage) * 100;
+    return {percentage: actualPercentage}
+
+  }
+
+  async getGoldInfo(){
+    const upgradeAmount = await this.suscriptionRepository
+        .createQueryBuilder('su')
+        .where('su.name = :name', {name: SuscriptionType.GOLD})
+        .getOne();
+
+    const amount = upgradeAmount.upgradedAmount /100;
+    return await amount;
   }
 }
