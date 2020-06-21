@@ -1,0 +1,5 @@
+build:
+  docker:
+    web: petromiles-backend/Dockerfile
+run:
+  web: npm run start:dev
