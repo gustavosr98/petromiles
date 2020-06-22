@@ -9,8 +9,9 @@ import {
 } from 'typeorm';
 import { Transform } from 'class-transformer';
 
-import { ClientBankAccount } from './client-bank-account.entity';
-import { UserDetails } from './user-details.entity';
+import { ClientBankAccount } from '@/entities/client-bank-account.entity';
+import { UserDetails } from '@/entities/user-details.entity';
+import { RoutingNumber } from '@/entities/routing-number.entity';
 
 @Entity()
 export class BankAccount extends BaseEntity {
@@ -25,13 +26,10 @@ export class BankAccount extends BaseEntity {
   checkNumber: string;
 
   @Column()
-  type: string;
-
-  @Column({ nullable: true })
-  primary?: string;
+  nickname: string;
 
   @Column()
-  routingNumber: number;
+  type: string;
 
   @OneToMany(
     type => ClientBankAccount,
@@ -47,4 +45,12 @@ export class BankAccount extends BaseEntity {
   )
   @JoinColumn({ name: 'fk_person_details' })
   userDetails: UserDetails;
+
+  @ManyToOne(
+    type => RoutingNumber,
+    routingNumber => routingNumber.idRoutingNumber,
+    { nullable: false, eager: true },
+  )
+  @JoinColumn({ name: 'fk_routing_number' })
+  routingNumber: RoutingNumber;
 }

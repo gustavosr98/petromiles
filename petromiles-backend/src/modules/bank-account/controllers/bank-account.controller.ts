@@ -11,9 +11,10 @@ import {
   Param,
   ParseIntPipe,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import {Roles} from "@/modules/auth/decorators/roles.decorator";
+import { Roles } from '@/modules/auth/decorators/roles.decorator';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -21,15 +22,16 @@ import { Logger } from 'winston';
 import { GetUser } from '@/modules/auth/decorators/get-user.decorator';
 
 // INTERFACES
-import { CreateBankAccountDTO } from '../dto/createBankAccount.dto';
 import { Role } from '@/enums/role.enum';
 import { HttpRequest } from '@/logger/http-requests.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
+import { updatePrimaryAccountDTO } from '@/modules/bank-account/dto/update-primary-account.dto';
+import { CreateBankAccountDTO } from '@/modules/bank-account/dto/create-bank-account.dto';
 
 // SERVICES
 import { ClientBankAccountService } from '../services/client-bank-account.service';
 import { BankAccountService } from '../services/bank-account.service';
-import {RolesGuard} from "@/modules/auth/guards/roles.guard";
+import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 
 const baseEndpoint = Object.freeze('bank-account');
 
@@ -52,10 +54,10 @@ export class BankAccountController {
       `[${ApiModules.BANK_ACCOUNT}] {${user.email}} Creating bank account to the client`,
     );
 
-    const clientBankAccount = await this.clientBankAccountService.create({
-      ...bankAccountCreateParams,
-      email: user.email,
-    });
+    const clientBankAccount = await this.clientBankAccountService.create(
+      bankAccountCreateParams,
+      user,
+    );
 
     const { bankAccount: bankAccountCreated } = clientBankAccount;
     return bankAccountCreated;
@@ -102,23 +104,29 @@ export class BankAccountController {
     );
   }
 
-  @Roles(Role.ADMINISTRATOR)
-  @UseGuards(RolesGuard)
   @Get('accounts/:account')
-  accountInfo(@Param('account') accountId: number){
+  accountInfo(@Param('account') accountId: number) {
     this.logger.http(
-        `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ask /${baseEndpoint}/account/${accountId}`
+      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ask /${baseEndpoint}/account/${accountId}`,
     );
-    return this.bankAccountService.accountInfo(accountId)
+    return this.bankAccountService.accountInfo(accountId);
   }
 
   @Roles(Role.ADMINISTRATOR)
   @UseGuards(RolesGuard)
   @Get('accounts')
-  allAccountInfo(){
-      this.logger.http(
-          `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ask /${baseEndpoint}/accounts all`
-      );
-      return this.bankAccountService.getAllAccounts();
+  allAccountInfo() {
+    this.logger.http(
+      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ask /${baseEndpoint}/accounts all`,
+    );
+    return this.bankAccountService.getAllAccounts();
+  }
+
+  @Put('primary')
+  updatePrimary(@Body() primary: updatePrimaryAccountDTO, @GetUser() user) {
+    this.logger.http(
+      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.PUT}) ask /${baseEndpoint}/primary`,
+    );
+    return this.clientBankAccountService.updateCurrentPrimary(primary, user.id);
   }
 }

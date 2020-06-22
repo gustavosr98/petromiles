@@ -1,7 +1,8 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 
-import { getConnection } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -22,6 +23,7 @@ import { PointsConversionService } from '@/modules/management/services/points-co
 import { Transaction } from '@/entities/transaction.entity';
 import { UserClient } from '@/entities/user-client.entity';
 import { PointsConversion } from '@/entities/points-conversion.entity';
+import { ClientBankAccount } from '@/entities/client-bank-account.entity';
 
 // INTERFACES
 import { Suscription } from '@/enums/suscription.enum';
@@ -36,6 +38,8 @@ export class PaymentsService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private clientBankAccountService: ClientBankAccountService,
+    @InjectRepository(ClientBankAccount)
+    private clientBankAccountRepository: Repository<ClientBankAccount>,
     private transactionService: TransactionService,
     private thirdPartyInterestService: ThirdPartyInterestService,
     private platformInterestService: PlatformInterestService,
@@ -79,15 +83,13 @@ export class PaymentsService {
   }
 
   async buyPoints(
-    idUserClient: number,
     idClientBankAccount: number,
     amount,
     amountToCharge,
   ): Promise<Transaction> {
-    const clientBankAccount = await this.clientBankAccountService.getOne(
-      idUserClient,
+    const clientBankAccount = await this.clientBankAccountRepository.findOne({
       idClientBankAccount,
-    );
+    });
 
     const charge = await this.paymentProviderService.createCharge({
       customer: clientBankAccount.userClient.userDetails.customerId,
@@ -130,11 +132,11 @@ export class PaymentsService {
     amount,
     amountToCharge,
   ): Promise<Transaction> {
-    const { id, email } = user;
-    const clientBankAccount = await this.clientBankAccountService.getOne(
-      id,
+    const { email } = user;
+
+    const clientBankAccount = await this.clientBankAccountRepository.findOne({
       idClientBankAccount,
-    );
+    });
 
     if (await this.verifyEnoughPoints(email, amount)) {
       await this.paymentProviderService.updateBankAccountOfAnAccount(

@@ -51,7 +51,6 @@ export class PaymentsController {
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/buy-points`,
     );
     return await this.paymentsService.buyPoints(
-      user.id,
       idClientBankAccount,
       amount,
       amountToCharge,

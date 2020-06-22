@@ -27,11 +27,8 @@ export const actions = {
   async setBankAccount({ commit, state }, bankAccount) {
     commit("SET_BANK_ACCOUNT", bankAccount);
     const account = {
+      ...bankAccount,
       userDetails: state.userDetails,
-      accountNumber: state.bankAccount.accountNumber,
-      routingNumber: state.bankAccount.routingNumber,
-      type: state.bankAccount.type,
-      checkNumber: state.bankAccount.checkNumber,
     };
 
     await httpClient.post("/bank-account", account);

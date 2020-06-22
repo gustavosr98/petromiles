@@ -6,6 +6,7 @@
         :headers="headers"
         :fetchedData="mungedData"
         @deleteItem="deleteItem"
+        tableName="bank-accounts"
       ></datatable>
     </v-col>
   </v-row>
@@ -35,36 +36,29 @@ export default {
     headers() {
       return [
         {
-          text: `${this.$tc("common.code")}`,
+          text: `${this.$t("bank-account-properties.nickname")}`,
           align: "center",
-          value: "idBankAccount",
+          value: "nickname",
         },
         {
-          text: this.$tc("common.type"),
+          text: `${this.$t("bank-account-properties.accountNumber")}`,
           align: "center",
-          value: "type",
+          value: "number",
         },
         {
-          text: this.$tc("bank-account-properties.routingNumber"),
+          text: this.$t("bank-account-properties.routingNumber"),
           align: "center",
           value: "routingNumber",
         },
         {
-          text: `${this.$tc(
-            "bank-account-properties.accountNumber"
-          )} (${this.$tc("bank-account-properties.lastFourDigits")})`,
-          align: "center",
-          value: "accountNumber",
-        },
-        {
-          text: this.$tc("common.state"),
+          text: this.$t("common.state"),
           align: "center",
           value: "state",
         },
         {
-          text: this.$tc("common.cancel"),
+          text: this.$t("common.seeMore"),
           align: "center",
-          value: "cancel",
+          value: "details",
         },
       ];
     },
@@ -81,15 +75,18 @@ export default {
         );
         return {
           ...data,
+          nickname: data.nickname.toUpperCase(),
+          id: data.idBankAccount,
+          routingNumber: data.routingNumber.number,
           bankAccountType,
           state,
+          number: "XXXX-".concat(data.accountNumber),
         };
       });
     },
   },
   methods: {
     async deleteItem(id) {
-      await this.$http.delete(`/bank-account/cancel/${id}`);
       const bankAccount = this.fetchedData.find(
         bankAccount => bankAccount.idBankAccount === id
       );

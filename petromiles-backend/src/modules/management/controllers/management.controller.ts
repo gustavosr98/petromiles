@@ -7,11 +7,13 @@ import {
   Post,
   ClassSerializerInterceptor,
   UseInterceptors,
-  ValidationPipe, Inject, UseGuards,
+  ValidationPipe,
+  Inject,
+  UseGuards,
 } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import {GetUser} from "@/modules/auth/decorators/get-user.decorator";
+import { GetUser } from '@/modules/auth/decorators/get-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
 
 // SERVICES
@@ -24,14 +26,13 @@ import { ThirdPartyInterestService } from '@/modules/management/services/third-p
 import { UpdateSubscriptionDTO } from '@/modules/suscription/dto/update-subscription.dto';
 import { CreatePlatformInterestDTO } from '@/modules/management/dto/create-platform-interest.dto';
 import { CreateThirdPartyInterestDTO } from '@/modules/management/dto/create-third-party-interest.dto';
-import {UpdateUserStateDTO} from "@/modules/management/dto/update-user-state.dto";
+import { UpdateUserStateDTO } from '@/modules/management/dto/update-user-state.dto';
 
 // ENTITIES
 import { ThirdPartyInterest } from '@/entities/third-party-interest.entity';
-import {ApiModules} from "@/logger/api-modules.enum";
-import {HttpRequest} from "@/logger/http-requests.enum";
-import {StateUser} from "@/entities/state-user.entity";
-;
+import { ApiModules } from '@/logger/api-modules.enum';
+import { HttpRequest } from '@/logger/http-requests.enum';
+import { StateUser } from '@/entities/state-user.entity';
 
 const baseEndpoint = 'management';
 @UseGuards(AuthGuard('jwt'))
@@ -49,6 +50,11 @@ export class ManagementController {
   @Get('languages')
   getLanguages() {
     return this.managementService.getLanguages();
+  }
+
+  @Get('banks')
+  getBanks() {
+    return this.managementService.getBanks();
   }
 
   @Get('countries')
@@ -111,13 +117,19 @@ export class ManagementController {
   }
 
   @Post('state/:id')
-  updateUserState(@Param('id') userId: number,
-                  @Body() updateUserStateDTO: UpdateUserStateDTO,
-                  @GetUser() user): Promise<StateUser>{
+  updateUserState(
+    @Param('id') userId: number,
+    @Body() updateUserStateDTO: UpdateUserStateDTO,
+    @GetUser() user,
+  ): Promise<StateUser> {
     this.logger.http(
-        `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) ${user?.email} changing state /${baseEndpoint}/state/${userId}`,
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) ${user?.email} changing state /${baseEndpoint}/state/${userId}`,
     );
-    return this.managementService.updateUserState(updateUserStateDTO.role, updateUserStateDTO.state, userId, user.id);
+    return this.managementService.updateUserState(
+      updateUserStateDTO.role,
+      updateUserStateDTO.state,
+      userId,
+      user.id,
+    );
   }
-
 }

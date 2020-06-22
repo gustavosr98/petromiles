@@ -109,6 +109,7 @@ export class Transaction extends BaseEntity {
       date: this.initialDate.toLocaleDateString(),
       type: this.type,
       bankAccount: this.clientBankAccount.bankAccount.accountNumber.substr(-4),
+      bankAccountNickname: this.clientBankAccount.bankAccount.nickname,
       pointsConversion: 1 / this.pointsConversion.onePointEqualsDollars,
       ...details,
       state,

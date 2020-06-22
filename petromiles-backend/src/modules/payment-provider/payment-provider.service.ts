@@ -47,7 +47,7 @@ export class PaymentProviderService {
       },
     });
     this.logger.verbose(
-      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account first token created ${bankAccountToken.id}`,
+      `[${ApiModules.PAYMENT_PROVIDER}] {${userClient.email}} Bank account first token created ${bankAccountToken.id}`,
     );
 
     const bankAccountSource = await this.asociateBankToCustomer(
@@ -55,7 +55,7 @@ export class PaymentProviderService {
       bankAccountToken.id,
     );
     this.logger.verbose(
-      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account asociated to CUSTOMER {last4: ${bankAccountSource.last4}} `,
+      `[${ApiModules.PAYMENT_PROVIDER}] {${userClient.email}} Bank account asociated to CUSTOMER {last4: ${bankAccountSource.last4}} `,
     );
 
     // Asocitating with Account to send money to
@@ -70,7 +70,7 @@ export class PaymentProviderService {
       },
     });
     this.logger.verbose(
-      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account second token created ${bankAccountToken.id}`,
+      `[${ApiModules.PAYMENT_PROVIDER}] {${userClient.email}} Bank account second token created ${bankAccountToken.id}`,
     );
 
     const asociatedBankAccount = await this.stripeService.asociateBankAccountToAccount(
@@ -168,7 +168,7 @@ export class PaymentProviderService {
   ) {
     await this.stripeService.deleteBankAccount(customerId, bankAccountId);
     this.logger.verbose(
-      `[${ApiModules.PAYMENT_PROVIDER}] {${email}} deleteBankAccount(): ${bankAccountId}`,
+      `[${ApiModules.PAYMENT_PROVIDER}] {${email}} deleteBankAccount()`,
     );
   }
 

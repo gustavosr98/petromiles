@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 // MODULES
 import { TransactionModule } from '@/modules/transaction/transaction.module';
@@ -15,8 +16,12 @@ import { PaymentsController } from '@/modules/payments/controller/payments.contr
 // SERVICES
 import { PaymentsService } from '@/modules/payments/services/payments.service';
 
+//ENTITIES
+import { ClientBankAccount } from '@/entities/client-bank-account.entity';
+
 @Module({
   imports: [
+    TypeOrmModule.forFeature([ClientBankAccount]),
     TransactionModule,
     BankAccountModule,
     SuscriptionModule,

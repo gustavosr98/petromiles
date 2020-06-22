@@ -23,11 +23,13 @@ import { ClientBankAccount } from '@/entities/client-bank-account.entity';
 import { StateBankAccount } from '@/entities/state-bank-account.entity';
 import { BankAccount } from '@/entities/bank-account.entity';
 
-// ENUMS
+// INTERFACES
 import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { StateName, StateDescription } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
+import { CreateBankAccountDTO } from '@/modules/bank-account/dto/create-bank-account.dto';
+import { updatePrimaryAccountDTO } from '@/modules/bank-account/dto/update-primary-account.dto';
 
 @Injectable()
 export class ClientBankAccountService {
@@ -36,6 +38,8 @@ export class ClientBankAccountService {
     private bankAccountService: BankAccountService,
     @InjectRepository(ClientBankAccount)
     private clientBankAccountRepository: Repository<ClientBankAccount>,
+    @InjectRepository(BankAccount)
+    private bankAccountRepository: Repository<BankAccount>,
     @InjectRepository(StateBankAccount)
     private stateBankAccountRepository: Repository<StateBankAccount>,
     private stateTransactionService: StateTransactionService,
@@ -47,11 +51,14 @@ export class ClientBankAccountService {
     private configService: ConfigService,
   ) {}
 
-  async create(bankAccountCreateParams): Promise<ClientBankAccount> {
-    let userClient = await this.userClientService.getActive(
-      bankAccountCreateParams.email,
-    );
-    userClient = await this.userClientService.get({ email: userClient.email });
+  async create(
+    bankAccountCreateParams: CreateBankAccountDTO,
+    user,
+  ): Promise<ClientBankAccount> {
+    if (await this.nicknameIsTaken(bankAccountCreateParams.nickname, user.id))
+      throw new BadRequestException('error-messages.invalidNickname');
+
+    const userClient = await this.userClientService.get({ email: user.email });
 
     const bankAccount = await this.bankAccountService.create(
       bankAccountCreateParams,
@@ -83,7 +90,7 @@ export class ClientBankAccountService {
     );
 
     this.logger.verbose(
-      `[${ApiModules.BANK_ACCOUNT}] {${bankAccountCreateParams.email}} Bank account successfully created`,
+      `[${ApiModules.BANK_ACCOUNT}] {${user.email}} Bank account successfully created`,
     );
 
     return clientBankAccount;
@@ -101,6 +108,8 @@ export class ClientBankAccountService {
             stateBankAccount: 'clientBankAccount.stateBankAccount',
             userClient: 'clientBankAccount.userClient',
             state: 'stateBankAccount.state',
+            routingNumber: 'bankAccount.routingNumber',
+            bank: 'routingNumber.bank',
           },
         },
       });
@@ -247,7 +256,6 @@ export class ClientBankAccountService {
     clientBankAccount: ClientBankAccount,
     description?,
   ) {
-
     if (clientBankAccount.stateBankAccount)
       await this.endLastState(clientBankAccount);
 
@@ -260,7 +268,7 @@ export class ClientBankAccountService {
       `[${ApiModules.BANK_ACCOUNT}] ID: ${clientBankAccount.idClientBankAccount} updated to state: (${stateName})`,
     );
 
-    await this.sendStatusBankAccount(stateName,clientBankAccount);
+    await this.sendStatusBankAccount(stateName, clientBankAccount);
 
     return await getConnection()
       .getRepository(StateBankAccount)
@@ -270,16 +278,16 @@ export class ClientBankAccountService {
   sendStatusBankAccount(
     bankAccountStatus: StateName,
     clientBankAccount: ClientBankAccount,
-    ) {
-
+  ) {
     const lastNumbersBankAccount = 4;
-    const languageMails = clientBankAccount.userClient.userDetails.language.name;
+    const languageMails =
+      clientBankAccount.userClient.userDetails.language.name;
+    const bank = clientBankAccount.bankAccount.routingNumber.bank.name;
 
-    if (bankAccountStatus === 'verifying') {
-
+    if (bankAccountStatus === StateName.VERIFYING) {
       const template = `bankAccountRegistration[${languageMails}]`;
 
-      const subject =  mailsSubjets.bank_account_registration[languageMails];
+      const subject = mailsSubjets.bank_account_registration[languageMails];
 
       const msg = {
         to: clientBankAccount.userClient.email,
@@ -289,17 +297,18 @@ export class ClientBankAccountService {
         ),
         dynamic_template_data: {
           user: clientBankAccount.userClient.userDetails.firstName,
-          bank: 'bankName',
-          accountHolderName: 
-            clientBankAccount.bankAccount.userDetails.firstName + ' ' + 
+          bank,
+          accountHolderName:
+            clientBankAccount.bankAccount.userDetails.firstName +
+            ' ' +
             clientBankAccount.bankAccount.userDetails.lastName,
-          accountNumber: clientBankAccount.bankAccount.accountNumber.slice(-lastNumbersBankAccount),
+          accountNumber: clientBankAccount.bankAccount.accountNumber.slice(
+            -lastNumbersBankAccount,
+          ),
         },
       };
       this.mailsService.sendEmail(msg);
-
-    } else if (bankAccountStatus === 'active') {
-      
+    } else if (bankAccountStatus === StateName.ACTIVE) {
       const template = `bankAccountVerified[${languageMails}]`;
 
       const subject = mailsSubjets.bank_account_verified[languageMails];
@@ -312,14 +321,14 @@ export class ClientBankAccountService {
         ),
         dynamic_template_data: {
           user: clientBankAccount.userClient.userDetails.firstName,
-          bank: 'bankName',
-          accountNumber: clientBankAccount.bankAccount.accountNumber.slice(-lastNumbersBankAccount),
+          bank,
+          accountNumber: clientBankAccount.bankAccount.accountNumber.slice(
+            -lastNumbersBankAccount,
+          ),
         },
       };
       this.mailsService.sendEmail(msg);
-      
-    } else if (bankAccountStatus === 'cancelled') {
-
+    } else if (bankAccountStatus === StateName.CANCELLED) {
       const template = `bankAccountDeletion[${languageMails}]`;
 
       const subject = mailsSubjets.bank_account_deletion[languageMails];
@@ -332,12 +341,14 @@ export class ClientBankAccountService {
         ),
         dynamic_template_data: {
           user: clientBankAccount.userClient.userDetails.firstName,
-          accountNumber: clientBankAccount.bankAccount.accountNumber.slice(-lastNumbersBankAccount),
+          accountNumber: clientBankAccount.bankAccount.accountNumber.slice(
+            -lastNumbersBankAccount,
+          ),
         },
       };
       this.mailsService.sendEmail(msg);
     }
-  } 
+  }
 
   private async endLastState(clientBankAccount: ClientBankAccount) {
     let currentStateBankAccount = await this.stateBankAccountRepository.findOne(
@@ -409,5 +420,49 @@ export class ClientBankAccountService {
     if (pendingTransactions.length > 0) return true;
 
     return false;
+  }
+  private async nicknameIsTaken(
+    nickname: string,
+    idUserClient: number,
+  ): Promise<Boolean> {
+    const bankAccounts = await this.getClientBankAccounts(idUserClient);
+    const accountWithNickname = bankAccounts.find(
+      bankAccount =>
+        bankAccount.nickname.toLowerCase() == nickname.toLowerCase(),
+    );
+
+    if (accountWithNickname !== undefined) return true;
+    return false;
+  }
+
+  async updateCurrentPrimary(
+    updatePrimaryAccountDTO: updatePrimaryAccountDTO,
+    idUserClient: number,
+  ): Promise<ClientBankAccount> {
+    const { primary, idBankAccount } = updatePrimaryAccountDTO;
+
+    // Set primary=false to the current primary bank account
+    if (primary) {
+      const clientBankAccount = await this.clientBankAccountRepository.findOne({
+        userClient: await this.userClientService.get({ idUserClient }),
+        primary: true,
+      });
+
+      if (clientBankAccount) await this.updatePrimary(clientBankAccount, false);
+    }
+
+    const clientBankAccount = await this.clientBankAccountRepository.findOne({
+      bankAccount: await this.bankAccountRepository.findOne({ idBankAccount }),
+    });
+
+    return await this.updatePrimary(clientBankAccount, primary);
+  }
+
+  async updatePrimary(
+    clientBankAccount: ClientBankAccount,
+    primary: boolean,
+  ): Promise<ClientBankAccount> {
+    clientBankAccount.primary = primary;
+    return await this.clientBankAccountRepository.save(clientBankAccount);
   }
 }

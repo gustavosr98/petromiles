@@ -33,6 +33,9 @@ export class ClientBankAccount extends BaseEntity {
   @Exclude()
   chargeId?: string;
 
+  @Column({ nullable: true, default: false })
+  primary: boolean;
+
   @Column({ nullable: true })
   @Exclude()
   transferId?: string;

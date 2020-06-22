@@ -11,6 +11,7 @@ import { ThirdPartyInterestSeederService } from './third_party_interest/third_pa
 import { PointsConversionSeederService } from './points_conversion/points_conversion.service';
 import { BankSeederService } from './bank/bank.service';
 import { TaskSeederService } from './task/task.service';
+import { RoutingNumberSeederService } from './routing-number/routing-number.service';
 
 @Injectable()
 export class Seeder {
@@ -26,6 +27,7 @@ export class Seeder {
     private readonly pointsConversionSeederService: PointsConversionSeederService,
     private readonly bankSeederService: BankSeederService,
     private readonly taskSeederService: TaskSeederService,
+    private readonly routingNumberSeederService: RoutingNumberSeederService,
   ) {}
 
   async clean() {
@@ -54,6 +56,7 @@ export class Seeder {
       THIRD_PARTY_INTEREST: await this.thirdPartyInterest(),
       POINTS_CONVERSION: await this.pointsConversion(),
       TASKS: await this.task(),
+      ROUTING_NUMBER: await this.routingNumber(),
     };
   }
 
@@ -174,6 +177,21 @@ export class Seeder {
           nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
         ).length;
         return BANK_ROWS;
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
+  }
+
+  async routingNumber(): Promise<number> {
+    return await Promise.all(
+      this.routingNumberSeederService.createRoutingNumber(),
+    )
+      .then(createdRoutingNumber => {
+        const ROUTING_NUMBER_ROWS = createdRoutingNumber.filter(
+          nullValueOrCreatedRoutingNumber => nullValueOrCreatedRoutingNumber,
+        ).length;
+        return ROUTING_NUMBER_ROWS;
       })
       .catch(error => {
         return Promise.reject(error);

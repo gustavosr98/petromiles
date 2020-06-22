@@ -22,18 +22,23 @@
           <v-list-item-content>
             <v-list-item-title>
               <span class="font-weight-medium">{{ $tc("navbar.bankAccount", 0) }}:</span>
-              <span class="ml-2 font-weight-light caption">XXXX - {{ transaction.bankAccount }}</span>
+              <span class="ml-2 font-weight-light body-2">XXXX - {{ transaction.bankAccount }}</span>
             </v-list-item-title>
-
+            <v-list-item-title>
+              <span class="font-weight-medium">{{ $t("bank-account-properties.nickname") }}:</span>
+              <span
+                class="ml-2 font-weight-light body-2 text-uppercase"
+              >{{ transaction.bankAccountNickname}}</span>
+            </v-list-item-title>
             <v-list-item-title>
               <span class="font-weight-medium">{{ $t("common.type") }}:</span>
-              <span class="ml-2 caption text-uppercase font-weight-light">{{ type }}</span>
+              <span class="ml-2 body-2 text-uppercase font-weight-light">{{ type }}</span>
             </v-list-item-title>
 
             <v-list-item-title>
               <span class="font-weight-medium">{{ $t("common.state") }}:</span>
               <span
-                class="ml-2 caption text-uppercase font-weight-light"
+                class="ml-2 body-2 text-uppercase font-weight-light"
               >{{ $t(`state-name.${transaction.state}`) }}</span>
             </v-list-item-title>
           </v-list-item-content>
