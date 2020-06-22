@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "preserve": "npm run i18n:load",
     "serve": "vue-cli-service serve",
     "prebuild": "npm run i18n:load",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --mode production",
     "serve:build": "live-server dist/",
     "lint": "vue-cli-service lint",
     "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'",
