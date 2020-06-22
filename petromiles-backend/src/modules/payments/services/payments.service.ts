@@ -198,9 +198,17 @@ export class PaymentsService {
   }
 
   async sendPaymentInvoiceEmail(user, file) {
-    let userClient = await getConnection()
+    const userClient = await getConnection()
       .getRepository(UserClient)
       .findOne({ email: user.email });
+    
+    const transactionCode = await this.transactionService.getTransactions(
+      user.email
+    );
+
+    const transaction = await getConnection()
+        .getRepository(Transaction)
+        .findOne({ idTransaction: transactionCode[transactionCode.length - 1].id });
 
     const languageMails = userClient.userDetails.language.name;
 
@@ -217,7 +225,7 @@ export class PaymentsService {
       dynamic_template_data: { user: userClient.userDetails.firstName },
       attachments: [
         {
-          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}`,
+          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${transaction.paymentProviderTransactionId}`,
           type: file.mimetype,
           content: file.buffer.toString('base64'),
         },
@@ -230,6 +238,14 @@ export class PaymentsService {
       .getRepository(UserClient)
       .findOne({ email: user.email });
 
+    const transactionCode = await this.transactionService.getTransactions(
+      user.email
+    );
+
+    const transaction = await getConnection()
+        .getRepository(Transaction)
+        .findOne({ idTransaction: transactionCode[transactionCode.length - 1].id });
+  
     const languageMails = userClient.userDetails.language.name;
 
     const template = `withdrawal[${languageMails}]`;
@@ -249,7 +265,7 @@ export class PaymentsService {
       },
       attachments: [
         {
-          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}`,
+          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${transaction.paymentProviderTransactionId}`,
           type: file.mimetype,
           content: file.buffer.toString('base64'),
         },
