@@ -8,7 +8,8 @@
               <login-form
                 title="Or login with"
                 :showClientElement="true"
-                :signUpRoute="clientRoutes"
+                :signUpRoute="signUpRoute"
+                :recoverRoute="recoverRoute"
                 :dashboardRoute="dashboardRoute"
                 :role="role"
               />
@@ -33,7 +34,8 @@ export default {
   },
   data() {
     return {
-      clientRoutes: clientRoutes.SIGN_UP.name,
+      signUpRoute: clientRoutes.SIGN_UP.name,
+      recoverRoute: clientRoutes.RECOVER_PASSWORD.name,
       dashboardRoute: clientRoutes.DASHBOARD.name,
       role: authConstants.CLIENT,
     };

@@ -10,6 +10,17 @@ const adminRoutesRaw = Object.freeze({
       adminGuest: true,
     },
   },
+  RECOVER_PASSWORD: {
+    path: "/admin/recover-password",
+    name: "AdminRecoverPassword",
+    component: () =>
+      import(
+        /* webpackChunkName: "admin-recover-password" */ "@/views/Admin/Login/RecoverPassword.view.vue"
+      ),
+    meta: {
+      adminGuest: true,
+    },
+  },
   DASHBOARD: {
     path: "/admin/dashboard",
     name: "AdminDashboard",

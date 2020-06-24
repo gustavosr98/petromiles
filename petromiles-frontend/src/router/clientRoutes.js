@@ -21,6 +21,17 @@ const clientRoutesRaw = Object.freeze({
       clientGuest: true,
     },
   },
+  RECOVER_PASSWORD: {
+    path: "/recover-password",
+    name: "ClientRecoverPassword",
+    component: () =>
+      import(
+        /* webpackChunkName: "client-recover-password" */ "@/views/Client/Login/RecoverPassword.view.vue"
+      ),
+    meta: {
+      clientGuest: true,
+    },
+  },
   DASHBOARD: {
     path: "/dashboard",
     name: "ClientDashboard",

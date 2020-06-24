@@ -69,6 +69,10 @@ export default () => ({
           english: process.env.SENDGRID_WITHDRAWAL_EN_TEMPLATE,
           spanish: process.env.SENDGRID_WITHDRAWAL_ES_TEMPLATE,
         },
+        recover: {
+          english: process.env.SENDGRID_RECOVER_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_RECOVER_ES_TEMPLATE,
+        },
       },
     },
   },
