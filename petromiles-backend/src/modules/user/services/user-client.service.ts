@@ -200,9 +200,7 @@ export class UserClientService {
   async getDetails(userClient: UserClient): Promise<UserDetails> {
     if (userClient)
       return await this.userDetailsRepository.findOne({
-        where: {
-          fk_user_client: userClient.idUserClient,
-        },
+        where: `fk_user_client = ${userClient.idUserClient}`,
       });
     return null;
   }
