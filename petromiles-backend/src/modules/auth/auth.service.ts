@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+import * as generator from 'generate-password';
 import * as bcrypt from 'bcrypt';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -126,5 +127,52 @@ export class AuthService {
     }
 
     return bcrypt.hash(password, salt);
+  }
+
+  async recoverPassword(credentials: App.Auth.LoginRequest) {
+    const { email } = credentials;
+    const info = await this.userService.getActive(credentials);
+
+    if (info) {
+      const { user, userDetails } = info;
+
+      // If the user didn't sign up with email and password
+      if (!info.user.password) {
+        this.logger.error(
+          `[${ApiModules.AUTH}] {${email}} The user was not created with password`,
+        );
+        throw new UnauthorizedException('error-messages.userWithoutPassword');
+      }
+
+      const password = generator.generate({
+        length: 10,
+        numbers: true,
+      });
+      const salt = await bcrypt.genSalt();
+
+      await this.userClientService.updatePasswordWithoutCurrent(user, {
+        password: await bcrypt.hash(password, salt),
+        salt: salt,
+      });
+
+      const languageMails = userDetails.language.name;
+      const template = `recover[${languageMails}]`;
+      const subject = mailsSubjets.recover[languageMails];
+
+      const message = {
+        to: email,
+        subject: subject,
+        templateId: this.configService.get(
+          `mails.sendgrid.templates.${template}`,
+        ),
+        dynamic_template_data: { user: userDetails.name, password: password },
+      };
+      await this.mailsService.sendEmail(message);
+    } else {
+      this.logger.error(
+        `[${ApiModules.AUTH}] {${email}} The user was not found or user is not active`,
+      );
+      throw new UnauthorizedException('error-messages.userNotFound');
+    }
   }
 }

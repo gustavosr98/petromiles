@@ -6,7 +6,7 @@ import { UserModule } from '@/modules/user/user.module';
 import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { ManagementModule } from '@/modules/management/management.module';
 import { PaymentProviderModule } from '@/modules/payment-provider/payment-provider.module';
-import { MailsModule } from '@/modules/mails/mails.module'
+import { MailsModule } from '@/modules/mails/mails.module';
 
 // CONTROLLER
 import { BankAccountController } from '@/modules/bank-account/controllers/bank-account.controller';
@@ -19,10 +19,10 @@ import { ClientBankAccountService } from './services/client-bank-account.service
 import { BankAccount } from '@/entities/bank-account.entity';
 import { StateBankAccount } from '@/entities/state-bank-account.entity';
 import { ClientBankAccount } from '@/entities/client-bank-account.entity';
-import {UserClientService} from "@/modules/user/services/user-client.service";
-import {UserClient} from "@/entities/user-client.entity";
-import {UserDetails} from "@/entities/user-details.entity";
-import {State} from "@/entities/state.entity";
+import { RoutingNumber } from '@/entities/routing-number.entity';
+import { UserClient } from '@/entities/user-client.entity';
+import { UserDetails } from '@/entities/user-details.entity';
+import { State } from '@/entities/state.entity';
 
 @Module({
   imports: [
@@ -30,9 +30,10 @@ import {State} from "@/entities/state.entity";
       BankAccount,
       StateBankAccount,
       ClientBankAccount,
-        UserClient,
-        UserDetails,
-        State,
+      RoutingNumber,
+      UserClient,
+      UserDetails,
+      State,
     ]),
     PaymentProviderModule,
     ManagementModule,

@@ -28,20 +28,12 @@
             >
               <v-list-item-content class="text--primary subtitle-2">
                 <p>
-                  {{ $t("common.code") }}:
-                  <span class="subtitle-2 font-weight-light">
-                    {{
-                    account.idBankAccount
-                    }}
-                  </span>
-                </p>
-                <p>
-                  {{ $t("bank-account-properties.routingNumber") }}:
+                  {{$t("bank-account-properties.nickname")}}:
                   <span
-                    class="subtitle-2 font-weight-light"
+                    class="subtitle-2 font-weight-light text-uppercase"
                   >
                     {{
-                    account.routingNumber
+                    account.nickname
                     }}
                   </span>
                 </p>
@@ -56,10 +48,21 @@
                   </span>
                 </p>
                 <p>
+                  {{ $t("bank-account-properties.routingNumber") }}:
+                  <span
+                    class="subtitle-2 font-weight-light"
+                  >
+                    {{
+                    account.routingNumber.number
+                    }}
+                  </span>
+                </p>
+
+                <p>
                   {{ $t("common.type") }}:
                   <span class="subtitle-2 font-weight-light">
                     {{
-                    account.type
+                    $t(`bank-account-properties.${account.type.toLowerCase()}`)
                     }}
                   </span>
                 </p>

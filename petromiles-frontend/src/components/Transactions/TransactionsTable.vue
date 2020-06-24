@@ -6,6 +6,7 @@
       :headers="headers"
       :fetchedData="mungedData"
       linkTo="/transaction-details"
+      :tableName="table.TRANSACTIONS"
     />
   </div>
 </template>
@@ -14,6 +15,8 @@
 import Datatable from "@/components/General/Datatable/Datatable";
 import DateRangePicker from "@/components/Transactions/DateRangePicker";
 import Transaction from "@/constants/transaction";
+import Tables from "@/constants/table";
+
 import PlatformInterest from "@/constants/platformInterest";
 
 export default {
@@ -26,6 +29,7 @@ export default {
     return {
       transactions: [],
       fetchedData: [],
+      table: Tables,
     };
   },
   async mounted() {

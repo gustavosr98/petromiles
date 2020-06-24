@@ -4,4 +4,5 @@ export enum PlatformInterest {
   VERIFICATION = 'verification',
   BUY = 'buy',
   WITHDRAWAL = 'Withdrawal',
+  THIRD_PARTY_CLIENT_COMMISSION = 'thirdPartyClientCommission',
 }

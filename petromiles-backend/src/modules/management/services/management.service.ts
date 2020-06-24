@@ -12,6 +12,7 @@ import { UserClient } from '@/entities/user-client.entity';
 import { Suscription } from '@/entities/suscription.entity';
 import { UserAdministrator } from '@/entities/user-administrator.entity';
 import { Country } from '@/entities/country.entity';
+import { Bank } from '@/entities/bank.entity';
 
 // INTERFACES
 import { StateName } from '@/enums/state.enum';
@@ -33,18 +34,20 @@ export class ManagementService {
     private userClientRepository: Repository<UserClient>,
     @InjectRepository(StateUser)
     private stateUserRepository: Repository<StateUser>,
+    @InjectRepository(Bank)
+    private bankRepository: Repository<Bank>,
   ) {}
 
   async getLanguages(): Promise<Language[]> {
     return await this.languageRepository.find();
   }
 
-  async getCountries(): Promise<Country[]> {
-    return await this.countryRepository.find();
-  }
-
   async getLanguage(name: string): Promise<Language> {
     return await this.languageRepository.findOne({ name });
+  }
+
+  async getCountries(): Promise<Country[]> {
+    return await this.countryRepository.find();
   }
 
   async getState(name: StateName): Promise<State> {
@@ -55,8 +58,12 @@ export class ManagementService {
     return await this.roleRepository.findOne({ name });
   }
 
+  async getBanks(): Promise<Bank[]> {
+    return await this.bankRepository.find();
+  }
+
   async updateSubscriptionConditions(
-    idSuscription,
+    idSuscription: number,
     updateSubscriptionDTO: UpdateSubscriptionDTO,
   ) {
     return await getConnection()

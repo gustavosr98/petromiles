@@ -34,35 +34,18 @@
         <v-icon @click="confirmDeleteAction(item.idBankAccount)">mdi-delete</v-icon>
       </template>
     </v-data-table>
-    <!-- Dialog to confirm delete action -->
-    <v-row justify="center">
-      <v-dialog v-model="eliminateDialog" persistent max-width="50%">
-        <v-card>
-          <v-card-title class="headline">
-            {{
-            $t("common.areYouSure")
-            }}
-          </v-card-title>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn color="error" dark @click="eliminateDialog = false">
-              {{
-              $t("common.cancel")
-              }}
-            </v-btn>
-            <v-btn color="success" dark @click="eliminateItem">
-              {{
-              $t("common.yes")
-              }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row>
 
     <v-row justify="center">
-      <v-dialog v-model="transactionDetails" max-width="450">
-        <transaction-information :idTransaction="elementId" v-if="transactionDetails" />
+      <v-dialog v-model="details" max-width="600">
+        <transaction-information
+          :idTransaction="elementId"
+          v-if="elementDetails === this.table.TRANSACTIONS"
+        />
+        <bank-account-details
+          :idBankAccount="elementId"
+          v-if="elementDetails === this.table.BANK_ACCOUNTS"
+          @deleteItem="deleteItem"
+        />
       </v-dialog>
     </v-row>
   </v-card>
@@ -71,12 +54,15 @@
 <script>
 import { getColor } from "@/mixins/tables/getColor.js";
 import TransactionInformation from "@/components/Transactions/TransactionInformation";
+import BankAccountDetails from "@/components/BankAccounts/BankAccountList/BankAccountDetails";
+import Tables from "@/constants/table";
 
 export default {
   name: "datatable",
   mixins: [getColor],
   components: {
     "transaction-information": TransactionInformation,
+    "bank-account-details": BankAccountDetails,
   },
   props: {
     title: {
@@ -92,21 +78,25 @@ export default {
       required: true,
     },
     linkTo: { type: String },
+    tableName: { type: String },
   },
   data() {
     return {
       search: "",
       isLoading: false,
-      eliminateDialog: false,
       elementToDelete: null,
-      transactionDetails: false,
+      details: false,
+      elementDetails: "",
       elementId: null,
+      table: Tables,
+      bankAccount: null,
     };
   },
   methods: {
     seeDetails(id) {
       this.elementId = id;
-      this.transactionDetails = true;
+      this.elementDetails = this.tableName;
+      this.details = true;
     },
     createLink(id) {
       return `${this.linkTo}/${id}`;
@@ -115,9 +105,14 @@ export default {
       this.eliminateDialog = true;
       this.elementToDelete = id;
     },
-    eliminateItem() {
-      this.eliminateDialog = false;
-      this.$emit("deleteItem", this.elementToDelete);
+    deleteItem(id) {
+      this.details = false;
+      this.$emit("deleteItem", id);
+    },
+  },
+  watch: {
+    details: function() {
+      if (!this.details) this.elementDetails = "";
     },
   },
 };

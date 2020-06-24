@@ -12,6 +12,8 @@ import { ThirdPartyInterestSeederService } from './third_party_interest/third_pa
 import { PointsConversionSeederService } from './points_conversion/points_conversion.service';
 import { BankSeederService } from './bank/bank.service';
 import { TaskSeederService } from './task/task.service';
+import { RoutingNumberSeederService } from './routing-number/routing-number.service';
+import { ThirdPartyClientSeederService } from './third-party-client/third-party-client.service';
 
 @Injectable()
 export class Seeder {
@@ -27,6 +29,8 @@ export class Seeder {
     private readonly pointsConversionSeederService: PointsConversionSeederService,
     private readonly bankSeederService: BankSeederService,
     private readonly taskSeederService: TaskSeederService,
+    private readonly routingNumberSeederService: RoutingNumberSeederService,
+    private readonly thirdPartyClientSeederService: ThirdPartyClientSeederService,
   ) {}
 
   async clean() {
@@ -64,6 +68,8 @@ export class Seeder {
       THIRD_PARTY_INTEREST: await this.thirdPartyInterest(),
       POINTS_CONVERSION: await this.pointsConversion(),
       TASKS: await this.task(),
+      ROUTING_NUMBER: await this.routingNumber(),
+      THIRD_PARTY_CLIENT: await this.thirdPartyClient(),
     };
   }
 
@@ -190,6 +196,21 @@ export class Seeder {
       });
   }
 
+  async routingNumber(): Promise<number> {
+    return await Promise.all(
+      this.routingNumberSeederService.createRoutingNumber(),
+    )
+      .then(createdRoutingNumber => {
+        const ROUTING_NUMBER_ROWS = createdRoutingNumber.filter(
+          nullValueOrCreatedRoutingNumber => nullValueOrCreatedRoutingNumber,
+        ).length;
+        return ROUTING_NUMBER_ROWS;
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
+  }
+
   async task(): Promise<number> {
     return await Promise.all(this.taskSeederService.createTask())
       .then(createdTasks => {
@@ -197,6 +218,22 @@ export class Seeder {
           nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
         ).length;
         return TASK_ROWS;
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
+  }
+
+  async thirdPartyClient(): Promise<number> {
+    return await Promise.all(
+      this.thirdPartyClientSeederService.createThirdPartyClient(),
+    )
+      .then(createdThirdPartyClient => {
+        const THIRD_PARTY_CLIENT_ROWS = createdThirdPartyClient.filter(
+          nullValueOrCreatedThirdPartyClient =>
+            nullValueOrCreatedThirdPartyClient,
+        ).length;
+        return THIRD_PARTY_CLIENT_ROWS;
       })
       .catch(error => {
         return Promise.reject(error);

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Suscription } from './suscription.entity';
 import { TransactionInterest } from './transaction-interest.entity';
+import { PlatformInterest as PlatformInterestType} from "@/enums/platform-interest.enum";
 
 @Entity()
 export class PlatformInterest extends BaseEntity {
@@ -55,4 +56,8 @@ export class PlatformInterest extends BaseEntity {
     { nullable: true },
   )
   transactionInterestExtraPoints: TransactionInterest[];
+
+  isGold(){
+    return this.name === PlatformInterestType.GOLD_EXTRA;
+  }
 }

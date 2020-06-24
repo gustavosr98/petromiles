@@ -1,4 +1,3 @@
-import { Country } from './country.entity';
 import {
   BaseEntity,
   Entity,
@@ -9,6 +8,9 @@ import {
   OneToMany,
 } from 'typeorm';
 
+import { Country } from '@/entities/country.entity';
+import { RoutingNumber } from '@/entities/routing-number.entity';
+
 @Entity()
 export class Bank extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -17,11 +19,21 @@ export class Bank extends BaseEntity {
   @Column()
   name: string;
 
+  @Column()
+  photo: string;
+
   @ManyToOne(
     type => Country,
     country => country.idCountry,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_country' })
   country: Country;
+
+  @OneToMany(
+    type => RoutingNumber,
+    routingNumber => routingNumber.idRoutingNumber,
+    { nullable: true },
+  )
+  routingNumber: RoutingNumber[];
 }

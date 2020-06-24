@@ -33,7 +33,10 @@
     </v-card-text>
     <v-row class="text-center">
       <v-col :cols="showClientElement ? '6' : '12'">
-        <h5 class="caption">Forgot your password?</h5>
+        <h5 class="caption">
+          Forgot your password?
+          <router-link :to="{ name: routeNameRecover }">Recover</router-link>
+        </h5>
         <v-spacer />
       </v-col>
       <v-col cols="6" v-if="showClientElement">
@@ -65,6 +68,7 @@ export default {
   props: {
     title: { required: true, type: String },
     signUpRoute: { type: String },
+    recoverRoute: { type: String },
     dashboardRoute: { required: true, type: String },
     showClientElement: { required: true, type: Boolean },
     role: { required: true, type: String },
@@ -74,6 +78,7 @@ export default {
       email: "",
       password: "",
       routeNameSignUp: this.signUpRoute,
+      routeNameRecover: this.recoverRoute,
     };
   },
   methods: {

@@ -31,4 +31,9 @@ export const PLATAFORM_INTERESTS = [
     name: 'Withdrawal',
     percentage: '0.05',
   },
+  {
+    idPlatformInterest: 6,
+    name: 'thirdPartyClientCommission',
+    amount: '125',
+  },
 ];

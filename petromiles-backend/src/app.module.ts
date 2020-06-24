@@ -22,6 +22,7 @@ import { SuscriptionModule } from '@/modules/suscription/suscription.module';
 import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { UserModule } from '@/modules/user/user.module';
 import { PaymentsModule } from '@/modules/payments/payments.module';
+import { ThirdPartyClientsModule } from '@/modules/third-party-clients/third-party-clients.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { PaymentsModule } from '@/modules/payments/payments.module';
     TransactionModule,
     WinstonModule.forRoot(createOptions({ fileName: 'petromiles-global.log' })),
     PaymentsModule,
+    ThirdPartyClientsModule,
   ],
   providers: [],
 })

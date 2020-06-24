@@ -65,4 +65,12 @@ export class AuthController {
     );
     return user;
   }
+
+  @Post('recover-password')
+  async recoverPassword(@Body() credentials: App.Auth.LoginRequest) {
+    this.logger.http(
+      `[${ApiModules.AUTH}] {${credentials.email}} The user is starting the recover-password process`,
+    );
+    await this.authService.recoverPassword(credentials);
+  }
 }

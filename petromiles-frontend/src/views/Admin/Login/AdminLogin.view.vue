@@ -8,6 +8,7 @@
               <login-form
                 title="Login with your administrator account"
                 :showClientElement="false"
+                :recoverRoute="recoverRoute"
                 :dashboardRoute="dashboardRoute"
                 :role="role"
               />
@@ -36,6 +37,7 @@ export default {
   data() {
     return {
       dashboardRoute: adminRoutes.DASHBOARD.name,
+      recoverRoute: adminRoutes.RECOVER_PASSWORD.name,
       role: authConstants.ADMINISTRATOR,
     };
   },
