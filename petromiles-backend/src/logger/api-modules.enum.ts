@@ -12,6 +12,7 @@ enum ApiModules {
   MAILS = 'MAILS',
   USER = 'USER',
   PAYMENTS = 'PAYMENTS',
+  THIRD_PARTY_CLIENTS = 'THIRD_PARTY_CLIENTS',
 }
 
 enum ApiSubmodules {
