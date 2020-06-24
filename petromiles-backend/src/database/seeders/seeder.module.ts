@@ -17,6 +17,7 @@ import { PointsConversionSeederModule } from './points_conversion/points_convers
 import { BankSeederModule } from './bank/bank.module';
 import { TaskSeederModule } from './task/task.module';
 import { RoutingNumberModule } from './routing-number/routing-number.module';
+import { ThirdPartyClientSeederModule } from './third-party-client/third-party-client.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { RoutingNumberModule } from './routing-number/routing-number.module';
     BankSeederModule,
     TaskSeederModule,
     RoutingNumberModule,
+    ThirdPartyClientSeederModule,
   ],
   providers: [Seeder, Logger],
 })

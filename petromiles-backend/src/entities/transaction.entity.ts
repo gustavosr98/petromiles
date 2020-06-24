@@ -12,12 +12,13 @@ import { Transform } from 'class-transformer';
 
 import { TransactionDetails } from '@/modules/transaction/interfaces/transaction-details.interface';
 
-import { UserSuscription } from './user-suscription.entity';
-import { ClientBankAccount } from './client-bank-account.entity';
-import { StateTransaction } from './state-transaction.entity';
-import { TransactionInterest } from './transaction-interest.entity';
-import { PointsConversion } from './points-conversion.entity';
-import { TransactionType } from '../enums/transaction.enum';
+import { UserSuscription } from '@/entities/user-suscription.entity';
+import { ClientBankAccount } from '@/entities/client-bank-account.entity';
+import { StateTransaction } from '@/entities/state-transaction.entity';
+import { TransactionInterest } from '@/entities/transaction-interest.entity';
+import { PointsConversion } from '@/entities/points-conversion.entity';
+import { TransactionType } from '@/enums/transaction.enum';
+import { ClientOnThirdParty } from '@/entities/client-on-third-party.entity';
 
 @Entity()
 export class Transaction extends BaseEntity {
@@ -85,10 +86,18 @@ export class Transaction extends BaseEntity {
   @ManyToOne(
     type => ClientBankAccount,
     clientBankAccount => clientBankAccount.idClientBankAccount,
-    { nullable: false, eager: true },
+    { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_client_bank_account' })
-  clientBankAccount: ClientBankAccount;
+  clientBankAccount?: ClientBankAccount;
+
+  @ManyToOne(
+    type => ClientOnThirdParty,
+    clientOnThirdParty => clientOnThirdParty.idClientOnThirdParty,
+    { nullable: true, eager: true },
+  )
+  @JoinColumn({ name: 'fk_client_on_third_party' })
+  clientOnThirdParty?: ClientOnThirdParty;
 
   calculateDetails(): TransactionDetails {
     const state = this.stateTransaction.find(state => !state.finalDate).state
@@ -99,17 +108,28 @@ export class Transaction extends BaseEntity {
       details = this.calculateVerificationDetails();
     if (this.type == TransactionType.SUSCRIPTION_PAYMENT)
       details = this.calculateSubscriptionDetails();
-    if (this.type == TransactionType.DEPOSIT)
+    if (
+      this.type == TransactionType.DEPOSIT ||
+      this.type == TransactionType.THIRD_PARTY_CLIENT
+    )
       details = this.calculateDepositDetails();
     if (this.type == TransactionType.WITHDRAWAL)
       details = this.calculateWithdrawalDetails();
+
+    const bankAccount = this.clientBankAccount
+      ? this.clientBankAccount.bankAccount.accountNumber.substr(-4)
+      : null;
+
+    const bankAccountNickname = this.clientBankAccount
+      ? this.clientBankAccount.bankAccount.nickname
+      : null;
 
     return {
       id: this.idTransaction,
       date: this.initialDate.toLocaleDateString(),
       type: this.type,
-      bankAccount: this.clientBankAccount.bankAccount.accountNumber.substr(-4),
-      bankAccountNickname: this.clientBankAccount.bankAccount.nickname,
+      bankAccount,
+      bankAccountNickname,
       pointsConversion: 1 / this.pointsConversion.onePointEqualsDollars,
       ...details,
       state,

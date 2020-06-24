@@ -50,7 +50,8 @@ declare namespace App {
       rawAmount: number;
       type: import('../src/enums/transaction.enum').TransactionType;
       pointsConversion: import('../src/entities/points-conversion.entity').PointsConversion;
-      clientBankAccount: import('../src/entities/client-bank-account.entity').ClientBankAccount;
+      clientBankAccount?: import('../src/entities/client-bank-account.entity').ClientBankAccount;
+      clientOnThirdParty?: import('../src/entities/client-on-third-party.entity').ClientOnThirdParty;
       thirdPartyInterest?: import('../src/entities/third-party-interest.entity').ThirdPartyInterest;
       platformInterest: import('../src/entities/platform-interest.entity').PlatformInterest;
       stateTransactionDescription: string;

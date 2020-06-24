@@ -6,15 +6,16 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
-import { Exclude, Transform } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 
 import * as bcrypt from 'bcrypt';
 
-import { ClientBankAccount } from './client-bank-account.entity';
-import { StateUser } from './state-user.entity';
-import { UserDetails } from './user-details.entity';
-import { UserRole } from './user-role.entity';
-import { UserSuscription } from './user-suscription.entity';
+import { ClientBankAccount } from '@/entities/client-bank-account.entity';
+import { StateUser } from '@/entities/state-user.entity';
+import { UserDetails } from '@/entities/user-details.entity';
+import { UserRole } from '@/entities/user-role.entity';
+import { UserSuscription } from '@/entities/user-suscription.entity';
+import { ClientOnThirdParty } from '@/entities/client-on-third-party.entity';
 
 @Entity()
 export class UserClient extends BaseEntity {
@@ -80,6 +81,13 @@ export class UserClient extends BaseEntity {
     { nullable: true },
   )
   clientBankAccount: ClientBankAccount[];
+
+  @OneToMany(
+    type => ClientOnThirdParty,
+    clientOnThirdParty => clientOnThirdParty.idClientOnThirdParty,
+    { nullable: true },
+  )
+  clientOnThirdParty?: ClientOnThirdParty[];
 
   async isPasswordCorrect(password: string): Promise<boolean> {
     const passwordHashed = await bcrypt.hash(password, this.salt);

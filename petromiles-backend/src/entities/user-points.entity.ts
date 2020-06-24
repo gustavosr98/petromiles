@@ -4,6 +4,7 @@ import { Transform } from 'class-transformer';
 import { Transaction } from './transaction.entity';
 import { TransactionType } from '@/enums/transaction.enum';
 import { StateName } from '@/enums/state.enum';
+import { UserClient } from './user-client.entity';
 
 @ViewEntity({
   expression: (connection: Connection) =>
@@ -19,8 +20,13 @@ import { StateName } from '@/enums/state.enum';
       )
       .addSelect('userClient.email', 'email')
       .from(Transaction, 'transaction')
+      .leftJoin('transaction.clientOnThirdParty', 'clientOnThirdParty')
       .leftJoin('transaction.clientBankAccount', 'clientBankAccount')
-      .leftJoin('clientBankAccount.userClient', 'userClient')
+      .leftJoin(
+        UserClient,
+        'userClient',
+        '"userClient"."idUserClient" = "clientBankAccount".fk_user_client OR "userClient"."idUserClient" = "clientOnThirdParty".fk_user_client',
+      )
       .leftJoin('transaction.stateTransaction', 'stateTransaction')
       .leftJoin('stateTransaction.state', 'state')
       .leftJoin('transaction.pointsConversion', 'pointsConversion')
@@ -29,7 +35,10 @@ import { StateName } from '@/enums/state.enum';
         new Brackets(type => {
           type
             .where(`transaction.type = '${TransactionType.DEPOSIT}'`)
-            .orWhere(`transaction.type = '${TransactionType.WITHDRAWAL}'`);
+            .orWhere(`transaction.type = '${TransactionType.WITHDRAWAL}'`)
+            .orWhere(
+              `transaction.type = '${TransactionType.THIRD_PARTY_CLIENT}'`,
+            );
         }),
       )
       .groupBy('userClient.email'),

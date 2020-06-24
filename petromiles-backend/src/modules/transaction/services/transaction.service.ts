@@ -104,10 +104,13 @@ export class TransactionService {
     email: string,
   ): Promise<App.Transaction.TransactionDetails[]> {
     const transactions = await this.transactionRepository.find({
-      where: `userClient.email = '${email}' AND stateTransaction.finalDate is null AND trans.transaction is null`,
+      where: `(userClient.email = '${email}' OR user.email= '${email}') AND stateTransaction.finalDate is null AND trans.transaction is null`,
       join: {
         alias: 'trans',
         leftJoinAndSelect: {
+          clientOnThirdParty: 'trans.clientOnThirdParty',
+          user: 'clientOnThirdParty.userClient',
+          thirdPartyClient: 'clientOnThirdParty.thirdPartyClient',
           clientBankAccount: 'trans.clientBankAccount',
           bankAccount: 'clientBankAccount.bankAccount',
           stateTransaction: 'trans.stateTransaction',
