@@ -2,7 +2,9 @@ version: '3'
 services:
   # PG DATABASE
   db:
-    image: 'postgres:latest'
+    build:
+      context: ./database
+      dockerfile: Dockerfile
     ports:
       - 5435:5432
     environment:
