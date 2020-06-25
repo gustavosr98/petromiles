@@ -19,6 +19,7 @@
           prepend-icon="email"
           type="text"
           color="light-blue darken-4"
+          @keyup.enter="buildUser"
         ></v-text-field>
         <v-text-field
           id="password"
@@ -28,6 +29,7 @@
           prepend-icon="lock"
           type="password"
           color="light-blue darken-4"
+          @keyup.enter="buildUser"
         ></v-text-field>
       </v-form>
     </v-card-text>
