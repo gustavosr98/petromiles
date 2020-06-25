@@ -127,4 +127,5 @@ export class BankAccountService {
       .andWhere('sba."finalDate" IS NULL')
       .execute();
   }
+
 }

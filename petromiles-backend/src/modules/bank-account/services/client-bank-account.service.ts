@@ -30,6 +30,7 @@ import { StateName, StateDescription } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { CreateBankAccountDTO } from '@/modules/bank-account/dto/create-bank-account.dto';
 import { updatePrimaryAccountDTO } from '@/modules/bank-account/dto/update-primary-account.dto';
+import {UpdateAccountStateDto} from "@/modules/bank-account/dto/update-account-state.dto";
 
 @Injectable()
 export class ClientBankAccountService {
@@ -464,5 +465,31 @@ export class ClientBankAccountService {
   ): Promise<ClientBankAccount> {
     clientBankAccount.primary = primary;
     return await this.clientBankAccountRepository.save(clientBankAccount);
+  }
+
+  async updateAccountState(updateAccountStateDto: UpdateAccountStateDto) {
+    const clientBankAccount = await this.getOne(updateAccountStateDto.idUserClient, updateAccountStateDto.idBankAccount);
+
+    const hasPendingTransaction = await this.hasPendingTransaction(
+        clientBankAccount,
+    );
+    if (hasPendingTransaction) {
+      this.logger.error(
+          `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: ${clientBankAccount.idClientBankAccount} state cannot be changed`,
+      );
+      throw new BadRequestException('error-messages.pendingTransactions');
+    }
+    let description;
+    if(updateAccountStateDto.state === StateName.BLOCKED){
+      description = StateDescription.BANK_ACCOUNT_BLOCKED;
+    }else if (updateAccountStateDto.state === StateName.ACTIVE){
+      description = StateDescription.BANK_ACCOUNT_ACTIVATED;
+    }
+
+    await this.changeState(
+        updateAccountStateDto.state,
+        clientBankAccount,
+        description
+    );
   }
 }

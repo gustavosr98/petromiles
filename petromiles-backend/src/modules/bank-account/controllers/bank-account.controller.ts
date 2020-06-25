@@ -27,11 +27,13 @@ import { HttpRequest } from '@/logger/http-requests.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { updatePrimaryAccountDTO } from '@/modules/bank-account/dto/update-primary-account.dto';
 import { CreateBankAccountDTO } from '@/modules/bank-account/dto/create-bank-account.dto';
+import {UpdateAccountStateDto} from "@/modules/bank-account/dto/update-account-state.dto";
 
 // SERVICES
 import { ClientBankAccountService } from '../services/client-bank-account.service';
 import { BankAccountService } from '../services/bank-account.service';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
+
 
 const baseEndpoint = Object.freeze('bank-account');
 
@@ -128,5 +130,15 @@ export class BankAccountController {
       `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.PUT}) ask /${baseEndpoint}/primary`,
     );
     return this.clientBankAccountService.updateCurrentPrimary(primary, user.id);
+  }
+
+  @Roles(Role.ADMINISTRATOR)
+  @UseGuards(RolesGuard)
+  @Put('state')
+  updateAccountState(@Body() updateAccountStateDto: UpdateAccountStateDto)  {
+      this.logger.http(
+          `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.POST}) ask /${baseEndpoint}/state`,
+      );
+      return this.clientBankAccountService.updateAccountState(updateAccountStateDto)
   }
 }
