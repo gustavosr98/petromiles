@@ -1,6 +1,7 @@
+import { CsvService } from '@/modules/third-party-clients/services/csv.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan } from 'typeorm';
+import { Repository } from 'typeorm';
 
 // SERVICES
 import { PointsConversionService } from '@/modules/management/services/points-conversion.service';
@@ -18,13 +19,17 @@ import { TransactionType } from '@/enums/transaction.enum';
 import { PlatformInterest } from '@/enums/platform-interest.enum';
 import { Interest } from '@/modules/payments/interest.interface';
 
+// INTERFACES
+import { ConfirmationTicket } from '@/interfaces/third-party-clients/confirmation-ticket.interface';
+
 @Injectable()
 export class ThirdPartyClientsService {
   constructor(
     @InjectRepository(ThirdPartyClient)
-    private thirdPartyClientsRepository: Repository<ThirdPartyClient>,
-    private pointsConversionService: PointsConversionService,
-    private paymentsService: PaymentsService,
+    private readonly thirdPartyClientsRepository: Repository<ThirdPartyClient>,
+    private readonly pointsConversionService: PointsConversionService,
+    private readonly paymentsService: PaymentsService,
+    private readonly csvService: CsvService,
   ) {}
 
   async get(apiKey: string): Promise<ThirdPartyClient> {
@@ -92,5 +97,18 @@ export class ThirdPartyClientsService {
     if (addPointsRequest.type === AddPointsRequestType.CONSULT) {
       return await this.consultPoints(addPointsRequest);
     }
+  }
+
+  async csvCheck(apiKey: string, file): Promise<ConfirmationTicket[]> {
+    const confirmationTickets: ConfirmationTicket[] = await this.csvService.toJSON<
+      ConfirmationTicket
+    >(file, [
+      'confirmationId',
+      'date',
+      'userEmail',
+      'priceTag',
+      'accumulatedPoints',
+    ]);
+    return confirmationTickets;
   }
 }

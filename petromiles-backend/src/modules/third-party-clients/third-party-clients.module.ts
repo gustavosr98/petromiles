@@ -13,6 +13,10 @@ import { ThirdPartyClientsController } from '@/modules/third-party-clients/contr
 
 // SERVICES
 import { ThirdPartyClientsService } from '@/modules/third-party-clients/services/third-party-clients.service';
+import { CsvService } from '@/modules/third-party-clients/services/csv.service';
+
+// PROVIDERS
+import { CsvToJsonProvider } from '@/modules/third-party-clients/providers/csv-to-json.provider';
 
 @Module({
   imports: [
@@ -21,6 +25,6 @@ import { ThirdPartyClientsService } from '@/modules/third-party-clients/services
     PaymentsModule,
   ],
   controllers: [ThirdPartyClientsController],
-  providers: [ThirdPartyClientsService],
+  providers: [ThirdPartyClientsService, CsvToJsonProvider, CsvService],
 })
 export class ThirdPartyClientsModule {}
