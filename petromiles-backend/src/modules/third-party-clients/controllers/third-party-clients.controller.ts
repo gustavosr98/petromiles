@@ -1,7 +1,23 @@
-import { Controller, Post } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Inject,
+  UploadedFile,
+  UseInterceptors,
+  Body,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+
+// SERVICES
+import { ThirdPartyClientsService } from '@/modules/third-party-clients/services/third-party-clients.service';
 
 // INTERFACES
-import { AddPointsRequest } from '@/interfaces/third-party-clients/add-points-request.interface';
+import { ApiModules } from '@/logger/api-modules.enum';
+import { HttpRequest } from '@/logger/http-requests.enum';
+import { AddPointsRequest } from '@/modules/third-party-clients/dto/add-points-request.dto';
 import { AddPointsResponse } from '@/interfaces/third-party-clients/add-points-response.interface';
 import { AssociateUserCodeRequest } from '@/interfaces/third-party-clients/associate-user-code-request.interface';
 import { AssociateUserCodeResponse } from '@/interfaces/third-party-clients/associate-user-code-response.interface';
@@ -13,6 +29,11 @@ import { CsvCheckResponse } from '@/interfaces/third-party-clients/csv-check-res
 const baseEndpoint = 'third-party-clients';
 @Controller(baseEndpoint)
 export class ThirdPartyClientsController {
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    private readonly thirdPartyClientsService: ThirdPartyClientsService,
+  ) {}
+
   @Post('associate-user-code')
   associateUserCode(
     associateUserCodeRequest: AssociateUserCodeRequest,
@@ -28,12 +49,31 @@ export class ThirdPartyClientsController {
   }
 
   @Post('add-points')
-  addPoints(addPointsRequest: AddPointsRequest): AddPointsResponse {
-    return null;
+  async addPoints(
+    @Body() addPointsRequest: AddPointsRequest,
+  ): Promise<AddPointsResponse> {
+    this.logger.http(
+      `[${ApiModules.THIRD_PARTY_CLIENTS}] (${HttpRequest.POST}) ${addPointsRequest.apiKey} asks /${baseEndpoint}/add-points`,
+    );
+    return await this.thirdPartyClientsService.addPoints(addPointsRequest);
   }
 
   @Post('csv-check')
-  csvCheck(csvCheckRequest: CsvCheckRequest): CsvCheckResponse {
-    return null;
+  @UseInterceptors(FileInterceptor('file'))
+  async csvCheck(
+    @Body() csvCheckRequest: CsvCheckRequest,
+    @UploadedFile('file') csvFile,
+  ): Promise<CsvCheckResponse> {
+    this.logger.http(
+      `[${ApiModules.THIRD_PARTY_CLIENTS}] { apiKey: ${csvCheckRequest.apiKey} } ${baseEndpoint}/csv-check`,
+    );
+    const csvCheckResponse: CsvCheckResponse = {
+      request: csvCheckRequest,
+      confirmationTickets: await this.thirdPartyClientsService.csvCheck(
+        csvCheckRequest.apiKey,
+        csvFile,
+      ),
+    };
+    return csvCheckResponse;
   }
 }

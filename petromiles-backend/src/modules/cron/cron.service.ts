@@ -29,7 +29,7 @@ import { Transaction } from '@/entities/transaction.entity';
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
 import { CronJobs } from './cron-jobs.enum';
-import { StateName } from '@/enums/state.enum';
+import { StateName, StateDescription } from '@/enums/state.enum';
 import { StripeBankAccountStatus } from '@/modules/payment-provider/stripe/bank-account-status.enum';
 import { StripeChargeStatus } from '@/modules/payment-provider/stripe/stripe-charge-status.enum';
 
@@ -126,32 +126,31 @@ export class CronService {
         unverifiedTransaction.paymentProviderTransactionId,
       );
       
-      const transactionState = await getConnection()
+      const transaction = await getConnection()
             .getRepository(Transaction)
             .findOne({ idTransaction: unverifiedTransaction.idTransaction });
 
-      const languageMails = transactionState.clientBankAccount.userClient.userDetails.language.name;
-      const points = (transactionState.rawAmount / transactionState.pointsConversion.onePointEqualsDollars)/100;
+      const languageMails = transaction.clientBankAccount.userClient.userDetails.language.name;
+      const points = (transaction.rawAmount / transaction.pointsConversion.onePointEqualsDollars)/100;
 
       if (charge.status === StripeChargeStatus.SUCCEEDED) {
         await this.stateTransactionService.update(
           StateName.VALID,
           unverifiedTransaction,
+          StateDescription.CHANGE_VERIFICATION_TO_VALID,
         );
-        
-        //mail delivery when verification is valid for a payment
+
         const template = `successfulPointsPayment[${languageMails}]`;    
         const subject =  mailsSubjets.successful_points_payment[languageMails];
         
-    
         const msg = {
-          to: transactionState.clientBankAccount.userClient.email,
+          to: transaction.clientBankAccount.userClient.email,
           subject: subject,
           templateId: this.configService.get<string>(
             `mails.sendgrid.templates.${template}`,
           ),
           dynamic_template_data: {
-            user: transactionState.clientBankAccount.userClient.userDetails.firstName,
+            user: transaction.clientBankAccount.userClient.userDetails.firstName,
             numberPoints: points,
             },
           };
@@ -162,22 +161,70 @@ export class CronService {
           unverifiedTransaction,
         );
       } else if (charge.status === StripeChargeStatus.FAILED) {
-        await this.stateTransactionService.update(
-          StateName.INVALID,
-          unverifiedTransaction,
-        );
-        
+
+        if (charge.failure_code === StateDescription.NO_ACCOUNT.toLowerCase()) {
+          await this.stateTransactionService.update(
+            StateName.INVALID,
+            unverifiedTransaction,
+            StateDescription.NO_ACCOUNT,
+          );
+          
+          this.logger.error(
+            `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
+          );
+        } else if (charge.failure_code === StateDescription.ACCOUNT_CLOSED.toLowerCase()) {
+          await this.stateTransactionService.update(
+            StateName.INVALID,
+            unverifiedTransaction,
+            StateDescription.ACCOUNT_CLOSED,
+          );
+          
+          this.logger.error(
+            `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
+          );
+        } else if (charge.failure_code === StateDescription.INSUFFICIENT_FUNDS.toLowerCase()) {
+          await this.stateTransactionService.update(
+            StateName.INVALID,
+            unverifiedTransaction,
+            StateDescription.INSUFFICIENT_FUNDS,
+          );
+          
+          this.logger.error(
+            `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
+          );
+        } else if (charge.failure_code === StateDescription.DEBIT_NOT_AUTHORIZED.toLowerCase()) {
+          await this.stateTransactionService.update(
+            StateName.INVALID,
+            unverifiedTransaction,
+            StateDescription.DEBIT_NOT_AUTHORIZED,
+          );
+          
+          this.logger.error(
+            `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
+          );
+        } else if (charge.failure_code === StateDescription.INVALID_CURRENCY.toLowerCase()) {
+          await this.stateTransactionService.update(
+            StateName.INVALID,
+            unverifiedTransaction,
+            StateDescription.INVALID_CURRENCY,
+          );
+          
+          this.logger.error(
+            `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
+          );
+        }
+
         const template = `failedPointsPayment[${languageMails}]`;    
         const subject =  mailsSubjets.failed_points_payment[languageMails];
-    
+        
         const msg = {
-          to: transactionState.clientBankAccount.userClient.email,
+          to: transaction.clientBankAccount.userClient.email,
           subject: subject,
           templateId: this.configService.get<string>(
             `mails.sendgrid.templates.${template}`,
           ),
           dynamic_template_data: {
-            user: transactionState.clientBankAccount.userClient.userDetails.firstName,
+            user: transaction.clientBankAccount.userClient.userDetails.firstName,
             numberPoints: points,
             },
           };

@@ -32,5 +32,6 @@ import { ClientBankAccount } from '@/entities/client-bank-account.entity';
   ],
   controllers: [PaymentsController],
   providers: [PaymentsService],
+  exports: [PaymentsService],
 })
 export class PaymentsModule {}

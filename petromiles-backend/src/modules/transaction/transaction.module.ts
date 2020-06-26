@@ -22,7 +22,6 @@ import { StateTransaction } from '@/entities/state-transaction.entity';
   imports: [
     PaymentProviderModule,
     ManagementModule,
-    PaymentProviderModule,
     TypeOrmModule.forFeature([
       Transaction,
       TransactionInterest,

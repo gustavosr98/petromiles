@@ -1,6 +1,7 @@
 // NEST CORE
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 
 // CONFIGURATION
 import configuration from '@/config/configuration';
@@ -46,6 +47,11 @@ import { ThirdPartyClientsModule } from '@/modules/third-party-clients/third-par
     PaymentsModule,
     ThirdPartyClientsModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+  ],
 })
 export class AppModule {}

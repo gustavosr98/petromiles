@@ -57,7 +57,7 @@ export class PaymentsService {
 
   async getInterests(
     trasactionType: TransactionType,
-    platformInterestType,
+    platformInterestType: PlatformInterest,
   ): Promise<Interest[]> {
     let interests: Interest[] = [];
     const thirdPartyInterest = await this.thirdPartyInterestService.get(
