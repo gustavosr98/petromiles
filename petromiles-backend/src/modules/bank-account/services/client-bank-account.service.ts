@@ -214,10 +214,12 @@ export class ClientBankAccountService {
     await this.stateTransactionService.update(
       StateName.VALID,
       verificationTransactions[0],
+      StateDescription.CHANGE_VERIFICATION_TO_VALID,
     );
     await this.stateTransactionService.update(
       StateName.VALID,
       verificationTransactions[1],
+      StateDescription.CHANGE_VERIFICATION_TO_VALID,
     );
 
     return verification;
