@@ -12,7 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 // CONSTANTS
-import { mailsSubjets } from '@/constants/mailsSubjectConst';
+import { MailsSubjets } from '@/constants/mailsSubjectConst';
 
 // SERVICES
 import { StripeService } from '@/modules/payment-provider/stripe/stripe.service';
@@ -125,13 +125,17 @@ export class CronService {
       const charge = await this.stripeService.getCharge(
         unverifiedTransaction.paymentProviderTransactionId,
       );
-      
-      const transaction = await getConnection()
-            .getRepository(Transaction)
-            .findOne({ idTransaction: unverifiedTransaction.idTransaction });
 
-      const languageMails = transaction.clientBankAccount.userClient.userDetails.language.name;
-      const points = (transaction.rawAmount / transaction.pointsConversion.onePointEqualsDollars)/100;
+      const transaction = await getConnection()
+        .getRepository(Transaction)
+        .findOne({ idTransaction: unverifiedTransaction.idTransaction });
+
+      const languageMails =
+        transaction.clientBankAccount.userClient.userDetails.language.name;
+      const points =
+        transaction.rawAmount /
+        transaction.pointsConversion.onePointEqualsDollars /
+        100;
 
       if (charge.status === StripeChargeStatus.SUCCEEDED) {
         await this.stateTransactionService.update(
@@ -140,9 +144,9 @@ export class CronService {
           StateDescription.CHANGE_VERIFICATION_TO_VALID,
         );
 
-        const template = `successfulPointsPayment[${languageMails}]`;    
-        const subject =  mailsSubjets.successful_points_payment[languageMails];
-        
+        const template = `successfulPointsPayment[${languageMails}]`;
+        const subject = MailsSubjets.successful_points_payment[languageMails];
+
         const msg = {
           to: transaction.clientBankAccount.userClient.email,
           subject: subject,
@@ -150,73 +154,84 @@ export class CronService {
             `mails.sendgrid.templates.${template}`,
           ),
           dynamic_template_data: {
-            user: transaction.clientBankAccount.userClient.userDetails.firstName,
+            user:
+              transaction.clientBankAccount.userClient.userDetails.firstName,
             numberPoints: points,
-            },
-          };
+          },
+        };
         this.mailsService.sendEmail(msg);
-        
+
         this.suscriptionService.upgradeSubscriptionIfIsPossible(
           unverifiedTransaction.idUserClient,
           unverifiedTransaction,
         );
       } else if (charge.status === StripeChargeStatus.FAILED) {
-
         if (charge.failure_code === StateDescription.NO_ACCOUNT.toLowerCase()) {
           await this.stateTransactionService.update(
             StateName.INVALID,
             unverifiedTransaction,
             StateDescription.NO_ACCOUNT,
           );
-          
+
           this.logger.error(
             `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
           );
-        } else if (charge.failure_code === StateDescription.ACCOUNT_CLOSED.toLowerCase()) {
+        } else if (
+          charge.failure_code === StateDescription.ACCOUNT_CLOSED.toLowerCase()
+        ) {
           await this.stateTransactionService.update(
             StateName.INVALID,
             unverifiedTransaction,
             StateDescription.ACCOUNT_CLOSED,
           );
-          
+
           this.logger.error(
             `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
           );
-        } else if (charge.failure_code === StateDescription.INSUFFICIENT_FUNDS.toLowerCase()) {
+        } else if (
+          charge.failure_code ===
+          StateDescription.INSUFFICIENT_FUNDS.toLowerCase()
+        ) {
           await this.stateTransactionService.update(
             StateName.INVALID,
             unverifiedTransaction,
             StateDescription.INSUFFICIENT_FUNDS,
           );
-          
+
           this.logger.error(
             `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
           );
-        } else if (charge.failure_code === StateDescription.DEBIT_NOT_AUTHORIZED.toLowerCase()) {
+        } else if (
+          charge.failure_code ===
+          StateDescription.DEBIT_NOT_AUTHORIZED.toLowerCase()
+        ) {
           await this.stateTransactionService.update(
             StateName.INVALID,
             unverifiedTransaction,
             StateDescription.DEBIT_NOT_AUTHORIZED,
           );
-          
+
           this.logger.error(
             `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
           );
-        } else if (charge.failure_code === StateDescription.INVALID_CURRENCY.toLowerCase()) {
+        } else if (
+          charge.failure_code ===
+          StateDescription.INVALID_CURRENCY.toLowerCase()
+        ) {
           await this.stateTransactionService.update(
             StateName.INVALID,
             unverifiedTransaction,
             StateDescription.INVALID_CURRENCY,
           );
-          
+
           this.logger.error(
             `[${ApiModules.CRON}] transactionChargeStatusStripe( ${charge.failure_message} )`,
           );
         }
 
-        const template = `failedPointsPayment[${languageMails}]`;    
-        const subject =  mailsSubjets.failed_points_payment[languageMails];
-        
+        const template = `failedPointsPayment[${languageMails}]`;
+        const subject = MailsSubjets.failed_points_payment[languageMails];
+
         const msg = {
           to: transaction.clientBankAccount.userClient.email,
           subject: subject,
@@ -224,10 +239,11 @@ export class CronService {
             `mails.sendgrid.templates.${template}`,
           ),
           dynamic_template_data: {
-            user: transaction.clientBankAccount.userClient.userDetails.firstName,
+            user:
+              transaction.clientBankAccount.userClient.userDetails.firstName,
             numberPoints: points,
-            },
-          };
+          },
+        };
         this.mailsService.sendEmail(msg);
       }
     });

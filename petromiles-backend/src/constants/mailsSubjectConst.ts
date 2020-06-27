@@ -1,4 +1,4 @@
-export const mailsSubjets = Object.freeze({
+export const MailsSubjets = Object.freeze({
   welcome: 'Welcome To PetroMiles',
   invoice: {
     english: 'Your transaction is being processed',
@@ -31,5 +31,9 @@ export const mailsSubjets = Object.freeze({
   recover: {
     english: 'Recover your password',
     spanish: 'Recupera tu contraseña',
+  },
+  verification_code: {
+    english: 'Connecting your PetroMiles account!',
+    spanish: '¡Conectando tu cuenta Petromiles!',
   },
 });

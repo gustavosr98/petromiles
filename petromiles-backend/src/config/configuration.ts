@@ -38,32 +38,32 @@ export default () => ({
       templates: {
         welcome: process.env.SENDGRID_WELCOME_TEMPLATE,
         invoice: {
-           english:process.env.SENDGRID_WELCOME_INVOICE_EN_TEMPLATE,
-           spanish:process.env.SENDGRID_WELCOME_INVOICE_ES_TEMPLATE,
+          english: process.env.SENDGRID_WELCOME_INVOICE_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_WELCOME_INVOICE_ES_TEMPLATE,
         },
         upgradeToGold: {
-           english:process.env.SENDGRID_UPGRADE_TO_GOLD_EN_TEMPLATE,
-           spanish:process.env.SENDGRID_UPGRADE_TO_GOLD_ES_TEMPLATE,
+          english: process.env.SENDGRID_UPGRADE_TO_GOLD_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_UPGRADE_TO_GOLD_ES_TEMPLATE,
         },
         bankAccountRegistration: {
-           english:process.env.SENDGRID_BANK_REGISTRATION_EN_TEMPLATE,
-           spanish:process.env.SENDGRID_BANK_REGISTRATION_ES_TEMPLATE,
+          english: process.env.SENDGRID_BANK_REGISTRATION_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_BANK_REGISTRATION_ES_TEMPLATE,
         },
         bankAccountVerified: {
-           english:process.env.SENDGRID_BANK_VERIFIED_EN_TEMPLATE,
-           spanish:process.env.SENDGRID_BANK_VERIFIED_ES_TEMPLATE,
+          english: process.env.SENDGRID_BANK_VERIFIED_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_BANK_VERIFIED_ES_TEMPLATE,
         },
         bankAccountDeletion: {
-           english:process.env.SENDGRID_BANK_DELETION_EN_TEMPLATE,
-           spanish:process.env.SENDGRID_BANK_DELETION_ES_TEMPLATE,
+          english: process.env.SENDGRID_BANK_DELETION_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_BANK_DELETION_ES_TEMPLATE,
         },
         successfulPointsPayment: {
-           english:process.env.SENDGRID_SUCCESSFUL_POINTS_PAYMENT_EN_TEMPLATE,
-           spanish:process.env.SENDGRID_SUCCESSFUL_POINTS_PAYMENT_ES_TEMPLATE,  
+          english: process.env.SENDGRID_SUCCESSFUL_POINTS_PAYMENT_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_SUCCESSFUL_POINTS_PAYMENT_ES_TEMPLATE,
         },
         failedPointsPayment: {
-           english:process.env.SENDGRID_FAILED_POINTS_PAYMENT_EN_TEMPLATE,
-           spanish:process.env.SENDGRID_FAILED_POINTS_PAYMENT_ES_TEMPLATE,
+          english: process.env.SENDGRID_FAILED_POINTS_PAYMENT_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_FAILED_POINTS_PAYMENT_ES_TEMPLATE,
         },
         withdrawal: {
           english: process.env.SENDGRID_WITHDRAWAL_EN_TEMPLATE,
@@ -72,6 +72,10 @@ export default () => ({
         recover: {
           english: process.env.SENDGRID_RECOVER_EN_TEMPLATE,
           spanish: process.env.SENDGRID_RECOVER_ES_TEMPLATE,
+        },
+        sendVerificationCodeEmail: {
+          english: process.env.SENDGRID_VERIFICATION_CODE_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_VERIFICATION_CODE_ES_TEMPLATE,
         },
       },
     },

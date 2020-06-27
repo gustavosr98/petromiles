@@ -7,7 +7,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 // CONSTANTS
-import { mailsSubjets } from '@/constants/mailsSubjectConst';
+import { MailsSubjets } from '@/constants/mailsSubjectConst';
 
 // SERVICES
 import { BankAccountService } from '@/modules/bank-account/services/bank-account.service';
@@ -30,7 +30,7 @@ import { StateName, StateDescription } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { CreateBankAccountDTO } from '@/modules/bank-account/dto/create-bank-account.dto';
 import { updatePrimaryAccountDTO } from '@/modules/bank-account/dto/update-primary-account.dto';
-import {UpdateAccountStateDto} from "@/modules/bank-account/dto/update-account-state.dto";
+import { UpdateAccountStateDto } from '@/modules/bank-account/dto/update-account-state.dto';
 
 @Injectable()
 export class ClientBankAccountService {
@@ -290,7 +290,7 @@ export class ClientBankAccountService {
     if (bankAccountStatus === StateName.VERIFYING) {
       const template = `bankAccountRegistration[${languageMails}]`;
 
-      const subject = mailsSubjets.bank_account_registration[languageMails];
+      const subject = MailsSubjets.bank_account_registration[languageMails];
 
       const msg = {
         to: clientBankAccount.userClient.email,
@@ -314,7 +314,7 @@ export class ClientBankAccountService {
     } else if (bankAccountStatus === StateName.ACTIVE) {
       const template = `bankAccountVerified[${languageMails}]`;
 
-      const subject = mailsSubjets.bank_account_verified[languageMails];
+      const subject = MailsSubjets.bank_account_verified[languageMails];
 
       const msg = {
         to: clientBankAccount.userClient.email,
@@ -334,7 +334,7 @@ export class ClientBankAccountService {
     } else if (bankAccountStatus === StateName.CANCELLED) {
       const template = `bankAccountDeletion[${languageMails}]`;
 
-      const subject = mailsSubjets.bank_account_deletion[languageMails];
+      const subject = MailsSubjets.bank_account_deletion[languageMails];
 
       const msg = {
         to: clientBankAccount.userClient.email,
@@ -470,28 +470,31 @@ export class ClientBankAccountService {
   }
 
   async updateAccountState(updateAccountStateDto: UpdateAccountStateDto) {
-    const clientBankAccount = await this.getOne(updateAccountStateDto.idUserClient, updateAccountStateDto.idBankAccount);
+    const clientBankAccount = await this.getOne(
+      updateAccountStateDto.idUserClient,
+      updateAccountStateDto.idBankAccount,
+    );
 
     const hasPendingTransaction = await this.hasPendingTransaction(
-        clientBankAccount,
+      clientBankAccount,
     );
     if (hasPendingTransaction) {
       this.logger.error(
-          `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: ${clientBankAccount.idClientBankAccount} state cannot be changed`,
+        `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: ${clientBankAccount.idClientBankAccount} state cannot be changed`,
       );
       throw new BadRequestException('error-messages.pendingTransactions');
     }
     let description;
-    if(updateAccountStateDto.state === StateName.BLOCKED){
+    if (updateAccountStateDto.state === StateName.BLOCKED) {
       description = StateDescription.BANK_ACCOUNT_BLOCKED;
-    }else if (updateAccountStateDto.state === StateName.ACTIVE){
+    } else if (updateAccountStateDto.state === StateName.ACTIVE) {
       description = StateDescription.BANK_ACCOUNT_ACTIVATED;
     }
 
     await this.changeState(
-        updateAccountStateDto.state,
-        clientBankAccount,
-        description
+      updateAccountStateDto.state,
+      clientBankAccount,
+      description,
     );
   }
 }
