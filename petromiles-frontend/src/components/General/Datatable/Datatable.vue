@@ -19,7 +19,7 @@
       :search="search"
     >
       <template #item.state="{value}">
-        <v-chip outlined class="overline" :color="getColor(value.name)" label dark>
+        <v-chip outlined class="overline" :color="getColor(value.name)" label dark @click="changeState(value)">
           {{
           value.translated
           }}
@@ -32,6 +32,11 @@
       </template>
       <template #item.cancel="{item}">
         <v-icon @click="confirmDeleteAction(item.idBankAccount)">mdi-delete</v-icon>
+      </template>
+      <template #item.userDetails="{item}">
+        <v-btn color="secondary" @click="seeUserDetails(item)" x-small>
+          <v-icon dark>mdi-plus</v-icon>
+        </v-btn>
       </template>
     </v-data-table>
 
@@ -109,6 +114,22 @@ export default {
       this.details = false;
       this.$emit("deleteItem", id);
     },
+    seeUserDetails(user){      
+      this.$router.push({name: "AdminUsersDetail", params: {user: user}});
+    },
+    
+    //ESTO DE ABAJO FUE ESCRITO POR RAFAEL - NO TOCAR YA QUE SE VA A USAR
+    changeState(item){
+      console.log("I wanna change its state: ", item);
+      /*if(item.name === "active"){
+        item.name = "blocked";
+        item.translated = "blocked";
+      }
+      else{
+        item.name = "active";
+        item.translated = "active";
+      }*/
+    }
   },
   watch: {
     details: function() {

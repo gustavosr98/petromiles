@@ -37,6 +37,10 @@ export default {
           text: this.$tc("common.state"),
           value: "state",
         },
+        {
+          text: "User Details",
+          value: "userDetails"
+        }
       ],
     };
   },

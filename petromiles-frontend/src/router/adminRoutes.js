@@ -43,6 +43,18 @@ const adminRoutesRaw = Object.freeze({
       requiresAdminAuth: true,
     },
   },
+  USER_DETAILS: {
+    path: "/admin/users/detail",
+    name: "AdminUsersDetail",
+    component: () => 
+      import(
+        /* webpackChunkName: "admin-user-list" */ "@/views/Admin/Users/ClientDetails.view"
+      ),
+    meta: {
+      requiresAdminAuth: true
+    },
+    props: true
+  },
   PLATFORM_CONFIG: {
     path: "/admin/platform-config",
     name: "AdminPlatformConfig",

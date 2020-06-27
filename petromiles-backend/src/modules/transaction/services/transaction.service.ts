@@ -24,12 +24,15 @@ import { TransactionType } from '@/enums/transaction.enum';
 import { StateName, StateDescription } from '@/enums/state.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
+import { UserClient } from '@/entities/user-client.entity';
 
 @Injectable()
 export class TransactionService {
   constructor(
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
+    @InjectRepository(UserClient)
+    private userClientRepository: Repository<UserClient>,
     private platformInterestService: PlatformInterestService,
     private pointsConversionService: PointsConversionService,
     private thirdPartyInterestService: ThirdPartyInterestService,
@@ -101,8 +104,11 @@ export class TransactionService {
   }
 
   async getTransactions(
-    email: string,
+    idUserClient: number,
   ): Promise<App.Transaction.TransactionDetails[]> {
+    const email = (await this.userClientRepository.findOne({ idUserClient }))
+      .email;
+
     const transactions = await this.transactionRepository.find({
       where: `(userClient.email = '${email}' OR user.email= '${email}') AND stateTransaction.finalDate is null AND trans.transaction is null`,
       join: {

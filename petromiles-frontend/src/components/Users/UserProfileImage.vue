@@ -1,5 +1,5 @@
 <template>
-    <div>                                
+    <div v-if="userData !== null">                                
         <div class="text-center">
             <v-col cols="12">                
                 <v-avatar  size="150">                                                                             
@@ -24,7 +24,7 @@
                   class="notVisible"                     
                 >        
             </v-col>                    
-            <v-col>                        
+            <v-col v-if="!isAdmin">                        
                 <v-btn
                   @click.native="loadImage"
                   color="primary"
@@ -49,6 +49,16 @@ import Snackbar from "@/components/General/Snackbar/Snackbar.vue";
 export default {    
     components: {       
         "snackbar": Snackbar
+    },
+    props: {
+        userData: {            
+            required: true,
+            default: null
+        },
+        isAdmin: {
+          type: Boolean,
+          required: true,
+        }
     },
     data(){
         return {
@@ -112,16 +122,23 @@ export default {
               );
             });
         }
-    },
+    },   
     mounted() {
-        if(this.user){
-            this.profileImg = this.user.details.photo;
-            this.userID = this.user.details.idUserDetails;
+        this.profileImg = this.userData.details.photo;
+        if(this.userData){
+            this.userID = this.userData.details.idUserDetails;
         }
-    },
+    }, 
     computed: {
         ...mapState("auth", ["user"])
     },
+    watch: {
+        userData: function(newValue){
+            this.userData = newValue;
+            this.profileImg = this.userData.details.photo;
+            this.userID = this.userData.details.idUserDetails;
+        }
+    }
 }
 </script>
 

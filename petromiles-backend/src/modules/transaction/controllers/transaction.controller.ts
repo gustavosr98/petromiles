@@ -6,6 +6,7 @@ import {
   ClassSerializerInterceptor,
   Inject,
   Param,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -33,11 +34,12 @@ export class TransactionController {
   ) {}
 
   @Get()
-  getTransactions(@GetUser() user) {
+  getTransactions(@GetUser() user, @Query('id') idUserClient?: number) {
     this.logger.http(
       `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}`,
     );
-    return this.transactionService.getTransactions(user.email);
+    const id = idUserClient ? idUserClient : user.id;
+    return this.transactionService.getTransactions(id);
   }
 
   @Get(':idTransaction')

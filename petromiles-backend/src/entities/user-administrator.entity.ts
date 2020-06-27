@@ -41,9 +41,9 @@ export class UserAdministrator extends BaseEntity {
   @OneToOne(
     type => UserDetails,
     userDetails => userDetails.userAdministrator,
-    { nullable: true },
+    { nullable: true, eager: true },
   )
-  userDetails?: UserDetails[];
+  userDetails?: UserDetails;
 
   @OneToMany(
     type => UserRole,

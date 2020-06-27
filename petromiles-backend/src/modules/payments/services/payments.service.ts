@@ -132,13 +132,13 @@ export class PaymentsService {
     amount,
     amountToCharge,
   ): Promise<Transaction> {
-    const { email } = user;
+    const { email, id } = user;
 
     const clientBankAccount = await this.clientBankAccountRepository.findOne({
       idClientBankAccount,
     });
 
-    if (await this.verifyEnoughPoints(email, amount)) {
+    if (await this.verifyEnoughPoints(id, amount)) {
       await this.paymentProviderService.updateBankAccountOfAnAccount(
         clientBankAccount.userClient.userDetails.accountId,
         clientBankAccount.transferId,
@@ -175,8 +175,8 @@ export class PaymentsService {
   }
 
   // Only verify points of valid transactions
-  private async verifyEnoughPoints(email: string, amount: number) {
-    const { dollars } = await this.userClientService.getPoints(email);
+  private async verifyEnoughPoints(idUserClient: number, amount: number) {
+    const { dollars } = await this.userClientService.getPoints(idUserClient);
     const thirdPartyInterest = await this.thirdPartyInterestService.get(
       PaymentProvider.STRIPE,
       TransactionType.WITHDRAWAL,
@@ -203,7 +203,7 @@ export class PaymentsService {
       .findOne({ email: user.email });
 
     const transactionCode = await this.transactionService.getTransactions(
-      user.email,
+      userClient.idUserClient,
     );
 
     const transaction = await getConnection()
@@ -243,7 +243,7 @@ export class PaymentsService {
       .findOne({ email: user.email });
 
     const transactionCode = await this.transactionService.getTransactions(
-      user.email,
+      userClient.idUserClient,
     );
 
     const transaction = await getConnection()

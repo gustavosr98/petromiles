@@ -30,16 +30,26 @@
 <script>
 import membershipConstants from "@/constants/memberships";
 export default {
-    data(){
-        return {
-            membership: "",
-            memberships: {},
-        };
+  props: {
+    membership: {
+      required: true
     },
-    async mounted(){
-        this.membership = await this.$http.get("suscription/actual");
-        this.memberships = membershipConstants;
+    isAdmin: {
+      type: Boolean,
+      required: true,
     }
+  },
+  data(){
+      return {          
+          memberships: {},
+      };
+  },
+  async mounted(){
+    /*if(!this.isAdmin){
+      this.membership = await this.$http.get("suscription/actual");        
+    } */     
+    this.memberships = membershipConstants;
+  }
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <div>              
+  <div v-if="userDetails !== null">              
     <v-divider></v-divider>
     <br/>
     <h3 class="text-center">{{ $t("profile.PersonalInformation") }}</h3>     
@@ -152,6 +152,15 @@ export default {
   components: {       
     "snackbar": Snackbar
   },
+  props: {
+    userDetails: {
+      required: true
+    },
+    isAdmin: {
+      type: Boolean,
+      required: true,
+    }
+  },
   data() {
     return { 
       userData: {
@@ -165,7 +174,9 @@ export default {
           phone: "",
           secondLastName: "",
         },
-        email: "",        
+        email: "",  
+        role: "",
+        id: 0
       },        
       birthdate: "",
       showPassword: false,      
@@ -191,11 +202,13 @@ export default {
   methods: {   
     ...mapActions(["updateUserData"]),     
     resetValues(){
-      if(this.user){        
-        const user = JSON.parse(JSON.stringify(this.user));
+      if(this.userDetails !== null){                
+        const user = JSON.parse(JSON.stringify(this.userDetails));        
         const { userClient, ...details } = user.details;
         this.userData.details = details;
-        this.userData.email = this.user.email;
+        this.userData.email = this.userDetails.email;
+        this.userData.role = this.userDetails.role;
+        this.userData.id = this.userDetails.id;
         if(this.userData.details.birthdate !== null && this.userData.details.birthdate !== ""){
           this.birthdate = this.userData.details.birthdate.split("T")[0];
         }
@@ -212,18 +225,18 @@ export default {
       }      
     },
     dataChanged(){
-      if(this.userData.details.address !== this.user.details.address || this.birthdateChanged() || this.countryChanged(this.userData.details.country, this.user.details.country) || this.userData.details.firstName !== this.user.details.firstName || this.userData.details.lastName !== this.user.details.lastName || this.userData.details.middleName !== this.user.details.middleName || this.userData.details.phone !== this.user.details.phone || this.userData.details.secondLastName !== this.user.details.secondLastName || this.userData.email !== this.user.email){
+      if(this.userData.details.address !== this.userDetails.details.address || this.birthdateChanged() || this.countryChanged(this.userData.details.country, this.userDetails.details.country) || this.userData.details.firstName !== this.userDetails.details.firstName || this.userData.details.lastName !== this.userDetails.details.lastName || this.userData.details.middleName !== this.userDetails.details.middleName || this.userData.details.phone !== this.userDetails.details.phone || this.userData.details.secondLastName !== this.userDetails.details.secondLastName || this.userData.email !== this.userDetails.email){
         return true;
       }
       return false;
     },
-    birthdateChanged(){
-      if(this.birthdate !== null && this.user.details.birthdate !== null && this.birthdate !== this.user.details.birthdate.split("T")[0]){       
+    birthdateChanged(){      
+      if(this.birthdate !== null && this.userDetails.details.birthdate !== null && this.birthdate !== this.userDetails.details.birthdate.split("T")[0]){               
         return true;        
       }
-      else if((this.birthdate !== null && this.user.details.birthdate === null) || (this.birthdate === null && this.user.details.birthdate !== null)){
+      else if((this.birthdate !== null && this.userDetails.details.birthdate === null) || (this.birthdate === null && this.userDetails.details.birthdate !== null)){        
         return true;
-      }
+      }      
       return false;
     },
     countryChanged(newCountry, currentCountry){      ;
@@ -240,7 +253,10 @@ export default {
         if(this.birthdate !== ""){
           this.userData.details.birthdate = this.birthdate;
         }
-        await this.updateUserData(this.userData.details);
+        await this.updateUserData({          
+          isAdmin: this.isAdmin,
+          user: this.userData,
+        });
         this.text = this.$tc("profile.UserSuccessfullyUpdated");      
         this.snackbar = true;
       } catch (error) {
@@ -248,7 +264,9 @@ export default {
       }
       finally{
         this.loading = false;
-        this.resetValues();
+        if(!this.isAdmin){          
+          this.resetValues();
+        }        
       }                        
     },    
     getMaxDatePicker(){
@@ -272,7 +290,7 @@ export default {
       }        
     },
     validateMaxChars(event, input){
-      if(input !== null && input.length === 15){
+      if(input !== null && input.length === 255){
         event.preventDefault();
       }
     },
@@ -320,6 +338,15 @@ export default {
       return errors;
     },               
   },
+  watch: {
+        userDetails: function(newValue){
+            this.userDetails = newValue;
+            this.resetValues();            
+        },
+        isAdmin: function(newValue){
+          this.isAdmin = newValue;
+        }
+    }
 };
 </script>
 
