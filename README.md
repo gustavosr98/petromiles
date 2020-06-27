@@ -255,7 +255,7 @@ Create your enviroment files explained on [Backend configuration file](#backend-
 
 1. Pay important attention to set the values of your Backend variables to
 
-- `DATABASE_PORT=5435`
+- `DATABASE_PORT=5432`
 - `DATABASE_HOST=db`
 
 2. Build and serve backend service
@@ -289,9 +289,9 @@ docker run --publish 8080:8080 --network host --env-file=.env petromiles-fronten
 Name your enviroment variable file under the name of `env`. Then follow the next commands
 
 ```
-cd petromiles-frontend
+cd petromiles-backend
 npm run build
-npx serve -s dist/
+npm run start:prod
 ```
 
 > WARNING: Don't forget to clear your browser cache
@@ -301,9 +301,9 @@ npx serve -s dist/
 Name your enviroment variable file under the name of `env.production`. Then follow the next commands
 
 ```
-cd petromiles-backend
+cd petromiles-frontend
 npm run build
-npm run start:prod
+npx serve -s dist/
 ```
 
 ---
