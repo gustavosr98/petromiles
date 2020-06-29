@@ -15,14 +15,20 @@ import { AuthGuard } from '@nestjs/passport';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-import { CreateUserDTO } from '../user/dto/create-user.dto';
-import { GetUser } from './decorators/get-user.decorator';
-import { Roles } from './decorators/roles.decorator';
-import { ApiModules } from '@/logger/api-modules.enum';
-import { HttpRequest } from '@/logger/http-requests.enum';
-
 import { PasswordEncryptorInterceptor } from '@/interceptors/password-encryptor.interceptor';
 import { RolesGuard } from './guards/roles.guard';
+
+// INTERFACES
+import { CreateUserDTO } from '../user/dto/create-user.dto';
+import { ApiModules } from '@/logger/api-modules.enum';
+import { HttpRequest } from '@/logger/http-requests.enum';
+import { Role } from '@/enums/role.enum';
+
+// DECORATOR
+import { GetUser } from './decorators/get-user.decorator';
+import { Roles } from './decorators/roles.decorator';
+
+// SERVICE
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -55,6 +61,14 @@ export class AuthController {
     return user;
   }
 
+  @Post('recover-password')
+  async recoverPassword(@Body() credentials: App.Auth.LoginRequest) {
+    this.logger.http(
+      `[${ApiModules.AUTH}] {${credentials.email}} The user is starting the recover-password process`,
+    );
+    await this.authService.recoverPassword(credentials);
+  }
+
   @Roles()
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
@@ -66,11 +80,15 @@ export class AuthController {
     return user;
   }
 
-  @Post('recover-password')
-  async recoverPassword(@Body() credentials: App.Auth.LoginRequest) {
+  @Roles(Role.ADMINISTRATOR)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
+  @Post('signup/administrator')
+  async signUpAdministrador(@Body(ValidationPipe) user: CreateUserDTO) {
     this.logger.http(
-      `[${ApiModules.AUTH}] {${credentials.email}} The user is starting the recover-password process`,
+      `[${ApiModules.AUTH}] {${user.email}} Administrador is starting the sign up process`,
     );
-    await this.authService.recoverPassword(credentials);
+
+    return await this.authService.createUserAdministrator(user);
   }
 }

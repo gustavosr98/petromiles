@@ -6,6 +6,12 @@ declare namespace App {
       role: import('../src/enums/role.enum').Role;
     }
 
+    interface UserAdministrator {
+      userAdmin: import('../src/entities/user-administrator.entity').UserAdministrator;
+      userDetails: import('../src/entities/user-details.entity').UserDetails;
+      role: import('../src/enums/role.enum').Role;
+    }
+
     interface JWTPayload {
       email: string;
       role: import('../src/enums/role.enum').Role;
@@ -18,6 +24,14 @@ declare namespace App {
       role: import('../src/enums/role.enum').Role;
       id: number;
       federated: boolean;
+    }
+
+    interface ResponseAdministrator {
+      email: string;
+      password: string; 
+      userDetails: object;
+      role: import('../src/enums/role.enum').Role;
+      id: number;
     }
 
     interface LoginRequest {
