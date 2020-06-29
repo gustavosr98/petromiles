@@ -27,16 +27,6 @@ declare namespace App {
     }
   }
 
-  namespace SendGrid {
-    interface Mail {
-      to: string;
-      from: string;
-      subject: string;
-      templateId: string;
-      dynamic_template_data: object;
-    }
-  }
-
   namespace BankAccount {
     interface validate {
       validateRoutingNumber(routingNumber: number): boolean;
