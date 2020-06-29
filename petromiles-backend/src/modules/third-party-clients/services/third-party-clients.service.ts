@@ -26,12 +26,15 @@ import { Interest } from '@/modules/payments/interest.interface';
 import { ConfirmationTicket } from '@/interfaces/third-party-clients/confirmation-ticket.interface';
 import { AssociateUserCodeResponse } from '@/interfaces/third-party-clients/associate-user-code-response.interface';
 import { AssociateUserTokenResponse } from '@/interfaces/third-party-clients/associate-user-token-response.interface';
+import { MailsStructure } from '@/interfaces/mails/mails-structure.interface';
 import { TransactionType } from '@/enums/transaction.enum';
 import { PlatformInterest } from '@/enums/platform-interest.enum';
 import { AddPointsRequestType } from '@/enums/add-points-request-type.enum';
 import { Role } from '@/enums/role.enum';
 import { ThirdPartyClientsErrorCodes } from '@/enums/third-party-clients-error-codes.enum';
 import { ThirdPartyClientResponseStatus } from '@/enums/third-party-clients-response-status.enum';
+import { MailsResponse } from '@/enums/mails-response.enum';
+
 import { MailsSubjets } from '@/constants/mailsSubjectConst';
 
 @Injectable()
@@ -74,28 +77,35 @@ export class ThirdPartyClientsService {
     const code = this.generateRandomCode();
     await this.saveClientOnThirdParty(userClient, thirdPartyClient, code);
 
-    this.sendVerificationCodeEmail(userClient, thirdPartyClient.name, code);
+    const mailResponse = await this.sendVerificationCodeEmail(
+      userClient,
+      thirdPartyClient.name,
+      code,
+    );
 
     const codeResponse: AssociateUserCodeResponse = {
       request: associateUserCodeRequest,
-      responseStatus: ThirdPartyClientResponseStatus.SUCCESSFUL,
+      responseStatus:
+        mailResponse === MailsResponse.SUCCESS
+          ? ThirdPartyClientResponseStatus.SUCCESSFUL
+          : ThirdPartyClientResponseStatus.FAILD,
     };
     return codeResponse;
   }
   private generateRandomCode(): string {
     return Math.floor(10000000 + Math.random() * 90000000).toString();
   }
-  private sendVerificationCodeEmail(
+  private async sendVerificationCodeEmail(
     userClient: UserClient,
     thirdPartyClientName: string,
     code: string,
-  ): void {
+  ): Promise<MailsResponse> {
     const language = userClient.userDetails.language.name;
 
     const template = `sendVerificationCodeEmail[${language}]`;
     const subject = MailsSubjets.verification_code[language];
 
-    const msg = {
+    const msg: MailsStructure = {
       to: userClient.email,
       subject: subject,
       templateId: this.configService.get<string>(
@@ -107,8 +117,9 @@ export class ThirdPartyClientsService {
         code,
       },
     };
-    this.mailsService.sendEmail(msg);
+    return await this.mailsService.sendEmail(msg);
   }
+
   private async saveClientOnThirdParty(
     userClient: UserClient,
     thirdPartyClient: ThirdPartyClient,
@@ -159,6 +170,9 @@ export class ThirdPartyClientsService {
 
     if (!codeValidation.valid)
       throw new BadRequestException(codeValidation.error);
+
+    clientOnThirdParty.expirationDate = new Date();
+    await this.clientOnThirdPartyRepository.save(clientOnThirdParty);
 
     const tokeResponse: AssociateUserTokenResponse = {
       request: associateUserTokenRequest,
