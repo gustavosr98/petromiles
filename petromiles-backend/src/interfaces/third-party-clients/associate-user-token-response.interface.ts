@@ -1,4 +1,4 @@
-import { AssociateUserTokenRequest } from '@/interfaces/third-party-clients/associate-user-token-request.interface';
+import { AssociateUserTokenRequest } from '@/modules/third-party-clients/dto/associate-user-token-request.dto';
 
 export interface AssociateUserTokenResponse {
   request: AssociateUserTokenRequest;

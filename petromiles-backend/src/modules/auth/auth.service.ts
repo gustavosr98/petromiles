@@ -8,7 +8,7 @@ import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 // CONSTANTS
-import { mailsSubjets } from '@/constants/mailsSubjectConst';
+import { MailsSubjets } from '@/constants/mailsSubjectConst';
 
 // INTERFACES
 import { Role } from '@/enums/role.enum';
@@ -103,7 +103,7 @@ export class AuthService {
     throw new UnauthorizedException('error-messages.userNotFound');
   }
 
-  private createToken(email: string, role: Role) {
+  createToken(email: string, role: Role) {
     const payload: App.Auth.JWTPayload = { email, role };
     return this.jwtService.sign(payload);
   }
@@ -111,7 +111,7 @@ export class AuthService {
   private async createWelcomeEmail(email, name) {
     const message = {
       to: email,
-      subject: mailsSubjets.welcome,
+      subject: MailsSubjets.welcome,
       templateId: this.configService.get('mails.sendgrid.templates.welcome'),
       dynamic_template_data: { user: name },
     };
@@ -157,7 +157,7 @@ export class AuthService {
 
       const languageMails = userDetails.language.name;
       const template = `recover[${languageMails}]`;
-      const subject = mailsSubjets.recover[languageMails];
+      const subject = MailsSubjets.recover[languageMails];
 
       const message = {
         to: email,

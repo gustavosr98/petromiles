@@ -99,7 +99,7 @@ export const actions = {
     commit("changeLang", language);
   },
   async updateProfileImage({ commit }, imageURL){
-    await httpClient.put("user/update-details", { photo : imageURL });
+    await httpClient.put("user/update-details", { photo : imageURL, role: authConstants.CLIENT.toLowerCase() });
     commit("updateProfileImage", imageURL);
   },
   async changePassword({ commit }, passwords){
@@ -108,13 +108,25 @@ export const actions = {
       password: passwords.newPassword
     });    
   },
-  async updateUserData({ commit }, userData){
-    const data = JSON.parse(JSON.stringify(userData));
-    if(data.birthdate !== null){
-      data.birthdate = data.birthdate.replace("-", "/").replace("-", "/");
+  async updateUserData({ commit }, payload){          
+    const data = JSON.parse(JSON.stringify(payload));        
+    if(data.user.details.birthdate !== null){
+      data.user.details.birthdate = data.user.details.birthdate.replace("-", "/").replace("-", "/");
+    }       
+    let saveUserURL = ``
+    if(!data.isAdmin){
+      saveUserURL = `user/update-details`;
+    }
+    else {
+      saveUserURL = `user/update-details?id=${data.user.id}`;
     }    
-    await httpClient.put("user/update-details", data);
-    commit("updateUserData", userData);
+    await httpClient.put(`${saveUserURL}`, {
+      role: data.user.role.toLowerCase(),
+      ...data.user.details
+    });
+    if(!data.isAdmin){
+      commit("updateUserData", payload.user.details);
+    }
   }
 };
 

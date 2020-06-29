@@ -7,7 +7,7 @@ import { Logger } from 'winston';
 import { InjectRepository } from '@nestjs/typeorm';
 
 // CONSTANTS
-import { mailsSubjets } from '@/constants/mailsSubjectConst';
+import { MailsSubjets } from '@/constants/mailsSubjectConst';
 
 // INTERFACES
 import { Suscription as SuscriptionType } from '@/enums/suscription.enum';
@@ -21,7 +21,7 @@ import { UserClient } from '@/entities/user-client.entity';
 import { Transaction } from '@/entities/transaction.entity';
 import { Suscription } from '@/entities/suscription.entity';
 import { UserSuscription } from '@/entities/user-suscription.entity';
-import { PlatformInterest as PlatformInterestEntity} from '@/entities/platform-interest.entity';
+import { PlatformInterest as PlatformInterestEntity } from '@/entities/platform-interest.entity';
 
 // SERVICES
 import { UserClientService } from '@/modules/user/services/user-client.service';
@@ -189,7 +189,7 @@ export class SuscriptionService {
 
     const template = `upgradeToGold[${languageMails}]`;
 
-    const subject = mailsSubjets.upgrade_to_gold[languageMails];
+    const subject = MailsSubjets.upgrade_to_gold[languageMails];
 
     const msg = {
       to: userClient.email,
@@ -224,44 +224,48 @@ export class SuscriptionService {
     }
   }
 
-  async getActualSubscription(email: string): Promise<Suscription> {
-    const userId = await this.userClientRepository.findOne({ email });
+  async getActualSubscription(id: number): Promise<Suscription> {
     const actualSubscription = await this.suscriptionRepository
       .createQueryBuilder('subscription')
       .innerJoin('subscription.userSuscription', 'us')
-      .where(`us.fk_user_client = :id`, { id: userId.idUserClient })
+      .where(`us.fk_user_client = :id`, { id })
       .andWhere('us."finalDate" is null')
       .getOne();
     return actualSubscription;
   }
 
-  async getSubscriptionPercentage(subscription: string){
+  async getSubscriptionPercentage(subscription: string) {
     const actualSubscription = await this.platformInterestRepository
-        .createQueryBuilder('pi')
-        .where('pi.name = :type', {type: subscription})
-        .andWhere('pi.finalDate IS NULL')
-        .getOne()
+      .createQueryBuilder('pi')
+      .where('pi.name = :type', { type: subscription })
+      .andWhere('pi.finalDate IS NULL')
+      .getOne();
 
     const pointsConversion = await this.pointsConversionService.getRecentPointsConversion();
 
-    if(actualSubscription.isGold()){
-      const points = parseFloat(actualSubscription.amount)/(100 * pointsConversion.onePointEqualsDollars);
+    if (actualSubscription.isGold()) {
+      const points =
+        parseFloat(actualSubscription.amount) /
+        (100 * pointsConversion.onePointEqualsDollars);
       const GoldInfo = await this.getGoldInfo();
       const actualPercentage = parseFloat(actualSubscription.percentage) * 100;
-      return {points: points, amountUpgrade: GoldInfo, percentage: actualPercentage}
+      return {
+        points: points,
+        amountUpgrade: GoldInfo,
+        percentage: actualPercentage,
+      };
     }
     const actualPercentage = parseFloat(actualSubscription.percentage) * 100;
-    return {percentage: actualPercentage}
-
+    return { percentage: actualPercentage };
   }
 
-  async getGoldInfo(){
+  async getGoldInfo() {
     const upgradeAmount = await this.suscriptionRepository
-        .createQueryBuilder('su')
-        .where('su.name = :name', {name: SuscriptionType.GOLD})
-        .getOne();
+      .createQueryBuilder('su')
+      .where('su.name = :name', { name: SuscriptionType.GOLD })
+      .getOne();
 
-    const amount = upgradeAmount.upgradedAmount /100;
+    const amount = upgradeAmount.upgradedAmount / 100;
     return await amount;
   }
 }

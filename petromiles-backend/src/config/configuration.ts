@@ -89,6 +89,10 @@ export default () => ({
           english: process.env.SENDGRID_RECOVER_EN_TEMPLATE,
           spanish: process.env.SENDGRID_RECOVER_ES_TEMPLATE,
         },
+        sendVerificationCodeEmail: {
+          english: process.env.SENDGRID_VERIFICATION_CODE_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_VERIFICATION_CODE_ES_TEMPLATE,
+        },
       },
     },
   },

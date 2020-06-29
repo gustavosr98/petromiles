@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height" fluid v-if="userData">
+  <v-container class="fill-height" fluid v-if="user && userData">
     <v-row align="center" justify="center">
       <v-col cols="12" sm="11" md="9">
         <v-card class="elevation-12">
@@ -11,19 +11,18 @@
               justify="center"
             >
               <v-col cols="11" lg="4" md="4" sm="4">
-                <user-membership :membership="membership" :isAdmin="false" ></user-membership>
+                <user-membership :membership="membership" :isAdmin="true"></user-membership>
               </v-col>          
               <v-col cols="11" lg="4" md="4" sm="4">
-                <user-profile-image :userData="userData" :isAdmin="false" ></user-profile-image> 
+                <user-profile-image :userData="userData" :isAdmin="true"></user-profile-image> 
               </v-col>    
               <v-col cols="11" lg="4" md="4" sm="4">
-                <user-points :conversion="conversion" :isAdmin="false" ></user-points>
+                <user-points :conversion="conversion" :isAdmin="true"></user-points>
               </v-col>
             </v-row>                             
           </v-window>
           <v-window>
-            <user-detail :userDetails="userData" :isAdmin="false" />  
-            <change-password></change-password>  
+            <user-detail :userDetails="userData" :isAdmin="true" />  
           </v-window>
         </v-card>
       </v-col>
@@ -35,19 +34,22 @@
 import { createNamespacedHelpers, mapState } from "vuex";
 const { mapActions } = createNamespacedHelpers("auth");
 import UserDetail from "@/components/Users/UserDetail.vue";
-import ChangePassword from "@/components/Users/changePassword.vue";
 import UserProfileImage from "@/components/Users/UserProfileImage.vue";
 import UserMembership from "@/components/Users/UserMembership.vue";
 import UserPoints from "@/components/Users/UserPoints.vue";
 
 export default {
   name: "user-detail-wrapper",
-  components: {
+ components: {
     "user-profile-image": UserProfileImage,
-    "user-detail": UserDetail,  
-    "change-password": ChangePassword,
     "user-membership": UserMembership,
     "user-points": UserPoints,
+    "user-detail": UserDetail,
+  },
+  props: {
+    user:{
+      required: true,            
+    }
   },
   data(){
     return{
@@ -56,16 +58,28 @@ export default {
       conversion: null
     };
   },
-  async mounted() {
-      this.conversion = await this.$http.get(`user/points/conversion`);
-      this.membership = await this.$http.get(`suscription/actual`);
-      if(this.user){
-        this.userData = this.user;        
-      }
-  },
-  computed: {
-      ...mapState("auth", ["user"])
-  },
+  async mounted() {       
+    this.conversion = await this.$http.get(`user/points/conversion?id=${this.user.idUserClient}`);
+    this.membership = await this.$http.get(`suscription/actual?id=${this.user.idUserClient}`);
+    const bankAccounts = await this.$http.get(`bank-account?id=${this.user.idUserClient}`);
+    const userInformation = await this.$http.get(`user/${this.user.idUserClient}/CLIENT`);
+    const transactions = await this.$http.get(`transaction?id=${this.user.idUserClient}`);
+
+    //console.log("cuentas bancarias: ", bankAccounts);
+    //console.log("datos usuario: ", userInformation);
+    //console.log("transacciones: ", transactions);
+
+    const { userDetails, ...basicInformation} = userInformation;
+    this.userData = {
+      details: userDetails,
+      ...basicInformation
+    }    
+  },  
+  methods: {
+    gotoUsersList(){
+      
+    }
+  }
 };
 </script>
 

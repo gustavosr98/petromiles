@@ -16,8 +16,8 @@ import { StateName } from '@/enums/state.enum';
 import { Language as LanguageEnum } from '@/enums/language.enum';
 import { Role } from '@/enums/role.enum';
 import { UpdatePasswordDTO } from '@/modules/user/dto/update-password.dto';
-import { UpdateDetailsDTO } from '@/modules/user/dto/update-details.dto';
 import { CreateUserDTO } from '@/modules/user/dto/create-user.dto';
+import { UserInfo } from '@/interfaces/user/user-info.interface';
 
 // SERVICES
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
@@ -180,7 +180,21 @@ export class UserClientService {
     return await this.userClientRepository.findOne({ email });
   }
 
-  async getPoints(email: string): Promise<ClientPoints> {
+  async getInfo(idUserClient: number): Promise<UserInfo> {
+    const userClient = await this.get({ idUserClient });
+    return {
+      email: userClient.email,
+      userDetails: userClient.userDetails,
+      role: Role.CLIENT,
+      id: userClient.idUserClient,
+      federated: userClient.password ? false : true,
+    };
+  }
+
+  async getPoints(idUserClient: number): Promise<ClientPoints> {
+    const email = (await this.userClientRepository.findOne({ idUserClient }))
+      .email;
+
     let points = await getConnection()
       .createQueryBuilder()
       .select('clientPoints.dollars')
@@ -263,14 +277,5 @@ export class UserClientService {
       `[${ApiModules.USER}] {${user.email}} Password successfully updated`,
     );
     return userClient;
-  }
-
-  async updateDetails(user, details: UpdateDetailsDTO): Promise<UpdateResult> {
-    return await this.userDetailsRepository
-      .createQueryBuilder()
-      .update(UserDetails)
-      .set({ ...details })
-      .where('fk_user_client = :id', { id: user.id })
-      .execute();
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 
 // SERVICES
 import { UserAdministratorService } from '@/modules/user/services/user-administrator.service';
@@ -11,31 +11,42 @@ import { UserDetails } from '@/entities/user-details.entity';
 import { UserAdministrator } from '@/entities/user-administrator.entity';
 
 // INTERFACES
-import { Role as RoleEnum } from '@/enums/role.enum';
+import { Role } from '@/enums/role.enum';
 import { UserClientService } from '@/modules/user/services/user-client.service';
+import { UpdateDetailsDTO } from '@/modules/user/dto/update-details.dto';
+import { UserInfo } from '@/interfaces/user/user-info.interface';
 
 @Injectable()
 export class UserService {
   constructor(
+    @InjectRepository(UserDetails)
+    private userDetailsRepository: Repository<UserDetails>,
     private userClientService: UserClientService,
     private userAdministratorService: UserAdministratorService,
   ) {}
 
   // ANY ROLE
   async findAll(role: string): Promise<UserClient[] | UserAdministrator[]> {
-    if (role === RoleEnum.CLIENT) {
+    if (role === Role.CLIENT) {
       const clients = await this.userClientService.findAll();
       return clients;
-    } else if (role === RoleEnum.ADMINISTRATOR) {
+    } else if (role === Role.ADMINISTRATOR) {
       const admins = await this.userAdministratorService.findAll();
       return admins;
     }
   }
 
+  async findInfo(id: number, role: string): Promise<UserInfo> {
+    if (role === Role.ADMINISTRATOR)
+      return await this.userAdministratorService.getInfo(id);
+
+    return await this.userClientService.getInfo(id);
+  }
+
   async getActive(credentials: App.Auth.LoginRequest) {
     const { email, role } = credentials;
     let user, userDetails;
-    if (role === RoleEnum.ADMINISTRATOR) {
+    if (role === Role.ADMINISTRATOR) {
       user = await this.userAdministratorService.getActive(email);
       userDetails = await this.userAdministratorService.getDetails(user);
     } else {
@@ -56,5 +67,19 @@ export class UserService {
       return { user: credentials, userDetails };
     }
     return null;
+  }
+
+  async updateDetails(
+    id: number,
+    details: UpdateDetailsDTO,
+  ): Promise<UpdateResult> {
+    const { role, ...userDetails } = details;
+
+    return await this.userDetailsRepository
+      .createQueryBuilder()
+      .update(UserDetails)
+      .set({ ...userDetails })
+      .where(`fk_user_${role} = :id`, { id })
+      .execute();
   }
 }

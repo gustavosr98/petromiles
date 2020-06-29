@@ -7,7 +7,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 // CONSTANTS
-import { mailsSubjets } from '@/constants/mailsSubjectConst';
+import { MailsSubjets } from '@/constants/mailsSubjectConst';
 
 // SERVICES
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
@@ -132,13 +132,13 @@ export class PaymentsService {
     amount,
     amountToCharge,
   ): Promise<Transaction> {
-    const { email } = user;
+    const { email, id } = user;
 
     const clientBankAccount = await this.clientBankAccountRepository.findOne({
       idClientBankAccount,
     });
 
-    if (await this.verifyEnoughPoints(email, amount)) {
+    if (await this.verifyEnoughPoints(id, amount)) {
       await this.paymentProviderService.updateBankAccountOfAnAccount(
         clientBankAccount.userClient.userDetails.accountId,
         clientBankAccount.transferId,
@@ -175,8 +175,8 @@ export class PaymentsService {
   }
 
   // Only verify points of valid transactions
-  private async verifyEnoughPoints(email: string, amount: number) {
-    const { dollars } = await this.userClientService.getPoints(email);
+  private async verifyEnoughPoints(idUserClient: number, amount: number) {
+    const { dollars } = await this.userClientService.getPoints(idUserClient);
     const thirdPartyInterest = await this.thirdPartyInterestService.get(
       PaymentProvider.STRIPE,
       TransactionType.WITHDRAWAL,
@@ -201,20 +201,22 @@ export class PaymentsService {
     const userClient = await getConnection()
       .getRepository(UserClient)
       .findOne({ email: user.email });
-    
+
     const transactionCode = await this.transactionService.getTransactions(
-      user.email
+      userClient.idUserClient,
     );
 
     const transaction = await getConnection()
-        .getRepository(Transaction)
-        .findOne({ idTransaction: transactionCode[transactionCode.length - 1].id });
+      .getRepository(Transaction)
+      .findOne({
+        idTransaction: transactionCode[transactionCode.length - 1].id,
+      });
 
     const languageMails = userClient.userDetails.language.name;
 
     const template = `invoice[${languageMails}]`;
 
-    const subject = mailsSubjets.invoice[languageMails];
+    const subject = MailsSubjets.invoice[languageMails];
 
     this.mailsService.sendEmail({
       to: userClient.email,
@@ -225,7 +227,9 @@ export class PaymentsService {
       dynamic_template_data: { user: userClient.userDetails.firstName },
       attachments: [
         {
-          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${transaction.paymentProviderTransactionId}`,
+          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${
+            transaction.paymentProviderTransactionId
+          }`,
           type: file.mimetype,
           content: file.buffer.toString('base64'),
         },
@@ -239,18 +243,20 @@ export class PaymentsService {
       .findOne({ email: user.email });
 
     const transactionCode = await this.transactionService.getTransactions(
-      user.email
+      userClient.idUserClient,
     );
 
     const transaction = await getConnection()
-        .getRepository(Transaction)
-        .findOne({ idTransaction: transactionCode[transactionCode.length - 1].id });
-  
+      .getRepository(Transaction)
+      .findOne({
+        idTransaction: transactionCode[transactionCode.length - 1].id,
+      });
+
     const languageMails = userClient.userDetails.language.name;
 
     const template = `withdrawal[${languageMails}]`;
 
-    const subject = mailsSubjets.invoice[languageMails];
+    const subject = MailsSubjets.invoice[languageMails];
 
     this.mailsService.sendEmail({
       to: userClient.email,
@@ -265,7 +271,9 @@ export class PaymentsService {
       },
       attachments: [
         {
-          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${transaction.paymentProviderTransactionId}`,
+          filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${
+            transaction.paymentProviderTransactionId
+          }`,
           type: file.mimetype,
           content: file.buffer.toString('base64'),
         },

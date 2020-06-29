@@ -12,6 +12,10 @@ import { ThirdPartyClient } from '@/entities/third-party-client.entity';
 import { UserClient } from '@/entities/user-client.entity';
 import { Transaction } from '@/entities/transaction.entity';
 
+import { ValidationCode } from '@/interfaces/third-party-clients/validation-code.interface';
+
+import { ThirdPartyClientsErrorCodes } from '@/enums/third-party-clients-error-codes.enum';
+
 @Entity()
 export class ClientOnThirdParty extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -48,4 +52,16 @@ export class ClientOnThirdParty extends BaseEntity {
     { nullable: true },
   )
   transaction?: Transaction[];
+
+  isCodeValid(code: string): ValidationCode {
+    const date = new Date();
+
+    if (this.code !== code)
+      return { valid: false, error: ThirdPartyClientsErrorCodes.INVALID_CODE };
+
+    if (this.expirationDate < date)
+      return { valid: false, error: ThirdPartyClientsErrorCodes.EXPIRED_CODE };
+
+    return { valid: true };
+  }
 }

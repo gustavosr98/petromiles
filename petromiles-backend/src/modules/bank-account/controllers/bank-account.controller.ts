@@ -12,6 +12,7 @@ import {
   ParseIntPipe,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
@@ -27,13 +28,12 @@ import { HttpRequest } from '@/logger/http-requests.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { updatePrimaryAccountDTO } from '@/modules/bank-account/dto/update-primary-account.dto';
 import { CreateBankAccountDTO } from '@/modules/bank-account/dto/create-bank-account.dto';
-import {UpdateAccountStateDto} from "@/modules/bank-account/dto/update-account-state.dto";
+import { UpdateAccountStateDto } from '@/modules/bank-account/dto/update-account-state.dto';
 
 // SERVICES
 import { ClientBankAccountService } from '../services/client-bank-account.service';
 import { BankAccountService } from '../services/bank-account.service';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
-
 
 const baseEndpoint = Object.freeze('bank-account');
 
@@ -80,12 +80,20 @@ export class BankAccountController {
   }
 
   @Get()
-  async getClientBankAccounts(@GetUser() user) {
+  async getClientBankAccounts(
+    @GetUser() user,
+    @Query('id') idUserClient?: number,
+  ) {
     this.logger.http(
       `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ${user.email} asks /${baseEndpoint}/${user.role}`,
     );
     if (user.role === Role.CLIENT)
       return await this.clientBankAccountService.getClientBankAccounts(user.id);
+
+    if (idUserClient)
+      return await this.clientBankAccountService.getClientBankAccounts(
+        idUserClient,
+      );
 
     return await this.bankAccountService.getAll();
   }
@@ -135,10 +143,12 @@ export class BankAccountController {
   @Roles(Role.ADMINISTRATOR)
   @UseGuards(RolesGuard)
   @Put('state')
-  updateAccountState(@Body() updateAccountStateDto: UpdateAccountStateDto)  {
-      this.logger.http(
-          `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.POST}) ask /${baseEndpoint}/state`,
-      );
-      return this.clientBankAccountService.updateAccountState(updateAccountStateDto)
+  updateAccountState(@Body() updateAccountStateDto: UpdateAccountStateDto) {
+    this.logger.http(
+      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.POST}) ask /${baseEndpoint}/state`,
+    );
+    return this.clientBankAccountService.updateAccountState(
+      updateAccountStateDto,
+    );
   }
 }

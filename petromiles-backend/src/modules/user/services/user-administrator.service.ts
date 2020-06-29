@@ -11,6 +11,8 @@ import { UserDetails } from '@/entities/user-details.entity';
 
 // INTERFACES
 import { StateName } from '@/enums/state.enum';
+import { Role } from '@/enums/role.enum';
+import { UserInfo } from '@/interfaces/user/user-info.interface';
 
 @Injectable()
 export class UserAdministratorService {
@@ -51,5 +53,18 @@ export class UserAdministratorService {
       });
 
     return null;
+  }
+
+  async getInfo(idUserAdministrator: number): Promise<UserInfo> {
+    const userAdministrator = await this.userAdministratorRepository.findOne({
+      idUserAdministrator,
+    });
+    return {
+      email: userAdministrator.email,
+      userDetails: userAdministrator.userDetails,
+      role: Role.ADMINISTRATOR,
+      id: userAdministrator.idUserAdministrator,
+      federated: false,
+    };
   }
 }

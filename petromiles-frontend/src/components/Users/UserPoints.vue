@@ -11,14 +11,24 @@
 
 <script>
 export default {
+    props: {
+      conversion: {
+        required: true
+      },
+      isAdmin: {
+        type: Boolean,
+        required: true,
+      }
+    },
     data(){
         return {
             points: 0,
-            conversion: {},
         };
     },
     async mounted(){
-        this.conversion = await this.$http.get("user/points/conversion");
+        /*if(!this.isAdmin){
+            this.conversion = await this.$http.get("user/points/conversion");
+        }*/
         this.points = parseInt(this.conversion.points);
     }
 }

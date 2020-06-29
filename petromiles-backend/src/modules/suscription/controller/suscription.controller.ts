@@ -5,7 +5,9 @@ import {
   Body,
   ParseIntPipe,
   Inject,
-  Get, Param,
+  Get,
+  Param,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -47,17 +49,22 @@ export class SuscriptionController {
   }
 
   @Get('actual')
-  getActualSuscription(@GetUser() user): Promise<Suscription> {
+  getActualSuscription(
+    @GetUser() user,
+    @Query('id') idUserClient?: number,
+  ): Promise<Suscription> {
     this.logger.http(
       `[${ApiModules.SUSCRIPTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/actual`,
     );
-    return this.suscriptionService.getActualSubscription(user.email);
+
+    const id = idUserClient ? idUserClient : user.id;
+    return this.suscriptionService.getActualSubscription(id);
   }
 
   @Get('information/:subscription')
-  getSubscripcionPercentage(@Param('subscription') subscription: string){
+  getSubscripcionPercentage(@Param('subscription') subscription: string) {
     this.logger.http(
-        `[${ApiModules.SUSCRIPTION}] (${HttpRequest.GET}) asks /${baseEndpoint}/information/${subscription}`,
+      `[${ApiModules.SUSCRIPTION}] (${HttpRequest.GET}) asks /${baseEndpoint}/information/${subscription}`,
     );
     return this.suscriptionService.getSubscriptionPercentage(subscription);
   }

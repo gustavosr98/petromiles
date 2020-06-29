@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Role } from '../../../enums/role.enum';
+import { Role } from '@/enums/role.enum';
 
 export const ROLES = [
   {
@@ -9,5 +9,9 @@ export const ROLES = [
   {
     idRole: 2,
     name: Role.CLIENT,
+  },
+  {
+    idRole: 2,
+    name: Role.THIRD_PARTY,
   },
 ];
