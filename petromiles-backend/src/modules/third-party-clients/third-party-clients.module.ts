@@ -11,6 +11,8 @@ import { PaymentsModule } from '@/modules/payments/payments.module';
 import { ManagementModule } from '@/modules/management/management.module';
 import { MailsModule } from '@/modules/mails/mails.module';
 import { AuthModule } from '@/modules/auth/auth.module';
+import { UserModule } from '@/modules/user/user.module';
+import { TransactionModule } from '@/modules/transaction/transaction.module';
 
 // CONTROLLERS
 import { ThirdPartyClientsController } from '@/modules/third-party-clients/controllers/third-party-clients.controller';
@@ -34,6 +36,8 @@ import { CsvToJsonProvider } from '@/modules/third-party-clients/providers/csv-t
     AuthModule,
     ManagementModule,
     PaymentsModule,
+    TransactionModule,
+    UserModule,
   ],
   controllers: [ThirdPartyClientsController],
   providers: [ThirdPartyClientsService, CsvToJsonProvider, CsvService],

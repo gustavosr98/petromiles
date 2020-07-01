@@ -10,6 +10,9 @@ import { PaymentsService } from '@/modules/payments/services/payments.service';
 import { MailsService } from '@/modules/mails/mails.service';
 import { AuthService } from '@/modules/auth/auth.service';
 import { CsvService } from '@/modules/third-party-clients/services/csv.service';
+import { TransactionService } from '@/modules/transaction/services/transaction.service';
+import { ThirdPartyInterestService } from '@/modules/management/services/third-party-interest.service';
+import { UserClientService } from '@/modules/user/services/user-client.service';
 
 // ENTITIES
 import { ThirdPartyClient } from '@/entities/third-party-client.entity';
@@ -36,6 +39,10 @@ import { ThirdPartyClientResponseStatus } from '@/enums/third-party-clients-resp
 import { MailsResponse } from '@/enums/mails-response.enum';
 
 import { MailsSubjets } from '@/constants/mailsSubjectConst';
+import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
+import { StateName, StateDescription } from '@/enums/state.enum';
+import { PaymentProvider } from '@/enums/payment-provider.enum';
+import { Suscription } from '@/enums/suscription.enum';
 
 @Injectable()
 export class ThirdPartyClientsService {
@@ -54,6 +61,9 @@ export class ThirdPartyClientsService {
     private readonly pointsConversionService: PointsConversionService,
     private readonly paymentsService: PaymentsService,
     private readonly csvService: CsvService,
+    private readonly transactionService: TransactionService,
+    private readonly thirdPartyInterestService: ThirdPartyInterestService,
+    private readonly userClientService: UserClientService,
   ) {}
 
   async get(apiKey: string): Promise<ThirdPartyClient> {
@@ -182,14 +192,7 @@ export class ThirdPartyClientsService {
     return tokeResponse;
   }
 
-  async addPoints(
-    addPointsRequest: AddPointsRequest,
-  ): Promise<AddPointsResponse> {
-    if (addPointsRequest.type === AddPointsRequestType.CONSULT) {
-      return await this.consultPoints(addPointsRequest);
-    }
-  }
-  calculateTentativeCommission(interests: Interest[], dollars: number): number {
+  private calculateCommission(interests: Interest[], dollars: number): number {
     let tentativeCommission: number = dollars;
     interests.map(i => {
       tentativeCommission =
@@ -197,9 +200,58 @@ export class ThirdPartyClientsService {
     });
     return dollars - tentativeCommission;
   }
+
+  async getClientOnThirdPartyByUserId(
+    userClient: UserClient,
+  ): Promise<ClientOnThirdParty> {
+    return await this.clientOnThirdPartyRepository.findOne({ userClient });
+  }
+
+  private chooseExtraPoints(suscriptionType): PlatformInterest {
+    if (suscriptionType == Suscription.BASIC) return null;
+    if (suscriptionType == Suscription.PREMIUM)
+      return PlatformInterest.PREMIUM_EXTRA;
+    return PlatformInterest.GOLD_EXTRA;
+  }
+
+  async calculateExtras(userClient: UserClient) {
+    const currentUserSuscription = await userClient.userSuscription.find(
+      suscription => !suscription.finalDate,
+    );
+    const extraPointsType = this.chooseExtraPoints(
+      currentUserSuscription.suscription.name,
+    );
+    const optionsExtras: App.Transaction.TransactionInterests = {
+      platformInterestType: PlatformInterest.WITHDRAWAL,
+      platformInterestExtraPointsType: extraPointsType,
+      thirdPartyInterestType: PaymentProvider.STRIPE,
+    };
+    const extras = await this.transactionService.getTransactionInterests(
+      optionsExtras,
+    );
+    return extras;
+  }
+
+  private calculateExtraPoints(extraPoints, amount: number) {
+    if (!extraPoints) return amount;
+    const extra = 1 + parseFloat(extraPoints.percentage);
+
+    if (extraPoints.name === PlatformInterest.PREMIUM_EXTRA)
+      return extra * amount;
+
+    if (extraPoints.name === PlatformInterest.GOLD_EXTRA) {
+      return amount * extra + parseFloat(extraPoints.amount);
+    }
+  }
+
   async consultPoints(
     addPointsRequest: AddPointsRequest,
+    user: AuthenticatedUser,
   ): Promise<AddPointsResponse> {
+    const userClient: UserClient = await this.userClientService.get({
+      email: user.email,
+      idUserClient: user.id,
+    });
     const mostRecentRate = await this.pointsConversionService.getRecentPointsConversion();
     const accumulatePercentage = parseFloat(
       (await this.get(addPointsRequest.apiKey)).accumulatePercentage,
@@ -208,39 +260,136 @@ export class ThirdPartyClientsService {
       TransactionType.WITHDRAWAL,
       PlatformInterest.WITHDRAWAL,
     );
+    const extras = await this.calculateExtras(userClient);
 
-    let tentativeCommission: number = 0;
+    let pointsToDollars: number = 0;
     let tentativePoints: number = 0;
 
     const products: Product[] = addPointsRequest.products.map(product => {
-      tentativePoints = Math.trunc(
-        ((product.priceTag / 100) * accumulatePercentage) /
-          mostRecentRate.onePointEqualsDollars,
-      );
+      pointsToDollars += (product.priceTag / 100) * accumulatePercentage;
 
-      tentativeCommission = Math.trunc(
-        this.calculateTentativeCommission(
-          interests,
+      tentativePoints = Math.trunc(
+        this.calculateExtraPoints(
+          extras.extraPoints,
           (product.priceTag / 100) * accumulatePercentage,
-        ) * 100,
+        ) / mostRecentRate.onePointEqualsDollars,
       );
 
       return {
         ...product,
-        tentativeCommission: tentativeCommission,
         tentativePoints: tentativePoints,
       };
     });
+
+    const commission: number = Math.trunc(
+      this.calculateCommission(interests, pointsToDollars) * 100,
+    );
 
     const response: AddPointsResponse = {
       request: {
         ...addPointsRequest,
         products,
+        totalTentativeCommission: commission,
       },
       confirmationTicket: null,
     };
 
     return response;
+  }
+
+  async createTransaction(
+    addPointsRequest: AddPointsRequest,
+    user: AuthenticatedUser,
+  ): Promise<AddPointsResponse> {
+    const accumulatePercentage = parseFloat(
+      (await this.get(addPointsRequest.apiKey)).accumulatePercentage,
+    );
+
+    const points: AddPointsResponse = await this.consultPoints(
+      addPointsRequest,
+      user,
+    );
+
+    const userClient: UserClient = await this.userClientService.get({
+      email: user.email,
+      idUserClient: user.id,
+    });
+    const clientOnThirdParty: ClientOnThirdParty = await this.getClientOnThirdPartyByUserId(
+      userClient,
+    );
+
+    const thirdPartyInterest = await this.thirdPartyInterestService.get(
+      PaymentProvider.STRIPE,
+      TransactionType.WITHDRAWAL,
+    );
+    const interests = await this.paymentsService.getInterests(
+      TransactionType.WITHDRAWAL,
+      PlatformInterest.WITHDRAWAL,
+    );
+    const extras = await this.calculateExtras(userClient);
+
+    let pointsToDollars: number = 0;
+    let accumulatedPoints: number = 0;
+    points.request.products.forEach(p => {
+      pointsToDollars += (p.priceTag / 100) * accumulatePercentage;
+      accumulatedPoints += p.tentativePoints;
+    });
+    const commission: number = Math.trunc(
+      this.calculateCommission(interests, pointsToDollars) * 100,
+    );
+
+    const options: App.Transaction.TransactionCreation = {
+      clientOnThirdParty,
+      totalAmountWithInterest: commission,
+      rawAmount: Math.trunc(
+        this.calculateExtraPoints(
+          extras.extraPoints,
+          Math.trunc(pointsToDollars * 100),
+        ),
+      ),
+      type: TransactionType.THIRD_PARTY_CLIENT,
+      pointsConversion: extras.pointsConversion,
+      platformInterest: extras.interest,
+      thirdPartyInterest,
+      platformInterestExtraPoints: extras.extraPoints,
+      stateTransactionDescription:
+        StateDescription.THIRD_PARTY_CLIENT_TRANSACTION,
+      operation: 1,
+    };
+
+    const transaction = await this.transactionService.createTransaction(
+      options,
+      StateName.VERIFYING,
+    );
+
+    const confirmationTicket: ConfirmationTicket = {
+      confirmationId: transaction.idTransaction.toString(),
+      userEmail: user.email,
+      date: new Date(),
+      currency: addPointsRequest.products[0].currency,
+      pointsToDollars: Math.trunc(pointsToDollars * 100),
+      accumulatedPoints,
+      commission,
+      status: StateName.VERIFYING,
+    };
+
+    const response: AddPointsResponse = {
+      request: points.request,
+      confirmationTicket: confirmationTicket,
+    };
+
+    return response;
+  }
+
+  async addPoints(
+    addPointsRequest: AddPointsRequest,
+    user: AuthenticatedUser,
+  ): Promise<AddPointsResponse> {
+    if (addPointsRequest.type === AddPointsRequestType.CONSULT) {
+      return await this.consultPoints(addPointsRequest, user);
+    } else if (addPointsRequest.type === AddPointsRequestType.CREATION) {
+      return await this.createTransaction(addPointsRequest, user);
+    }
   }
 
   async csvCheck(apiKey: string, file): Promise<ConfirmationTicket[]> {

@@ -9,4 +9,5 @@ export enum ThirdPartyClientsErrorCodes {
   CSV_WRONG_FORMAT = 'csv_wrong_format',
   UNKNOWN_TYPE = 'unknown_type',
   UNKNOWN_CURRENCY = 'unknown_currency',
+  DIFFERENT_CURRENCIES = 'different_currencies',
 }
