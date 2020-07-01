@@ -19,16 +19,23 @@ export class MailsService {
   ) {}
 
   async sendEmail(msg: MailsStructure): Promise<MailsResponse> {
-    const from = this.sendGridConfig.emailFrom;
-    try {
-      await this.sendGridClient.send({ ...msg, from });
-      this.logger.verbose(
-        `[${ApiModules.MAILS}] {${msg.to}} An email with the subject "${msg.subject}" has been sent`,
-      );
-      return MailsResponse.SUCCESS;
-    } catch (err) {
-      this.logger.error(
-        `[${ApiModules.MAILS}] {${msg.to}} Problem sending email. Reason: ${err.message}`,
+    if (process.env.SENDGRID_ON === 'true') {
+      const from = this.sendGridConfig.emailFrom;
+      try {
+        await this.sendGridClient.send({ ...msg, from });
+        this.logger.verbose(
+          `[${ApiModules.MAILS}] {${msg.to}} An email with the subject "${msg.subject}" has been sent`,
+        );
+        return MailsResponse.SUCCESS;
+      } catch (err) {
+        this.logger.error(
+          `[${ApiModules.MAILS}] {${msg.to}} Problem sending email. Reason: ${err.message}`,
+        );
+        return MailsResponse.ERROR;
+      }
+    } else {
+      this.logger.info(
+        `[${ApiModules.MAILS}] environment variable SENDGRID_ON is OFF`,
       );
       return MailsResponse.ERROR;
     }

@@ -1,13 +1,20 @@
 const axios = require("axios");
 const fs = require("fs");
 
+const baseDomain = process.env.VUE_APP_PETROMILES_API_URL;
+
 // Don't forget to add your tags
 // IMPORTANT! Each tag must have the name of the component
 const LANGS = ["en", "es"];
 
 const httpClient = axios.create({
-  baseURL: process.env.VUE_APP_PETROMILES_API || "http://localhost:3000/api/v1",
-  timeout: process.env.VUE_APP_PETROMILES_API_TIMEOUT || 30000,
+  baseURL: baseDomain || "http://localhost:3000/api/v1",
+  crossDomain: true,
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+  timeout: parseInt(process.env.VUE_APP_PETROMILES_API_TIMEOUT) || 30000,
 });
 httpClient.interceptors.response.use(response => response.data);
 
@@ -16,7 +23,7 @@ async function loadLocalesRemotelly() {
     httpClient
       .get(`/language/${lang}`)
       .then(terms => {
-        termsGroupedByTags = groupTermsByTags(terms);
+        let termsGroupedByTags = groupTermsByTags(terms);
         fs.writeFile(
           __dirname + `/${lang}.json`,
           JSON.stringify(termsGroupedByTags),
@@ -30,6 +37,7 @@ async function loadLocalesRemotelly() {
         console.log(
           `Error writing file ${lang}.json | Please SERVE FIRST BACKEND !!`
         );
+        console.log(err);
       });
   });
 }

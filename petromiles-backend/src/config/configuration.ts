@@ -1,7 +1,22 @@
 import Stripe from 'stripe';
 
+const databaseSSL = () => {
+  if (process.env.DATABASE_SSL_ON === 'true')
+    return {
+      ssl: true,
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      },
+    };
+  else return null;
+};
+
 export default () => ({
-  port: parseInt(process.env.PORT, 10) || 3000,
+  api: {
+    port: parseInt(process.env.PORT, 10) || 3000,
+  },
   database: {
     database: process.env.DATABASE_NAME,
     type: process.env.DATABASE_TYPE,
@@ -10,6 +25,7 @@ export default () => ({
     username: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     synchronize: process.env.DATABASE_SYNCHRONIZE,
+    ...databaseSSL(),
   },
   paymentProvider: {
     stripe: {

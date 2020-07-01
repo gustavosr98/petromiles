@@ -29,9 +29,7 @@ import { ThirdPartyClientsModule } from '@/modules/third-party-clients/third-par
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: !process.env.NODE_ENV
-        ? ['.env.development', '.env']
-        : ['.env', '.env.development'],
+      envFilePath: ['.env.development', '.env'],
       load: [configuration],
     }),
     AuthModule,

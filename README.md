@@ -38,6 +38,7 @@ Its written with [Vue](https://vuejs.org/) at the client side and [Nest](https:/
     - [Frontend configuration file](#frontend-configuration-file)
 - [Usage](#usage)
   - [Development usage](#development-usage)
+  - [Development on Docker containers](#development-on-docker-containers)
   - [Production build](#production-build)
 - [Authors and acknowledgment](#authors-and-acknowledgment)
   - [Team #2](#team-#2)
@@ -81,7 +82,7 @@ npm install # Install dependencies
 
 #### Backend configuration file
 
-Create two files inside **petromiles-backend/** folder named `.env` and `.env.development`
+Create a file inside **petromiles-backend/** folder named `.env` or `.env.development`
 
 These files will have the following structure
 
@@ -93,6 +94,7 @@ PETROMILES_ENV=
 PORT=
 
 # DATABASE
+DATABASE_SSL_ON=
 DATABASE_NAME=
 DATABASE_PORT=
 DATABASE_HOST=
@@ -107,6 +109,7 @@ STRIPE_PUBLIC_KEY=
 STRIPE_API_VERSION=
 
 # SENDGRID - TEST MODE
+SENDGRID_ON=
 SENDGRID_API_KEY=
 SENDGRID_FROM=
 SENDGRID_WELCOME_TEMPLATE=
@@ -140,7 +143,7 @@ JWT_EXPIRES_IN=
 POEDITOR_API_KEY=
 POEDITOR_PROJECT_ID=
 
-# CRON - Default mode ON
+# CRON
 CRON_INCLUDE=true
 ```
 
@@ -176,13 +179,14 @@ Check this link for futher information on [Vue](https://vuejs.org/v2/guide/) and
 
 #### Frontend configuration file
 
-Create two files inside **petromiles-frontend/** folder named `.env` and `.env.development`
+Create a file inside **petromiles-frontend/** folder named `.env` or `.env.development`
 
 These files will have the following structure
 
 ```bash
-# API - Default route
-VUE_APP_PETROMILES_API=http://localhost:3000/api/v1
+# API
+VUE_APP_PETROMILES_API_URL=
+VUE_APP_PETROMILES_API_TIMEOUT=
 
 # FIREBASE
 VUE_APP_FIREBASE_APIKEY=
@@ -246,9 +250,64 @@ You can be sure the backend is up and running if you see something like this:
 
 ---
 
-### Production build
+## Development on Docker containers
 
-Please wait for futher instructions. Production build guide to be defined.
+Create your enviroment files explained on [Backend configuration file](#backend-configuration-file) and [Frontend configuration file](#frontend-configuration-file) (Both under the names of `.env`)
+
+1. Pay important attention to set the values of your Backend variables to
+
+- `DATABASE_PORT=5432`
+- `DATABASE_HOST=db`
+
+2. Build and serve backend service
+
+```bash
+cd petromiles-backend
+docker-compose up
+```
+
+(Optional) If you want to clean your database run the following commands
+
+```bash
+cd petromiles-backend
+docker-compose up --build --remove-orphans -V
+```
+
+3. Build and serve frontend service (Only after backend is up and running)
+
+```bash
+cd petromiles-frontend
+docker build -t petromiles-frontend .
+docker run --publish 8080:8080 --network host --env-file=.env petromiles-frontend
+```
+
+---
+
+## Production build
+
+### Backend production mode
+
+Name your enviroment variable file under the name of `env`. Then follow the next commands
+
+```
+cd petromiles-backend
+npm run build
+npm run start:prod
+```
+
+> WARNING: Don't forget to clear your browser cache
+
+### Frontend production mode
+
+Name your enviroment variable file under the name of `env.production`. Then follow the next commands
+
+```
+cd petromiles-frontend
+npm run build
+npx serve -s dist/
+```
+
+---
 
 ## Authors and acknowledgment
 
@@ -315,6 +374,7 @@ Please wait for futher instructions. Production build guide to be defined.
 - Gabriel Tovar [@GabTovarUCAB](https://github.com/GabTovarUCAB)
 - Alejandro Jauregui [@alejjb](https://github.com/alejjb)
 - Diorfelis Medina [@DiorfelisMedina](https://github.com/DiorfelisMedina)
+- Gustavo Sánchez [@gustavosr98](https://github.com/gustavosr98)
 
 ### Backend Team
 
@@ -322,6 +382,7 @@ Please wait for futher instructions. Production build guide to be defined.
 - Javier Andrade [@JAA1998](https://github.com/JAA1998)
 - Miguel Coccaro [@mecoccaro](https://github.com/mecoccaro)
 - Christian Neira [@christianneiraUCAB](https://github.com/christianneiraUCAB)
+- Gustavo Sánchez [@gustavosr98](https://github.com/gustavosr98)
 
 ### DevOps
 
@@ -330,3 +391,4 @@ Please wait for futher instructions. Production build guide to be defined.
 ### QA
 
 - Rafael Mendez [@RafaelMendezUCAB](https://github.com/RafaelMendezUCAB)
+- Gabriel Tovar [@GabTovarUCAB](https://github.com/GabTovarUCAB)
