@@ -18,6 +18,10 @@ import { BankSeederModule } from './bank/bank.module';
 import { TaskSeederModule } from './task/task.module';
 import { RoutingNumberModule } from './routing-number/routing-number.module';
 import { ThirdPartyClientSeederModule } from './third-party-client/third-party-client.module';
+import {UserAdministratorSeederModule} from "@/database/seeders/user-administrator/user-administrator.module";
+import {StateUserSeederModule} from "@/database/seeders/state-user/state-user.module";
+import {UserRoleSeederModule} from "@/database/seeders/user-role/user-role.module";
+import {UserDetailsSeederModule} from "@/database/seeders/user-datails/user-details.module";
 
 @Module({
   imports: [
@@ -41,6 +45,10 @@ import { ThirdPartyClientSeederModule } from './third-party-client/third-party-c
     TaskSeederModule,
     RoutingNumberModule,
     ThirdPartyClientSeederModule,
+    UserAdministratorSeederModule,
+    StateUserSeederModule,
+    UserRoleSeederModule,
+    UserDetailsSeederModule,
   ],
   providers: [Seeder, Logger],
 })
