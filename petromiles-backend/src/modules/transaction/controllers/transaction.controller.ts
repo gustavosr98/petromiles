@@ -14,13 +14,16 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { GetUser } from '@/modules/auth/decorators/get-user.decorator';
+import { Roles } from '@/modules/auth/decorators/roles.decorator';
 
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
 import { HttpRequest } from '@/logger/http-requests.enum';
+import { Role } from '@/enums/role.enum';
 
 // SERVICES
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
+import { RolesGuard } from '@/modules/auth/guards/roles.guard'; 
 
 const baseEndpoint = Object.freeze('transaction');
 
@@ -51,5 +54,26 @@ export class TransactionController {
       `[${ApiModules.TRANSACTION}] (${HttpRequest.GET})  ${user?.email} asks /${baseEndpoint}/${idTransaction}`,
     );
     return this.transactionService.get(idTransaction);
+  }
+
+  @Roles(Role.ADMINISTRATOR)
+  @UseGuards(RolesGuard)
+  @Get('admin/:idTransaction')
+  getTransactionAdministrator(
+    @Param('idTransaction') idTransaction,
+    @GetUser() user,
+  ): Promise<App.Transaction.TransactionDetails> {
+    this.logger.http(
+      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET})  ${user?.email} asks /${baseEndpoint}/admin/${idTransaction}`,
+    );
+    return this.transactionService.getTransactionAdmin(idTransaction);
+  }
+
+  @Get('admin/list/all')
+  getTransactionsAdmin(@GetUser() user) {
+    this.logger.http(
+      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}`,
+    );
+    return this.transactionService.getTransactionsAdmin(user.email);
   }
 }

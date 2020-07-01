@@ -136,6 +136,48 @@ export class Transaction extends BaseEntity {
     };
   }
 
+  calculateDetailsAdministrator(): TransactionDetails {
+    const state = this.stateTransaction.find(state => !state.finalDate).state
+      .name;
+    let details;
+
+    if (this.type == TransactionType.BANK_ACCOUNT_VALIDATION)
+      details = this.calculateVerificationDetails();
+    if (this.type == TransactionType.SUSCRIPTION_PAYMENT)
+      details = this.calculateSubscriptionDetails();
+    if (
+      this.type == TransactionType.DEPOSIT ||
+      this.type == TransactionType.THIRD_PARTY_CLIENT
+    )
+      details = this.calculateDepositDetails();
+    if (this.type == TransactionType.WITHDRAWAL)
+      details = this.calculateWithdrawalDetails();
+
+    const bankAccount = this.clientBankAccount
+      ? this.clientBankAccount.bankAccount.accountNumber.substr(-4)
+      : null;
+
+    const bankAccountNickname = this.clientBankAccount
+      ? this.clientBankAccount.bankAccount.nickname
+      : null;
+    
+    const clientBankAccountEmail = this.clientBankAccount
+      ? this.clientBankAccount.userClient.email
+      : null;
+
+    return {
+      id: this.idTransaction,
+      date: this.initialDate.toLocaleDateString(),
+      type: this.type,
+      bankAccount,
+      bankAccountNickname,
+      pointsConversion: 1 / this.pointsConversion.onePointEqualsDollars,
+      ...details,
+      state,
+      clientBankAccountEmail,
+    };
+  }
+
   private calculateVerificationDetails() {
     const verificationInterest =
       parseFloat(this.transactionInterest[0].platformInterest.amount) / 100;

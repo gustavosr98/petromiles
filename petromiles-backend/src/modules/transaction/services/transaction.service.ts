@@ -136,11 +136,44 @@ export class TransactionService {
     });
   }
 
+async getTransactionsAdmin(
+	email: string
+	): Promise<App.Transaction.TransactionDetails[]> {
+    const transactions = await this.transactionRepository.find({
+    	where: `stateTransaction.finalDate is null AND trans.transaction is null`,
+      join: {
+        alias: 'trans',
+        leftJoinAndSelect: {
+          clientBankAccount: 'trans.clientBankAccount',
+          bankAccount: 'clientBankAccount.bankAccount',
+          stateTransaction: 'trans.stateTransaction',
+          state: 'stateTransaction.state',
+          transactionInterest: 'trans.transactionInterest',
+          thirdPartyInterest: 'transactionInterest.thirdPartyInterest',
+          platformInterest: 'transactionInterest.platformInterest',
+          platformInterestExtraPoints:
+            'transactionInterest.platformInterestExtraPoints',
+          userClient: 'clientBankAccount.userClient',
+        },
+      },
+    });
+    return transactions.map(transaction => {
+      return transaction.calculateDetailsAdministrator();
+    });
+  }
+
   async get(
     idTransaction: number,
   ): Promise<App.Transaction.TransactionDetails> {
     const transaction = await this.transactionRepository.findOne(idTransaction);
     return transaction.calculateDetails();
+  }
+
+  async getTransactionAdmin(
+    idTransaction: number,
+  ): Promise<App.Transaction.TransactionDetails> {
+    const transaction = await this.transactionRepository.findOne(idTransaction);
+    return transaction.calculateDetailsAdministrator();
   }
 
   async createTransaction(
