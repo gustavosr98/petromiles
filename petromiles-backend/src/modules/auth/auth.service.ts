@@ -18,6 +18,7 @@ import { CreateUserDTO } from '@/modules/user/dto/create-user.dto';
 
 // SERVICES
 import { UserClientService } from '@/modules/user/services/user-client.service';
+import { UserAdministratorService } from '@/modules/user/services/user-administrator.service';
 import { MailsService } from '@/modules/mails/mails.service';
 import { UserService } from '@/modules/user/services/user.service';
 import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
@@ -27,6 +28,7 @@ export class AuthService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private userClientService: UserClientService,
+    private userAdministratorService: UserAdministratorService,
     private jwtService: JwtService,
     private mailsService: MailsService,
     private configService: ConfigService,
@@ -63,6 +65,35 @@ export class AuthService {
     };
   }
 
+  async createUserAdministrator(
+    user: CreateUserDTO,
+  ): Promise<App.Auth.ResponseAdministrator> {
+
+    const passwordAdmin = generator.generate({
+      length: 10,
+      numbers: true,
+    });
+
+    user.salt = await bcrypt.genSalt();
+
+    user.password = await bcrypt.hash(passwordAdmin, user.salt)
+
+    const createdUser = await this.userAdministratorService.create(user);
+
+    this.createWelcomeEmail(
+      createdUser.userAdmin.email,
+      createdUser.userDetails.firstName,
+    );
+
+    return {
+      email: createdUser.userAdmin.email,
+      password: passwordAdmin,
+      userDetails: createdUser.userDetails,
+      role: Role.ADMINISTRATOR,
+      id: createdUser.userAdmin.idUserAdministrator,
+    };
+  }
+
   async validateUser(
     credentials: App.Auth.LoginRequest,
   ): Promise<App.Auth.Response> {
@@ -96,7 +127,7 @@ export class AuthService {
         throw new UnauthorizedException('error-messages.loginIncorrect');
       }
     }
-
+    
     this.logger.error(
       `[${ApiModules.AUTH}] {${email}} The user was not found or user is not active`,
     );

@@ -14,6 +14,10 @@ import { BankSeederService } from './bank/bank.service';
 import { TaskSeederService } from './task/task.service';
 import { RoutingNumberSeederService } from './routing-number/routing-number.service';
 import { ThirdPartyClientSeederService } from './third-party-client/third-party-client.service';
+import { UserAdministratorSeederService} from "@/database/seeders/user-administrator/user-administrator.service";
+import { StateUserSeederService} from "@/database/seeders/state-user/state-user.service";
+import { UserRoleSeederService} from "@/database/seeders/user-role/user-role.service";
+import { UserDetailsSeederService} from "@/database/seeders/user-datails/user-details.service";
 
 @Injectable()
 export class Seeder {
@@ -31,6 +35,10 @@ export class Seeder {
     private readonly taskSeederService: TaskSeederService,
     private readonly routingNumberSeederService: RoutingNumberSeederService,
     private readonly thirdPartyClientSeederService: ThirdPartyClientSeederService,
+    private readonly userAdministratorSeederService: UserAdministratorSeederService,
+    private readonly stateUserSeederService: StateUserSeederService,
+    private readonly userRoleSeederService: UserRoleSeederService,
+    private readonly userDetailsSeederService: UserDetailsSeederService,
   ) {}
 
   async clean() {
@@ -70,6 +78,10 @@ export class Seeder {
       TASKS: await this.task(),
       ROUTING_NUMBER: await this.routingNumber(),
       THIRD_PARTY_CLIENT: await this.thirdPartyClient(),
+        USER_ADMINISTRATOR: await this.userAdministrator(),
+        STATE_USER: await this.stateUser(),
+        USER_ROLE: await this.userRole(),
+        USER_DETAILS: await this.userDetails(),
     };
   }
 
@@ -239,4 +251,58 @@ export class Seeder {
         return Promise.reject(error);
       });
   }
+
+  async userAdministrator(): Promise<number> {
+      return await Promise.all(this.userAdministratorSeederService.createUserAdministrator())
+          .then(createdUserAdministrator => {
+              const USER_ADMINISTRATOR_ROWS = createdUserAdministrator.filter(
+                  nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
+              ).length;
+              return USER_ADMINISTRATOR_ROWS;
+          })
+          .catch(error => {
+              return Promise.reject(error);
+          });
+  }
+
+  async stateUser(): Promise<number> {
+      return await Promise.all(this.stateUserSeederService.createStateUser())
+          .then(createdStateUser => {
+              const STATE_USER_ROWS = createdStateUser.filter(
+                  nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
+              ).length;
+              return STATE_USER_ROWS;
+          })
+          .catch(error => {
+              return Promise.reject(error)
+          });
+  }
+
+  async userRole(): Promise<number> {
+      return await Promise.all(this.userRoleSeederService.createUserRole())
+          .then(createdUserRole => {
+              const USER_ROLE_ROWS = createdUserRole.filter(
+                  nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
+              ).length;
+              return USER_ROLE_ROWS;
+          })
+          .catch(error => {
+              return Promise.reject(error)
+          });
+  }
+
+  async userDetails(): Promise<number> {
+      return await Promise.all(this.userDetailsSeederService.createUserDetails())
+          .then(createdUserDetails => {
+              const USER_DETAILS_ROWS = createdUserDetails.filter(
+                  nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
+              ).length;
+              return USER_DETAILS_ROWS;
+          })
+          .catch(error => {
+              return Promise.reject(error)
+          });
+  }
+
+
 }

@@ -149,10 +149,14 @@ export default {
     },
 
     typeLabel: function() {
-      const label =
-        this.transaction.type === Transactions.DEPOSIT
-          ? this.$tc("transaction.yourPurchase")
-          : this.$tc("transaction.yourWithdrawal");
+      let label
+      if (this.transaction.type === Transactions.DEPOSIT) {
+        label = this.$tc("transaction.yourPurchase")
+      } else if (this.transaction.type === Transactions.WITHDRAWAL) {
+        label = this.$tc("transaction.yourWithdrawal");
+      } else if (this.transaction.type === Transactions.THIRD_PARTY_CLIENT) {
+        label = this.$tc("transaction.yourThirdPartyClient");
+      }
       return label;
     },
 

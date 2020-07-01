@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsOptional, IsEnum, IsPositive, IsInt } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsPositive,
+  IsInt,
+} from 'class-validator';
 
 import { AddPointsRequestCurrency } from '@/enums/add-points-request-currency.enum';
 import { ThirdPartyClientsErrorCodes } from '@/enums/third-party-clients-error-codes.enum';
@@ -17,9 +23,6 @@ export class Product {
     message: ThirdPartyClientsErrorCodes.UNKNOWN_TYPE,
   })
   currency: string; // Ej. 'usd'
-
-  @IsOptional()
-  tentativeCommission?: number; // USD dollar cents | Opertative expenses
 
   @IsOptional()
   tentativePoints?: number;

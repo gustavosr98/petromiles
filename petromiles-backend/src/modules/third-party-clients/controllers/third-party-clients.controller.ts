@@ -14,6 +14,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { ApiKeyInterceptor } from '@/interceptors/apikey-validator.interceptor';
+import { CurrencyInterceptor } from '@/interceptors/currency-validator.interceptor';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 
 import { GetUser } from '@/modules/auth/decorators/get-user.decorator';
@@ -92,6 +93,7 @@ export class ThirdPartyClientsController {
 
   @Roles(Role.THIRD_PARTY)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseInterceptors(CurrencyInterceptor)
   @Post('add-points')
   async addPoints(
     @Body() addPointsRequest: AddPointsRequest,
@@ -100,6 +102,9 @@ export class ThirdPartyClientsController {
     this.logger.http(
       `[${ApiModules.THIRD_PARTY_CLIENTS}] (${HttpRequest.POST}) {${user.email}} { apiKey: ${addPointsRequest.apiKey} } asks /${baseEndpoint}/add-points`,
     );
-    return await this.thirdPartyClientsService.addPoints(addPointsRequest);
+    return await this.thirdPartyClientsService.addPoints(
+      addPointsRequest,
+      user,
+    );
   }
 }
