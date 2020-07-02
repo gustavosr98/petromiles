@@ -240,7 +240,7 @@ export class ThirdPartyClientsService {
       return extra * amount;
 
     if (extraPoints.name === PlatformInterest.GOLD_EXTRA) {
-      return amount * extra + parseFloat(extraPoints.amount);
+      return amount * extra + parseFloat(extraPoints.amount) / 100;
     }
   }
 
