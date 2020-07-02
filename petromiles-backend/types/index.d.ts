@@ -34,6 +34,17 @@ declare namespace App {
       id: number;
     }
 
+    interface ResponseStripe {
+      object: string;
+      account_holder_name: string;
+      bank_name: string;
+      country: string;
+      currency: string;
+      accountNumber_last4: string;
+      metadata: object;
+      status: string;       
+    }
+    
     interface LoginRequest {
       email: string;
       password?: string;

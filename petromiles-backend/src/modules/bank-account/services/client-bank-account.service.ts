@@ -175,7 +175,7 @@ export class ClientBankAccountService {
   async verify(verificationRequest: {
     clientBankAccountId: number;
     amounts: number[];
-  }) {
+  }): Promise<App.Auth.ResponseStripe> {
     const clientBankAccount = await this.clientBankAccountRepository.findOne({
       idClientBankAccount: verificationRequest.clientBankAccountId,
     });
@@ -222,7 +222,16 @@ export class ClientBankAccountService {
       StateDescription.CHANGE_VERIFICATION_TO_VALID,
     );
 
-    return verification;
+    return {
+      object: verification.object,
+      account_holder_name: verification.account_holder_name,
+      bank_name: verification.bank_name,
+      country: verification.country,
+      currency: verification.currency,
+      accountNumber_last4: verification.last4,
+      metadata: verification.metadata,
+      status: verification.status,
+    };
   }
 
   async checkVerificationAmounts(clientBankAccount, amounts) {
