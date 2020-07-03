@@ -29,4 +29,11 @@ export class TransactionInterestService {
       .getRepository(TransactionInterest)
       .save(transactionInterest);
   }
+
+  async getExtraPointsTypeByTransaction(transaction: Transaction) {
+    const transactionInterest = await getConnection()
+      .getRepository(TransactionInterest).findOne({ transaction});
+
+    return transactionInterest.platformInterestExtraPoints.name
+  }
 }

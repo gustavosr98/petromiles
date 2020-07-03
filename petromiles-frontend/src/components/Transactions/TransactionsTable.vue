@@ -34,7 +34,15 @@ export default {
   },
   async mounted() {
     this.fetchedData = await this.$http.get("/transaction");
-    this.transactions = this.fetchedData;
+    this.transactions = this.fetchedData.sort((a, b) => {
+      if (a.id < b.id) {
+        return 1;
+      }
+      if (a.id > b.id) {
+        return -1;
+      }
+      return 0;
+    });
   },
 
   methods: {
@@ -96,7 +104,9 @@ export default {
           ...data,
           transactionAmount: `$ ${data.total.toFixed(2)}`,
           state,
-          points: data.pointsEquivalent ? data.pointsEquivalent : "-",
+          points: data.pointsEquivalent
+            ? data.pointsEquivalent + data.extra
+            : "-",
           translatedType: this.$tc(`transaction-type.${data.type}`),
         };
       });

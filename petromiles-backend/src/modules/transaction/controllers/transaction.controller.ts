@@ -23,7 +23,7 @@ import { Role } from '@/enums/role.enum';
 
 // SERVICES
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
-import { RolesGuard } from '@/modules/auth/guards/roles.guard'; 
+import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 
 const baseEndpoint = Object.freeze('transaction');
 
@@ -75,5 +75,14 @@ export class TransactionController {
       `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}`,
     );
     return this.transactionService.getTransactionsAdmin(user.email);
+  }
+
+  @Get('extra-points-type/:idTransaction')
+  async getExtraPointsOfATransaction(
+    @Param('idTransaction') idTransaction: number,
+  ) {
+    return await this.transactionService.getExtraPointsOfATransaction(
+      idTransaction,
+    );
   }
 }

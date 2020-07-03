@@ -136,11 +136,11 @@ export class TransactionService {
     });
   }
 
-async getTransactionsAdmin(
-	email: string
-	): Promise<App.Transaction.TransactionDetails[]> {
+  async getTransactionsAdmin(
+    email: string,
+  ): Promise<App.Transaction.TransactionDetails[]> {
     const transactions = await this.transactionRepository.find({
-    	where: `stateTransaction.finalDate is null AND trans.transaction is null`,
+      where: `stateTransaction.finalDate is null AND trans.transaction is null`,
       join: {
         alias: 'trans',
         leftJoinAndSelect: {
@@ -374,6 +374,14 @@ async getTransactionsAdmin(
         paymentProviderTransactionId,
       },
       StateName.VALID,
+    );
+  }
+
+  async getExtraPointsOfATransaction(idTransaction: number) {
+    const transaction = await this.transactionRepository.findOne(idTransaction);
+
+    return await this.transactionInterestService.getExtraPointsTypeByTransaction(
+      transaction,
     );
   }
 }
