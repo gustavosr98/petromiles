@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/camelcase */
 
-
-export const USER_ROLE = [
+export const USER_ROLE =Object.freeze( [
     {
         userAdministrator: {idUserAdministrator: 1},
         role: {idRole: 1}
     }
-];
+]);

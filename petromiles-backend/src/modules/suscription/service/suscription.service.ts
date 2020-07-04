@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {Injectable, Inject, BadRequestException} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { getConnection, getManager, getRepository, Repository } from 'typeorm';
@@ -15,6 +15,7 @@ import { ApiModules } from '@/logger/api-modules.enum';
 import { StateName } from '@/enums/state.enum';
 import { PlatformInterest } from '@/enums/platform-interest.enum';
 import { TransactionType } from '@/enums/transaction.enum';
+import {StateDescription} from "@/enums/state.enum";
 
 // ENTITIES
 import { UserClient } from '@/entities/user-client.entity';
@@ -22,6 +23,7 @@ import { Transaction } from '@/entities/transaction.entity';
 import { Suscription } from '@/entities/suscription.entity';
 import { UserSuscription } from '@/entities/user-suscription.entity';
 import { PlatformInterest as PlatformInterestEntity } from '@/entities/platform-interest.entity';
+import { StateTransaction} from "@/entities/state-transaction.entity";
 
 // SERVICES
 import { UserClientService } from '@/modules/user/services/user-client.service';
@@ -42,6 +44,8 @@ export class SuscriptionService {
     private suscriptionRepository: Repository<Suscription>,
     @InjectRepository(PlatformInterestEntity)
     private platformInterestRepository: Repository<PlatformInterestEntity>,
+    @InjectRepository(StateTransaction)
+    private stateTransactionRepository: Repository<StateTransaction>,
     private userClientService: UserClientService,
     private clientBankAccountService: ClientBankAccountService,
     private transactionService: TransactionService,
@@ -101,17 +105,58 @@ export class SuscriptionService {
     await userSuscriptionRepository.save(currentSuscription);
   }
 
-  async upgradeToPremium(
+  async hasPendingUpgrade(iduserClient: number): Promise<boolean>{
+    const status = await this.stateTransactionRepository
+        .createQueryBuilder('st')
+        .select('s.name')
+        .leftJoin('st.state', 's')
+        .leftJoin('st.transaction','t')
+        .leftJoin('t.clientBankAccount', 'cba')
+        .where('st."finalDate" IS NULL')
+        .andWhere('cba.fk_user_client = :id',{id: iduserClient})
+        .andWhere('t.type = :type', {type: TransactionType.SUSCRIPTION_PAYMENT})
+        .andWhere('st.description = :description', {description: StateDescription.SUSCRIPTION_UPGRADE })
+        .getRawOne();
+
+    if (status === undefined){
+      return false
+    }
+    return status.s_name === StateName.VERIFYING;
+
+  }
+
+  async  upgradeToPremium(
     email: string,
     idBankAccount: number,
   ): Promise<Transaction> {
     const userClient = await this.userClientService.get({ email });
     const suscription = await this.get(SuscriptionType.PREMIUM);
+    const idUserClient = userClient.idUserClient;
 
     const clientBankAccount = await this.clientBankAccountService.getOne(
       userClient.idUserClient,
       idBankAccount,
     );
+
+    if (await this.hasPendingUpgrade(idUserClient)){
+      this.logger.error(
+          `[${ApiModules.SUSCRIPTION}] Pending upgrade transaction {client: ${idUserClient}}`,
+      );
+      throw new BadRequestException('error-messages.pendingUpgradeTransaction');
+    }
+    const actualSubscription = await this.getUserSuscription(userClient);
+
+    if (actualSubscription.suscription.name === SuscriptionType.PREMIUM){
+      this.logger.error(
+          `[${ApiModules.SUSCRIPTION}] Already premium {client: ${idUserClient}}`,
+      );
+      throw new BadRequestException('error-messages.alreadyPremium');
+    } else if (actualSubscription.suscription.name === SuscriptionType.GOLD){
+      this.logger.error(
+          `[${ApiModules.SUSCRIPTION}] Gold users cannot request premium suscription {client: ${idUserClient}}`,
+      );
+      throw new BadRequestException('error-messages.goldUser');
+    }
 
     const paymentProviderCharge = await this.paymentProviderService.createCharge(
       {

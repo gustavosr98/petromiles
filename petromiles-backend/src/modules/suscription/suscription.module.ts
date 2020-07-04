@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { TypeOrmModule } from '@nestjs/typeorm';
 // SERVICES
 import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
 
@@ -13,10 +14,12 @@ import { PaymentProviderModule } from '@/modules/payment-provider/payment-provid
 
 //CONTROLLER
 import { SuscriptionController } from '@/modules/suscription/controller/suscription.controller';
+
+// Entities
 import { Suscription } from '@/entities/suscription.entity';
 import { UserClient } from '@/entities/user-client.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import {PlatformInterest} from "@/entities/platform-interest.entity";
+import {StateTransaction} from "@/entities/state-transaction.entity";
 
 @Module({
   imports: [
@@ -26,7 +29,7 @@ import {PlatformInterest} from "@/entities/platform-interest.entity";
     MailsModule,
     ManagementModule,
     PaymentProviderModule,
-    TypeOrmModule.forFeature([Suscription, UserClient, PlatformInterest]),
+    TypeOrmModule.forFeature([Suscription, UserClient, PlatformInterest, StateTransaction]),
   ],
   providers: [SuscriptionService],
   exports: [SuscriptionService],
