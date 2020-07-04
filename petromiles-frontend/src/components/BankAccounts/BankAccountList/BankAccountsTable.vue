@@ -53,7 +53,7 @@ export default {
         {
           text: this.$t("common.state"),
           align: "center",
-          value: "state",
+          value: "bankAccountState",
         },
         {
           text: this.$t("common.seeMore"),
@@ -64,7 +64,7 @@ export default {
     },
     mungedData() {
       return this.fetchedData.map(data => {
-        const state = {
+        const bankAccountState = {
           name: data.clientBankAccount[0].stateBankAccount[0].state.name,
           translated: this.$tc(
             `state-name.${data.clientBankAccount[0].stateBankAccount[0].state.name}`
@@ -79,7 +79,7 @@ export default {
           id: data.idBankAccount,
           routingNumber: data.routingNumber.number,
           bankAccountType,
-          state,
+          bankAccountState,
           number: "XXXX-".concat(data.accountNumber),
         };
       });

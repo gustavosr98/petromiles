@@ -1,9 +1,11 @@
 <template>
-  <datatable :title="title" :headers="headers" :fetchedData="mungedData" />
+  <datatable :title="title" :headers="headers" :fetchedData="mungedData" :userType="type" v-if="fetchedData !== []" @updateUserState="updateUserState" :isAdmin="true"/>
 </template>
 
 <script>
 import Datatable from "@/components/General/Datatable/Datatable";
+import auth from "@/constants/authConstants";
+import { states } from "@/constants/state";
 
 export default {
   name: "administrators-table",
@@ -37,6 +39,7 @@ export default {
           value: "state",
         },
       ],
+      type: auth.ADMINISTRATOR
     };
   },
   async mounted() {
@@ -45,7 +48,10 @@ export default {
   computed: {
     mungedData() {
       return this.fetchedData.map(data => {
-        const state = this.$tc(`state-name.${data.stateUser[0].state.name}`);
+        const state = {
+          name: data.stateUser[0].state.name,
+          translated: this.$tc(`state-name.${data.stateUser[0].state.name}`),
+        };
         return {
           ...data,
           state,
@@ -53,5 +59,27 @@ export default {
       });
     },
   },
+  methods: {
+    async updateUserState(item){
+      let userID = 0;      
+      userID = item.idUserAdministrator;      
+      if(item.state.name === states.ACTIVE.name){        
+        await this.$http.post(`management/state/${userID}`, {
+          state: states.BLOCKED.name,
+          role: auth.ADMINISTRATOR
+        });
+        item.state.name = states.BLOCKED.name;
+        item.state.translated = states.BLOCKED.name;
+      }
+      else{
+        await this.$http.post(`management/state/${userID}`, {
+          state: states.ACTIVE.name,
+          role: auth.ADMINISTRATOR
+        })
+        item.state.name = states.ACTIVE.name;
+        item.state.translated = states.ACTIVE.name;
+      }
+    }
+  }
 };
 </script>

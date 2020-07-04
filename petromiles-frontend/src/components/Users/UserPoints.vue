@@ -25,10 +25,7 @@ export default {
             points: 0,
         };
     },
-    async mounted(){
-        /*if(!this.isAdmin){
-            this.conversion = await this.$http.get("user/points/conversion");
-        }*/
+    async mounted(){        
         this.points = parseInt(this.conversion.points);
     }
 }

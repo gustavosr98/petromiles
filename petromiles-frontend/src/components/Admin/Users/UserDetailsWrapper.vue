@@ -37,7 +37,6 @@ import UserDetail from "@/components/Users/UserDetail.vue";
 import UserProfileImage from "@/components/Users/UserProfileImage.vue";
 import UserMembership from "@/components/Users/UserMembership.vue";
 import UserPoints from "@/components/Users/UserPoints.vue";
-
 export default {
   name: "user-detail-wrapper",
  components: {
@@ -64,11 +63,9 @@ export default {
     const bankAccounts = await this.$http.get(`bank-account?id=${this.user.idUserClient}`);
     const userInformation = await this.$http.get(`user/${this.user.idUserClient}/CLIENT`);
     const transactions = await this.$http.get(`transaction?id=${this.user.idUserClient}`);
-
     //console.log("cuentas bancarias: ", bankAccounts);
     //console.log("datos usuario: ", userInformation);
     //console.log("transacciones: ", transactions);
-
     const { userDetails, ...basicInformation} = userInformation;
     this.userData = {
       details: userDetails,

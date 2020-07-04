@@ -1,9 +1,11 @@
 <template>
-  <datatable :title="title" :headers="headers" :fetchedData="mungedData" />
+  <datatable :title="title" :headers="headers" :fetchedData="mungedData" @updateUserState="updateUserState" :isAdmin="true"/>
 </template>
 
 <script>
 import Datatable from "@/components/General/Datatable/Datatable";
+import { states } from "@/constants/state";
+import auth from "@/constants/authConstants";
 
 export default {
   name: "clients-table",
@@ -54,7 +56,6 @@ export default {
           name: data.stateUser[0].state.name,
           translated: this.$tc(`state-name.${data.stateUser[0].state.name}`),
         };
-
         return {
           ...data,
           state,
@@ -62,5 +63,27 @@ export default {
       });
     },
   },
+  methods: {
+    async updateUserState(item){
+      let userID = 0;      
+      userID = item.idUserClient;
+      if(item.state.name === states.ACTIVE.name){        
+        await this.$http.post(`management/state/${userID}`, {
+          state: states.BLOCKED.name,
+          role: auth.CLIENT
+        });
+        item.state.name = states.BLOCKED.name;
+        item.state.translated = states.BLOCKED.name;
+      }
+      else{
+        await this.$http.post(`management/state/${userID}`, {
+          state: states.ACTIVE.name,
+          role: auth.CLIENT
+        })
+        item.state.name = states.ACTIVE.name;
+        item.state.translated = states.ACTIVE.name;
+      }
+    }
+  }
 };
 </script>

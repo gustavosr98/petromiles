@@ -18,10 +18,27 @@
       :items="fetchedData"
       :search="search"
     >
-      <template #item.state="{value}">
-        <v-chip outlined class="overline" :color="getColor(value.name)" label dark @click="changeState(value)">
+      <template #item.state="{item}">
+        <v-tooltip bottom v-if="isAdmin">
+          <template v-slot:activator="{ on, attrs }">
+            <v-chip outlined class="overline" :color="getColor(item.state.name)" label dark @click="changeUserState(item)" v-bind="attrs" v-on="on">
+              {{
+              item.state.translated
+              }}
+            </v-chip>
+          </template>
+          <span>Click to Change State</span>
+        </v-tooltip>
+        <v-chip v-else outlined class="overline" :color="getColor(item.state.name)" label dark>
           {{
-          value.translated
+          item.state.translated
+          }}
+        </v-chip>
+      </template>
+      <template #item.bankAccountState="{item}">
+        <v-chip outlined class="overline" :color="getColor(item.bankAccountState.name)" label dark>
+          {{
+          item.bankAccountState.translated
           }}
         </v-chip>
       </template>
@@ -53,21 +70,28 @@
         />
       </v-dialog>
     </v-row>
+
+    <snackbar @close="closeSnackbar" :show="showSnackbar" :text="text"></snackbar>
   </v-card>
 </template>
 
 <script>
+import { createNamespacedHelpers, mapState } from "vuex";
+const { mapActions } = createNamespacedHelpers("auth");
 import { getColor } from "@/mixins/tables/getColor.js";
 import TransactionInformation from "@/components/Transactions/TransactionInformation";
 import BankAccountDetails from "@/components/BankAccounts/BankAccountList/BankAccountDetails";
+import Snackbar from "@/components/General/Snackbar/Snackbar.vue";
 import Tables from "@/constants/table";
-
+import { states } from "@/constants/state";
+import auth from "@/constants/authConstants";
 export default {
   name: "datatable",
   mixins: [getColor],
   components: {
     "transaction-information": TransactionInformation,
     "bank-account-details": BankAccountDetails,
+    "snackbar": Snackbar
   },
   props: {
     title: {
@@ -84,6 +108,12 @@ export default {
     },
     linkTo: { type: String },
     tableName: { type: String },
+    userType: {
+      default: auth.CLIENT
+    },
+    isAdmin: {
+      default: false
+    }
   },
   data() {
     return {
@@ -95,7 +125,12 @@ export default {
       elementId: null,
       table: Tables,
       bankAccount: null,
+      showSnackbar: false,
+      text: "",
     };
+  },
+  computed: {
+    ...mapState("auth", ["user"]),  
   },
   methods: {
     seeDetails(id) {
@@ -118,19 +153,19 @@ export default {
       this.$router.push({name: "AdminUsersDetail", params: {user: user}});
     },
     
-    //ESTO DE ABAJO FUE ESCRITO POR RAFAEL - NO TOCAR YA QUE SE VA A USAR
-    changeState(item){
-      console.log("I wanna change its state: ", item);
-      /*if(item.name === "active"){
-        item.name = "blocked";
-        item.translated = "blocked";
-      }
-      else{
-        item.name = "active";
-        item.translated = "active";
-      }*/
-    }
-  },
+    async changeUserState(item){
+      if(this.user.email !== item.email){
+        this.$emit('updateUserState', item);        
+      }   
+      else {
+        this.text = "You cannot block yourself.";
+        this.showSnackbar = true;
+      }   
+    },
+    closeSnackbar(){
+      this.showSnackbar = false;
+    },
+  },  
   watch: {
     details: function() {
       if (!this.details) this.elementDetails = "";

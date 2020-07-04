@@ -32,6 +32,8 @@ export class ManagementService {
     private countryRepository: Repository<Country>,
     @InjectRepository(UserClient)
     private userClientRepository: Repository<UserClient>,
+    @InjectRepository(UserAdministrator)
+    private userAdministratorRepository: Repository<UserAdministrator>,
     @InjectRepository(StateUser)
     private stateUserRepository: Repository<StateUser>,
     @InjectRepository(Bank)
@@ -78,39 +80,39 @@ export class ManagementService {
     role: RoleEnum,
     state: StateName,
     id: number,
-    adminId: UserAdministrator,
+    adminId: number,
   ): Promise<StateUser> {
     const roleName = await this.roleRepository
       .createQueryBuilder('role')
-      .where('role.name = :role', { role: role })
+      .where('role.name = :role', { role })
       .getOne();
 
-    let userId, stateus;
+    let user: UserClient, admin: UserAdministrator, status: StateUser;
     if (roleName.isClient()) {
-      userId = await this.userClientRepository.findOne(id);
-      stateus = await this.stateUserRepository.findOne({
-        where: [{ userClient: userId.idUserClient, finalDate: null }],
+      user = await this.userClientRepository.findOne({ idUserClient: id });
+      status = await this.stateUserRepository.findOne({
+        where: [{ userClient: user.idUserClient, finalDate: null }],
       });
     }
     if (roleName.isAdministrator()) {
-      stateus = await this.stateUserRepository.findOne({
-        where: [{ userClient: adminId, finalDate: null }],
+      admin = await this.userAdministratorRepository.findOne({
+        idUserAdministrator: id,
+      });
+
+      status = await this.stateUserRepository.findOne({
+        where: [{ userAdministrator: id, finalDate: null }],
       });
     }
 
-    if (stateus.userAdministrator === adminId) {
-      throw new BadRequestException('Cannot change your state');
-    }
-
-    await this.updateLastState(stateus);
+    await this.updateLastState(status);
 
     const newState = new StateUser();
     newState.initialDate = new Date();
     newState.state = await this.getState(state);
     if (roleName.isClient()) {
-      newState.userClient = userId;
+      newState.userClient = user;
     } else if (roleName.isAdministrator()) {
-      newState.userAdministrator = adminId;
+      newState.userAdministrator = admin;
     }
 
     return await this.stateUserRepository.save(newState);
