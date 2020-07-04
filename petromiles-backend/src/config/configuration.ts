@@ -93,6 +93,14 @@ export default () => ({
           english: process.env.SENDGRID_VERIFICATION_CODE_EN_TEMPLATE,
           spanish: process.env.SENDGRID_VERIFICATION_CODE_ES_TEMPLATE,
         },
+        customerPointsAccumulationApproval: {
+          english: process.env.SENDGRID_POINTS_ACCUMULATION_APPROVAL_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_POINTS_ACCUMULATION_APPROVAL_ES_TEMPLATE,
+        },
+        customerPointsAccumulationRejection: {
+          english: process.env.SENDGRID_POINTS_ACCUMULATION_REJECTION_EN_TEMPLATE,
+          spanish: process.env.SENDGRID_POINTS_ACCUMULATION_REJECTION_ES_TEMPLATE,
+        },
       },
     },
   },

@@ -36,4 +36,12 @@ export const MailsSubjets = Object.freeze({
     english: 'Connecting your PetroMiles account!',
     spanish: '¡Conectando tu cuenta Petromiles!',
   },
+  customer_points_accumulation_approval: {
+    english: 'Accumulation of customer approved points associated with an external platform',
+    spanish: 'Acumulación de puntos aprobada del cliente asociado a una plataforma externa',
+  },
+  customer_points_accumulation_rejection: {
+    english: 'Accumulation of points rejected from the client associated with an external platform',
+    spanish: 'Acumulación de puntos rechazada del cliente asociado a una plataforma externa',
+  },
 });

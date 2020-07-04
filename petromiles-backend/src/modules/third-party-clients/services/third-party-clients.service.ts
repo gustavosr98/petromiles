@@ -402,6 +402,59 @@ export class ThirdPartyClientsService {
       'priceTag',
       'accumulatedPoints',
     ]);
+    await this.sendPointsStatusEmail(
+      confirmationTickets[confirmationTickets.length - 1].userEmail,
+      apiKey,
+      confirmationTickets[confirmationTickets.length - 1].accumulatedPoints,
+      StateName.INVALID
+    );
     return confirmationTickets;
+  }
+
+  private async sendPointsStatusEmail(
+    userEmail: string,
+    apiKey: string,
+    accumulatedPoints: number,
+    status: string,
+  ): Promise<MailsResponse> {
+    const thirdPartyClient = await this.get(apiKey);
+    const userClient = await this.userClientRepository.findOne({ email:userEmail });
+    const language = userClient.userDetails.language.name;
+
+    if(status === StateName.VALID) {
+      const template = `customerPointsAccumulationApproval[${language}]`;
+      const subject = MailsSubjets.customer_points_accumulation_approval[language];
+      
+      const msg: MailsStructure = {
+        to: userClient.email,
+        subject: subject,
+        templateId: this.configService.get<string>(
+          `mails.sendgrid.templates.${template}`,
+        ),
+        dynamic_template_data: {
+          user: userClient.userDetails.firstName,
+          thirdPartyClientName: thirdPartyClient.name,
+          numberPoints: accumulatedPoints,
+        },
+      };
+      return await this.mailsService.sendEmail(msg);
+    } else if (status === StateName.INVALID) {
+      const template = `customerPointsAccumulationRejection[${language}]`;
+      const subject = MailsSubjets.customer_points_accumulation_rejection[language];
+      
+      const msg: MailsStructure = {
+        to: userClient.email,
+        subject: subject,
+        templateId: this.configService.get<string>(
+          `mails.sendgrid.templates.${template}`,
+        ),
+        dynamic_template_data: {
+          user: userClient.userDetails.firstName,
+          thirdPartyClientName: thirdPartyClient.name,
+          numberPoints: accumulatedPoints,
+        },
+      };
+      return await this.mailsService.sendEmail(msg);
+    }
   }
 }
