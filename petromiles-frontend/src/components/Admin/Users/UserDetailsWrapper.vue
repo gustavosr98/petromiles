@@ -24,6 +24,9 @@
           <v-window>
             <user-detail :userDetails="userData" :isAdmin="true" />  
           </v-window>
+          <v-window>
+            <bank-account-table :bankAccounts="userBankAccounts" :isAdmin="true" />
+          </v-window>
         </v-card>
       </v-col>
     </v-row>
@@ -37,6 +40,7 @@ import UserDetail from "@/components/Users/UserDetail.vue";
 import UserProfileImage from "@/components/Users/UserProfileImage.vue";
 import UserMembership from "@/components/Users/UserMembership.vue";
 import UserPoints from "@/components/Users/UserPoints.vue";
+import BankAccountsTable from "@/components/BankAccounts/BankAccountList/BankAccountsTable";
 export default {
   name: "user-detail-wrapper",
  components: {
@@ -44,6 +48,7 @@ export default {
     "user-membership": UserMembership,
     "user-points": UserPoints,
     "user-detail": UserDetail,
+    "bank-account-table": BankAccountsTable,
   },
   props: {
     user:{
@@ -54,13 +59,14 @@ export default {
     return{
       userData: null,
       membership: null,
-      conversion: null
+      conversion: null,
+      userBankAccounts: null
     };
   },
   async mounted() {       
     this.conversion = await this.$http.get(`user/points/conversion?id=${this.user.idUserClient}`);
     this.membership = await this.$http.get(`suscription/actual?id=${this.user.idUserClient}`);
-    const bankAccounts = await this.$http.get(`bank-account?id=${this.user.idUserClient}`);
+    this.userBankAccounts = await this.$http.get(`bank-account?id=${this.user.idUserClient}`);
     const userInformation = await this.$http.get(`user/${this.user.idUserClient}/CLIENT`);
     const transactions = await this.$http.get(`transaction?id=${this.user.idUserClient}`);
     //console.log("cuentas bancarias: ", bankAccounts);

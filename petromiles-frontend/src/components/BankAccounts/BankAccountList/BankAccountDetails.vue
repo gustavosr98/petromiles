@@ -25,7 +25,7 @@
             />
           </div>
 
-          <div class="mt-4">
+          <div class="mt-4" v-if="!isAdmin">
             <span class="overline">{{$t('bank-account-details.setAsPrimaryAccount')}}</span>
             <v-switch
               v-model="primary"
@@ -44,12 +44,12 @@
 
         <!-- Delete and set primary actions -->
         <div class="mt-5">
-          <v-btn small class="my-2 elevation-0 btn-width" color="secondary" to="/buy-points">
+          <v-btn small class="my-2 elevation-0 btn-width" color="secondary" to="/buy-points" v-if="!isAdmin">
             <span>{{$t('buy-points-form.getPoints')}}</span>
             <v-icon small right>mdi-coins</v-icon>
           </v-btn>
 
-          <v-btn class="btn-width" @click="showAreYouSureModal=true" color="red" small outlined>
+          <v-btn class="btn-width" @click="showAreYouSureModal=true" color="red" small outlined v-if="!isAdmin">
             {{$t('bank-account-details.deleteAccount')}}
             <v-icon small right>mdi-delete</v-icon>
           </v-btn>
@@ -75,6 +75,7 @@ export default {
   mixins: [getColor],
   props: {
     idBankAccount: { type: Number, required: true },
+    isAdmin: { default: false }
   },
   components: {
     property: BankAccountProperty,

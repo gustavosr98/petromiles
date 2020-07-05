@@ -67,6 +67,7 @@
           :idBankAccount="elementId"
           v-if="elementDetails === this.table.BANK_ACCOUNTS"
           @deleteItem="deleteItem"
+          :isAdmin="isAdmin"
         />
       </v-dialog>
     </v-row>

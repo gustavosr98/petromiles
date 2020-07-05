@@ -1,12 +1,13 @@
 <template>
   <v-row align="center" justify="center" class="mx-auto">
-    <v-col cols="12" md="8">
+    <v-col cols="12" md="10">
       <datatable
         :title="title"
         :headers="headers"
         :fetchedData="mungedData"
         @deleteItem="deleteItem"
         tableName="bank-accounts"
+        :isAdmin="isAdmin"
       ></datatable>
     </v-col>
   </v-row>
@@ -17,6 +18,14 @@ import Datatable from "@/components/General/Datatable/Datatable";
 
 export default {
   name: "bank-accounts-table",
+  props: {  
+    isAdmin: {
+      default: false
+    },  
+    bankAccounts: {
+      default: null
+    }
+  },
   components: {
     Datatable,
   },
@@ -26,8 +35,13 @@ export default {
     };
   },
   async mounted() {
-    this.fetchedData = await this.$http.get("/bank-account");
-    this.$store.commit("bankAccount/SET_BANK_ACCOUNTS", this.fetchedData);
+    if(!this.bankAccounts){
+      this.fetchedData = await this.$http.get("/bank-account");
+      this.$store.commit("bankAccount/SET_BANK_ACCOUNTS", this.fetchedData);
+    }    
+    else{
+      this.fetchedData = this.bankAccounts;
+    }
   },
   computed: {
     title() {
