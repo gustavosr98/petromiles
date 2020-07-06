@@ -36,7 +36,17 @@
         </v-chip>
       </template>
       <template #item.bankAccountState="{item}">
-        <v-chip outlined class="overline" :color="getColor(item.bankAccountState.name)" label dark>
+        <v-tooltip bottom v-if="isAdmin">
+          <template v-slot:activator="{ on, attrs }">
+            <v-chip outlined class="overline" :color="getColor(item.bankAccountState.name)" label dark @click="changeBankAccountState(item)" v-bind="attrs" v-on="on">
+              {{
+              item.bankAccountState.translated
+              }}
+            </v-chip>
+          </template>
+          <span>Click to Change State</span>
+        </v-tooltip>
+        <v-chip v-else outlined class="overline" :color="getColor(item.bankAccountState.name)" label dark>
           {{
           item.bankAccountState.translated
           }}
@@ -166,6 +176,9 @@ export default {
         this.text = "You cannot block yourself.";
         this.showSnackbar = true;
       }   
+    },
+    changeBankAccountState(item){      
+      this.$emit('updateBankAccountState', item);
     },
     closeSnackbar(){
       this.showSnackbar = false;

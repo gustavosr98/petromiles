@@ -6,6 +6,7 @@
         :headers="headers"
         :fetchedData="mungedData"
         @deleteItem="deleteItem"
+        @updateBankAccountState="updateBankAccountState"
         tableName="bank-accounts"
         :isAdmin="isAdmin"
         :clientID="clientID"
@@ -16,6 +17,7 @@
 
 <script>
 import Datatable from "@/components/General/Datatable/Datatable";
+import { states } from "@/constants/state";
 
 export default {
   name: "bank-accounts-table",
@@ -111,6 +113,25 @@ export default {
 
       this.fetchedData.splice(this.fetchedData.indexOf(bankAccount), 1);
     },
+    async updateBankAccountState(item){
+      let state = "";
+      let stateTranslated = "";
+      if(item.bankAccountState.name === states.ACTIVE.name){ 
+        state = states.BLOCKED.name;
+        stateTranslated = states.BLOCKED.name;        
+      }
+      else{
+        state = states.ACTIVE.name;
+        stateTranslated = states.ACTIVE.name;        
+      }
+      await this.$http.put(`bank-account/state`, {
+        idUserClient: item.clientBankAccount[0].userClient.idUserClient,
+        idBankAccount: item.idBankAccount,
+        state: state,          
+      });
+      item.bankAccountState.name = state;
+      item.bankAccountState.translated = stateTranslated;    
+    }
   },
 };
 </script>
