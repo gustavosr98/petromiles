@@ -46,8 +46,10 @@
 import store from "@/store/index";
 import NoFederatedButton from "@/components/Auth/NoFederatedButton";
 import recoverMixin from "@/mixins/validation-forms/recover.mixin.js";
+import authConstants from "@/constants/authConstants";
 
 import clientRoutes from "@/router/clientRoutes";
+import adminRoutes from "@/router/adminRoutes";
 
 export default {
   mixins: [recoverMixin],
@@ -77,7 +79,11 @@ export default {
           role: this.role,
         })
         .then(res => {
-          this.$router.push("/");
+          if (this.role === authConstants.ADMINISTRATOR) {
+            this.$router.push(adminRoutes.LOGIN.path);
+          } else {
+            this.$router.push(clientRoutes.LOGIN.path);
+          }
         })
         .finally(() => {
           this.loading = false;

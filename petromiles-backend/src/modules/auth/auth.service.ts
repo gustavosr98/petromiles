@@ -68,7 +68,6 @@ export class AuthService {
   async createUserAdministrator(
     user: CreateUserDTO,
   ): Promise<App.Auth.ResponseAdministrator> {
-
     const passwordAdmin = generator.generate({
       length: 10,
       numbers: true,
@@ -76,7 +75,7 @@ export class AuthService {
 
     user.salt = await bcrypt.genSalt();
 
-    user.password = await bcrypt.hash(passwordAdmin, user.salt)
+    user.password = await bcrypt.hash(passwordAdmin, user.salt);
 
     const createdUser = await this.userAdministratorService.create(user);
 
@@ -127,7 +126,7 @@ export class AuthService {
         throw new UnauthorizedException('error-messages.loginIncorrect');
       }
     }
-    
+
     this.logger.error(
       `[${ApiModules.AUTH}] {${email}} The user was not found or user is not active`,
     );
@@ -181,10 +180,17 @@ export class AuthService {
       });
       const salt = await bcrypt.genSalt();
 
-      await this.userClientService.updatePasswordWithoutCurrent(user, {
-        password: await bcrypt.hash(password, salt),
-        salt: salt,
-      });
+      if (credentials.role === Role.ADMINISTRATOR) {
+        await this.userAdministratorService.updatePasswordWithoutCurrent(user, {
+          password: await bcrypt.hash(password, salt),
+          salt: salt,
+        });
+      } else {
+        await this.userClientService.updatePasswordWithoutCurrent(user, {
+          password: await bcrypt.hash(password, salt),
+          salt: salt,
+        });
+      }
 
       const languageMails = userDetails.language.name;
       const template = `recover[${languageMails}]`;

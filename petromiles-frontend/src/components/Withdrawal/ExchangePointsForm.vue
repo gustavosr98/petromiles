@@ -232,7 +232,6 @@ export default {
           amountToCharge: (this.costWithInterests * 100).toFixed(0),
         })
         .then(res => {
-          console.log(res);
           this.transaction = res;
           this.paymentIsReady = true;
         })

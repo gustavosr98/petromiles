@@ -99,6 +99,17 @@ const adminRoutesRaw = Object.freeze({
       requiresAdminAuth: true,
     },
   },
+  CREATE_ADMIN: {
+    path: "/admin/create-admin",
+    name: "CreateAdmin",
+    component: () =>
+      import(
+        /* webpackChunkName: "create-admin" */ "@/views/Admin/CreateAdmin/CreateAdmin.view"
+      ),
+    meta: {
+      requiresAdminAuth: true,
+    },
+  },
 });
 
 // To be used in Vue Router

@@ -47,6 +47,11 @@ export default {
           mdiIcon: "how_to_reg",
           route: adminRoutes.PARTNERS_INFO,
         },
+        {
+          name: "navbar.createAdmin",
+          mdiIcon: "add_circle",
+          route: adminRoutes.CREATE_ADMIN,
+        },
       ],
     };
   },

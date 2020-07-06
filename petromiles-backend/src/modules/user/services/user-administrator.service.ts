@@ -1,9 +1,5 @@
 import { ApiModules } from '@/logger/api-modules.enum';
-import {
-  Injectable,
-  Inject,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -27,7 +23,6 @@ import { Language as LanguageEnum } from '@/enums/language.enum';
 import { CreateUserDTO } from '@/modules/user/dto/create-user.dto';
 import { Role } from '@/enums/role.enum';
 import { UserInfo } from '@/interfaces/user/user-info.interface';
-
 
 @Injectable()
 export class UserAdministratorService {
@@ -69,18 +64,23 @@ export class UserAdministratorService {
     }
     const userAdministrator = await this.userAdministratorRepository.save(user);
 
-    const userAdministratorDetails = await this.completeRegistration(userAdministrator, {
-      firstName,
-      lastName,
-      middleName,
-      secondLastName,
-      birthdate,
-      address,
-      phone,
-      photo,
-      language: await this.managementService.getLanguage(LanguageEnum.ENGLISH),
+    const userAdministratorDetails = await this.completeRegistration(
       userAdministrator,
-    });
+      {
+        firstName,
+        lastName,
+        middleName,
+        secondLastName,
+        birthdate,
+        address,
+        phone,
+        photo,
+        language: await this.managementService.getLanguage(
+          LanguageEnum.ENGLISH,
+        ),
+        userAdministrator,
+      },
+    );
 
     this.logger.silly(
       `[${ApiModules.USER}] Administrator with ID: ${userAdministrator.idUserAdministrator} was successfully registered`,
@@ -116,7 +116,9 @@ export class UserAdministratorService {
   }
 
   async createDetails(userAdministratorDetails): Promise<UserDetails> {
-    const result = await this.userDetailsRepository.save(userAdministratorDetails);
+    const result = await this.userDetailsRepository.save(
+      userAdministratorDetails,
+    );
     result.userAdministrator = null;
     return result;
   }
@@ -130,7 +132,7 @@ export class UserAdministratorService {
     await this.createState(userAdministrator, StateName.ACTIVE, null);
 
     await this.createRole(userAdministrator);
-    
+
     return {
       userAdmin: userAdministrator,
       userDetails,
@@ -161,7 +163,9 @@ export class UserAdministratorService {
   }): Promise<UserAdministrator> {
     const { email, idUserAdministrator } = credentials;
     if (idUserAdministrator)
-      return await this.userAdministratorRepository.findOne({ idUserAdministrator });
+      return await this.userAdministratorRepository.findOne({
+        idUserAdministrator,
+      });
     return await this.userAdministratorRepository.findOne({ email });
   }
 
@@ -185,5 +189,22 @@ export class UserAdministratorService {
       id: userAdministrator.idUserAdministrator,
       federated: false,
     };
+  }
+
+  async updatePasswordWithoutCurrent(user, credentials) {
+    const { password, salt } = credentials;
+    const userAdmin = await this.get({ idUserAdministrator: user.id });
+
+    await this.userAdministratorRepository
+      .createQueryBuilder()
+      .update(UserAdministrator)
+      .set({ password, salt })
+      .where('idUserAdministrator = :id', { id: userAdmin.idUserAdministrator })
+      .execute();
+
+    this.logger.silly(
+      `[${ApiModules.USER}] {${user.email}} Password successfully updated`,
+    );
+    return userAdmin;
   }
 }
