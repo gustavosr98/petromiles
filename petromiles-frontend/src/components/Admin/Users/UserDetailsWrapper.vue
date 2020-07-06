@@ -25,7 +25,7 @@
             <user-detail :userDetails="userData" :isAdmin="true" />  
           </v-window>
           <v-window>
-            <bank-account-table :bankAccounts="userBankAccounts" :isAdmin="true" />
+            <bank-account-table :bankAccounts="userBankAccounts" :isAdmin="true" :clientID="user.idUserClient"/>
           </v-window>
         </v-card>
       </v-col>
@@ -68,10 +68,7 @@ export default {
     this.membership = await this.$http.get(`suscription/actual?id=${this.user.idUserClient}`);
     this.userBankAccounts = await this.$http.get(`bank-account?id=${this.user.idUserClient}`);
     const userInformation = await this.$http.get(`user/${this.user.idUserClient}/CLIENT`);
-    const transactions = await this.$http.get(`transaction?id=${this.user.idUserClient}`);
-    //console.log("cuentas bancarias: ", bankAccounts);
-    //console.log("datos usuario: ", userInformation);
-    //console.log("transacciones: ", transactions);
+    const transactions = await this.$http.get(`transaction?id=${this.user.idUserClient}`);  
     const { userDetails, ...basicInformation} = userInformation;
     this.userData = {
       details: userDetails,

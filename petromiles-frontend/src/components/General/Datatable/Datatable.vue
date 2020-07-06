@@ -68,6 +68,7 @@
           v-if="elementDetails === this.table.BANK_ACCOUNTS"
           @deleteItem="deleteItem"
           :isAdmin="isAdmin"
+          :clientID="clientID"
         />
       </v-dialog>
     </v-row>
@@ -114,6 +115,9 @@ export default {
     },
     isAdmin: {
       default: false
+    },
+    clientID: {
+      default: 0
     }
   },
   data() {

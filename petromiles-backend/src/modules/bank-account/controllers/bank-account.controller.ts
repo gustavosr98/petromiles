@@ -16,11 +16,14 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { GetUser } from '@/modules/auth/decorators/get-user.decorator';
+import {UserClient} from "@/entities/user-client.entity";
 
 // INTERFACES
 import { Role } from '@/enums/role.enum';
@@ -35,6 +38,7 @@ import { ClientBankAccountService } from '../services/client-bank-account.servic
 import { BankAccountService } from '../services/bank-account.service';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 
+
 const baseEndpoint = Object.freeze('bank-account');
 
 @UseGuards(AuthGuard('jwt'))
@@ -43,6 +47,8 @@ const baseEndpoint = Object.freeze('bank-account');
 export class BankAccountController {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectRepository(UserClient)
+    private readonly userClientRepository: Repository<UserClient>,
     private clientBankAccountService: ClientBankAccountService,
     private bankAccountService: BankAccountService,
   ) {}
@@ -111,6 +117,27 @@ export class BankAccountController {
       id,
       idBankAccount,
       email,
+    );
+  }
+
+  @Roles(Role.ADMINISTRATOR)
+  @UseGuards(RolesGuard)
+  @Delete('cancel')
+  async adminCancelBankAccount(
+      @Query('id') idBankAccount: number,
+      @Query('userId') idUserClient: number,
+  ) {
+    const email = this.userClientRepository.findOne(idUserClient);
+    console.log(email)
+    this.logger.http(
+        `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.PUT}) ${email} asks /${baseEndpoint}/cancel/${idBankAccount}&${idUserClient}`,
+    );
+    const id = idBankAccount ? idBankAccount : idBankAccount;
+    const idUser = idUserClient ? idUserClient : idUserClient;
+    return await this.clientBankAccountService.cancelBankAccount(
+        idUser,
+        id,
+        email,
     );
   }
 

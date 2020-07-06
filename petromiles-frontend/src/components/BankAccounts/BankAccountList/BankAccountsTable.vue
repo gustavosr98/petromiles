@@ -8,6 +8,7 @@
         @deleteItem="deleteItem"
         tableName="bank-accounts"
         :isAdmin="isAdmin"
+        :clientID="clientID"
       ></datatable>
     </v-col>
   </v-row>
@@ -24,6 +25,9 @@ export default {
     },  
     bankAccounts: {
       default: null
+    },
+    clientID: {
+      default: 0
     }
   },
   components: {

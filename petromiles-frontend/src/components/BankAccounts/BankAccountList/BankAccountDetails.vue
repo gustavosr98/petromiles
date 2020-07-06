@@ -49,7 +49,7 @@
             <v-icon small right>mdi-coins</v-icon>
           </v-btn>
 
-          <v-btn class="btn-width" @click="showAreYouSureModal=true" color="red" small outlined v-if="!isAdmin">
+          <v-btn class="btn-width" @click="showAreYouSureModal=true" color="red" small outlined>
             {{$t('bank-account-details.deleteAccount')}}
             <v-icon small right>mdi-delete</v-icon>
           </v-btn>
@@ -75,7 +75,8 @@ export default {
   mixins: [getColor],
   props: {
     idBankAccount: { type: Number, required: true },
-    isAdmin: { default: false }
+    isAdmin: { default: false },
+    clientID: { default: 0 }
   },
   components: {
     property: BankAccountProperty,
@@ -101,11 +102,18 @@ export default {
     },
     setPrimary() {
       this.primary = this.bankAccount.primary;
-    },
+    },    
     async deleteAccount() {
       this.loading = true;
-      await this.$http
-        .delete(`/bank-account/cancel/${this.idBankAccount}`)
+      let apiCall = "";      
+      if(this.isAdmin){
+        apiCall = `/bank-account/cancel?id=${this.idBankAccount}&userId=${this.clientID}`;
+      }      
+      else{
+        apiCall = `/bank-account/cancel/${this.idBankAccount}`
+      }
+      await this.$http        
+        .delete(apiCall)
         .then(() => {
           this.$emit("deleteItem", this.idBankAccount);
         })
