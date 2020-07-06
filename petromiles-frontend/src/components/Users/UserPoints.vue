@@ -1,44 +1,50 @@
 <template>
-    <div class="text-center">                    
-        <v-col cols="12">                
-            <h3>{{ $t("profile.PointsAvailable") }}</h3>                                                                                    
-            <h1 class="pointsText">{{points}}</h1>
-            <h3>{{ $t("profile.PointsInDollars") }}</h3>                                                                                    
-            <h1 class="dolarsText">${{conversion.dollars}}</h1>            
-        </v-col>        
-    </div>
+  <div class="text-center">
+    <v-col cols="12">
+      <h3>{{ $t("profile.PointsAvailable") }}</h3>
+      <h1 class="pointsText">{{conversion.points}}</h1>
+      <h3>{{ $t("profile.PointsInDollars") }}</h3>
+      <h1 class="dolarsText">${{dollars}}</h1>
+    </v-col>
+  </div>
 </template>
 
 <script>
 export default {
-    props: {
-      conversion: {
-        required: true
-      },
-      isAdmin: {
-        type: Boolean,
-        required: true,
-      }
+  props: {
+    conversion: {
+      required: true,
     },
-    data(){
-        return {
-            points: 0,
-        };
+    isAdmin: {
+      type: Boolean,
+      required: true,
     },
-    async mounted(){        
-        this.points = parseInt(this.conversion.points);
-    }
-}
+  },
+  data() {
+    return {
+      points: 0,
+      dollars: 0,
+    };
+  },
+  async mounted() {
+    const conversion = await this.$http.get("/payments/one-point-to-dollars");
+
+    this.dollars = (
+      this.conversion.points * conversion.onePointEqualsDollars
+    ).toFixed(2);
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-.pointsText{    
-    font-size: 30px;
-    color: blue;
-    margin-bottom: 5%;
+.pointsText {
+  font-size: 30px;
+  color: blue;
+  margin-bottom: 5%;
 }
-.dolarsText{
-    margin-bottom: 20%;
-    font-size: 30px;
-    color: green;
-}</style>
+.dolarsText {
+  margin-bottom: 20%;
+  font-size: 30px;
+  color: green;
+}
+</style>

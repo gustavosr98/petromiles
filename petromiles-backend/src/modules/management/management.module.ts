@@ -22,7 +22,7 @@ import { Bank } from '@/entities/bank.entity';
 import { Country } from '@/entities/country.entity';
 
 // CONTROLLER
-import { ManagementController } from './controllers/management.controller';
+import { ManagementController } from '@/modules/management/controllers/management.controller';
 
 @Module({
   imports: [

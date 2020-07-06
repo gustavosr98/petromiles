@@ -11,7 +11,7 @@ import { RoleSeederModule } from './role/role.module';
 import { CountrySeederModule } from './country/country.module';
 import { LanguageSeederModule } from './language/language.module';
 import { SuscriptionSeederModule } from './suscription/suscription.module';
-import { PlatformInterestSeederModule } from './platform_interest/platform_interest.module';
+import { PlatformInterestSeederModule } from './platform-interest/platform-interest.module';
 import { ThirdPartyInterestSeederModule } from './third_party_interest/third_party_interest.module';
 import { PointsConversionSeederModule } from './points_conversion/points_conversion.module';
 import { BankSeederModule } from './bank/bank.module';

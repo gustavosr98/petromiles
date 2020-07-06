@@ -46,14 +46,14 @@ const adminRoutesRaw = Object.freeze({
   USER_DETAILS: {
     path: "/admin/users/detail",
     name: "AdminUsersDetail",
-    component: () => 
+    component: () =>
       import(
         /* webpackChunkName: "admin-user-list" */ "@/views/Admin/Users/ClientDetails.view"
       ),
     meta: {
-      requiresAdminAuth: true
+      requiresAdminAuth: true,
     },
-    props: true
+    props: true,
   },
   PLATFORM_CONFIG: {
     path: "/admin/platform-config",
@@ -83,6 +83,17 @@ const adminRoutesRaw = Object.freeze({
     component: () =>
       import(
         /* webpackChunkName: "admin-transaction-list" */ "@/views/Admin/Transactions/AdminTransactionList.view"
+      ),
+    meta: {
+      requiresAdminAuth: true,
+    },
+  },
+  PARTNERS_INFO: {
+    path: "/admin/partners",
+    name: "PartnersInfo",
+    component: () =>
+      import(
+        /* webpackChunkName: "partners-info" */ "@/views/Admin/ThirdPartyClients/PartnersInfo.view"
       ),
     meta: {
       requiresAdminAuth: true,

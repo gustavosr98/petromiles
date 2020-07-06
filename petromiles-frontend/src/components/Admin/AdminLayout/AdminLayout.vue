@@ -42,6 +42,11 @@ export default {
           mdiIcon: "mdi-settings",
           route: adminRoutes.PLATFORM_CONFIG,
         },
+        {
+          name: "navbar.partners",
+          mdiIcon: "how_to_reg",
+          route: adminRoutes.PARTNERS_INFO,
+        },
       ],
     };
   },

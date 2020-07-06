@@ -1,90 +1,176 @@
 <template>
   <div>
-    <v-row align="center">
-      <v-col cols="4" align="center">
-        <v-overflow-btn
-          :items="interestName"
-          v-model="itemSelected"
-          :label="$t('configuration.selectAnInterest')"
-        ></v-overflow-btn>
-      </v-col>
-      <v-col cols="4" class="mt-0" align="center" v-if="item.amount">
-        <v-text-field
-          :value="item.amount"
-          v-model="amount"
-          :label="` ${$tc('common.amount',1)} ($)`"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="4" class="mt-0" align="center" v-if="item.percentage">
-        <v-text-field
-          :value="item.percentage"
-          v-model="percentage"
-          :label="`${$t('configuration.percentage')} (%)`"
-          v-if="item.percentage"
-        ></v-text-field>
+    <v-row>
+      <v-col cols="12" align="center">
+        <v-select
+          v-model="selectedInterest"
+          item-text="type"
+          item-value="type"
+          :items="interests"
+          :label="$t(`configuration.selectAnInterest`)"
+        ></v-select>
       </v-col>
     </v-row>
-    <v-row v-if="itemSelected">
-      <v-col cols="3">
-        <v-btn color="secondary" class="ma-2 white--text" @click="updateInterest">
-          {{$t("configuration.update")}}
-          <v-icon class="ml-3" x-small right dark>mdi-pencil</v-icon>
-        </v-btn>
+    <v-row v-if="selectedInterest">
+      <v-col cols="12" md="6" align="center" class="mt-3" width="100%">
+        <v-expand-transition>
+          <v-alert color="primary" class="white--text d-flex align-center" height="90%">
+            <h3
+              class="subtitle-1 font-weight-bold font-italic text-capitalize"
+            >{{ interestData.type }}</h3>
+            <div
+              class="font-weight-light text-justify"
+            >{{ $t(`interests.${interestData.description}`) }}</div>
+          </v-alert>
+        </v-expand-transition>
+      </v-col>
+      <v-col cols="12" md="6" align="center">
+        <v-row align="center">
+          <v-col cols="12" class="mt-0 pb-0" align="center" v-if="interestData.amount !==null">
+            <v-text-field
+              :value="amount"
+              type="number"
+              v-model="amount"
+              :label="labels[0]"
+              @change="$v.interestData.amount.$touch()"
+              @blur="$v.interestData.amount.$touch()"
+              :error-messages="amountErrors"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" class="mt-0 pb-0" align="center" v-if="interestData.points !==null">
+            <v-text-field
+              :value="interestData.points"
+              type="number"
+              v-model="interestData.points"
+              :label="labels[0]"
+              @change="$v.interestData.points.$touch()"
+              @blur="$v.interestData.points.$touch()"
+              :error-messages="pointsErrors"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" class="mt-0 py-0" align="center" v-if="interestData.percentage !==null">
+            <v-text-field
+              :value="interestData.percentage"
+              v-model="interestData.percentage"
+              :label="labels[1]"
+              @change="$v.interestData.percentage.$touch()"
+              @blur="$v.interestData.percentage.$touch()"
+              :error-messages="percentageErrors"
+              type="number"
+            ></v-text-field>
+          </v-col>
+          <update-btn @update="update" :loading="loading" />
+        </v-row>
       </v-col>
     </v-row>
-    <configuration-modal @closeModal="closeModal" :dialog="dialog" />
+    <configuration-modal @closeModal="closeModal" :dialog="dialog" :message="modalMessage" />
   </div>
 </template>
-
 <script>
 import ConfigurationModal from "@/components/General/Modals/ConfigurationModal/ConfigurationModal.vue";
+import PlatformConfigMixin from "@/mixins/validation-forms/platform-config.mixin";
+import UpdateBtn from "@/components/Admin/PlatformConfiguration/UpdateBtn";
+
 export default {
+  mixins: [PlatformConfigMixin],
   components: {
     "configuration-modal": ConfigurationModal,
+    "update-btn": UpdateBtn,
   },
   props: {
-    platformInterests: { type: Array },
+    platformInterest: { type: Array, required: true },
+    labels: { type: Array },
+    pointsConversion: { type: Number },
   },
   data() {
     return {
-      itemSelected: null,
-      percentage: null,
-      amount: null,
-      item: {},
+      selectedInterest: null,
+      interests: [],
+      amount: 0,
       dialog: false,
+      message: "",
+      loading: false,
     };
   },
-
+  mounted() {
+    this.interests = this.getInterest();
+    this.selectedInterest = this.interests[0].type;
+  },
   computed: {
-    interestName: function() {
-      return this.platformInterests.map(interest => interest.name);
+    modalMessage: function() {
+      return this.message;
     },
   },
-
   watch: {
-    itemSelected: function() {
-      this.item = this.platformInterests.find(
-        interest => interest.name === this.itemSelected
+    selectedInterest: function() {
+      this.interestData = this.interests.find(
+        interest => interest.type == this.selectedInterest
       );
-      this.percentage = this.item.percentage;
-      this.amount = this.item.amount;
+      this.amount = this.interestData.amount;
+    },
+    amount: function() {
+      this.interestData.amount = this.amount;
     },
   },
   methods: {
-    updateInterest() {
-      this.$http.put(
-        `management/platform-interest/${this.item.idPlatformInterest}`,
-        {
-          name: this.item.name,
-          amount: this.amount ? this.amount * 100 : null,
-          percentage: this.percentage ? this.percentage / 100 : null,
-        }
-      );
+    getInterest: function() {
+      const newData = [];
+      this.platformInterest.forEach(d => {
+        newData.push({
+          id: d.idPlatformInterest,
+          name: d.name,
+          type: this.$t(`interest.${d.name.toLowerCase()}Config`),
+          amount: d.amount && d.percentage ? null : d.amount,
+          percentage: d.percentage,
+          points:
+            d.amount && d.percentage
+              ? (d.amount / this.pointsConversion).toFixed(0)
+              : null,
+          description: d.description,
+          suscription: d.suscription,
+        });
+      });
+      return newData;
+    },
+    async update() {
+      this.$v.$touch();
+      if (!this.$v.$invalid) {
+        this.loading = true;
+        await this.$http
+          .put(
+            `management/platform-interest/${this.interestData.id}`,
+            this.calculateInterests()
+          )
+          .then(res => {
+            this.interestData.id = res.idPlatformInterest;
+            this.updateInterestList();
+            this.message = this.$t("configuration.changeMadeSuccessfully");
+            this.dialog = true;
+          })
+          .finally(() => (this.loading = false));
+      }
+    },
+    calculateInterests() {
+      let { id, amount, points, percentage, type, ...item } = this.interestData;
+      if (points) amount = points * this.pointsConversion;
 
-      this.dialog = true;
+      return {
+        amount: amount ? (amount * 100).toFixed(2) : null,
+        percentage: percentage ? (percentage / 100).toFixed(4) : null,
+        ...item,
+      };
     },
     closeModal() {
       this.dialog = false;
+    },
+    updateInterestList() {
+      this.interests.map(i => {
+        if (i.name == this.interestData.name) {
+          i.percentage = this.interestData.percentage;
+          i.amount = this.interestData.amount;
+        }
+        return i;
+      });
     },
   },
 };

@@ -1,7 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository, getConnection } from 'typeorm';
+import { Repository, getConnection, UpdateResult, In } from 'typeorm';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 // ENTITIES
 import { Language } from '@/entities/language.entity';
@@ -18,6 +20,7 @@ import { Bank } from '@/entities/bank.entity';
 import { StateName } from '@/enums/state.enum';
 import { Role as RoleEnum } from '@/enums/role.enum';
 import { UpdateSubscriptionDTO } from '@/modules/suscription/dto/update-subscription.dto';
+import { ApiModules } from '@/logger/api-modules.enum';
 
 @Injectable()
 export class ManagementService {
@@ -38,6 +41,7 @@ export class ManagementService {
     private stateUserRepository: Repository<StateUser>,
     @InjectRepository(Bank)
     private bankRepository: Repository<Bank>,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   async getLanguages(): Promise<Language[]> {
@@ -67,13 +71,25 @@ export class ManagementService {
   async updateSubscriptionConditions(
     idSuscription: number,
     updateSubscriptionDTO: UpdateSubscriptionDTO,
-  ) {
-    return await getConnection()
+  ): Promise<UpdateResult> {
+    const result = await getConnection()
       .createQueryBuilder()
       .update(Suscription)
       .set({ ...updateSubscriptionDTO })
       .where('idSuscription = :idSuscription', { idSuscription })
       .execute();
+
+    let log;
+    const amount = updateSubscriptionDTO.cost
+      ? updateSubscriptionDTO.cost / 100
+      : updateSubscriptionDTO.upgradedAmount / 100;
+    if (updateSubscriptionDTO.cost) log = `New cost: [${amount} $]`;
+    else log = `New upgraded amount: [${amount} $]`;
+
+    this.logger.warn(
+      `[${ApiModules.MANAGEMENT}] Subscription: ID = ${idSuscription}  updated | ${log}`,
+    );
+    return result;
   }
 
   async updateUserState(

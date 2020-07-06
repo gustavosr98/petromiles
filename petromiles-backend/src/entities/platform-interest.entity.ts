@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Suscription } from './suscription.entity';
 import { TransactionInterest } from './transaction-interest.entity';
-import { PlatformInterest as PlatformInterestType} from "@/enums/platform-interest.enum";
+import { PlatformInterest as PlatformInterestType } from '@/enums/platform-interest.enum';
 
 @Entity()
 export class PlatformInterest extends BaseEntity {
@@ -20,19 +20,30 @@ export class PlatformInterest extends BaseEntity {
   @Column()
   name: string;
 
-  @Transform(amount => amount / 100)
-  @Column({ nullable: true })
-  amount: string;
+  @Transform(amount => {
+    if (amount) return (amount / 100).toFixed(2);
 
-  @Transform(percentage => percentage * 100)
+    return amount;
+  })
   @Column({ nullable: true })
-  percentage: string;
+  amount?: string;
+
+  @Transform(percentage => {
+    if (percentage) return (percentage * 100).toFixed(2);
+
+    return percentage;
+  })
+  @Column({ nullable: true })
+  percentage?: string;
 
   @Column({ default: () => 'CURRENT_DATE' })
   initialDate: Date;
 
   @Column({ nullable: true })
-  finalDate: Date;
+  finalDate?: Date;
+
+  @Column({ nullable: true })
+  description?: string;
 
   @ManyToOne(
     type => Suscription,
@@ -40,14 +51,14 @@ export class PlatformInterest extends BaseEntity {
     { nullable: true, eager: true },
   )
   @JoinColumn({ name: 'fk_suscription' })
-  suscription: Suscription;
+  suscription?: Suscription;
 
   @OneToMany(
     type => TransactionInterest,
     transactionInterest => transactionInterest.platformInterest,
     { nullable: true },
   )
-  transactionInterest: TransactionInterest[];
+  transactionInterest?: TransactionInterest[];
 
   @OneToMany(
     type => TransactionInterest,
@@ -55,9 +66,9 @@ export class PlatformInterest extends BaseEntity {
       transactionInterestExtraPoints.platformInterest,
     { nullable: true },
   )
-  transactionInterestExtraPoints: TransactionInterest[];
+  transactionInterestExtraPoints?: TransactionInterest[];
 
-  isGold(){
+  isGold() {
     return this.name === PlatformInterestType.GOLD_EXTRA;
   }
 }

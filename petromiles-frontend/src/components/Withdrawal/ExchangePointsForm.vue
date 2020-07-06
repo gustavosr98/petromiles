@@ -6,21 +6,12 @@
         <v-row justify="center" align="center">
           <!-- Phrase -->
           <v-col cols="12">
-            <h3 class="text-center">
-              {{ $t("exchange-points-form.letsEarnDollars") }}
-            </h3>
+            <h3 class="text-center">{{ $t("exchange-points-form.letsEarnDollars") }}</h3>
           </v-col>
 
           <!-- Image -->
 
-          <v-col
-            xs="10"
-            sm="10"
-            md="4"
-            justify="center"
-            align="center"
-            class="pt-lg-12"
-          >
+          <v-col xs="10" sm="10" md="4" justify="center" align="center" class="pt-lg-12">
             <v-img :src="makeItRainImage" alt="Change points for money" />
           </v-col>
 
@@ -90,8 +81,7 @@
                       class="primary"
                       :loading="loading"
                       dark
-                      >{{ $t("exchange-points-form.getDollars") }}</v-btn
-                    >
+                    >{{ $t("exchange-points-form.getDollars") }}</v-btn>
                   </v-col>
                 </v-row>
               </v-form>
@@ -103,17 +93,23 @@
         <v-row justify="center">
           <v-dialog v-model="dialog" persistent max-width="50%">
             <v-card>
-              <v-card-title class="headline">{{
+              <v-card-title class="headline">
+                {{
                 $t("exchange-points-form.successfulWithdrawal")
-              }}</v-card-title>
-              <v-card-text>{{
+                }}
+              </v-card-title>
+              <v-card-text>
+                {{
                 $t("exchange-points-form.withdrawalToValidate")
-              }}</v-card-text>
+                }}
+              </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">{{
+                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">
+                  {{
                   $t("common.ok")
-                }}</v-btn>
+                  }}
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -123,17 +119,23 @@
         <v-row justify="center">
           <v-dialog v-model="areYouSureDialog" persistent max-width="50%">
             <v-card>
-              <v-card-title class="headline">{{
+              <v-card-title class="headline">
+                {{
                 $t("common.areYouSure")
-              }}</v-card-title>
+                }}
+              </v-card-title>
               <v-card-actions>
                 <v-spacer />
-                <v-btn color="error" dark @click="areYouSureDialog = false">{{
+                <v-btn color="error" dark @click="areYouSureDialog = false">
+                  {{
                   $t("common.cancel")
-                }}</v-btn>
-                <v-btn color="success" dark @click="exchangePoints">{{
+                  }}
+                </v-btn>
+                <v-btn color="success" dark @click="exchangePoints">
+                  {{
                   $t("common.yes")
-                }}</v-btn>
+                  }}
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -250,7 +252,7 @@ export default {
     },
     async loadInterests() {
       this.interests = await this.$http.get(
-        "/payments/interests/withdrawal/Withdrawal"
+        "/payments/interests/withdrawal/withdrawal"
       );
     },
     pdfWasCreated() {

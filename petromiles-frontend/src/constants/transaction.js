@@ -3,5 +3,5 @@ export default Object.freeze({
   SUBSCRIPTION_PAYMENT: "subscriptionPayment",
   DEPOSIT: "deposit",
   WITHDRAWAL: "withdrawal",
-  THIRD_PARTY_CLIENT: 'thirdPartyClient',
+  THIRD_PARTY_CLIENT: "thirdPartyClient",
 });

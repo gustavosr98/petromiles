@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" persistent max-width="400">
     <v-card>
-      <v-card-title class="title">{{$t("configuration.changeMadeSuccessfully")}}</v-card-title>
+      <v-card-title class="title">{{message}}</v-card-title>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -15,6 +15,7 @@
 export default {
   props: {
     dialog: { required: true, type: Boolean },
+    message: { required: true, type: String },
   },
   methods: {
     closeModal() {

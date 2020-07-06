@@ -28,7 +28,7 @@ declare namespace App {
 
     interface ResponseAdministrator {
       email: string;
-      password: string; 
+      password: string;
       userDetails: object;
       role: import('../src/enums/role.enum').Role;
       id: number;
@@ -42,9 +42,9 @@ declare namespace App {
       currency: string;
       accountNumber_last4: string;
       metadata: object;
-      status: string;       
+      status: string;
     }
-    
+
     interface LoginRequest {
       email: string;
       password?: string;
@@ -79,6 +79,7 @@ declare namespace App {
       platformInterestType: import('../src/enums/platform-interest.enum').PlatformInterest;
       platformInterestExtraPointsType: import('../src/enums/platform-interest.enum').PlatformInterest;
       thirdPartyInterestType: import('../src/enums/payment-provider.enum').PaymentProvider;
+      type: import('../src/enums/transaction.enum').TransactionType;
     }
 
     interface TransactionDetails {

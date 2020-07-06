@@ -18,8 +18,8 @@ import { SuscriptionController } from '@/modules/suscription/controller/suscript
 // Entities
 import { Suscription } from '@/entities/suscription.entity';
 import { UserClient } from '@/entities/user-client.entity';
-import {PlatformInterest} from "@/entities/platform-interest.entity";
-import {StateTransaction} from "@/entities/state-transaction.entity";
+import { PlatformInterest } from '@/entities/platform-interest.entity';
+import { StateTransaction } from '@/entities/state-transaction.entity';
 
 @Module({
   imports: [
@@ -29,7 +29,12 @@ import {StateTransaction} from "@/entities/state-transaction.entity";
     MailsModule,
     ManagementModule,
     PaymentProviderModule,
-    TypeOrmModule.forFeature([Suscription, UserClient, PlatformInterest, StateTransaction]),
+    TypeOrmModule.forFeature([
+      Suscription,
+      UserClient,
+      PlatformInterest,
+      StateTransaction,
+    ]),
   ],
   providers: [SuscriptionService],
   exports: [SuscriptionService],

@@ -11,10 +11,13 @@ import {
   Inject,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { UpdateResult } from 'typeorm';
+
 import { GetUser } from '@/modules/auth/decorators/get-user.decorator';
-import { AuthGuard } from '@nestjs/passport';
 
 // SERVICES
 import { ManagementService } from '@/modules/management/services/management.service';
@@ -27,12 +30,21 @@ import { UpdateSubscriptionDTO } from '@/modules/suscription/dto/update-subscrip
 import { CreatePlatformInterestDTO } from '@/modules/management/dto/create-platform-interest.dto';
 import { CreateThirdPartyInterestDTO } from '@/modules/management/dto/create-third-party-interest.dto';
 import { UpdateUserStateDTO } from '@/modules/management/dto/update-user-state.dto';
+import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
+import { ApiModules } from '@/logger/api-modules.enum';
+import { HttpRequest } from '@/logger/http-requests.enum';
+import { PlatformInterestType } from '@/enums/platform-interest-type.enum';
 
 // ENTITIES
 import { ThirdPartyInterest } from '@/entities/third-party-interest.entity';
-import { ApiModules } from '@/logger/api-modules.enum';
-import { HttpRequest } from '@/logger/http-requests.enum';
 import { StateUser } from '@/entities/state-user.entity';
+import { Language } from '@/entities/language.entity';
+import { Bank } from '@/entities/bank.entity';
+import { Country } from '@/entities/country.entity';
+import { PlatformInterest } from '@/entities/platform-interest.entity';
+import { PointsConversion } from '@/entities/points-conversion.entity';
+import { Task } from '@/entities/task.entity';
+import { UpdateCronDTO } from '@/modules/cron/dto/cron.dto';
 
 const baseEndpoint = 'management';
 @UseGuards(AuthGuard('jwt'))
@@ -48,27 +60,47 @@ export class ManagementController {
   ) {}
 
   @Get('languages')
-  getLanguages() {
+  getLanguages(@GetUser() user: AuthenticatedUser): Promise<Language[]> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.GET})  {${user.email}} asks /${baseEndpoint}/languages`,
+    );
     return this.managementService.getLanguages();
   }
 
   @Get('banks')
-  getBanks() {
+  getBanks(@GetUser() user: AuthenticatedUser): Promise<Bank[]> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.GET}) {${user.email}} asks  /${baseEndpoint}/banks`,
+    );
     return this.managementService.getBanks();
   }
 
   @Get('countries')
-  getCountries() {
+  getCountries(@GetUser() user: AuthenticatedUser): Promise<Country[]> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.GET})  {${user.email}} asks /${baseEndpoint}/countries`,
+    );
     return this.managementService.getCountries();
   }
 
-  @Get('platform-interest')
-  getPlatformInterests() {
-    return this.platformInterestService.getInterests();
+  @Get('platform-interest/:type')
+  getPlatformInterests(
+    @Param('type') type: PlatformInterestType,
+    @GetUser() user: AuthenticatedUser,
+  ): Promise<PlatformInterest[]> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.GET}) {${user.email}} asks  /${baseEndpoint}/platform-interest/${type}`,
+    );
+    return this.platformInterestService.getInterests(type);
   }
 
   @Get('third-party-interest')
-  getThirdPartyInterests(): Promise<ThirdPartyInterest[]> {
+  getThirdPartyInterests(
+    @GetUser() user: AuthenticatedUser,
+  ): Promise<ThirdPartyInterest[]> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.GET})   {${user.email}} asks  /${baseEndpoint}/third-party-interest`,
+    );
     return this.thirdPartyInterestService.getAll();
   }
 
@@ -76,18 +108,26 @@ export class ManagementController {
   updateSubscriptionConditions(
     @Param('id') idSubscription: number,
     @Body() updateSubscriptionDTO: UpdateSubscriptionDTO,
-  ) {
+    @GetUser() user: AuthenticatedUser,
+  ): Promise<UpdateResult> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.PUT})  {${user.email}} asks  /${baseEndpoint}/subscription/${idSubscription}`,
+    );
     return this.managementService.updateSubscriptionConditions(
       idSubscription,
       updateSubscriptionDTO,
     );
   }
 
-  @Post('platform-interest/:id')
+  @Put('platform-interest/:id')
   updatePlatformInterest(
     @Param('id') idPlatformInterest: number,
     @Body(ValidationPipe) createPlatformInterest: CreatePlatformInterestDTO,
-  ) {
+    @GetUser() user: AuthenticatedUser,
+  ): Promise<PlatformInterest> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.PUT})  {${user.email}} asks /${baseEndpoint}/platform-interest/${idPlatformInterest}`,
+    );
     return this.platformInterestService.update(
       idPlatformInterest,
       createPlatformInterest,
@@ -98,7 +138,11 @@ export class ManagementController {
   updatePointsConversion(
     @Param('id') idPointsConversion: number,
     @Body('onePointEqualsDollars') onePointEqualsDollars: number,
-  ) {
+    @GetUser() user: AuthenticatedUser,
+  ): Promise<PointsConversion> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.PUT})  {${user.email}}  asks /${baseEndpoint}/points-conversion`,
+    );
     return this.pointsConversionService.update(
       idPointsConversion,
       onePointEqualsDollars,
@@ -109,7 +153,11 @@ export class ManagementController {
   updateThirdPartyInterest(
     @Param('id') idthirdPartyInterest: number,
     @Body() createThirdPartyInterestDTO: CreateThirdPartyInterestDTO,
-  ) {
+    @GetUser() user: AuthenticatedUser,
+  ): Promise<ThirdPartyInterest> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.PUT}) ${user?.email} updating third-party-interest /${baseEndpoint}/third-party-interest/${idthirdPartyInterest}`,
+    );
     return this.thirdPartyInterestService.update(
       idthirdPartyInterest,
       createThirdPartyInterestDTO,
@@ -123,7 +171,7 @@ export class ManagementController {
     @GetUser() user,
   ): Promise<StateUser> {
     this.logger.http(
-      `[${ApiModules.MANAGEMENT}] (${HttpRequest.POST}) ${user?.email} changing state /${baseEndpoint}/state/${userId}`,
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.PUT}) ${user?.email} changing state /${baseEndpoint}/state/${userId}`,
     );
     return this.managementService.updateUserState(
       updateUserStateDTO.role,

@@ -15,14 +15,13 @@ export const SUSCRIPTIONS = [
     idSuscription: 2,
     name: Suscription.PREMIUM,
     cost: 2500,
-    description: 'User must to ask for this suscription',
+    description: 'premiumConditionals',
   },
   {
     idSuscription: 3,
     name: Suscription.GOLD,
     cost: 0,
     upgradedAmount: 15000,
-    description:
-      'This suscription is active when the user has spend an amount greater or equal to upgraded_amount',
+    description: 'goldConditionals',
   },
 ];

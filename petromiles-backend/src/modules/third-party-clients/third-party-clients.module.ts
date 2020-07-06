@@ -23,6 +23,7 @@ import { CsvService } from '@/modules/third-party-clients/services/csv.service';
 
 // PROVIDERS
 import { CsvToJsonProvider } from '@/modules/third-party-clients/providers/csv-to-json.provider';
+import { ThirdPartyAdministrationController } from './controllers/third-party-administration.controller';
 
 @Module({
   imports: [
@@ -39,7 +40,10 @@ import { CsvToJsonProvider } from '@/modules/third-party-clients/providers/csv-t
     TransactionModule,
     UserModule,
   ],
-  controllers: [ThirdPartyClientsController],
+  controllers: [
+    ThirdPartyClientsController,
+    ThirdPartyAdministrationController,
+  ],
   providers: [ThirdPartyClientsService, CsvToJsonProvider, CsvService],
 })
 export class ThirdPartyClientsModule {}

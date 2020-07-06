@@ -1,10 +1,8 @@
-import { TransactionType } from '../../enums/transaction.enum';
-import { PaymentProvider } from '../../enums/payment-provider.enum';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { SchedulerRegistry, Timeout, Interval } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 
-import { getConnection } from 'typeorm';
+import { getConnection, In, UpdateResult } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -28,10 +26,12 @@ import { Transaction } from '@/entities/transaction.entity';
 
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
-import { CronJobs } from './cron-jobs.enum';
 import { StateName, StateDescription } from '@/enums/state.enum';
 import { StripeBankAccountStatus } from '@/modules/payment-provider/stripe/bank-account-status.enum';
 import { StripeChargeStatus } from '@/modules/payment-provider/stripe/stripe-charge-status.enum';
+import { CronJobs } from '@/enums/cron-jobs.enum';
+import { TransactionType } from '@/enums/transaction.enum';
+import { PaymentProvider } from '@/enums/payment-provider.enum';
 
 @Injectable()
 export class CronService {
@@ -71,19 +71,30 @@ export class CronService {
   }
 
   // DATABASE
-  async getTasks() {
-    return await this.taskRepository.find();
+  async getTasks(): Promise<Task[]> {
+    return await this.taskRepository.find({
+      where: {
+        name: In([
+          CronJobs.TRANSACTION_CHARGE_STATUS_STRIPE,
+          CronJobs.TRANSACTION_TRANSFER_STATUS_STRIPE,
+        ]),
+      },
+    });
   }
 
   async getTask(jobName: CronJobs) {
     return await this.taskRepository.findOne({ name: jobName });
   }
 
-  async updateTask(jobName: CronJobs, jobFrequency: number) {
-    return await this.taskRepository.update(
+  async updateTask(
+    jobName: CronJobs,
+    jobFrequency: number,
+  ): Promise<UpdateResult> {
+    const result = await this.taskRepository.update(
       { name: jobName },
       { frequency: jobFrequency },
     );
+    return result;
   }
 
   // BUSINESS JOBS
@@ -274,5 +285,19 @@ export class CronService {
       `[${ApiModules.CRON}] ${jobName} to be excecuted every ${frequency /
         1000} seconds`,
     );
+  }
+
+  async updateJob(jobName: CronJobs, jobFrequency: number) {
+    if (jobName === CronJobs.TRANSACTION_CHARGE_STATUS_STRIPE) {
+      return await this.adjustJob(jobName, jobFrequency, async () => {
+        this.transactionChargeStatusStripe();
+      });
+    } else if (jobName === CronJobs.TRANSACTION_TRANSFER_STATUS_STRIPE) {
+      return await this.adjustJob(jobName, jobFrequency, async () => {
+        this.transactionTransferStatusStripe();
+      });
+    } else {
+      throw new BadRequestException('error-messages.unknowCronJob');
+    }
   }
 }

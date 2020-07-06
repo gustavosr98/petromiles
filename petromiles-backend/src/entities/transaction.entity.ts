@@ -130,7 +130,9 @@ export class Transaction extends BaseEntity {
       type: this.type,
       bankAccount,
       bankAccountNickname,
-      pointsConversion: 1 / this.pointsConversion.onePointEqualsDollars,
+      pointsConversion: (
+        1 / this.pointsConversion.onePointEqualsDollars
+      ).toFixed(0),
       ...details,
       state,
     };
@@ -160,7 +162,7 @@ export class Transaction extends BaseEntity {
     const bankAccountNickname = this.clientBankAccount
       ? this.clientBankAccount.bankAccount.nickname
       : null;
-    
+
     const clientBankAccountEmail = this.clientBankAccount
       ? this.clientBankAccount.userClient.email
       : null;
@@ -194,8 +196,8 @@ export class Transaction extends BaseEntity {
     const thirdPartyInterest =
       this.transactionInterest[0].thirdPartyInterest.amountDollarCents / 100;
     return {
-      amount: subscriptionCost - thirdPartyInterest,
-      interest: thirdPartyInterest,
+      amount: (subscriptionCost - thirdPartyInterest).toFixed(2),
+      interest: thirdPartyInterest.toFixed(2),
       total: subscriptionCost,
     };
   }

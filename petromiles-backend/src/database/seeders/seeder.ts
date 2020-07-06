@@ -7,7 +7,7 @@ import { RolesSeederService } from './role/role.service';
 import { CountrySeederService } from './country/country.service';
 import { LanguageSeederService } from './language/language.service';
 import { SuscriptionSeederService } from './suscription/suscription.service';
-import { PlatformInterestSeederService } from './platform_interest/platform_interest.service';
+import { PlatformInterestSeederService } from './platform-interest/platform-interest.service';
 import { ThirdPartyInterestSeederService } from './third_party_interest/third_party_interest.service';
 import { PointsConversionSeederService } from './points_conversion/points_conversion.service';
 import { BankSeederService } from './bank/bank.service';

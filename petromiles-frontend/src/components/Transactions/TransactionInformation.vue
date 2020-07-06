@@ -2,9 +2,11 @@
   <v-card>
     <v-subheader>
       <div class="title my-2 mx-2">
-        <span class="font-weight-bold">{{
+        <span class="font-weight-bold">
+          {{
           $tc("transaction.transaction", 0)
-        }}</span>
+          }}
+        </span>
         #{{ transaction.id }}
       </div>
     </v-subheader>
@@ -22,38 +24,34 @@
       <v-col cols="12" class="pt-0" justify="center">
         <v-list-item three-line>
           <v-list-item-content>
-            <v-list-item-title
-              v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT"
-            >
-              <span class="font-weight-medium"
-                >{{ $tc("navbar.bankAccount", 0) }}:</span
-              >
-              <span class="ml-2 font-weight-light body-2"
-                >XXXX - {{ transaction.bankAccount }}</span
-              >
+            <v-list-item-title v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
+              <span class="font-weight-medium">{{ $tc("navbar.bankAccount", 0) }}:</span>
+              <span class="ml-2 font-weight-light body-2">XXXX - {{ transaction.bankAccount }}</span>
             </v-list-item-title>
-            <v-list-item-title
-              v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT"
-            >
-              <span class="font-weight-medium"
-                >{{ $t("bank-account-properties.nickname") }}:</span
-              >
-              <span class="ml-2 font-weight-light body-2 text-uppercase">{{
+            <v-list-item-title v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
+              <span class="font-weight-medium">{{ $t("bank-account-properties.nickname") }}:</span>
+              <span class="ml-2 font-weight-light body-2 text-uppercase">
+                {{
                 transaction.bankAccountNickname
-              }}</span>
+                }}
+              </span>
             </v-list-item-title>
             <v-list-item-title>
               <span class="font-weight-medium">{{ $t("common.type") }}:</span>
-              <span class="ml-2 body-2 text-uppercase font-weight-light">{{
+              <span class="ml-2 body-2 text-uppercase font-weight-light">
+                {{
                 type
-              }}</span>
+                }}
+              </span>
             </v-list-item-title>
 
             <v-list-item-title>
               <span class="font-weight-medium">{{ $t("common.state") }}:</span>
-              <span class="ml-2 body-2 text-uppercase font-weight-light">{{
+              <span class="ml-2 body-2 text-uppercase font-weight-light">
+                {{
                 $t(`state-name.${transaction.state}`)
-              }}</span>
+                }}
+              </span>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -72,8 +70,7 @@
               text-color="white"
               label
               @click.stop="dialog = true"
-              >{{ $t("common.see") }}</v-chip
-            >
+            >{{ $t("common.see") }}</v-chip>
           </td>
         </tr>
         <!-- For all type of transactions -->
@@ -98,9 +95,11 @@
     <!-- Modal for points conversion -->
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
-        <v-card-title class="headline">{{
+        <v-card-title class="headline">
+          {{
           $t("common.yourPoints")
-        }}</v-card-title>
+          }}
+        </v-card-title>
         <v-divider></v-divider>
         <v-card-text class="mt-2 px-8">
           <v-alert dense text color="primary" v-if="paymentTransaction">
@@ -111,9 +110,7 @@
             <v-row>
               <v-col>
                 <div class="d-flex justify-end align-center">
-                  <p class="mb-1 mr-4 font-weight-bold">
-                    {{ $t("payments.points") }}
-                  </p>
+                  <p class="mb-1 mr-4 font-weight-bold">{{ $t("payments.points") }}</p>
                 </div>
                 <div class="d-flex justify-space-between align-center">
                   <p class="mb-1">{{ typeLabel }}</p>
@@ -121,34 +118,24 @@
                 </div>
                 <div
                   class="d-flex justify-space-between align-center"
-                  v-if="
-                    (transaction.type == transactionsType.DEPOSIT ||
-                      transaction.type ===
-                        transactionsType.THIRD_PARTY_CLIENT) &&
-                      this.transaction.extra &&
-                      this.transaction.extra > 0
-                  "
+                  v-if="(transaction.type == transactionsType.DEPOSIT || transaction.type === transactionsType.THIRD_PARTY_CLIENT) && this.transaction.extra && this.transaction.extra > 0"
                 >
                   <p
                     class="mb-1"
                     v-if="this.extraPointsType == suscriptionsType.PREMIUM"
-                  >
-                    {{ $t("transaction.subscriptionExtraPremium") }}
-                  </p>
+                  >{{ $t("transaction.subscriptionExtraPremium") }}</p>
                   <p
                     class="mb-1"
                     v-if="this.extraPointsType == suscriptionsType.GOLD"
-                  >
-                    {{ $t("transaction.subscriptionExtraGold") }}
-                  </p>
-                  <p class="mr-4 mb-1">{{ transaction.extra }}</p>
+                  >{{ $t("transaction.subscriptionExtraGold") }}</p>
+                  <p class="mr-4 mb-1">{{ transaction.extra}}</p>
                 </div>
                 <v-divider></v-divider>
                 <div class="d-flex justify-space-between align-center mt-2">
                   <p class="mb-1 font-weight-bold">{{ $t("common.total") }}</p>
-                  <p class="mr-4 mb-1 font-weight-bold">
-                    {{ transaction.extra + transaction.pointsEquivalent }}
-                  </p>
+                  <p
+                    class="mr-4 mb-1 font-weight-bold"
+                  >{{ transaction.extra + transaction.pointsEquivalent }}</p>
                 </div>
               </v-col>
             </v-row>

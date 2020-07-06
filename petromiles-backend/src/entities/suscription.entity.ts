@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { UserSuscription } from '@/entities/user-suscription.entity';
+import { Transform } from 'class-transformer';
 
 @Entity()
 export class Suscription extends BaseEntity {
@@ -16,9 +17,17 @@ export class Suscription extends BaseEntity {
   @Column()
   name: string;
 
+  @Transform(cost => {
+    if (cost) return (cost / 100).toFixed(2);
+    return cost;
+  })
   @Column()
   cost: number;
 
+  @Transform(upgradedAmount => {
+    if (upgradedAmount) return (upgradedAmount / 100).toFixed(2);
+    return upgradedAmount;
+  })
   @Column({ nullable: true })
   upgradedAmount: number;
 

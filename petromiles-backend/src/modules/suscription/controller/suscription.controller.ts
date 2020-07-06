@@ -7,10 +7,14 @@ import {
   Inject,
   Get,
   Param,
+  Put,
+  UseInterceptors,
+  ClassSerializerInterceptor,
   Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
+import { UpdateResult } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -25,9 +29,11 @@ import { HttpRequest } from '@/logger/http-requests.enum';
 // SERVICES
 import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
 import { Suscription } from '@/entities/suscription.entity';
+import { UpdateSubscriptionDTO } from '@/modules/suscription/dto/update-subscription.dto';
 
 const baseEndpoint = 'suscription';
 @UseGuards(AuthGuard('jwt'))
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller(baseEndpoint)
 export class SuscriptionController {
   constructor(
@@ -67,5 +73,24 @@ export class SuscriptionController {
       `[${ApiModules.SUSCRIPTION}] (${HttpRequest.GET}) asks /${baseEndpoint}/information/${subscription}`,
     );
     return this.suscriptionService.getSubscriptionPercentage(subscription);
+  }
+
+  @Get()
+  getAll(@GetUser() user): Promise<Suscription[]> {
+    this.logger.http(
+      `[${ApiModules.SUSCRIPTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}`,
+    );
+    return this.suscriptionService.getAll();
+  }
+
+  @Put(':id')
+  async updateSubscription(
+    @Param('id') idSubscription: number,
+    @Body() updateSubscriptionDTO: UpdateSubscriptionDTO,
+  ): Promise<UpdateResult> {
+    return await this.suscriptionService.update(
+      updateSubscriptionDTO,
+      idSubscription,
+    );
   }
 }

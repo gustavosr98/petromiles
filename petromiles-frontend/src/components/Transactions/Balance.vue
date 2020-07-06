@@ -11,7 +11,7 @@
           <div class="mr-5">
             <v-icon color="secondary">sync_alt</v-icon>
           </div>
-          <balance-option :header="$t('user-balance.equivalent')" :value="points.dollars" type="$" />
+          <balance-option :header="$t('user-balance.equivalent')" :value="dollars" type="$" />
         </div>
       </v-col>
     </v-row>
@@ -28,11 +28,17 @@ export default {
   data() {
     return {
       points: {},
+      dollars: null,
     };
   },
 
   async mounted() {
     this.points = await this.$http.get("user/points/conversion");
+    const conversion = await this.$http.get("/payments/one-point-to-dollars");
+
+    this.dollars = (
+      this.points.points * conversion.onePointEqualsDollars
+    ).toFixed(2);
   },
 };
 </script>

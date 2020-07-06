@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { CronJobs } from '@/modules/cron/cron-jobs.enum';
+
+import { CronJobs } from '@/enums/cron-jobs.enum';
 
 const minute = 60 * 1000;
 const hour = 60 * minute;

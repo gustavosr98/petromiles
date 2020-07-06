@@ -1,8 +1,9 @@
 import { validationMixin } from "vuelidate";
 import { required, numeric, integer, minValue } from "vuelidate/lib/validators";
+import validationMessagges from "@/mixins/validation-forms/validation-messages.mixin";
 
 export default {
-  mixins: [validationMixin],
+  mixins: [validationMixin, validationMessagges],
   validations: {
     points: {
       required,
@@ -40,23 +41,8 @@ export default {
       return errors;
     },
     // i18n Transaltions
-    thisIsRequired() {
-      return this.$t("error-messages.required");
-    },
-    shouldBeNumber() {
-      return this.$t("error-messages.shouldBeNumber");
-    },
-    shouldBeInteger() {
-      return this.$t("error-messages.shouldBeInteger");
-    },
     minValue() {
       return this.$tc("error-messages.minValue", 1, { min: 1 });
-    },
-    minValueRest() {
-      return this.$t("error-messages.minValueRest");
-    },
-    minCostTotal() {
-      return this.$t("error-messages.minCostTotal");
     },
   },
 };

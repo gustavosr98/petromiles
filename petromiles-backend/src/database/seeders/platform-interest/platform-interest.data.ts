@@ -7,28 +7,33 @@ export const PLATAFORM_INTERESTS = [
     idPlatformInterest: 1,
     name: 'premium',
     percentage: '0.20',
+    description: 'premiumInterest',
   },
   {
     idPlatformInterest: 2,
     name: 'gold',
     percentage: '0.2',
     amount: '500',
+    description: 'goldInterest',
   },
   {
     idPlatformInterest: 3,
     name: 'verification',
     amount: '250',
+    description: 'verificationInterest',
   },
 
   {
     idPlatformInterest: 4,
     name: 'buy',
     percentage: '0.015',
+    description: 'buyInterest',
   },
 
   {
     idPlatformInterest: 5,
-    name: 'Withdrawal',
+    name: 'withdrawal',
     percentage: '0.05',
+    description: 'withdrawalInterest',
   },
 ];

@@ -94,6 +94,7 @@ export class TransactionService {
 
     const thirdPartyInterest = await this.thirdPartyInterestService.getCurrentInterest(
       options.thirdPartyInterestType,
+      options.type,
     );
     return {
       interest,
@@ -235,6 +236,7 @@ export class TransactionService {
       platformInterestType: PlatformInterest.VERIFICATION,
       platformInterestExtraPointsType: null,
       thirdPartyInterestType: PaymentProvider.STRIPE,
+      type: TransactionType.DEPOSIT,
     });
 
     const randomAmounts = this.generateRandomAmounts(
@@ -282,6 +284,7 @@ export class TransactionService {
       platformInterestType: PlatformInterest.PREMIUM_EXTRA,
       platformInterestExtraPointsType: null,
       thirdPartyInterestType: PaymentProvider.STRIPE,
+      type: TransactionType.DEPOSIT,
     });
 
     return await this.createTransaction(
@@ -312,6 +315,7 @@ export class TransactionService {
       platformInterestType: PlatformInterest.BUY,
       platformInterestExtraPointsType: extraPointsType,
       thirdPartyInterestType: PaymentProvider.STRIPE,
+      type: TransactionType.DEPOSIT,
     });
 
     return await this.createTransaction(
@@ -356,6 +360,7 @@ export class TransactionService {
       platformInterestType: PlatformInterest.WITHDRAWAL,
       platformInterestExtraPointsType: null,
       thirdPartyInterestType: PaymentProvider.STRIPE,
+      type: TransactionType.WITHDRAWAL,
     });
 
     return await this.createTransaction(

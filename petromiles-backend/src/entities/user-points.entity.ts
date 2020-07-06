@@ -44,11 +44,12 @@ import { UserClient } from './user-client.entity';
       .groupBy('userClient.email'),
 })
 export class ClientPoints {
+  constructor() {}
   @Transform(dollars => parseFloat(dollars).toFixed(2))
   @ViewColumn()
   dollars: number;
 
-  @Transform(points => parseFloat(points).toFixed(2))
+  @Transform(points => parseFloat(points).toFixed(0))
   @ViewColumn()
   points: number;
 

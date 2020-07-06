@@ -1,8 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 // SERVICES
 import { PointsConversionService } from '@/modules/management/services/points-conversion.service';
@@ -43,6 +45,7 @@ import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interfac
 import { StateName, StateDescription } from '@/enums/state.enum';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { Suscription } from '@/enums/suscription.enum';
+import { ApiModules } from '@/logger/api-modules.enum';
 
 @Injectable()
 export class ThirdPartyClientsService {
@@ -64,10 +67,35 @@ export class ThirdPartyClientsService {
     private readonly transactionService: TransactionService,
     private readonly thirdPartyInterestService: ThirdPartyInterestService,
     private readonly userClientService: UserClientService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   async get(apiKey: string): Promise<ThirdPartyClient> {
     return await this.thirdPartyClientsRepository.findOne({ apiKey });
+  }
+
+  async getAll(): Promise<ThirdPartyClient[]> {
+    return await this.thirdPartyClientsRepository.find();
+  }
+
+  async update(
+    idThirdPartyClient: number,
+    accumulatePercentage: string,
+  ): Promise<UpdateResult> {
+    const result = await this.thirdPartyClientsRepository.update(
+      { idThirdPartyClient },
+      { accumulatePercentage },
+    );
+
+    this.logger.warn(
+      `[${
+        ApiModules.THIRD_PARTY_CLIENTS
+      }] Third party interest: ID =  [${idThirdPartyClient}] updated | New percentage = [${parseFloat(
+        accumulatePercentage,
+      ) * 100} $]`,
+    );
+
+    return result;
   }
 
   async associateUserCode(
@@ -225,6 +253,7 @@ export class ThirdPartyClientsService {
       platformInterestType: PlatformInterest.WITHDRAWAL,
       platformInterestExtraPointsType: extraPointsType,
       thirdPartyInterestType: PaymentProvider.STRIPE,
+      type: TransactionType.WITHDRAWAL,
     };
     const extras = await this.transactionService.getTransactionInterests(
       optionsExtras,
@@ -406,7 +435,7 @@ export class ThirdPartyClientsService {
       confirmationTickets[confirmationTickets.length - 1].userEmail,
       apiKey,
       confirmationTickets[confirmationTickets.length - 1].accumulatedPoints,
-      StateName.INVALID
+      StateName.INVALID,
     );
     return confirmationTickets;
   }
@@ -418,13 +447,16 @@ export class ThirdPartyClientsService {
     status: string,
   ): Promise<MailsResponse> {
     const thirdPartyClient = await this.get(apiKey);
-    const userClient = await this.userClientRepository.findOne({ email:userEmail });
+    const userClient = await this.userClientRepository.findOne({
+      email: userEmail,
+    });
     const language = userClient.userDetails.language.name;
 
-    if(status === StateName.VALID) {
+    if (status === StateName.VALID) {
       const template = `customerPointsAccumulationApproval[${language}]`;
-      const subject = MailsSubjets.customer_points_accumulation_approval[language];
-      
+      const subject =
+        MailsSubjets.customer_points_accumulation_approval[language];
+
       const msg: MailsStructure = {
         to: userClient.email,
         subject: subject,
@@ -440,8 +472,9 @@ export class ThirdPartyClientsService {
       return await this.mailsService.sendEmail(msg);
     } else if (status === StateName.INVALID) {
       const template = `customerPointsAccumulationRejection[${language}]`;
-      const subject = MailsSubjets.customer_points_accumulation_rejection[language];
-      
+      const subject =
+        MailsSubjets.customer_points_accumulation_rejection[language];
+
       const msg: MailsStructure = {
         to: userClient.email,
         subject: subject,

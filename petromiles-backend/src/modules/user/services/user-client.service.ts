@@ -208,6 +208,7 @@ export class UserClientService {
       points.dollars = 0;
       points.points = 0;
     }
+
     return points;
   }
 

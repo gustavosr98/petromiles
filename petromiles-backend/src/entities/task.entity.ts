@@ -1,5 +1,12 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { CronJobs } from '@/modules/cron/cron-jobs.enum';
+import {
+  BaseEntity,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BeforeUpdate,
+} from 'typeorm';
+import { Transform } from 'class-transformer';
+import { CronJobs } from '@/enums/cron-jobs.enum';
 
 @Entity()
 export class Task extends BaseEntity {
@@ -12,6 +19,7 @@ export class Task extends BaseEntity {
   })
   name: CronJobs;
 
+  @Transform(frecuency => frecuency / 60000)
   @Column()
   frequency: number;
 }

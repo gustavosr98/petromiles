@@ -6,6 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { ClientOnThirdParty } from '@/entities/client-on-third-party.entity';
+import { Transform } from 'class-transformer';
 
 @Entity()
 export class ThirdPartyClient extends BaseEntity {
@@ -18,8 +19,15 @@ export class ThirdPartyClient extends BaseEntity {
   @Column()
   apiKey: string;
 
+  @Transform(percentage => (percentage * 100).toFixed(2))
   @Column()
   accumulatePercentage: string;
+
+  @Column({ nullable: true })
+  description?: string;
+
+  @Column({ nullable: true })
+  photo?: string;
 
   @OneToMany(
     type => ClientOnThirdParty,
