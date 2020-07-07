@@ -6,23 +6,24 @@ import { Repository } from 'typeorm';
 import { RoutingNumber } from '@/entities/routing-number.entity';
 import { Bank } from '@/entities/bank.entity';
 
-import { RoutingNumber as RoutingNumbers } from '@/database/seeders/routing-number/routing-number.data';
+import { routingNumbers } from '@/database/seeders/routing-number/routing-number.data';
 
 @Injectable()
 export class RoutingNumberSeederService {
   constructor(
     @InjectRepository(RoutingNumber)
-    private readonly routingNumber: Repository<RoutingNumber>,
+    private readonly repository: Repository<RoutingNumber>,
     @InjectRepository(Bank)
-    private readonly bank: Repository<Bank>,
+    private readonly bankRepository: Repository<Bank>,
   ) {}
 
-  createRoutingNumber(): Promise<RoutingNumber>[] {
-    return RoutingNumbers.map(async routingNumber => {
-      const bank = await this.bank.findOne({ name: routingNumber.bankName });
-      return this.routingNumber
+  async createRoutingNumber(): Promise<Promise<RoutingNumber>[]> {
+    const banks = await this.bankRepository.find();
+
+    return routingNumbers.map(async routingNumber => {
+      const bank = banks.find(b => b.name === routingNumber.bankName);
+      return this.repository
         .create({
-          idRoutingNumber: routingNumber.id,
           number: routingNumber.number,
           bank,
         })
