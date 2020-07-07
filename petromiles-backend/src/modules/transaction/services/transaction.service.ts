@@ -79,6 +79,23 @@ export class TransactionService {
     return transactions;
   }
 
+  async getThirdPartyTransactions(idThirdPartyClient: number) {
+    const transactions = await this.transactionRepository.find({
+      where: `"thirdPartyClient"."idThirdPartyClient" = ${idThirdPartyClient}`,
+      join: {
+        alias: 'transaction',
+        innerJoinAndSelect: {
+          clientOnThirdParty: 'transaction.clientOnThirdParty',
+          userClient: 'clientOnThirdParty.userClient',
+          thirdPartyClient: 'clientOnThirdParty.thirdPartyClient',
+        },
+      },
+    });
+
+    return transactions.map(transaction =>
+      transaction.calculateDetailsAdministrator(),
+    );
+  }
   async getTransactionInterests(options: App.Transaction.TransactionInterests) {
     const interest = await this.platformInterestService.getInterestByName(
       options.platformInterestType,
@@ -158,6 +175,7 @@ export class TransactionService {
         },
       },
     });
+
     return transactions.map(transaction => {
       return transaction.calculateDetailsAdministrator();
     });

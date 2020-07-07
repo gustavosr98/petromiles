@@ -20,6 +20,7 @@ import { Roles } from '@/modules/auth/decorators/roles.decorator';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { HttpRequest } from '@/logger/http-requests.enum';
 import { Role } from '@/enums/role.enum';
+import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
 
 // SERVICES
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
@@ -43,6 +44,17 @@ export class TransactionController {
     );
     const id = idUserClient ? idUserClient : user.id;
     return this.transactionService.getTransactions(id);
+  }
+
+  @Get('getThirdPartyTransactions/:id')
+  getThirdPartyTransactions(
+    @GetUser() user: AuthenticatedUser,
+    @Param('id') id: number,
+  ) {
+    this.logger.http(
+      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/getThirdPartyTransactions/${id}`,
+    );
+    return this.transactionService.getThirdPartyTransactions(id);
   }
 
   @Get(':idTransaction')
@@ -72,7 +84,7 @@ export class TransactionController {
   @Get('admin/list/all')
   getTransactionsAdmin(@GetUser() user) {
     this.logger.http(
-      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}`,
+      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/admin/list/all`,
     );
     return this.transactionService.getTransactionsAdmin(user.email);
   }

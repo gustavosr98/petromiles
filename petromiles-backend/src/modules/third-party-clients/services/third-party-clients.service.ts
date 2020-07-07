@@ -165,6 +165,7 @@ export class ThirdPartyClientsService {
   ): Promise<ClientOnThirdParty> {
     let clientOnThirdParty = await this.clientOnThirdPartyRepository.findOne({
       userClient,
+      thirdPartyClient,
     });
 
     if (!clientOnThirdParty) {
@@ -186,8 +187,9 @@ export class ThirdPartyClientsService {
   async associateUserToken(
     associateUserTokenRequest: AssociateUserTokenRequest,
   ): Promise<AssociateUserTokenResponse> {
-    const { userEmail: email, userCode } = associateUserTokenRequest;
+    const { userEmail: email, userCode, apiKey } = associateUserTokenRequest;
 
+    const thirdPartyClient = await this.get(apiKey);
     const userClient = await this.userClientRepository.findOne({ email });
     if (!userClient) {
       throw new BadRequestException(
@@ -197,6 +199,7 @@ export class ThirdPartyClientsService {
 
     let clientOnThirdParty = await this.clientOnThirdPartyRepository.findOne({
       userClient,
+      thirdPartyClient,
     });
 
     if (!clientOnThirdParty)
@@ -231,8 +234,12 @@ export class ThirdPartyClientsService {
 
   async getClientOnThirdPartyByUserId(
     userClient: UserClient,
+    thirdPartyClient: ThirdPartyClient,
   ): Promise<ClientOnThirdParty> {
-    return await this.clientOnThirdPartyRepository.findOne({ userClient });
+    return await this.clientOnThirdPartyRepository.findOne({
+      userClient,
+      thirdPartyClient,
+    });
   }
 
   private chooseExtraPoints(suscriptionType): PlatformInterest {
@@ -339,13 +346,21 @@ export class ThirdPartyClientsService {
       user,
     );
 
+    const thirdPartyClient = await this.get(addPointsRequest.apiKey);
+
     const userClient: UserClient = await this.userClientService.get({
       email: user.email,
       idUserClient: user.id,
     });
     const clientOnThirdParty: ClientOnThirdParty = await this.getClientOnThirdPartyByUserId(
       userClient,
+      thirdPartyClient,
     );
+
+    if (!clientOnThirdParty)
+      throw new BadRequestException(
+        ThirdPartyClientsErrorCodes.UNKNOWN_API_KEY,
+      );
 
     const thirdPartyInterest = await this.thirdPartyInterestService.get(
       PaymentProvider.STRIPE,

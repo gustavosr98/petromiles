@@ -69,6 +69,13 @@
           </v-card>
         </v-col>
       </v-col>
+      <v-spacer></v-spacer>
+      <v-col cols="12" md="8">
+        <transactions-table
+          v-if="selectedItem"
+          :url="`transaction/getThirdPartyTransactions/${selectedItem.idThirdPartyClient}`"
+        />
+      </v-col>
     </v-row>
     <configuration-modal @closeModal="closeModal" :dialog="dialog" :message="modalMessage" />
   </v-container>
@@ -77,11 +84,13 @@
 <script>
 import PlatformConfigMixin from "@/mixins/validation-forms/platform-config.mixin";
 import ConfigurationModal from "@/components/General/Modals/ConfigurationModal/ConfigurationModal.vue";
+import TransactionTable from "@/components/Transactions/TransactionsTable";
 
 export default {
   mixins: [PlatformConfigMixin],
   components: {
     "configuration-modal": ConfigurationModal,
+    "transactions-table": TransactionTable,
   },
   data() {
     return {
@@ -105,6 +114,8 @@ export default {
       this.selectedItem = this.thirdPartyAdministration.find(
         thirdParty => thirdParty.name == name
       );
+      this.interestData.percentage = this.selectedItem.accumulatePercentage;
+      this.disableEdit = true;
     },
     async update() {
       this.$v.$touch();
@@ -120,6 +131,7 @@ export default {
             }
           )
           .then(() => {
+            this.updateList();
             this.dialog = true;
           })
           .finally(() => {
@@ -129,6 +141,13 @@ export default {
     },
     closeModal() {
       this.dialog = false;
+    },
+    updateList() {
+      this.thirdPartyAdministration.map(tp => {
+        if (tp.name === this.selectedItem.name)
+          tp.accumulatePercentage = this.interestData.percentage;
+        return tp;
+      });
     },
   },
 };

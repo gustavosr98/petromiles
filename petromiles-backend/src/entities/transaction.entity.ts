@@ -124,12 +124,20 @@ export class Transaction extends BaseEntity {
       ? this.clientBankAccount.bankAccount.nickname
       : null;
 
+    const clientBankAccountEmail = this.clientBankAccount
+      ? this.clientBankAccount.userClient.email
+      : this.clientOnThirdParty.userClient.email;
+
     return {
       id: this.idTransaction,
       date: this.initialDate.toLocaleDateString(),
       type: this.type,
       bankAccount,
       bankAccountNickname,
+      clientBankAccountEmail,
+      thirdPartyClient: this.clientOnThirdParty
+        ? this.clientOnThirdParty.thirdPartyClient.name
+        : null,
       pointsConversion: (
         1 / this.pointsConversion.onePointEqualsDollars
       ).toFixed(0),
@@ -165,7 +173,7 @@ export class Transaction extends BaseEntity {
 
     const clientBankAccountEmail = this.clientBankAccount
       ? this.clientBankAccount.userClient.email
-      : null;
+      : this.clientOnThirdParty.userClient.email;
 
     return {
       id: this.idTransaction,
@@ -173,6 +181,9 @@ export class Transaction extends BaseEntity {
       type: this.type,
       bankAccount,
       bankAccountNickname,
+      thirdPartyClient: this.clientOnThirdParty
+        ? this.clientOnThirdParty.thirdPartyClient.name
+        : null,
       pointsConversion: 1 / this.pointsConversion.onePointEqualsDollars,
       ...details,
       state,

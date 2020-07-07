@@ -28,6 +28,14 @@
               <span class="font-weight-medium">{{ $tc("navbar.bankAccount", 0) }}:</span>
               <span class="ml-2 font-weight-light body-2">XXXX - {{ transaction.bankAccount }}</span>
             </v-list-item-title>
+            <v-list-item-title v-if="transaction.thirdPartyClient">
+              <span class="font-weight-medium">{{$t("transaction.company")}}:</span>
+              <span class="ml-2 font-weight-light body-2 text-uppercase">
+                {{
+                transaction.thirdPartyClient
+                }}
+              </span>
+            </v-list-item-title>
             <v-list-item-title v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
               <span class="font-weight-medium">{{ $t("bank-account-properties.nickname") }}:</span>
               <span class="ml-2 font-weight-light body-2 text-uppercase">
@@ -37,12 +45,16 @@
               </span>
             </v-list-item-title>
             <v-list-item-title>
-              <span class="font-weight-medium">{{ $t("common.type") }}:</span>
-              <span class="ml-2 body-2 text-uppercase font-weight-light">
+              <span class="font-weight-medium">{{$t("transaction.responsible")}}:</span>
+              <span class="ml-2 font-weight-light body-2 text-uppercase">
                 {{
-                type
+                transaction.clientBankAccountEmail
                 }}
               </span>
+            </v-list-item-title>
+            <v-list-item-title>
+              <span class="font-weight-medium">{{ $t("common.type") }}:</span>
+              <span class="ml-2 body-2 text-uppercase font-weight-light">{{type}}</span>
             </v-list-item-title>
 
             <v-list-item-title>

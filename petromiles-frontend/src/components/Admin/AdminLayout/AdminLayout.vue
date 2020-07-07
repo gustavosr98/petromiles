@@ -1,8 +1,8 @@
 <template>
-  <v-content>
+  <v-main>
     <navbar :navigationModules="navigationModules"></navbar>
     <slot></slot>
-  </v-content>
+  </v-main>
 </template>
 
 <script>

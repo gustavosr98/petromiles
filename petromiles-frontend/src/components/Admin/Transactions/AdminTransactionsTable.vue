@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div>
     <date-range-picker @filterData="filterData" :dataToFilter="transactions" />
     <datatable
@@ -6,7 +6,7 @@
       :headers="headers"
       :fetchedData="mungedData"
       linkTo="/transaction-details"
-      :tableName="table.TRANSACTIONS"      
+      :tableName="table.TRANSACTIONS"
     />
   </div>
 </template>
@@ -48,11 +48,6 @@ export default {
     headers() {
       return [
         {
-          text: this.$tc("common.code"),
-          align: "center",
-          value: "id",
-        },
-        {
           text: this.$tc("common.date"),
           align: "center",
           value: "date",
@@ -73,15 +68,16 @@ export default {
           value: "points",
         },
         {
+          text: this.$tc("transaction.responsible"),
+          align: "center",
+          value: "clientBankAccountEmail",
+        },
+        {
           text: this.$tc("common.state"),
           align: "center",
           value: "state",
         },
-        {
-          text: "Responsable",
-          align: "center",
-          value: "clientBankAccountEmail",
-        },
+
         {
           text: this.$tc("common.seeMore"),
           align: "center",

@@ -3,7 +3,7 @@
     <v-row align="center" justify="center" class="mx-auto">
       <v-col cols="12" md="10">
         <balance />
-        <transaction-table />
+        <transaction-table url="/transaction" />
       </v-col>
     </v-row>
   </client-layout>

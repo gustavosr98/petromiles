@@ -20,15 +20,33 @@
       <v-col cols="12" class="pt-0" justify="center">
         <v-list-item three-line>
           <v-list-item-content>
-            <v-list-item-title>
+            <v-list-item-title v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
               <span class="font-weight-medium">{{ $tc("navbar.bankAccount", 0) }}:</span>
               <span class="ml-2 font-weight-light body-2">XXXX - {{ transaction.bankAccount }}</span>
             </v-list-item-title>
-            <v-list-item-title>
+            <v-list-item-title v-if="transaction.thirdPartyClient">
+              <span class="font-weight-medium">{{$t("transaction.company")}}:</span>
+              <span class="ml-2 font-weight-light body-2 text-uppercase">
+                {{
+                transaction.thirdPartyClient
+                }}
+              </span>
+            </v-list-item-title>
+            <v-list-item-title v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
               <span class="font-weight-medium">{{ $t("bank-account-properties.nickname") }}:</span>
-              <span
-                class="ml-2 font-weight-light body-2 text-uppercase"
-              >{{ transaction.bankAccountNickname}}</span>
+              <span class="ml-2 font-weight-light body-2 text-uppercase">
+                {{
+                transaction.bankAccountNickname
+                }}
+              </span>
+            </v-list-item-title>
+            <v-list-item-title>
+              <span class="font-weight-medium">{{$t("transaction.responsible")}}:</span>
+              <span class="ml-2 font-weight-light body-2 text-uppercase">
+                {{
+                transaction.clientBankAccountEmail
+                }}
+              </span>
             </v-list-item-title>
             <v-list-item-title>
               <span class="font-weight-medium">{{ $t("common.type") }}:</span>
@@ -40,12 +58,6 @@
               <span
                 class="ml-2 body-2 text-uppercase font-weight-light"
               >{{ $t(`state-name.${transaction.state}`) }}</span>
-            </v-list-item-title>
-            <v-list-item-title>
-              <span class="font-weight-medium">Responsable:</span>
-              <span
-                class="ml-2 body-2 text-uppercase font-weight-light"
-              >{{ transaction.clientBankAccountEmail}}</span>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
