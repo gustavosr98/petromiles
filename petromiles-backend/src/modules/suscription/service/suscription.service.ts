@@ -325,6 +325,15 @@ export class SuscriptionService {
     return await amount;
   }
 
+  async getActualCost(subscriptionName: SuscriptionType): Promise<Suscription> {
+    const cost = await this.suscriptionRepository
+      .createQueryBuilder('subscription')
+      .where(`subscription.name = :name`, { name: subscriptionName })
+      .getOne();
+
+    return cost;
+  }
+
   async update(
     updateSubscriptionDTO: UpdateSubscriptionDTO,
     idSuscription: number,

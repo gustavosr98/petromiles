@@ -111,6 +111,28 @@ const clientRoutesRaw = Object.freeze({
       requiresClientAuth: true,
     },
   },
+  SUBSCRIPTION: {
+    path: "/user-subscription",
+    name: "UserSubscription",
+    component: () =>
+      import(
+        /* webpackChunkName: "subscription" */ "@/views/Client/Subscription/Subscription.view"
+      ),
+    meta: {
+      requiresClientAuth: true,
+    },
+  }, 
+  SUSCRIPTION_PURCHASE: {
+    path: "/user-subscription-purchase",
+    name: "UserSubscriptionPurchase",
+    component: () =>
+      import(
+        /* webpackChunkName: "subscription-purchase" */ "@/views/Client/Subscription/PurchaseSubscription/PurchaseSubscription.view"
+      ),
+    meta: {
+      requiresClientAuth: true,
+    },
+  },  
 });
 
 // To be used in Vue Router

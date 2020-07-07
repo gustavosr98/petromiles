@@ -16,6 +16,9 @@ export default {
           return {
             idClientBankAccount: b.clientBankAccount[0].idClientBankAccount,
             last4: `XXXX-${b.accountNumber}`,
+            nickname: b.nickname.toUpperCase(),
+            bank: b.routingNumber.bank.name,
+
           };
         });
 

@@ -25,6 +25,7 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
 import { HttpRequest } from '@/logger/http-requests.enum';
+import { Suscription as SuscriptionType } from '@/enums/suscription.enum';
 
 // SERVICES
 import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
@@ -75,6 +76,15 @@ export class SuscriptionController {
     return this.suscriptionService.getSubscriptionPercentage(subscription);
   }
 
+  @Get('/cost/:subscription')
+  getActualCost(
+    @Param('subscription') subscription: SuscriptionType,
+  ): Promise<Suscription> {
+    this.logger.http(
+      `[${ApiModules.SUSCRIPTION}] (${HttpRequest.GET}) ask cost of subscription /${baseEndpoint}/cost`,
+    );
+    return this.suscriptionService.getActualCost(subscription);
+  }
   @Get()
   getAll(@GetUser() user): Promise<Suscription[]> {
     this.logger.http(
