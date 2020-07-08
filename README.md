@@ -25,6 +25,8 @@ PetroMiles is a web-based customer loyalty platform built to earn, exchage and m
 
 Its written with [Vue](https://vuejs.org/) at the client side and [Nest](https://nestjs.com/) on the server side. It also integrates with [Stripe](https://stripe.com/) as its main payment provider.
 
+Our web app can be found at https://petromiles-frontend.herokuapp.com/ while our production API base url can be found at https://petromiles-frontend.herokuapp.com/api/v1
+
 ## Index
 
 - [Manual installation guide](#manual-installation-guide)
