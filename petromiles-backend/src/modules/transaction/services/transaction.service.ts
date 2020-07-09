@@ -1,3 +1,4 @@
+import { TransactionDetails } from '@/modules/transaction/interfaces/transaction-details.interface';
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -27,6 +28,7 @@ import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { UserClient } from '@/entities/user-client.entity';
 import { ConfirmationTicket } from '@/interfaces/third-party-clients/confirmation-ticket.interface';
 import { AddPointsRequestCurrency } from '@/enums/add-points-request-currency.enum';
+import { PlatformInterestType } from '@/enums/platform-interest-type.enum';
 
 @Injectable()
 export class TransactionService {
@@ -81,42 +83,6 @@ export class TransactionService {
     return transactions;
   }
 
-  async getConfirmationTickets(apiKey: string): Promise<ConfirmationTicket[]> {
-    const transactions = await this.transactionRepository.find({
-      where: [`"thirdPartyClient"."apiKey" = ${apiKey}`],
-      join: {
-        alias: 'transaction',
-        innerJoinAndSelect: {
-          clientOnThirdParty: 'transaction.clientOnThirdParty',
-          userClient: 'clientOnThirdParty.userClient',
-          thirdPartyClient: 'clientOnThirdParty.thirdPartyClient',
-        },
-      },
-    });
-
-    console.log(transactions[0]);
-    console.log(
-      transactions.map(transaction => {
-        return {
-          apiKey,
-          confirmationId: transaction.idTransaction,
-          userEmail: transaction.clientOnThirdParty.userClient.email,
-          date: transaction.initialDate,
-          currency: AddPointsRequestCurrency.USD,
-          pointsToDollars: Math.floor(transaction.rawAmount),
-          accumulatedPoints: Math.floor(
-            transaction.rawAmount /
-              transaction.pointsConversion.onePointEqualsDollars /
-              100,
-          ),
-          commission: transaction,
-          status: null,
-        };
-      })[0],
-    );
-    return null;
-  }
-
   async getTransactionsAdmin(): Promise<App.Transaction.TransactionDetails[]> {
     const transactions = await this.transactionRepository.find({
       where: `stateTransaction.finalDate is null AND trans.transaction is null`,
@@ -144,9 +110,26 @@ export class TransactionService {
     });
   }
 
-  async getThirdPartyTransactions(idThirdPartyClient: number) {
+  async getThirdPartyTransactions(params: {
+    idThirdPartyClient?: number;
+    apiKey?: string;
+    filter?: {
+      transactionIds?: number[];
+    };
+  }): Promise<TransactionDetails[]> {
+    let where = !!params.idThirdPartyClient
+      ? `"thirdPartyClient"."idThirdPartyClient" = ${params.idThirdPartyClient}`
+      : `"thirdPartyClient"."apiKey" = '${params.apiKey}'`;
+
+    if (!!params.filter?.transactionIds) {
+      where =
+        where +
+        ' AND ' +
+        ` transaction."idTransaction" IN( ${params.filter.transactionIds.toString()} ) `;
+    }
+
     const transactions = await this.transactionRepository.find({
-      where: `"thirdPartyClient"."idThirdPartyClient" = ${idThirdPartyClient}`,
+      where,
       join: {
         alias: 'transaction',
         innerJoinAndSelect: {

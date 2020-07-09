@@ -5,6 +5,7 @@ import { Logger } from 'winston';
 
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
+import { CsvApiError } from '@/enums/csv-process';
 import { ThirdPartyClientsErrorCodes } from '@/enums/third-party-clients-error-codes.enum';
 
 @Injectable()
@@ -31,19 +32,15 @@ export class CsvService {
         }
       } catch (error) {
         this.logger.error(
-          `[${ApiModules.THIRD_PARTY_CLIENTS}] => (${ThirdPartyClientsErrorCodes.CSV_WRONG_FORMAT})`,
+          `[${ApiModules.THIRD_PARTY_CLIENTS}] => (${CsvApiError.CSV_WRONG_FORMAT})`,
         );
-        throw new BadRequestException(
-          ThirdPartyClientsErrorCodes.CSV_WRONG_FORMAT,
-        );
+        throw new BadRequestException(CsvApiError.CSV_WRONG_FORMAT);
       }
     } else {
       this.logger.error(
-        `[${ApiModules.THIRD_PARTY_CLIENTS}] => (${ThirdPartyClientsErrorCodes.CSV_NO_FILE_FOUND})`,
+        `[${ApiModules.THIRD_PARTY_CLIENTS}] => (${CsvApiError.CSV_NO_FILE_FOUND})`,
       );
-      throw new BadRequestException(
-        ThirdPartyClientsErrorCodes.CSV_NO_FILE_FOUND,
-      );
+      throw new BadRequestException(CsvApiError.CSV_NO_FILE_FOUND);
     }
   }
 

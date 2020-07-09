@@ -1,6 +1,7 @@
 export interface ConfirmationTicket {
   confirmationId: string;
-  date: Date;
+  apiKey?: string;
+  date: string;
   userEmail: string; // Petromiles existing user email
   currency: string; // 'usd'
   pointsToDollars: number;

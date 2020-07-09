@@ -132,6 +132,7 @@ export class Transaction extends BaseEntity {
     return {
       id: this.idTransaction,
       date: this.initialDate.toLocaleDateString(),
+      fullDate: this.initialDate,
       type: this.type,
       bankAccount,
       bankAccountNickname,
