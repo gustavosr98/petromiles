@@ -27,6 +27,13 @@
           <v-window>
             <bank-account-table :bankAccounts="userBankAccounts" :isAdmin="true" :clientID="user.idUserClient"/>
           </v-window>
+          <v-window>
+            <v-row align="center" justify="center" class="mx-auto">
+              <v-col cols="12" md="10">
+                <transaction-table url="no-url" :transactionsData="transactions" :isAdmin="true" />
+              </v-col>
+            </v-row>
+          </v-window>
         </v-card>
       </v-col>
     </v-row>
@@ -41,6 +48,7 @@ import UserProfileImage from "@/components/Users/UserProfileImage.vue";
 import UserMembership from "@/components/Users/UserMembership.vue";
 import UserPoints from "@/components/Users/UserPoints.vue";
 import BankAccountsTable from "@/components/BankAccounts/BankAccountList/BankAccountsTable";
+import TransactionTable from "@/components/Transactions/TransactionsTable";
 export default {
   name: "user-detail-wrapper",
  components: {
@@ -49,6 +57,7 @@ export default {
     "user-points": UserPoints,
     "user-detail": UserDetail,
     "bank-account-table": BankAccountsTable,
+    "transaction-table": TransactionTable,
   },
   props: {
     user:{
@@ -60,7 +69,8 @@ export default {
       userData: null,
       membership: null,
       conversion: null,
-      userBankAccounts: null
+      userBankAccounts: null,
+      transactions: null
     };
   },
   async mounted() {       
@@ -68,7 +78,7 @@ export default {
     this.membership = await this.$http.get(`suscription/actual?id=${this.user.idUserClient}`);
     this.userBankAccounts = await this.$http.get(`bank-account?id=${this.user.idUserClient}`);
     const userInformation = await this.$http.get(`user/${this.user.idUserClient}/CLIENT`);
-    const transactions = await this.$http.get(`transaction?id=${this.user.idUserClient}`);  
+    this.transactions = await this.$http.get(`transaction?id=${this.user.idUserClient}`);  
     const { userDetails, ...basicInformation} = userInformation;
     this.userData = {
       details: userDetails,

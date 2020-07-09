@@ -23,6 +23,8 @@ export default {
   name: "transactions-table",
   props: {
     url: { type: String, required: true },
+    transactionsData: { default: null },
+    isAdmin: { default: false }
   },
   components: {
     Datatable,
@@ -36,7 +38,7 @@ export default {
     };
   },
   async mounted() {
-    await this.loadData();
+    await this.loadData();    
   },
 
   watch: {
@@ -92,7 +94,12 @@ export default {
       return headers;
     },
     async loadData() {
-      this.fetchedData = await this.$http.get(this.url);
+      if(!this.isAdmin){
+        this.fetchedData = await this.$http.get(this.url);
+      }
+      else {
+        this.fetchedData = this.transactionsData;
+      }
       this.transactions = this.fetchedData.sort((a, b) => {
         if (a.id < b.id) {
           return 1;

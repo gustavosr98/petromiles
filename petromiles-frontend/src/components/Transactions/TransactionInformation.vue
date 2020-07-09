@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="transaction">
     <v-subheader>
       <div class="title my-2 mx-2">
         <span class="font-weight-bold">
@@ -171,7 +171,7 @@ export default {
   },
   data() {
     return {
-      transaction: {},
+      transaction: null,
       dialog: false,
       transactionsType: Transactions,
       suscriptionsType: Suscriptions,
