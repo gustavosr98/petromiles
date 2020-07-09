@@ -25,6 +25,8 @@ import { StateName, StateDescription } from '@/enums/state.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { UserClient } from '@/entities/user-client.entity';
+import { ConfirmationTicket } from '@/interfaces/third-party-clients/confirmation-ticket.interface';
+import { AddPointsRequestCurrency } from '@/enums/add-points-request-currency.enum';
 
 @Injectable()
 export class TransactionService {
@@ -77,6 +79,41 @@ export class TransactionService {
     );
 
     return transactions;
+  }
+
+  async getConfirmationTickets(apiKey: string): Promise<ConfirmationTicket[]> {
+    const transactions = await this.transactionRepository.find({
+      where: [`"thirdPartyClient"."apiKey" = ${apiKey}`],
+      join: {
+        alias: 'transaction',
+        innerJoinAndSelect: {
+          clientOnThirdParty: 'transaction.clientOnThirdParty',
+          userClient: 'clientOnThirdParty.userClient',
+          thirdPartyClient: 'clientOnThirdParty.thirdPartyClient',
+        },
+      },
+    });
+    console.log(transactions[0]);
+    console.log(
+      transactions.map(transaction => {
+        return {
+          apiKey,
+          confirmationId: transaction.idTransaction,
+          userEmail: transaction.clientOnThirdParty.userClient.email,
+          date: transaction.initialDate,
+          currency: AddPointsRequestCurrency.USD,
+          pointsToDollars: Math.floor(transaction.rawAmount),
+          accumulatedPoints: Math.floor(
+            transaction.rawAmount /
+              transaction.pointsConversion.onePointEqualsDollars /
+              100,
+          ),
+          commission: transaction,
+          status: null,
+        };
+      })[0],
+    );
+    return null;
   }
 
   async getTransactionInterests(options: App.Transaction.TransactionInterests) {

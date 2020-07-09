@@ -394,7 +394,7 @@ export class ThirdPartyClientsService {
     const confirmationTicket: ConfirmationTicket = {
       confirmationId: transaction.idTransaction.toString(),
       userEmail: user.email,
-      date: new Date(),
+      date: transaction.initialDate,
       currency: addPointsRequest.products[0].currency,
       pointsToDollars: Math.trunc(pointsToDollars * 100),
       accumulatedPoints,
@@ -422,22 +422,35 @@ export class ThirdPartyClientsService {
   }
 
   async csvCheck(apiKey: string, file): Promise<ConfirmationTicket[]> {
-    const confirmationTickets: ConfirmationTicket[] = await this.csvService.toJSON<
+    const theirConfirmationTickets: ConfirmationTicket[] = await this.csvService.toJSON<
       ConfirmationTicket
     >(file, [
       'confirmationId',
+      'apiKey',
       'date',
       'userEmail',
-      'priceTag',
+      'pointsToDollars',
+      'commission',
       'accumulatedPoints',
     ]);
-    await this.sendPointsStatusEmail(
-      confirmationTickets[confirmationTickets.length - 1].userEmail,
+
+    const ourConfirmationTickets = await this.transactionService.getConfirmationTickets(
       apiKey,
-      confirmationTickets[confirmationTickets.length - 1].accumulatedPoints,
-      StateName.INVALID,
     );
-    return confirmationTickets;
+
+    // confirmationTickets.forEach( confirmationTicket => {
+    //   console.log(confirmationTicket)
+    // })
+
+    // await this.sendPointsStatusEmail(
+    //   confirmationTickets[confirmationTickets.length - 1].userEmail,
+    //   apiKey,
+    //   confirmationTickets[confirmationTickets.length - 1].accumulatedPoints,
+    //   StateName.INVALID,
+    // );
+    // const processedConfirmationTickets =
+
+    return theirConfirmationTickets;
   }
 
   private async sendPointsStatusEmail(
