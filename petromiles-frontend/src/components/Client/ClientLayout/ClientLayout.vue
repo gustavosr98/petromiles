@@ -1,8 +1,8 @@
 <template>
-  <v-content class="pt-0">
+  <v-main class="pt-0">
     <navbar :navigationModules="navigationModules"></navbar>
     <slot></slot>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
@@ -44,10 +44,15 @@ export default {
           route: clientRoutes.SELL_POINTS,
         },
         {
+          name: "navbar.subscriptions",
+          mdiIcon: "mdi-arrow-up-bold-circle-outline",
+          route: clientRoutes.SUBSCRIPTION,
+        },        
+        {
           name: "navbar.profile",
           mdiIcon: "mdi-account-circle",
           route: clientRoutes.PROFILE,
-        },
+        },        
       ],
     };
   },

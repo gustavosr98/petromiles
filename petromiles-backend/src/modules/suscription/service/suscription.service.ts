@@ -191,7 +191,7 @@ export class SuscriptionService {
         clientBankAccount.idClientBankAccount
       } | last4: ${clientBankAccount.bankAccount.accountNumber.substr(
         -4,
-      )}} charged with USD [${(suscription.cost / 100).toFixed(2)}]`,
+      )}} charged with USD [${Math.round(suscription.cost) / 100}]`,
     );
 
     return transaction;
@@ -297,16 +297,11 @@ export class SuscriptionService {
       .andWhere('pi.finalDate IS NULL')
       .getOne();
 
-    const pointsConversion = await this.pointsConversionService.getRecentPointsConversion();
-
     if (actualSubscription.isGold()) {
-      const points =
-        parseFloat(actualSubscription.amount) /
-        (100 * pointsConversion.onePointEqualsDollars);
       const GoldInfo = await this.getGoldInfo();
       const actualPercentage = parseFloat(actualSubscription.percentage) * 100;
       return {
-        points: points,
+        points: actualSubscription.points,
         amountUpgrade: GoldInfo,
         percentage: actualPercentage,
       };
@@ -323,6 +318,15 @@ export class SuscriptionService {
 
     const amount = upgradeAmount.upgradedAmount / 100;
     return await amount;
+  }
+
+  async getActualCost(subscriptionName: SuscriptionType): Promise<Suscription> {
+    const cost = await this.suscriptionRepository
+      .createQueryBuilder('subscription')
+      .where(`subscription.name = :name`, { name: subscriptionName })
+      .getOne();
+
+    return cost;
   }
 
   async update(

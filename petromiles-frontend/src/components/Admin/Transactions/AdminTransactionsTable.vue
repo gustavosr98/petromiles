@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div>
     <date-range-picker @filterData="filterData" :dataToFilter="transactions" />
     <datatable
@@ -6,7 +6,7 @@
       :headers="headers"
       :fetchedData="mungedData"
       linkTo="/transaction-details"
-      :tableName="table.TRANSACTIONS"      
+      :tableName="table.TRANSACTIONS"
     />
   </div>
 </template>
@@ -32,7 +32,7 @@ export default {
     };
   },
   async mounted() {
-    this.fetchedData = await this.$http.get("/transaction/admin/list/all");
+    this.fetchedData = await this.$http.get("transaction/admin/list/all");
     this.transactions = this.fetchedData;
   },
 
@@ -47,11 +47,6 @@ export default {
     },
     headers() {
       return [
-        {
-          text: this.$tc("common.code"),
-          align: "center",
-          value: "id",
-        },
         {
           text: this.$tc("common.date"),
           align: "center",
@@ -73,15 +68,16 @@ export default {
           value: "points",
         },
         {
+          text: this.$tc("transaction.responsible"),
+          align: "center",
+          value: "clientBankAccountEmail",
+        },
+        {
           text: this.$tc("common.state"),
           align: "center",
           value: "state",
         },
-        {
-          text: "Responsable",
-          align: "center",
-          value: "clientBankAccountEmail",
-        },
+
         {
           text: this.$tc("common.seeMore"),
           align: "center",
@@ -98,9 +94,14 @@ export default {
 
         return {
           ...data,
-          transactionAmount: `$ ${data.total.toFixed(2)}`,
+          transactionAmount:
+            data.type == Transaction.THIRD_PARTY_CLIENT
+              ? `$ ${data.amount.toFixed(2)}`
+              : `$ ${data.total.toFixed(2)}`,
           state,
-          points: data.pointsEquivalent ? data.pointsEquivalent : "-",
+          points: data.pointsEquivalent
+            ? data.pointsEquivalent + data.extra
+            : "-",
           translatedType: this.$tc(`transaction-type.${data.type}`),
         };
       });

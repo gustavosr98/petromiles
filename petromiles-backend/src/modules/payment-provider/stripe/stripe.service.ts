@@ -22,8 +22,13 @@ export class StripeService {
   ) {}
 
   private errorHandler(err, res) {
-    this.logger.error(`[${ApiSubmodules.STRIPE}] ${err.type}`);
-    throw new BadRequestException(`error-messages.stripe_${err.raw.code}`);
+    if(err.raw.code === undefined) {
+      this.logger.error(`[${ApiSubmodules.STRIPE}] ${err.type}`);
+      throw new BadRequestException(`error-messages.stripe_charge_exceeds_source_limit`);
+    } else {
+      this.logger.error(`[${ApiSubmodules.STRIPE}] ${err.type}`);
+      throw new BadRequestException(`error-messages.stripe_${err.raw.code}`);
+    }
     return null;
   }
 

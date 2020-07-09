@@ -95,7 +95,7 @@ export class PaymentsService {
       customer: clientBankAccount.userClient.userDetails.customerId,
       source: clientBankAccount.chargeId,
       currency: 'usd',
-      amount: amountToCharge,
+      amount: Math.round(amountToCharge),
     });
 
     let currentUserSuscription = clientBankAccount.userClient.userSuscription.find(
@@ -118,9 +118,9 @@ export class PaymentsService {
         clientBankAccount.userClient.email
       } | id: ${idClientBankAccount} | last4: ${clientBankAccount.bankAccount.accountNumber.substr(
         -4,
-      )}} charged with USD [raw ${(amount / 100).toFixed(2)}| total ${(
-        amountToCharge / 100
-      ).toFixed(2)}]`,
+      )}} charged with USD [raw ${Math.round(amount) / 100}| total ${Math.round(
+        amountToCharge,
+      ) / 100}]`,
     );
 
     return deposit;
@@ -150,7 +150,7 @@ export class PaymentsService {
       const transfer = await this.paymentProviderService.createTransfer({
         destination: clientBankAccount.userClient.userDetails.accountId,
         currency: 'usd',
-        amount: amountToCharge,
+        amount: Math.round(amountToCharge),
         source_type: 'bank_account',
       });
 
@@ -209,7 +209,7 @@ export class PaymentsService {
     const transaction = await getConnection()
       .getRepository(Transaction)
       .findOne({
-        idTransaction: transactionCode[transactionCode.length - 1].id,
+        idTransaction: (await transactionCode[transactionCode.length - 1]).id,
       });
 
     const languageMails = userClient.userDetails.language.name;
@@ -249,7 +249,7 @@ export class PaymentsService {
     const transaction = await getConnection()
       .getRepository(Transaction)
       .findOne({
-        idTransaction: transactionCode[transactionCode.length - 1].id,
+        idTransaction: (await transactionCode[transactionCode.length - 1]).id,
       });
 
     const languageMails = userClient.userDetails.language.name;

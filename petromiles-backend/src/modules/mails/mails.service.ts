@@ -19,7 +19,7 @@ export class MailsService {
   ) {}
 
   async sendEmail(msg: MailsStructure): Promise<MailsResponse> {
-    if (process.env.SENDGRID_ON === 'true') {
+    if (process.env.SENDGRID_ON === 'true' && !!msg.templateId) {
       const from = this.sendGridConfig.emailFrom;
       try {
         await this.sendGridClient.send({ ...msg, from });
@@ -35,7 +35,7 @@ export class MailsService {
       }
     } else {
       this.logger.info(
-        `[${ApiModules.MAILS}] environment variable SENDGRID_ON is OFF`,
+        `[${ApiModules.MAILS}] global or local configuration to mail ${msg.subject} is OFF`,
       );
       return MailsResponse.ERROR;
     }

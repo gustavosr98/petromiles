@@ -18,14 +18,14 @@ export class Suscription extends BaseEntity {
   name: string;
 
   @Transform(cost => {
-    if (cost) return (cost / 100).toFixed(2);
+    if (cost) return Math.round(cost * 100) / 10000;
     return cost;
   })
   @Column()
   cost: number;
 
   @Transform(upgradedAmount => {
-    if (upgradedAmount) return (upgradedAmount / 100).toFixed(2);
+    if (upgradedAmount) return Math.round(upgradedAmount * 100) / 10000;
     return upgradedAmount;
   })
   @Column({ nullable: true })

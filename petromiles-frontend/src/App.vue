@@ -1,9 +1,9 @@
 <template>
   <v-app>
-    <v-content>
+    <v-main>
       <router-view></router-view>
       <error-modal />
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 

@@ -20,6 +20,7 @@ import { Roles } from '@/modules/auth/decorators/roles.decorator';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { HttpRequest } from '@/logger/http-requests.enum';
 import { Role } from '@/enums/role.enum';
+import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
 
 // SERVICES
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
@@ -45,6 +46,17 @@ export class TransactionController {
     return this.transactionService.getTransactions(id);
   }
 
+  @Get('getThirdPartyTransactions/:id')
+  getThirdPartyTransactions(
+    @GetUser() user: AuthenticatedUser,
+    @Param('id') id: number,
+  ) {
+    this.logger.http(
+      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/getThirdPartyTransactions/${id}`,
+    );
+    return this.transactionService.getThirdPartyTransactions(id);
+  }
+
   @Get(':idTransaction')
   getTransaction(
     @Param('idTransaction') idTransaction,
@@ -56,27 +68,6 @@ export class TransactionController {
     return this.transactionService.get(idTransaction);
   }
 
-  @Roles(Role.ADMINISTRATOR)
-  @UseGuards(RolesGuard)
-  @Get('admin/:idTransaction')
-  getTransactionAdministrator(
-    @Param('idTransaction') idTransaction,
-    @GetUser() user,
-  ): Promise<App.Transaction.TransactionDetails> {
-    this.logger.http(
-      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET})  ${user?.email} asks /${baseEndpoint}/admin/${idTransaction}`,
-    );
-    return this.transactionService.getTransactionAdmin(idTransaction);
-  }
-
-  @Get('admin/list/all')
-  getTransactionsAdmin(@GetUser() user) {
-    this.logger.http(
-      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}`,
-    );
-    return this.transactionService.getTransactionsAdmin(user.email);
-  }
-
   @Get('extra-points-type/:idTransaction')
   async getExtraPointsOfATransaction(
     @Param('idTransaction') idTransaction: number,
@@ -84,5 +75,13 @@ export class TransactionController {
     return await this.transactionService.getExtraPointsOfATransaction(
       idTransaction,
     );
+  }
+
+  @Get('admin/list/all')
+  getTransactionsAdmin(@GetUser() user) {
+    this.logger.http(
+      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}`,
+    );
+    return this.transactionService.getTransactionsAdmin();
   }
 }

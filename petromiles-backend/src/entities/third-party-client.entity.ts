@@ -19,7 +19,7 @@ export class ThirdPartyClient extends BaseEntity {
   @Column()
   apiKey: string;
 
-  @Transform(percentage => (percentage * 100).toFixed(2))
+  @Transform(percentage => Math.round(percentage * 1000000) / 10000)
   @Column()
   accumulatePercentage: string;
 

@@ -28,6 +28,14 @@
               <span class="font-weight-medium">{{ $tc("navbar.bankAccount", 0) }}:</span>
               <span class="ml-2 font-weight-light body-2">XXXX - {{ transaction.bankAccount }}</span>
             </v-list-item-title>
+            <v-list-item-title v-if="transaction.thirdPartyClient">
+              <span class="font-weight-medium">{{$t("transaction.company")}}:</span>
+              <span class="ml-2 font-weight-light body-2 text-uppercase">
+                {{
+                transaction.thirdPartyClient
+                }}
+              </span>
+            </v-list-item-title>
             <v-list-item-title v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
               <span class="font-weight-medium">{{ $t("bank-account-properties.nickname") }}:</span>
               <span class="ml-2 font-weight-light body-2 text-uppercase">
@@ -37,12 +45,16 @@
               </span>
             </v-list-item-title>
             <v-list-item-title>
-              <span class="font-weight-medium">{{ $t("common.type") }}:</span>
-              <span class="ml-2 body-2 text-uppercase font-weight-light">
+              <span class="font-weight-medium">{{$t("transaction.responsible")}}:</span>
+              <span class="ml-2 font-weight-light body-2 text-uppercase">
                 {{
-                type
+                transaction.clientBankAccountEmail
                 }}
               </span>
+            </v-list-item-title>
+            <v-list-item-title>
+              <span class="font-weight-medium">{{ $t("common.type") }}:</span>
+              <span class="ml-2 body-2 text-uppercase font-weight-light">{{type}}</span>
             </v-list-item-title>
 
             <v-list-item-title>
@@ -75,19 +87,24 @@
         </tr>
         <!-- For all type of transactions -->
 
-        <tr class="text-center">
+        <tr class="text-center" v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
           <td class="font-weight-bold">{{ $tc("common.amount", 0) }}</td>
-          <td>{{ transaction.amount }} $</td>
+          <td>{{ Math.round(transaction.amount * 100) / 100 !== 0 ? (transaction.amount).toFixed(2) : transaction.amount }} $</td>
         </tr>
 
-        <tr class="text-center">
+        <tr class="text-center" v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
           <td class="font-weight-bold">{{ $t("invoice.taxes") }}</td>
-          <td>{{ transaction.interest }} $</td>
+          <td>{{ Math.round(transaction.amount * 100) / 100 !== 0 ? (transaction.interest).toFixed(2) : transaction.interest }} $</td>
         </tr>
 
         <tr class="text-center total-item">
           <td class="font-weight-bold">{{ $t("common.total") }}</td>
-          <td>{{ transaction.total }} $</td>
+          <td
+            v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT"
+          >{{ Math.round(transaction.amount * 100) / 100 !== 0 ? (transaction.total).toFixed(2) : transaction.total }} $</td>
+          <td
+            v-else
+          >{{ Math.round(transaction.amount * 100) / 100 !== 0 ? (transaction.amount).toFixed(2) : transaction.amount }} $</td>
         </tr>
       </tbody>
     </v-simple-table>

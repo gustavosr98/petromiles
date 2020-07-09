@@ -6,7 +6,7 @@
       <v-app-bar-nav-icon @click="drawer = true" color="white"></v-app-bar-nav-icon>
       <v-toolbar-title>PetroMiles</v-toolbar-title>
       <v-spacer></v-spacer>
-      <div class="text-center">
+      <div class="text-center" v-if="!isAdmin">
         <languages-dropdown color="primary white--text" />
       </div>
     </v-app-bar>
@@ -78,6 +78,9 @@ export default {
         },
       ],
     },
+    isAdmin: {
+      default: false
+    }
   },
   data() {
     return {

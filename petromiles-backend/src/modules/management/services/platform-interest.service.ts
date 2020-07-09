@@ -52,8 +52,8 @@ export class PlatformInterestService {
     currentPlatformInterestId: number,
     createPlatformInterest: CreatePlatformInterestDTO,
   ): Promise<PlatformInterest> {
+    let { percentage, points } = createPlatformInterest;
     let amount = parseFloat(createPlatformInterest.amount);
-    let percentage = createPlatformInterest.percentage;
 
     if (!(await this.verifyCorrectAmount(amount, createPlatformInterest.name)))
       throw new BadRequestException('error-messages.invalidVerificationAmount');
@@ -66,15 +66,19 @@ export class PlatformInterestService {
     });
 
     amount = amount / 100;
-    percentage = percentage ? (parseFloat(percentage) * 100).toFixed(2) : null;
-    lastInterest.amount = (parseFloat(lastInterest.amount) / 100).toFixed(2);
+    percentage = percentage
+      ? (Math.round(parseFloat(percentage) * 1000000) / 10000).toString()
+      : null;
+    lastInterest.amount = (
+      Math.round(parseFloat(lastInterest.amount) * 100) / 10000
+    ).toString();
     lastInterest.percentage = (
-      parseFloat(lastInterest.percentage) * 100
-    ).toFixed(2);
+      Math.round(parseFloat(lastInterest.percentage) * 1000000) / 10000
+    ).toString();
 
     let log;
-    if (amount && percentage)
-      log = `Amount: Last= [${lastInterest.amount} $]; New= [${amount} $]; Percentage: Last = [${lastInterest.percentage} %]; New  = [${percentage} %]`;
+    if (points)
+      log = `Points: Last= [${lastInterest.points} ]; New= [${points} ]; Percentage: Last = [${lastInterest.percentage} %]; New  = [${percentage} %]`;
     else if (amount)
       log = `Amount: Last =  [${lastInterest.amount} $]; New = [${amount} $]`;
     else

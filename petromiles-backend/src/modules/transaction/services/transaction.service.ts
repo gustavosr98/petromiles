@@ -93,6 +93,7 @@ export class TransactionService {
         },
       },
     });
+
     console.log(transactions[0]);
     console.log(
       transactions.map(transaction => {
@@ -114,6 +115,48 @@ export class TransactionService {
       })[0],
     );
     return null;
+  }
+
+  async getTransactionsAdmin(): Promise<App.Transaction.TransactionDetails[]> {
+    const transactions = await this.transactionRepository.find({
+      where: `stateTransaction.finalDate is null AND trans.transaction is null`,
+      join: {
+        alias: 'trans',
+        leftJoinAndSelect: {
+          clientOnThirdParty: 'trans.clientOnThirdParty',
+          thirdPartyClient: 'clientOnThirdParty.thirdPartyClient',
+          user: 'clientOnThirdParty.userClient',
+          clientBankAccount: 'trans.clientBankAccount',
+          bankAccount: 'clientBankAccount.bankAccount',
+          stateTransaction: 'trans.stateTransaction',
+          state: 'stateTransaction.state',
+          transactionInterest: 'trans.transactionInterest',
+          thirdPartyInterest: 'transactionInterest.thirdPartyInterest',
+          platformInterest: 'transactionInterest.platformInterest',
+          platformInterestExtraPoints:
+            'transactionInterest.platformInterestExtraPoints',
+          userClient: 'clientBankAccount.userClient',
+        },
+      },
+    });
+    return transactions.map(transaction => {
+      return transaction.calculateDetails();
+    });
+  }
+
+  async getThirdPartyTransactions(idThirdPartyClient: number) {
+    const transactions = await this.transactionRepository.find({
+      where: `"thirdPartyClient"."idThirdPartyClient" = ${idThirdPartyClient}`,
+      join: {
+        alias: 'transaction',
+        innerJoinAndSelect: {
+          clientOnThirdParty: 'transaction.clientOnThirdParty',
+          userClient: 'clientOnThirdParty.userClient',
+          thirdPartyClient: 'clientOnThirdParty.thirdPartyClient',
+        },
+      },
+    });
+    return transactions.map(transaction => transaction.calculateDetails());
   }
 
   async getTransactionInterests(options: App.Transaction.TransactionInterests) {
@@ -174,44 +217,11 @@ export class TransactionService {
     });
   }
 
-  async getTransactionsAdmin(
-    email: string,
-  ): Promise<App.Transaction.TransactionDetails[]> {
-    const transactions = await this.transactionRepository.find({
-      where: `stateTransaction.finalDate is null AND trans.transaction is null`,
-      join: {
-        alias: 'trans',
-        leftJoinAndSelect: {
-          clientBankAccount: 'trans.clientBankAccount',
-          bankAccount: 'clientBankAccount.bankAccount',
-          stateTransaction: 'trans.stateTransaction',
-          state: 'stateTransaction.state',
-          transactionInterest: 'trans.transactionInterest',
-          thirdPartyInterest: 'transactionInterest.thirdPartyInterest',
-          platformInterest: 'transactionInterest.platformInterest',
-          platformInterestExtraPoints:
-            'transactionInterest.platformInterestExtraPoints',
-          userClient: 'clientBankAccount.userClient',
-        },
-      },
-    });
-    return transactions.map(transaction => {
-      return transaction.calculateDetailsAdministrator();
-    });
-  }
-
   async get(
     idTransaction: number,
   ): Promise<App.Transaction.TransactionDetails> {
     const transaction = await this.transactionRepository.findOne(idTransaction);
     return transaction.calculateDetails();
-  }
-
-  async getTransactionAdmin(
-    idTransaction: number,
-  ): Promise<App.Transaction.TransactionDetails> {
-    const transaction = await this.transactionRepository.findOne(idTransaction);
-    return transaction.calculateDetailsAdministrator();
   }
 
   async createTransaction(
@@ -254,13 +264,10 @@ export class TransactionService {
     paymentProviderInterest: number,
   ) {
     const max = amount - paymentProviderInterest;
-    const baseRandomAmount = Number(
-      (
-        Math.random() * (max - paymentProviderInterest) +
-        paymentProviderInterest
-      ).toFixed(0),
+    const baseRandomAmount = Math.round(
+      Math.random() * (max - paymentProviderInterest) + paymentProviderInterest,
     );
-    const randomAmount = Number((amount - baseRandomAmount).toFixed(0));
+    const randomAmount = Math.round(amount - baseRandomAmount);
     return [baseRandomAmount, randomAmount];
   }
 
@@ -360,7 +367,7 @@ export class TransactionService {
         totalAmountWithInterest:
           options.thirdPartyInterest.amountDollarCents +
           parseFloat(options.interest.percentage) * amount,
-        rawAmount: this.calculateExtraPoints(options.extraPoints, amount),
+        rawAmount: await this.calculateExtraPoints(options.extraPoints, amount),
         type: TransactionType.DEPOSIT,
         pointsConversion: options.pointsConversion,
         clientBankAccount,
@@ -375,7 +382,7 @@ export class TransactionService {
     );
   }
 
-  private calculateExtraPoints(extraPoints, amount: number) {
+  private async calculateExtraPoints(extraPoints, amount: number) {
     if (!extraPoints) return amount;
     const extra = 1 + parseFloat(extraPoints.percentage);
 
@@ -383,7 +390,11 @@ export class TransactionService {
       return extra * amount;
 
     if (extraPoints.name === PlatformInterest.GOLD_EXTRA) {
-      return amount * extra + parseFloat(extraPoints.amount);
+      const conversion =
+        (await this.pointsConversionService.getRecentPointsConversion())
+          .onePointEqualsDollars * 100;
+
+      return amount * extra + parseFloat(extraPoints.points) * conversion;
     }
   }
 

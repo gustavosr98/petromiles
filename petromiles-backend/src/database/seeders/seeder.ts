@@ -2,22 +2,22 @@ import { Role } from '@/entities/role.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 
-import { StateSeederService } from './state/state.service';
-import { RolesSeederService } from './role/role.service';
-import { CountrySeederService } from './country/country.service';
-import { LanguageSeederService } from './language/language.service';
-import { SuscriptionSeederService } from './suscription/suscription.service';
-import { PlatformInterestSeederService } from './platform-interest/platform-interest.service';
-import { ThirdPartyInterestSeederService } from './third_party_interest/third_party_interest.service';
-import { PointsConversionSeederService } from './points_conversion/points_conversion.service';
-import { BankSeederService } from './bank/bank.service';
-import { TaskSeederService } from './task/task.service';
-import { RoutingNumberSeederService } from './routing-number/routing-number.service';
-import { ThirdPartyClientSeederService } from './third-party-client/third-party-client.service';
-import { UserAdministratorSeederService} from "@/database/seeders/user-administrator/user-administrator.service";
-import { StateUserSeederService} from "@/database/seeders/state-user/state-user.service";
-import { UserRoleSeederService} from "@/database/seeders/user-role/user-role.service";
-import { UserDetailsSeederService} from "@/database/seeders/user-datails/user-details.service";
+import { StateSeederService } from '@/database/seeders/state/state.service';
+import { RolesSeederService } from '@/database/seeders/role/role.service';
+import { CountrySeederService } from '@/database/seeders/country/country.service';
+import { LanguageSeederService } from '@/database/seeders/language/language.service';
+import { SuscriptionSeederService } from '@/database/seeders/suscription/suscription.service';
+import { PlatformInterestSeederService } from '@/database/seeders/platform-interest/platform-interest.service';
+import { ThirdPartyInterestSeederService } from '@/database/seeders/third_party_interest/third_party_interest.service';
+import { PointsConversionSeederService } from '@/database/seeders/points_conversion/points_conversion.service';
+import { BankSeederService } from '@/database/seeders/bank/bank.service';
+import { TaskSeederService } from '@/database/seeders/task/task.service';
+import { RoutingNumberSeederService } from '@/database/seeders/routing-number/routing-number.service';
+import { ThirdPartyClientSeederService } from '@/database/seeders/third-party-client/third-party-client.service';
+import { UserAdministratorSeederService } from '@/database/seeders/user-administrator/user-administrator.service';
+import { StateUserSeederService } from '@/database/seeders/state-user/state-user.service';
+import { UserRoleSeederService } from '@/database/seeders/user-role/user-role.service';
+import { UserDetailsSeederService } from '@/database/seeders/user-datails/user-details.service';
 
 @Injectable()
 export class Seeder {
@@ -65,23 +65,40 @@ export class Seeder {
   }
 
   async seedInitial() {
+    const ROLES = await this.role();
+    const STATE = await this.state();
+    const COUNTRY = await this.country();
+    const BANK = await this.bank();
+    const LANGUAGE = await this.language();
+    const SUSCRIPTION = await this.suscription();
+    const PLATFORM = await this.platformInterest();
+    const THIRD_PARTY_INTEREST = await this.thirdPartyInterest();
+    const POINTS_CONVERSION = await this.pointsConversion();
+    const TASKS = await this.task();
+    const ROUTING_NUMBER = await this.routingNumber();
+    const THIRD_PARTY_CLIENT = await this.thirdPartyClient();
+    const USER_ADMINISTRATOR = await this.userAdministrator();
+    const STATE_USER = await this.stateUser();
+    const USER_ROLE = await this.userRole();
+    const USER_DETAILS = await this.userDetails();
+
     return {
-      ROLES: await this.role(),
-      STATE: await this.state(),
-      COUNTRY: await this.country(),
-      BANK: await this.bank(),
-      LANGUAGE: await this.language(),
-      SUSCRIPTION: await this.suscription(),
-      PLATFORM: await this.platformInterest(),
-      THIRD_PARTY_INTEREST: await this.thirdPartyInterest(),
-      POINTS_CONVERSION: await this.pointsConversion(),
-      TASKS: await this.task(),
-      ROUTING_NUMBER: await this.routingNumber(),
-      THIRD_PARTY_CLIENT: await this.thirdPartyClient(),
-        USER_ADMINISTRATOR: await this.userAdministrator(),
-        STATE_USER: await this.stateUser(),
-        USER_ROLE: await this.userRole(),
-        USER_DETAILS: await this.userDetails(),
+      ROLES,
+      STATE,
+      COUNTRY,
+      BANK,
+      LANGUAGE,
+      SUSCRIPTION,
+      PLATFORM,
+      THIRD_PARTY_INTEREST,
+      POINTS_CONVERSION,
+      TASKS,
+      ROUTING_NUMBER,
+      THIRD_PARTY_CLIENT,
+      USER_ADMINISTRATOR,
+      STATE_USER,
+      USER_ROLE,
+      USER_DETAILS,
     };
   }
 
@@ -210,7 +227,7 @@ export class Seeder {
 
   async routingNumber(): Promise<number> {
     return await Promise.all(
-      this.routingNumberSeederService.createRoutingNumber(),
+      await this.routingNumberSeederService.createRoutingNumber(),
     )
       .then(createdRoutingNumber => {
         const ROUTING_NUMBER_ROWS = createdRoutingNumber.filter(
@@ -253,56 +270,56 @@ export class Seeder {
   }
 
   async userAdministrator(): Promise<number> {
-      return await Promise.all(this.userAdministratorSeederService.createUserAdministrator())
-          .then(createdUserAdministrator => {
-              const USER_ADMINISTRATOR_ROWS = createdUserAdministrator.filter(
-                  nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
-              ).length;
-              return USER_ADMINISTRATOR_ROWS;
-          })
-          .catch(error => {
-              return Promise.reject(error);
-          });
+    return await Promise.all(
+      this.userAdministratorSeederService.createUserAdministrator(),
+    )
+      .then(createdUserAdministrator => {
+        const USER_ADMINISTRATOR_ROWS = createdUserAdministrator.filter(
+          nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
+        ).length;
+        return USER_ADMINISTRATOR_ROWS;
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
   }
 
   async stateUser(): Promise<number> {
-      return await Promise.all(this.stateUserSeederService.createStateUser())
-          .then(createdStateUser => {
-              const STATE_USER_ROWS = createdStateUser.filter(
-                  nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
-              ).length;
-              return STATE_USER_ROWS;
-          })
-          .catch(error => {
-              return Promise.reject(error)
-          });
+    return await Promise.all(this.stateUserSeederService.createStateUser())
+      .then(createdStateUser => {
+        const STATE_USER_ROWS = createdStateUser.filter(
+          nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
+        ).length;
+        return STATE_USER_ROWS;
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
   }
 
   async userRole(): Promise<number> {
-      return await Promise.all(this.userRoleSeederService.createUserRole())
-          .then(createdUserRole => {
-              const USER_ROLE_ROWS = createdUserRole.filter(
-                  nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
-              ).length;
-              return USER_ROLE_ROWS;
-          })
-          .catch(error => {
-              return Promise.reject(error)
-          });
+    return await Promise.all(this.userRoleSeederService.createUserRole())
+      .then(createdUserRole => {
+        const USER_ROLE_ROWS = createdUserRole.filter(
+          nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
+        ).length;
+        return USER_ROLE_ROWS;
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
   }
 
   async userDetails(): Promise<number> {
-      return await Promise.all(this.userDetailsSeederService.createUserDetails())
-          .then(createdUserDetails => {
-              const USER_DETAILS_ROWS = createdUserDetails.filter(
-                  nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
-              ).length;
-              return USER_DETAILS_ROWS;
-          })
-          .catch(error => {
-              return Promise.reject(error)
-          });
+    return await Promise.all(this.userDetailsSeederService.createUserDetails())
+      .then(createdUserDetails => {
+        const USER_DETAILS_ROWS = createdUserDetails.filter(
+          nullValueOrCreatedLanguage => nullValueOrCreatedLanguage,
+        ).length;
+        return USER_DETAILS_ROWS;
+      })
+      .catch(error => {
+        return Promise.reject(error);
+      });
   }
-
-
 }

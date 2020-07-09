@@ -34,7 +34,7 @@ export class ThirdPartyInterest extends BaseEntity {
   })
   paymentProvider: string;
 
-  @Transform(amount => (amount / 100).toFixed(2))
+  @Transform(amount => Math.round(amount * 100) / 10000)
   @Column({ nullable: true })
   amountDollarCents: number;
 

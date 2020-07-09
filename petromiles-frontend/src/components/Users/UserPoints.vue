@@ -29,9 +29,10 @@ export default {
   async mounted() {
     const conversion = await this.$http.get("/payments/one-point-to-dollars");
 
-    this.dollars = (
-      this.conversion.points * conversion.onePointEqualsDollars
-    ).toFixed(2);
+    this.dollars =
+      Math.round(
+        this.conversion.points * conversion.onePointEqualsDollars * 100
+      ) / 100;
   },
 };
 </script>

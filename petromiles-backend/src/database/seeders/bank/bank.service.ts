@@ -12,7 +12,7 @@ export class BankSeederService {
     private readonly bankRepository: Repository<Bank>,
   ) {}
 
-  createBank(): Promise<Bank>[] {
-    return BANK.map(bank => this.bankRepository.create(bank).save());
+  createBank(): Promise<InsertResult>[] {
+    return BANK.map(async bank => await this.bankRepository.insert(bank));
   }
 }

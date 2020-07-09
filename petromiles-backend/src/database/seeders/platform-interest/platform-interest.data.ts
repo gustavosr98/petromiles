@@ -13,7 +13,7 @@ export const PLATAFORM_INTERESTS = [
     idPlatformInterest: 2,
     name: 'gold',
     percentage: '0.2',
-    amount: '500',
+    points: 2500,
     description: 'goldInterest',
   },
   {

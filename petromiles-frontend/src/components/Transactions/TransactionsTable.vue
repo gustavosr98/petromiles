@@ -21,6 +21,9 @@ import PlatformInterest from "@/constants/platformInterest";
 
 export default {
   name: "transactions-table",
+  props: {
+    url: { type: String, required: true },
+  },
   components: {
     Datatable,
     "date-range-picker": DateRangePicker,
@@ -33,29 +36,20 @@ export default {
     };
   },
   async mounted() {
-    this.fetchedData = await this.$http.get("/transaction");
-    this.transactions = this.fetchedData.sort((a, b) => {
-      if (a.id < b.id) {
-        return 1;
-      }
-      if (a.id > b.id) {
-        return -1;
-      }
-      return 0;
-    });
+    await this.loadData();
   },
 
+  watch: {
+    url: function() {
+      this.loadData();
+    },
+  },
   methods: {
     filterData(filteredData) {
       this.fetchedData = filteredData;
     },
-  },
-  computed: {
-    title() {
-      return this.$tc("navbar.transaction", 1);
-    },
-    headers() {
-      return [
+    buildHeaders() {
+      const headers = [
         {
           text: this.$tc("common.code"),
           align: "center",
@@ -65,11 +59,6 @@ export default {
           text: this.$tc("common.date"),
           align: "center",
           value: "date",
-        },
-        {
-          text: this.$tc("common.type"),
-          align: "center",
-          value: "translatedType",
         },
         {
           text: this.$tc("common.total", 0) + " ( $ )",
@@ -92,6 +81,35 @@ export default {
           value: "details",
         },
       ];
+
+      if (!this.url.includes("ThirdParty"))
+        headers.splice(2, 0, {
+          text: this.$tc("common.type"),
+          align: "center",
+          value: "translatedType",
+        });
+
+      return headers;
+    },
+    async loadData() {
+      this.fetchedData = await this.$http.get(this.url);
+      this.transactions = this.fetchedData.sort((a, b) => {
+        if (a.id < b.id) {
+          return 1;
+        }
+        if (a.id > b.id) {
+          return -1;
+        }
+        return 0;
+      });
+    },
+  },
+  computed: {
+    title() {
+      return this.$tc("navbar.transaction", 1);
+    },
+    headers() {
+      return this.buildHeaders();
     },
     mungedData() {
       return this.fetchedData.map(data => {
@@ -102,7 +120,10 @@ export default {
 
         return {
           ...data,
-          transactionAmount: `$ ${data.total.toFixed(2)}`,
+          transactionAmount:
+            data.type == Transaction.THIRD_PARTY_CLIENT
+              ? `$ ${data.amount.toFixed(2)}`
+              : `$ ${data.total.toFixed(2)}`,
           state,
           points: data.pointsEquivalent
             ? data.pointsEquivalent + data.extra

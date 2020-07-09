@@ -45,11 +45,11 @@ import { UserClient } from './user-client.entity';
 })
 export class ClientPoints {
   constructor() {}
-  @Transform(dollars => parseFloat(dollars).toFixed(2))
+  @Transform(dollars => Math.round(parseFloat(dollars) * 10000) / 10000)
   @ViewColumn()
   dollars: number;
 
-  @Transform(points => parseFloat(points).toFixed(0))
+  @Transform(points => Math.round(parseFloat(points)))
   @ViewColumn()
   points: number;
 

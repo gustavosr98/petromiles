@@ -22,8 +22,15 @@
                   alt="Avatar"     
                   width="140"   
                   class="center bottomSeparation"                              
-                ></v-img>                
-            </v-col>                        
+                ></v-img>    
+                <router-link to="/user-subscription" style="text-decoration: none" v-if="!isAdmin">
+                  <div class="mt-n10">
+                    <v-btn dark color="secondary">
+                      {{$t("subscription.premiumBtn")}}
+                    </v-btn>
+                  </div>                      
+                </router-link>                            
+            </v-col>   
         </div>    
 </template>
 

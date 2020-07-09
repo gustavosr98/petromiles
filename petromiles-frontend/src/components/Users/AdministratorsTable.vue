@@ -14,7 +14,7 @@ export default {
   },
   data() {
     return {
-      title: this.$tc("navbar.transaction", 1),
+      title: this.$tc("role.administrator", 1),
       fetchedData: [],
       headers: [
         {

@@ -80,7 +80,6 @@ export default {
   props: {
     platformInterest: { type: Array, required: true },
     labels: { type: Array },
-    pointsConversion: { type: Number },
   },
   data() {
     return {
@@ -120,12 +119,9 @@ export default {
           id: d.idPlatformInterest,
           name: d.name,
           type: this.$t(`interest.${d.name.toLowerCase()}Config`),
-          amount: d.amount && d.percentage ? null : d.amount,
+          amount: d.amount,
           percentage: d.percentage,
-          points:
-            d.amount && d.percentage
-              ? (d.amount / this.pointsConversion).toFixed(0)
-              : null,
+          points: d.points,
           description: d.description,
           suscription: d.suscription,
         });
@@ -151,12 +147,11 @@ export default {
       }
     },
     calculateInterests() {
-      let { id, amount, points, percentage, type, ...item } = this.interestData;
-      if (points) amount = points * this.pointsConversion;
+      let { id, amount, percentage, type, ...item } = this.interestData;
 
       return {
-        amount: amount ? (amount * 100).toFixed(2) : null,
-        percentage: percentage ? (percentage / 100).toFixed(4) : null,
+        amount: amount ? Math.round(amount * 10000) / 100 : null,
+        percentage: percentage ? Math.round(percentage * 100) / 10000 : null,
         ...item,
       };
     },
@@ -168,6 +163,7 @@ export default {
         if (i.name == this.interestData.name) {
           i.percentage = this.interestData.percentage;
           i.amount = this.interestData.amount;
+          i.points = this.interestData.points;
         }
         return i;
       });
