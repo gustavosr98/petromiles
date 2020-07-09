@@ -39,12 +39,14 @@
         dark
       >Recover Password</v-btn>
     </div>
+    <snackbar @close="closeSnackbar" :show="snackbar" :text="text"></snackbar>
   </v-col>
 </template>
 
 <script>
 import store from "@/store/index";
 import NoFederatedButton from "@/components/Auth/NoFederatedButton";
+import Snackbar from "@/components/General/Snackbar/Snackbar.vue";
 import recoverMixin from "@/mixins/validation-forms/recover.mixin.js";
 import authConstants from "@/constants/authConstants";
 
@@ -53,7 +55,9 @@ import adminRoutes from "@/router/adminRoutes";
 
 export default {
   mixins: [recoverMixin],
-  components: {},
+  components: {
+    "snackbar": Snackbar
+  },
   props: {
     title: { required: true, type: String },
     loginRoute: { type: String },
@@ -68,6 +72,8 @@ export default {
       routeNameLogin: this.loginRoute,
       routeNameSignUp: this.signUpRoute,
       loading: false,
+      showSnackbar: false,
+      text: "",
     };
   },
   methods: {
@@ -79,15 +85,15 @@ export default {
           role: this.role,
         })
         .then(res => {
-          if (this.role === authConstants.ADMINISTRATOR) {
-            this.$router.push(adminRoutes.LOGIN.path);
-          } else {
-            this.$router.push(clientRoutes.LOGIN.path);
-          }
+          this.text = this.$tc("profile.sentEmail") + this.email;
+          this.snackbar = true;          
         })
         .finally(() => {
           this.loading = false;
         });
+    },
+    closeSnackbar(){
+      this.snackbar = false;
     },
   },
 };

@@ -196,9 +196,9 @@ export default {
           this.transaction = res;
           this.paymentIsReady = true;
         })
-        .finally(() => {
+        .catch(err => {
           this.loading = false;
-        });
+        })        
     },
     async loadRate() {
       this.onePointToDollars = (

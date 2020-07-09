@@ -71,14 +71,14 @@ export const mutations = {
 
 export const actions = {
   async signUp({ commit }, credentials) {
-    httpClient.post("/auth/signup", credentials).then(data => {
+    await httpClient.post("/auth/signup", credentials).then(data => {
       commit("setUserLocalStorage", data);
       commit("loadUserToken");
       location.reload();
     });
   },
   async logIn({ commit }, credentials) {
-    httpClient.post("/auth/login", credentials).then(data => {
+    await httpClient.post("/auth/login", credentials).then(data => {
       commit("setUserLocalStorage", data);
       commit("loadUserToken");
       location.reload();

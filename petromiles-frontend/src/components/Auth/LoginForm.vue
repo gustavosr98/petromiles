@@ -49,7 +49,7 @@
       </v-col>
     </v-row>
     <div class="text-center mt-3 mb-8">
-      <v-btn @click="buildUser()" color="light-blue darken-4" dark>Login</v-btn>
+      <v-btn @click="buildUser()" color="light-blue darken-4" dark :loading="loading">Login</v-btn>
     </div>
   </v-col>
 </template>
@@ -81,10 +81,12 @@ export default {
       password: "",
       routeNameSignUp: this.signUpRoute,
       routeNameRecover: this.recoverRoute,
+      loading: false,
     };
   },
   methods: {
     buildUser() {
+      this.loading = true;
       const user = {
         email: this.email,
         password: this.password,
@@ -96,6 +98,9 @@ export default {
     login(user) {
       store.dispatch("auth/logIn", user).then(() => {
         this.$router.push({ name: this.dashboardRoute });
+      })
+      .finally(() => {
+        this.loading = false;
       });
     },
   },

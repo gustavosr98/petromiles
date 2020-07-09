@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <navbar :navigationModules="navigationModules"></navbar>
+    <navbar :navigationModules="navigationModules" :isAdmin="true"></navbar>
     <slot></slot>
   </v-main>
 </template>
@@ -26,12 +26,7 @@ export default {
           name: "navbar.user",
           mdiIcon: "mdi-account-multiple",
           route: adminRoutes.USER_LIST,
-        },
-        {
-          name: "navbar.bankAccount",
-          mdiIcon: "mdi-bank",
-          route: adminRoutes.BANK_ACCOUNT_LIST,
-        },
+        },        
         {
           name: "navbar.transaction",
           mdiIcon: "mdi-repeat",

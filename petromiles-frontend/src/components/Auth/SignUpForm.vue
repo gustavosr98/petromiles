@@ -73,7 +73,7 @@
       </h5>
     </div>
     <div class="text-center mt-3 mb-8">
-      <v-btn @click="ckeckingValidForm" type="submit" class="light-blue darken-4" dark>SIGN UP</v-btn>
+      <v-btn :loading="loading" @click="ckeckingValidForm" type="submit" class="light-blue darken-4" dark>SIGN UP</v-btn>
     </div>
   </v-col>
 </template>
@@ -105,6 +105,7 @@ export default {
       password: "",
       lastName: "",
       routeNameLogin: clientRoutes.LOGIN.name,
+      loading: false,
     };
   },
   validations: {
@@ -158,6 +159,7 @@ export default {
       if (!this.$v.$invalid) this.buildUser();
     },
     buildUser() {
+      this.loading = true;
       const user = {
         firstName: this.firstName,
         lastName: this.lastName,
@@ -170,6 +172,9 @@ export default {
     signUp(user) {
       store.dispatch("auth/signUp", user).then(() => {
         this.$router.push({ name: clientRoutes.DASHBOARD.name });
+      })
+      .finally(() => {
+        this.loading = false;
       });
     },
   },
