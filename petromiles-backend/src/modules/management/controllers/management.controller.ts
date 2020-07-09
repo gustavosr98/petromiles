@@ -104,6 +104,16 @@ export class ManagementController {
     return this.thirdPartyInterestService.getAll();
   }
 
+  @Get('statistics')
+  getStatistics(
+    @GetUser() user: AuthenticatedUser,
+  ): Promise<App.Statistics> {
+    this.logger.http(
+      `[${ApiModules.MANAGEMENT}] (${HttpRequest.GET})   {${user.email}} asks  /${baseEndpoint}/statistics`,
+    );
+    return this.managementService.getStatistics(user);
+  }
+
   @Put('subscription/:id')
   updateSubscriptionConditions(
     @Param('id') idSubscription: number,

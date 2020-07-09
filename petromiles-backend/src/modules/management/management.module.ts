@@ -20,6 +20,7 @@ import { UserAdministrator } from '@/entities/user-administrator.entity';
 import { UserRole } from '@/entities/user-role.entity';
 import { Bank } from '@/entities/bank.entity';
 import { Country } from '@/entities/country.entity';
+import { Transaction } from '@/entities/transaction.entity';
 
 // CONTROLLER
 import { ManagementController } from '@/modules/management/controllers/management.controller';
@@ -39,6 +40,7 @@ import { ManagementController } from '@/modules/management/controllers/managemen
       UserAdministrator,
       UserRole,
       Bank,
+      Transaction,
     ]),
   ],
   providers: [

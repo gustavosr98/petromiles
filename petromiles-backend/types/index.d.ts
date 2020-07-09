@@ -95,4 +95,46 @@ declare namespace App {
       total: number;
     }
   }
+
+  interface Statistics {
+    transactions: {
+      addPoints: {
+        totalInvalid: number;
+        totalValid: number;
+        totalPending: number;
+        total: number;
+      };
+      exchangePoints: {
+        totalInvalid: number;
+        totalValid: number;
+        totalPending: number;
+        total: number;
+      };
+      thirdPartyClient: {
+        totalInvalid: number;
+        totalValid: number;
+        totalPending: number;
+        total: number;
+      };
+      total: number;
+    };
+    clientBankAccounts: {
+      totalInvalid: number;
+      totalValid: number;
+      totalPending: number;
+      total: number;
+    };
+    users?: {
+      clients: {
+        totalBlocked: number;
+        totalActive: number;
+        totalClients: number;
+      };
+      admins: {
+        totalBlocked: number;
+        totalActive: number;
+        totalAdmins: number;
+      };
+    };
+  }
 }
