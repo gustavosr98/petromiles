@@ -27,18 +27,11 @@
               />
               <platform-interest
                 :platformInterest="subscriptionBenefits"
-                :pointsConversion="
-                  parseFloat(pointsConversion.onePointEqualsDollars)
-                "
                 :labels="subscriptionInterestLabels"
                 v-if="i === 1"
               />
               <subscription-conditionals :subscriptions="subscriptions" v-if="i === 2" />
-              <points-conversion-config
-                :pointsConversion="pointsConversion"
-                @update="updateConversion"
-                v-if="i === 3"
-              />
+              <points-conversion-config :pointsConversion="pointsConversion" v-if="i === 3" />
               <third-party-interest-config :thirdPartyInterest="thirdPartyInterest" v-if="i === 4" />
               <cron-frenquency-config :frequencies="frequencies" v-if="i === 5" />
             </v-expansion-panel-content>
@@ -114,9 +107,6 @@ export default {
     },
     async loadCronFrequencies() {
       this.frequencies = await this.$http.get("cron");
-    },
-    updateConversion(conversion) {
-      this.pointsConversion.onePointEqualsDollars = conversion;
     },
   },
 

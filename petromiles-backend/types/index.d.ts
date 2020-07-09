@@ -93,6 +93,7 @@ declare namespace App {
       pointsEquivalent?: number;
       pointsConversion: number;
       total: number;
+      clientBankAccountEmail?: string;
     }
   }
 

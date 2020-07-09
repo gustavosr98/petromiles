@@ -12,7 +12,7 @@ export class PointsConversion extends BaseEntity {
   @PrimaryGeneratedColumn()
   idPointsConversion: number;
 
-  @Column('decimal', { precision: 11, scale: 6 })
+  @Column('decimal', { precision: 19, scale: 14 })
   onePointEqualsDollars: number;
 
   @Column({ default: () => 'CURRENT_DATE' })

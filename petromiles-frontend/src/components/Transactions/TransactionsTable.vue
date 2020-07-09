@@ -36,7 +36,6 @@ export default {
     };
   },
   async mounted() {
-    console.log(this.url);
     await this.loadData();
   },
 
@@ -121,7 +120,10 @@ export default {
 
         return {
           ...data,
-          transactionAmount: `$ ${data.total.toFixed(2)}`,
+          transactionAmount:
+            data.type == Transaction.THIRD_PARTY_CLIENT
+              ? `$ ${data.amount.toFixed(2)}`
+              : `$ ${data.total.toFixed(2)}`,
           state,
           points: data.pointsEquivalent
             ? data.pointsEquivalent + data.extra

@@ -268,7 +268,11 @@ export class ThirdPartyClientsService {
     return extras;
   }
 
-  private calculateExtraPoints(extraPoints, amount: number) {
+  private calculateExtraPoints(
+    extraPoints,
+    amount: number,
+    conversion: number,
+  ) {
     if (!extraPoints) return amount;
     const extra = 1 + parseFloat(extraPoints.percentage);
 
@@ -276,7 +280,7 @@ export class ThirdPartyClientsService {
       return extra * amount;
 
     if (extraPoints.name === PlatformInterest.GOLD_EXTRA) {
-      return amount * extra + parseFloat(extraPoints.amount) / 100;
+      return amount * extra + parseFloat(extraPoints.points) * conversion;
     }
   }
 
@@ -298,18 +302,23 @@ export class ThirdPartyClientsService {
     );
     const extras = await this.calculateExtras(userClient);
 
-    let pointsToDollars: number = 0;
     let tentativePoints: number = 0;
+    let accumulatedPoints: number = 0;
 
     const products: Product[] = addPointsRequest.products.map(product => {
-      pointsToDollars += (product.priceTag / 100) * accumulatePercentage;
-
-      tentativePoints = Math.trunc(
-        this.calculateExtraPoints(
-          extras.extraPoints,
-          (product.priceTag / 100) * accumulatePercentage,
-        ) / mostRecentRate.onePointEqualsDollars,
+      tentativePoints = Math.round(
+        Math.round(
+          this.calculateExtraPoints(
+            extras.extraPoints,
+            (product.priceTag / 100) * accumulatePercentage,
+            mostRecentRate.onePointEqualsDollars,
+          ) * 10000,
+        ) /
+          10000 /
+          mostRecentRate.onePointEqualsDollars,
       );
+
+      accumulatedPoints += tentativePoints;
 
       return {
         ...product,
@@ -317,8 +326,14 @@ export class ThirdPartyClientsService {
       };
     });
 
+    const rawAmount =
+      Math.round(
+        accumulatedPoints * mostRecentRate.onePointEqualsDollars * 10000,
+      ) / 100;
+
     const commission: number = Math.trunc(
-      this.calculateCommission(interests, pointsToDollars) * 100,
+      Math.round(this.calculateCommission(interests, rawAmount / 100) * 10000) /
+        100,
     );
 
     const response: AddPointsResponse = {
@@ -337,10 +352,6 @@ export class ThirdPartyClientsService {
     addPointsRequest: AddPointsRequest,
     user: AuthenticatedUser,
   ): Promise<AddPointsResponse> {
-    const accumulatePercentage = parseFloat(
-      (await this.get(addPointsRequest.apiKey)).accumulatePercentage,
-    );
-
     const points: AddPointsResponse = await this.consultPoints(
       addPointsRequest,
       user,
@@ -362,35 +373,36 @@ export class ThirdPartyClientsService {
         ThirdPartyClientsErrorCodes.UNKNOWN_API_KEY,
       );
 
+    const mostRecentRate = await this.pointsConversionService.getRecentPointsConversion();
     const thirdPartyInterest = await this.thirdPartyInterestService.get(
       PaymentProvider.STRIPE,
       TransactionType.WITHDRAWAL,
     );
+    const extras = await this.calculateExtras(userClient);
+
+    let accumulatedPoints: number = 0;
+    points.request.products.forEach(p => {
+      accumulatedPoints += p.tentativePoints;
+    });
+
+    const rawAmount =
+      Math.round(
+        accumulatedPoints * mostRecentRate.onePointEqualsDollars * 10000,
+      ) / 100;
+
     const interests = await this.paymentsService.getInterests(
       TransactionType.WITHDRAWAL,
       PlatformInterest.WITHDRAWAL,
     );
-    const extras = await this.calculateExtras(userClient);
 
-    let pointsToDollars: number = 0;
-    let accumulatedPoints: number = 0;
-    points.request.products.forEach(p => {
-      pointsToDollars += (p.priceTag / 100) * accumulatePercentage;
-      accumulatedPoints += p.tentativePoints;
-    });
-    const commission: number = Math.trunc(
-      this.calculateCommission(interests, pointsToDollars) * 100,
-    );
+    const commission: number =
+      Math.round(this.calculateCommission(interests, rawAmount / 100) * 10000) /
+      100;
 
     const options: App.Transaction.TransactionCreation = {
       clientOnThirdParty,
       totalAmountWithInterest: commission,
-      rawAmount: Math.trunc(
-        this.calculateExtraPoints(
-          extras.extraPoints,
-          Math.trunc(pointsToDollars * 100),
-        ),
-      ),
+      rawAmount,
       type: TransactionType.THIRD_PARTY_CLIENT,
       pointsConversion: extras.pointsConversion,
       platformInterest: extras.interest,
@@ -409,11 +421,11 @@ export class ThirdPartyClientsService {
     const confirmationTicket: ConfirmationTicket = {
       confirmationId: transaction.idTransaction.toString(),
       userEmail: user.email,
-      date: new Date(),
+      date: transaction.initialDate,
       currency: addPointsRequest.products[0].currency,
-      pointsToDollars: Math.trunc(pointsToDollars * 100),
+      pointsToDollars: Math.trunc(rawAmount),
       accumulatedPoints,
-      commission,
+      commission: points.request.totalTentativeCommission,
       status: StateName.VERIFYING,
     };
 

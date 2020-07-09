@@ -125,9 +125,8 @@ export default {
           .put(
             `third-party-administration/${this.selectedItem.idThirdPartyClient}`,
             {
-              accumulatePercentage: (
-                this.interestData.percentage / 100
-              ).toFixed(4),
+              accumulatePercentage:
+                (this.interestData.percentage * 100) / 10000,
             }
           )
           .then(() => {

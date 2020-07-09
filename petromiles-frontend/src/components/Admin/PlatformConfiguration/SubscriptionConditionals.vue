@@ -138,9 +138,9 @@ export default {
       let { amount, percentage } = this.interestData;
 
       return {
-        cost: amount ? parseFloat((amount * 100).toFixed(2)) : 0,
+        cost: amount ? Math.round(amount * 10000) / 100 : 0,
         upgradedAmount: percentage
-          ? parseFloat((percentage * 100).toFixed(2))
+          ? Math.round(percentage * 10000) / 100
           : null,
       };
     },

@@ -42,9 +42,9 @@ export default {
     };
   },
   mounted() {
-    this.interestData.points = (
+    this.interestData.points = Math.round(
       1 / this.pointsConversion.onePointEqualsDollars
-    ).toFixed(0);
+    );
   },
   methods: {
     async update() {

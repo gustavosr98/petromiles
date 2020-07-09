@@ -36,7 +36,7 @@
                 <v-row justify="center">
                   <v-col cols="8">
                     <v-text-field
-                      :value="costWithInterests"
+                      :value="Math.round(costWithInterests * 100) / 100"
                       :label="$t('payments.totalCost')"
                       append-icon="mdi-cash"
                       :disabled="true"
@@ -158,16 +158,15 @@ export default {
   },
   computed: {
     rawCost() {
-      return (this.points * this.onePointToDollars).toFixed(2);
+      return Math.round(this.points * this.onePointToDollars * 10000) / 10000;
     },
     costWithInterests() {
       if (this.points) {
-        let result = parseFloat(this.rawCost);
+        let result = this.rawCost;
         this.interests.map(i => {
-          result =
-            result + parseFloat(this.rawCost) * i.percentage + i.amount / 100;
+          result = result + this.rawCost * i.percentage + i.amount / 100;
         });
-        return result.toFixed(2);
+        return Math.round(result * 10000) / 10000;
       } else return "0.00";
     },
   },
@@ -189,8 +188,8 @@ export default {
       this.$http
         .post("/payments/buy-points", {
           idClientBankAccount: this.selectedBankAccount,
-          amount: (this.rawCost * 100).toFixed(2),
-          amountToCharge: (this.costWithInterests * 100).toFixed(0),
+          amount: Math.round(this.rawCost * 10000) / 100,
+          amountToCharge: Math.round(this.costWithInterests * 10000) / 100,
         })
         .then(res => {
           this.transaction = res;

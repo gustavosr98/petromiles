@@ -81,16 +81,16 @@
                       class="invoice-table-content-type"
                     >{{ this.$tc(`transaction-type.${transaction.type}`) }}</td>
                     <td>{{ points }}</td>
-                    <td>{{ (transaction.rawAmount / 100).toFixed(2) }}</td>
+                    <td>{{ Math.round(transaction.rawAmount) / 100 }}</td>
                   </tr>
                   <tr class="item center-item invoice-table-content">
                     <td></td>
                     <td>Subtotal:</td>
-                    <td>{{ (transaction.rawAmount / 100).toFixed(2) }}</td>
+                    <td>{{ Math.round(transaction.rawAmount) / 100 }}</td>
                   </tr>
                   <tr class="item center-item invoice-table-content">
                     <td></td>
-                    <td>{{ $t("invoice.taxes") }} ({{ tax.toFixed(2) }}):</td>
+                    <td>{{ $t("invoice.taxes") }} ({{ Math.round(tax * 100) / 100 }}):</td>
                     <td>{{ total }}</td>
                   </tr>
                   <tr class="total center-item">
@@ -176,7 +176,9 @@ export default {
       );
     },
     total: function() {
-      return (this.transaction.rawAmount / 100 + this.tax).toFixed(2);
+      return (
+        Math.round((this.transaction.rawAmount / 100 + this.tax) * 100) / 100
+      );
     },
   },
   methods: {

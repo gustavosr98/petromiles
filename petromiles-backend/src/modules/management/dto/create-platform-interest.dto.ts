@@ -6,6 +6,9 @@ export class CreatePlatformInterestDTO {
   name: PlatformInterest;
 
   @IsOptional()
+  points?: number;
+
+  @IsOptional()
   amount?: string;
 
   @IsOptional()

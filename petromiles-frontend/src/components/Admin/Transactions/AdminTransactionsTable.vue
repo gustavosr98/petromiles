@@ -32,7 +32,7 @@ export default {
     };
   },
   async mounted() {
-    this.fetchedData = await this.$http.get("/transaction/admin/list/all");
+    this.fetchedData = await this.$http.get("transaction/admin/list/all");
     this.transactions = this.fetchedData;
   },
 
@@ -94,9 +94,14 @@ export default {
 
         return {
           ...data,
-          transactionAmount: `$ ${data.total.toFixed(2)}`,
+          transactionAmount:
+            data.type == Transaction.THIRD_PARTY_CLIENT
+              ? `$ ${data.amount.toFixed(2)}`
+              : `$ ${data.total.toFixed(2)}`,
           state,
-          points: data.pointsEquivalent ? data.pointsEquivalent : "-",
+          points: data.pointsEquivalent
+            ? data.pointsEquivalent + data.extra
+            : "-",
           translatedType: this.$tc(`transaction-type.${data.type}`),
         };
       });

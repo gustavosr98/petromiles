@@ -5,7 +5,7 @@
         <div class="d-flex justify-center">
           <balance-option
             :header="$t('user-balance.myPoints')"
-            :value="Math.trunc(points.points)"
+            :value="Math.round(points.points)"
             type
           />
           <div class="mr-5">
@@ -36,9 +36,9 @@ export default {
     this.points = await this.$http.get("user/points/conversion");
     const conversion = await this.$http.get("/payments/one-point-to-dollars");
 
-    this.dollars = (
-      this.points.points * conversion.onePointEqualsDollars
-    ).toFixed(2);
+    this.dollars =
+      Math.round(this.points.points * conversion.onePointEqualsDollars * 100) /
+      100;
   },
 };
 </script>

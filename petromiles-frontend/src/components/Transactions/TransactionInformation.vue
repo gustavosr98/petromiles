@@ -87,19 +87,24 @@
         </tr>
         <!-- For all type of transactions -->
 
-        <tr class="text-center">
+        <tr class="text-center" v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
           <td class="font-weight-bold">{{ $tc("common.amount", 0) }}</td>
-          <td>{{ transaction.amount }} $</td>
+          <td>{{ Math.round(transaction.amount * 100) / 100 !== 0 ? (transaction.amount).toFixed(2) : transaction.amount }} $</td>
         </tr>
 
-        <tr class="text-center">
+        <tr class="text-center" v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
           <td class="font-weight-bold">{{ $t("invoice.taxes") }}</td>
-          <td>{{ transaction.interest }} $</td>
+          <td>{{ Math.round(transaction.amount * 100) / 100 !== 0 ? (transaction.interest).toFixed(2) : transaction.interest }} $</td>
         </tr>
 
         <tr class="text-center total-item">
           <td class="font-weight-bold">{{ $t("common.total") }}</td>
-          <td>{{ transaction.total }} $</td>
+          <td
+            v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT"
+          >{{ Math.round(transaction.amount * 100) / 100 !== 0 ? (transaction.total).toFixed(2) : transaction.total }} $</td>
+          <td
+            v-else
+          >{{ Math.round(transaction.amount * 100) / 100 !== 0 ? (transaction.amount).toFixed(2) : transaction.amount }} $</td>
         </tr>
       </tbody>
     </v-simple-table>

@@ -68,27 +68,6 @@ export class TransactionController {
     return this.transactionService.get(idTransaction);
   }
 
-  @Roles(Role.ADMINISTRATOR)
-  @UseGuards(RolesGuard)
-  @Get('admin/:idTransaction')
-  getTransactionAdministrator(
-    @Param('idTransaction') idTransaction,
-    @GetUser() user,
-  ): Promise<App.Transaction.TransactionDetails> {
-    this.logger.http(
-      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET})  ${user?.email} asks /${baseEndpoint}/admin/${idTransaction}`,
-    );
-    return this.transactionService.getTransactionAdmin(idTransaction);
-  }
-
-  @Get('admin/list/all')
-  getTransactionsAdmin(@GetUser() user) {
-    this.logger.http(
-      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/admin/list/all`,
-    );
-    return this.transactionService.getTransactionsAdmin(user.email);
-  }
-
   @Get('extra-points-type/:idTransaction')
   async getExtraPointsOfATransaction(
     @Param('idTransaction') idTransaction: number,
@@ -96,5 +75,13 @@ export class TransactionController {
     return await this.transactionService.getExtraPointsOfATransaction(
       idTransaction,
     );
+  }
+
+  @Get('admin/list/all')
+  getTransactionsAdmin(@GetUser() user) {
+    this.logger.http(
+      `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}`,
+    );
+    return this.transactionService.getTransactionsAdmin();
   }
 }

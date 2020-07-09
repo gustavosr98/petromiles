@@ -58,7 +58,7 @@ export class ThirdPartyInterestService {
     createThirdPartyInterestDTO: CreateThirdPartyInterestDTO,
   ): Promise<ThirdPartyInterest> {
     let { amountDollarCents, transactionType } = createThirdPartyInterestDTO;
-    amountDollarCents = parseFloat(amountDollarCents.toFixed(2));
+    amountDollarCents = Math.round(amountDollarCents * 10000) / 10000;
 
     createThirdPartyInterestDTO.amountDollarCents = amountDollarCents;
 

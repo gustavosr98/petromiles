@@ -21,7 +21,7 @@ export class PlatformInterest extends BaseEntity {
   name: string;
 
   @Transform(amount => {
-    if (amount) return (amount / 100).toFixed(2);
+    if (amount) return Math.round(amount * 100) / 10000;
 
     return amount;
   })
@@ -29,12 +29,15 @@ export class PlatformInterest extends BaseEntity {
   amount?: string;
 
   @Transform(percentage => {
-    if (percentage) return (percentage * 100).toFixed(2);
+    if (percentage) return Math.round(percentage * 1000000) / 10000;
 
     return percentage;
   })
   @Column({ nullable: true })
   percentage?: string;
+
+  @Column({ nullable: true })
+  points?: number;
 
   @Column({ default: () => 'CURRENT_DATE' })
   initialDate: Date;
