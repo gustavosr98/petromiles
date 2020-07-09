@@ -506,17 +506,17 @@ export class ThirdPartyClientsService {
               parseInt(theirConfirmationTicket.confirmationId),
           );
 
-          const ourConfirmationTicket = {
-            confirmationId: ourTransaction.id,
-            date: new Date(ourTransaction.fullDate),
-            userEmail: ourTransaction.clientBankAccountEmail,
-            pointsToDollars: Math.trunc(ourTransaction.amount * 100),
-            commission: Math.trunc(ourTransaction.interest * 100),
-            accumulatedPoints: Math.trunc(ourTransaction.pointsEquivalent),
-            state: ourTransaction.state,
-          };
+          if (!!ourTransaction) {
+            const ourConfirmationTicket = {
+              confirmationId: ourTransaction.id,
+              date: new Date(ourTransaction.fullDate),
+              userEmail: ourTransaction.clientBankAccountEmail,
+              pointsToDollars: Math.trunc(ourTransaction.amount * 100),
+              commission: Math.trunc(ourTransaction.interest * 100),
+              accumulatedPoints: Math.trunc(ourTransaction.pointsEquivalent),
+              state: ourTransaction.state,
+            };
 
-          if (!!ourConfirmationTicket) {
             if (ourConfirmationTicket.state !== StateName.VERIFYING) {
               processingDetails.result = CsvProcessResult.MAINTAIN;
               processingDetails.state =
@@ -550,6 +550,7 @@ export class ThirdPartyClientsService {
             processingDetails.description.push(
               CsvProcessDescription.NOT_EXISTING_TRANSACTION_ID,
             );
+            processingDetails.state = StateName.INVALID;
           }
 
           this.internalTicketProcessing({
@@ -563,6 +564,7 @@ export class ThirdPartyClientsService {
           processingDetails.description.push(
             CsvProcessDescription.WRONG_TYPE_OF_VALUES,
           );
+          processingDetails.state = StateName.INVALID;
         } finally {
           logPrefix =
             logPrefix +
