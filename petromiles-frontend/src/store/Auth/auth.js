@@ -108,12 +108,13 @@ export const actions = {
       password: passwords.newPassword
     });    
   },
-  async updateUserData({ commit }, payload){          
+  async updateUserData({ commit }, payload){           
     const data = JSON.parse(JSON.stringify(payload));        
     if(data.user.details.birthdate !== null){
       data.user.details.birthdate = data.user.details.birthdate.replace("-", "/").replace("-", "/");
     }       
-    let saveUserURL = ``
+    let saveUserURL = ``;
+    let userRole = authConstants.CLIENT.toLowerCase();
     if(!data.isAdmin){
       saveUserURL = `user/update-details`;
     }
@@ -121,7 +122,7 @@ export const actions = {
       saveUserURL = `user/update-details?id=${data.user.id}`;
     }    
     await httpClient.put(`${saveUserURL}`, {
-      role: data.user.role.toLowerCase(),
+      role: userRole,
       ...data.user.details
     });
     if(!data.isAdmin){

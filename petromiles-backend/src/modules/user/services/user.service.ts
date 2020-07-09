@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ApiModules } from '@/logger/api-modules.enum';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 // SERVICES
 import { UserAdministratorService } from '@/modules/user/services/user-administrator.service';
@@ -19,6 +22,7 @@ import { UserInfo } from '@/interfaces/user/user-info.interface';
 @Injectable()
 export class UserService {
   constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     @InjectRepository(UserDetails)
     private userDetailsRepository: Repository<UserDetails>,
     private userClientService: UserClientService,
@@ -75,11 +79,19 @@ export class UserService {
   ): Promise<UpdateResult> {
     const { role, ...userDetails } = details;
 
-    return await this.userDetailsRepository
+    if (role === Role.CLIENT.toLowerCase() || role === Role.ADMINISTRATOR.toLowerCase()) {
+      return await this.userDetailsRepository
       .createQueryBuilder()
       .update(UserDetails)
       .set({ ...userDetails })
       .where(`fk_user_${role} = :id`, { id })
       .execute();
+    }
+    else {
+      this.logger.error(
+        `[${ApiModules.USER}] Unknown Role: {${role}}`,
+      );
+      throw new BadRequestException('error-messages.unknownRole');
+    }    
   }
 }

@@ -201,7 +201,7 @@ export default {
   },  
   methods: {   
     ...mapActions(["updateUserData"]),     
-    resetValues(){
+    resetValues(){      
       if(this.userDetails !== null){                
         const user = JSON.parse(JSON.stringify(this.userDetails));        
         const { userClient, ...details } = user.details;
@@ -218,7 +218,7 @@ export default {
       }      
     },
     checkingValidForm(){
-      this.$v.$touch();
+      this.$v.$touch();    
       if (!this.$v.$invalid && this.dataChanged()){
         this.loading = true;
         this.saveUserData();
@@ -239,7 +239,7 @@ export default {
       }      
       return false;
     },
-    countryChanged(newCountry, currentCountry){      ;
+    countryChanged(newCountry, currentCountry){      
       if((currentCountry === undefined && newCountry !== undefined) || (currentCountry === null && newCountry !== null)){
         return true;
       }
@@ -266,9 +266,23 @@ export default {
         this.loading = false;
         if(!this.isAdmin){          
           this.resetValues();
-        }        
+        }             
+        else {
+          this.updateOriginalDataForAdmin();
+        }  
       }                        
     },    
+    updateOriginalDataForAdmin(){
+      const user = JSON.parse(JSON.stringify(this.userData));   
+      this.userDetails.details.address = user.details.address
+      this.userDetails.details.birthdate = user.details.birthdate
+      this.userDetails.details.country = user.details.country
+      this.userDetails.details.firstName = user.details.firstName
+      this.userDetails.details.secondLastName = user.details.secondLastName
+      this.userDetails.details.lastName = user.details.lastName
+      this.userDetails.details.middleName = user.details.middleName
+      this.userDetails.details.phone = user.details.phone            
+    },
     getMaxDatePicker(){
       const fecha = new Date();
       fecha.setDate(fecha.getDate() - 1);
