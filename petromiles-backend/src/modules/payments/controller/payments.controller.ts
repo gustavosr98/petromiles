@@ -46,7 +46,12 @@ export class PaymentsController {
     @GetUser() user,
     @Body(ValidationPipe) paymentProperties: CreatePaymentDTO,
   ): Promise<Transaction> {
-    const { idClientBankAccount, amount, amountToCharge } = paymentProperties;
+    const {
+      idClientBankAccount,
+      amount,
+      amountToCharge,
+      points,
+    } = paymentProperties;
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/buy-points`,
     );
@@ -54,6 +59,7 @@ export class PaymentsController {
       idClientBankAccount,
       amount,
       amountToCharge,
+      points,
     );
   }
 
@@ -62,7 +68,12 @@ export class PaymentsController {
     @GetUser() user,
     @Body(ValidationPipe) paymentProperties: CreatePaymentDTO,
   ) {
-    const { idClientBankAccount, amount, amountToCharge } = paymentProperties;
+    const {
+      idClientBankAccount,
+      amount,
+      amountToCharge,
+      points,
+    } = paymentProperties;
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/withdraw-points`,
     );
@@ -72,6 +83,7 @@ export class PaymentsController {
       idClientBankAccount,
       amount,
       amountToCharge,
+      points,
     );
   }
 

@@ -52,14 +52,22 @@
                       :label="$tc('navbar.bankAccount', 0)"
                       append-outer-icon="mdi-bank"
                       :items="bankAccounts"
-                      item-text="last4"
                       item-value="idClientBankAccount"
                       @change="$v.points.$touch()"
                       @blur="$v.points.$touch()"
                       :error-messages="selectedBankAccountErrors"
                       :loading="loadingBankAccounts"
                       :disabled="loadingBankAccounts || loading"
-                    ></v-select>
+                    >
+                      <template
+                        slot="selection"
+                        slot-scope="data"
+                      >{{ data.item.nickname }} - {{ data.item.last4 }}</template>
+                      <template
+                        slot="item"
+                        slot-scope="data"
+                      >{{ data.item.nickname }} - {{ data.item.last4 }}</template>
+                    </v-select>
                   </v-col>
                 </v-row>
                 <v-row justify="center">
@@ -190,6 +198,7 @@ export default {
           idClientBankAccount: this.selectedBankAccount,
           amount: Math.round(this.rawCost * 10000) / 100,
           amountToCharge: Math.round(this.costWithInterests * 10000) / 100,
+          points: this.points
         })
         .then(res => {
           this.transaction = res;
@@ -197,7 +206,7 @@ export default {
         })
         .catch(err => {
           this.loading = false;
-        })        
+        });
     },
     async loadRate() {
       this.onePointToDollars = (

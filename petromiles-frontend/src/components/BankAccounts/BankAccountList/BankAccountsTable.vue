@@ -21,16 +21,16 @@ import { states } from "@/constants/state";
 
 export default {
   name: "bank-accounts-table",
-  props: {  
+  props: {
     isAdmin: {
-      default: false
-    },  
+      default: false,
+    },
     bankAccounts: {
-      default: null
+      default: null,
     },
     clientID: {
-      default: 0
-    }
+      default: 0,
+    },
   },
   components: {
     Datatable,
@@ -41,11 +41,10 @@ export default {
     };
   },
   async mounted() {
-    if(!this.bankAccounts){
+    if (!this.bankAccounts) {
       this.fetchedData = await this.$http.get("/bank-account");
       this.$store.commit("bankAccount/SET_BANK_ACCOUNTS", this.fetchedData);
-    }    
-    else{
+    } else {
       this.fetchedData = this.bankAccounts;
     }
   },
@@ -69,6 +68,11 @@ export default {
           text: this.$t("bank-account-properties.routingNumber"),
           align: "center",
           value: "routingNumber",
+        },
+        {
+          text: this.$t("bank-account-properties.accountType"),
+          align: "center",
+          value: "bankAccountType",
         },
         {
           text: this.$t("common.state"),
@@ -113,25 +117,24 @@ export default {
 
       this.fetchedData.splice(this.fetchedData.indexOf(bankAccount), 1);
     },
-    async updateBankAccountState(item){
+    async updateBankAccountState(item) {
       let state = "";
       let stateTranslated = "";
-      if(item.bankAccountState.name === states.ACTIVE.name){ 
+      if (item.bankAccountState.name === states.ACTIVE.name) {
         state = states.BLOCKED.name;
-        stateTranslated = states.BLOCKED.name;        
-      }
-      else{
+        stateTranslated = states.BLOCKED.name;
+      } else {
         state = states.ACTIVE.name;
-        stateTranslated = states.ACTIVE.name;        
+        stateTranslated = states.ACTIVE.name;
       }
       await this.$http.put(`bank-account/state`, {
         idUserClient: item.clientBankAccount[0].userClient.idUserClient,
         idBankAccount: item.idBankAccount,
-        state: state,          
+        state: state,
       });
       item.bankAccountState.name = state;
-      item.bankAccountState.translated = stateTranslated;    
-    }
+      item.bankAccountState.translated = stateTranslated;
+    },
   },
 };
 </script>

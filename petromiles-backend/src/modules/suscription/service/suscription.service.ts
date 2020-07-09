@@ -22,6 +22,7 @@ import { PlatformInterest } from '@/enums/platform-interest.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { UpdateSubscriptionDTO } from '@/modules/suscription/dto/update-subscription.dto';
 import { StateDescription } from '@/enums/state.enum';
+import { PaymentProvider } from '@/enums/payment-provider.enum';
 
 // ENTITIES
 import { UserClient } from '@/entities/user-client.entity';
@@ -39,6 +40,7 @@ import { PointsConversionService } from '@/modules/management/services/points-co
 import { PlatformInterestService } from '@/modules/management/services/platform-interest.service';
 import { MailsService } from '@/modules/mails/mails.service';
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
+import { ThirdPartyInterestService } from '@/modules/management/services/third-party-interest.service';
 
 @Injectable()
 export class SuscriptionService {
@@ -60,6 +62,7 @@ export class SuscriptionService {
     private mailsService: MailsService,
     private configService: ConfigService,
     private paymentProviderService: PaymentProviderService,
+    private thirdPartyInterestService: ThirdPartyInterestService,
   ) {}
   async get(suscriptionType: SuscriptionType): Promise<Suscription> {
     return await getConnection()
@@ -139,10 +142,23 @@ export class SuscriptionService {
   async upgradeToPremium(
     email: string,
     idBankAccount: number,
+    costSuscription: number,
   ): Promise<Transaction> {
     const userClient = await this.userClientService.get({ email });
     const suscription = await this.get(SuscriptionType.PREMIUM);
     const idUserClient = userClient.idUserClient;
+
+    const thirdPartyInterest = await this.thirdPartyInterestService.getCurrentInterest(
+      PaymentProvider.STRIPE,
+      TransactionType.DEPOSIT,
+    );
+
+    if (suscription.cost !== costSuscription) {
+      this.logger.error(
+        `[${ApiModules.SUSCRIPTION}] The user has no updated configuration parameters`,
+      );
+      throw new BadRequestException(`error-messages.oldPlatformConfiguration`);
+    }
 
     const clientBankAccount = await this.clientBankAccountService.getOne(
       userClient.idUserClient,
@@ -174,7 +190,9 @@ export class SuscriptionService {
         customer: clientBankAccount.userClient.userDetails.customerId,
         source: clientBankAccount.chargeId,
         currency: 'usd',
-        amount: suscription.cost,
+        amount: Math.trunc(
+          suscription.cost + thirdPartyInterest.amountDollarCents,
+        ),
       },
     );
 

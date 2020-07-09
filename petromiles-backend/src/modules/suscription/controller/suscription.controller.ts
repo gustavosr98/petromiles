@@ -48,11 +48,16 @@ export class SuscriptionController {
   async upgradeToPremiumSuscription(
     @GetUser() user,
     @Body('idBankAccount', ParseIntPipe) idBankAccount,
+    @Body('costSuscription') costSuscription: number,
   ) {
     this.logger.http(
       `[${ApiModules.SUSCRIPTION}] (${HttpRequest.POST})  ${user?.email} asks /${baseEndpoint}/upgrade-to-premium`,
     );
-    await this.suscriptionService.upgradeToPremium(user.email, idBankAccount);
+    await this.suscriptionService.upgradeToPremium(
+      user.email,
+      idBankAccount,
+      costSuscription,
+    );
   }
 
   @Get('actual')

@@ -5,15 +5,15 @@
         <v-row align="center" justify="center">
           <v-col cols="2">
             <router-link to="/user-subscription" style="text-decoration: none">
-              <v-icon x-large class="ml-3">mdi-arrow-left-thick </v-icon>
+              <v-icon x-large class="ml-3">mdi-arrow-left-thick</v-icon>
             </router-link>
           </v-col>
           <v-col cols="8">
             <!-- Title Page -->
             <div class="text-center">
-              <h1 class="secondary--text text--darken-1">
-                {{ $t("transaction-type.subscriptionPayment") }}
-              </h1>
+              <h1
+                class="secondary--text text--darken-1"
+              >{{ $t("transaction-type.subscriptionPayment") }}</h1>
             </div>
           </v-col>
           <v-col cols="2"></v-col>
@@ -25,16 +25,10 @@
             <div class="text-center">
               <v-row align="center" justify="center">
                 <v-col>
-                  <h1 class="primary--text">
-                    {{ $t("subscription.premiumLevel") }}
-                  </h1>
+                  <h1 class="primary--text">{{ $t("subscription.premiumLevel") }}</h1>
                   <v-row align="center" justify="center">
                     <v-col cols="11" lg="12">
-                      <v-card
-                        class="mx-auto pt-8"
-                        max-width="400"
-                        elevation="10"
-                      >
+                      <v-card class="mx-auto pt-8" max-width="400" elevation="10">
                         <v-img
                           class="white--text align-end"
                           contain
@@ -44,14 +38,12 @@
                         <v-card-text class="text--primary">
                           <div class="pb-3">
                             <b>
-                              <h1>
-                                {{ $t("subscription.cost") }}: ${{ cost }}
-                              </h1>
+                              <h1>{{ $t("subscription.cost") }}: ${{ cost }}</h1>
                             </b>
                           </div>
                           <p>
                             {{
-                              $t("subscription.descriptionPremium", { percentage })
+                            $t("subscription.descriptionPremium", { percentage })
                             }}
                           </p>
                           <p>
@@ -70,24 +62,22 @@
             <div>
               <v-row align="center" justify="center">
                 <v-col cols="11" lg="12">
-                  <h1 class="text-center primary--text">
-                    {{ $t("subscription.transactionInformation") }}
-                  </h1>
+                  <h1
+                    class="text-center primary--text"
+                  >{{ $t("subscription.transactionInformation") }}</h1>
                   <v-card class="mx-auto mt-3" max-width="344" elevation="10">
                     <v-card-text>
-                      <h1
-                        class="text-center pb-4 secondary--text text--darken-1"
-                      >
-                        PetroMiles
-                      </h1>
+                      <h1 class="text-center pb-4 secondary--text text--darken-1">PetroMiles</h1>
                       <v-divider></v-divider>
                       <br />
                       <div class="text--primary">
                         <p>
                           {{ $t("invoice.transactionType") }}:
-                          <b>{{
+                          <b>
+                            {{
                             $t("transaction-type.subscriptionPayment")
-                          }}</b>
+                            }}
+                          </b>
                         </p>
                         <p>
                           {{ $t("subscription.description") }}:
@@ -99,16 +89,18 @@
                         </p>
                         <v-divider></v-divider>
                         <p class="mt-4 primary--text body-1">
-                          <b
-                            >{{ $t("subscription.bankAccountInformation") }}:</b
-                          >
+                          <b>{{ $t("subscription.bankAccountInformation") }}:</b>
                         </p>
                         <ul class="mt-n3 mb-3">
                           <li>
                             {{ $t("bank-account-properties.nickname") }}:
-                            <b class="secondary--text text--darken-1">{{
+                            <b
+                              class="secondary--text text--darken-1"
+                            >
+                              {{
                               nickname
-                            }}</b>
+                              }}
+                            </b>
                           </li>
                           <li>
                             {{ $t("subscription.holderName") }}:
@@ -126,9 +118,9 @@
                         <v-divider></v-divider>
                         <h2 class="pt-3">
                           {{ $t("subscription.cost") }}:
-                          <b class="green--text text--darken-1">
-                            ${{ cost }}
-                          </b>
+                          <b
+                            class="green--text text--darken-1"
+                          >${{ cost }}</b>
                         </h2>
                       </div>
                     </v-card-text>
@@ -137,9 +129,9 @@
                         <v-divider></v-divider>
                         <v-card-text>
                           <b>
-                            <h4 class="error--text text--darken-1">
-                              {{ $t("subscription.premiumAlready") }}
-                            </h4>
+                            <h4
+                              class="error--text text--darken-1"
+                            >{{ $t("subscription.premiumAlready") }}</h4>
                           </b>
                         </v-card-text>
                       </div>
@@ -153,14 +145,22 @@
                           :label="$tc('navbar.bankAccount', 0)"
                           append-outer-icon="mdi-bank"
                           :items="bankAccounts"
-                          item-text="nickname"
                           item-value="idClientBankAccount"
                           :error-messages="selectedBankAccountErrors"
                           :loading="loadingBankAccounts"
                           :disabled="
                             loadingBankAccounts || loading || isPremium
                           "
-                        ></v-select>
+                        >
+                          <template
+                            slot="selection"
+                            slot-scope="data"
+                          >{{ data.item.nickname }} - {{ data.item.last4 }}</template>
+                          <template
+                            slot="item"
+                            slot-scope="data"
+                          >{{ data.item.nickname }} - {{ data.item.last4 }}</template>
+                        </v-select>
                       </v-col>
                     </v-row>
                   </v-form>
@@ -186,9 +186,9 @@
           <v-col offset="0" md="12" cols="12" lg="4">
             <div>
               <v-row align="center" justify="center">
-                <h1 class="text-center primary--text mt-3 mb-n1 pr-6">
-                  {{ $t("subscription.howItWorks") }}
-                </h1>
+                <h1
+                  class="text-center primary--text mt-3 mb-n1 pr-6"
+                >{{ $t("subscription.howItWorks") }}</h1>
                 <v-col cols="10" lg="10" class="mr-sm-8 mt-1">
                   <v-card class="mx-auto px-2" max-width="380" elevation="10">
                     <v-card-text class="black--text">
@@ -200,29 +200,27 @@
                       <ul>
                         <li>
                           {{
-                            $t("subscription.premiumPointsWontAppearInstantly")
+                          $t("subscription.premiumPointsWontAppearInstantly")
                           }}
                         </li>
                         <li>
                           {{
-                            $t("subscription.premiumPointsPurchaseDelayLabel")
+                          $t("subscription.premiumPointsPurchaseDelayLabel")
                           }}
                         </li>
-                        <li>
-                          {{ $t("subscription.premiumPurchaseEmail") }}
-                        </li>
+                        <li>{{ $t("subscription.premiumPurchaseEmail") }}</li>
                         <li>
                           {{
-                            $t("subscription.premiumProccessedPurchaseEmail")
+                          $t("subscription.premiumProccessedPurchaseEmail")
                           }}
                         </li>
                       </ul>
                       <br />
                       <h3>
                         {{ $t("subscription.premiumIssues") }}:
-                        <span class="secondary--text text--darken-1">
-                          support@petromiles.com
-                        </span>
+                        <span
+                          class="secondary--text text--darken-1"
+                        >support@petromiles.com</span>
                       </h3>
                     </v-card-text>
                   </v-card>
@@ -234,17 +232,11 @@
           <v-row justify="center">
             <v-dialog v-model="dialog" persistent max-width="50%">
               <v-card>
-                <v-card-title class="headline">
-                  {{ $t("subscription.thanksForPayingSubscription") }}
-                </v-card-title>
-                <v-card-text>
-                  {{ $t("subscription.transactionValidateSubscription") }}
-                </v-card-text>
+                <v-card-title class="headline">{{ $t("subscription.thanksForPayingSubscription") }}</v-card-title>
+                <v-card-text>{{ $t("subscription.transactionValidateSubscription") }}</v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="secondary" dark :to="{ name: comeBackRoute }">
-                    {{ $t("common.ok") }}
-                  </v-btn>
+                  <v-btn color="secondary" dark :to="{ name: comeBackRoute }">{{ $t("common.ok") }}</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -254,17 +246,15 @@
           <v-row justify="center">
             <v-dialog v-model="areYouSureDialog" persistent max-width="50%">
               <v-card>
-                <v-card-title class="headline">
-                  {{ $t("common.areYouSure") }}
-                </v-card-title>
+                <v-card-title class="headline">{{ $t("common.areYouSure") }}</v-card-title>
                 <v-card-actions>
                   <v-spacer />
-                  <v-btn color="error" dark @click="areYouSureDialog = false">
-                    {{ $t("common.cancel") }}
-                  </v-btn>
-                  <v-btn color="success" dark @click="paySubscription">
-                    {{ $t("common.yes") }}
-                  </v-btn>
+                  <v-btn
+                    color="error"
+                    dark
+                    @click="areYouSureDialog = false"
+                  >{{ $t("common.cancel") }}</v-btn>
+                  <v-btn color="success" dark @click="paySubscription">{{ $t("common.yes") }}</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -349,6 +339,7 @@ export default {
       this.$http
         .post("/suscription/upgrade-to-premium", {
           idBankAccount: this.selectedBankAccount,
+          costSuscription: this.cost * 100,
         })
         .then(res => {
           this.dialog = true;
@@ -368,7 +359,9 @@ export default {
   watch: {
     selectedBankAccount: function() {
       for (var i = 0; i < this.bankAccounts.length; i++) {
-        if (this.bankAccounts[i].idClientBankAccount === this.selectedBankAccount) {
+        if (
+          this.bankAccounts[i].idClientBankAccount === this.selectedBankAccount
+        ) {
           const account = this.bankAccounts[i];
           this.bankAccountNumber = account.last4;
           this.bank = account.bank;

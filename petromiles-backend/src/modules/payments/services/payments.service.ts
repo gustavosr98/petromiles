@@ -86,7 +86,30 @@ export class PaymentsService {
     idClientBankAccount: number,
     amount,
     amountToCharge,
+    points,
   ): Promise<Transaction> {
+    const interests = await this.getInterests(
+      TransactionType.DEPOSIT,
+      PlatformInterest.BUY,
+    );
+    const onePointToDollars = (await this.getOnePointToDollars())
+      .onePointEqualsDollars;
+
+    const rawCost = Math.round(points * onePointToDollars * 10000) / 10000;
+    let result = rawCost;
+    interests.map(i => {
+      result = result + rawCost * i.percentage + i.amount / 100;
+    });
+    const costWithInterests = Math.round(result * 10000) / 10000;
+    const amountToChargeAct = Math.round(costWithInterests * 10000) / 100;
+
+    if (amountToCharge !== amountToChargeAct) {
+      this.logger.error(
+        `[${ApiModules.PAYMENTS}] The user has no updated configuration parameters`,
+      );
+      throw new BadRequestException(`error-messages.oldPlatformConfiguration`);
+    }
+
     const clientBankAccount = await this.clientBankAccountRepository.findOne({
       idClientBankAccount,
     });
@@ -131,7 +154,30 @@ export class PaymentsService {
     idClientBankAccount,
     amount,
     amountToCharge,
+    points,
   ): Promise<Transaction> {
+    const interests = await this.getInterests(
+      TransactionType.WITHDRAWAL,
+      PlatformInterest.WITHDRAWAL,
+    );
+    const onePointToDollars = (await this.getOnePointToDollars())
+      .onePointEqualsDollars;
+
+    const rawCost = Math.round(points * onePointToDollars * 10000) / 10000;
+    let result = rawCost;
+    interests.map(i => {
+      result = result - (rawCost * i.percentage + i.amount / 100);
+    });
+    const costWithInterests = Math.round(result * 10000) / 10000;
+    const amountToChargeAct = Math.round(costWithInterests * 10000) / 100;
+
+    if (amountToCharge !== amountToChargeAct) {
+      this.logger.error(
+        `[${ApiModules.PAYMENTS}] The user has no updated configuration parameters`,
+      );
+      throw new BadRequestException(`error-messages.oldPlatformConfiguration`);
+    }
+
     const { email, id } = user;
 
     const clientBankAccount = await this.clientBankAccountRepository.findOne({
