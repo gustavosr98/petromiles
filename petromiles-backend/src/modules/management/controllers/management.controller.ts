@@ -43,8 +43,6 @@ import { Bank } from '@/entities/bank.entity';
 import { Country } from '@/entities/country.entity';
 import { PlatformInterest } from '@/entities/platform-interest.entity';
 import { PointsConversion } from '@/entities/points-conversion.entity';
-import { Task } from '@/entities/task.entity';
-import { UpdateCronDTO } from '@/modules/cron/dto/cron.dto';
 
 const baseEndpoint = 'management';
 @UseGuards(AuthGuard('jwt'))
@@ -104,10 +102,13 @@ export class ManagementController {
     return this.thirdPartyInterestService.getAll();
   }
 
+  @Get('points-details')
+  getPointsDetails() {
+    return this.managementService.getPointsDetails();
+  }
+
   @Get('statistics')
-  getStatistics(
-    @GetUser() user: AuthenticatedUser,
-  ): Promise<App.Statistics> {
+  getStatistics(@GetUser() user: AuthenticatedUser): Promise<App.Statistics> {
     this.logger.http(
       `[${ApiModules.MANAGEMENT}] (${HttpRequest.GET})   {${user.email}} asks  /${baseEndpoint}/statistics`,
     );

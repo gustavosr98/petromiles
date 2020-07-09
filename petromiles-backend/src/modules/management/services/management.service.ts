@@ -26,6 +26,11 @@ import { Role as RoleEnum } from '@/enums/role.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { UpdateSubscriptionDTO } from '@/modules/suscription/dto/update-subscription.dto';
 import { ApiModules } from '@/logger/api-modules.enum';
+import { PointsToDollars } from '@/interfaces/management/points-to-dollars.interface';
+import { PointsDetails } from '@/interfaces/management/points-details.interface';
+
+// SERVICES
+import { PointsConversionService } from '@/modules/management/services/points-conversion.service';
 import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
 
 @Injectable()
@@ -50,6 +55,7 @@ export class ManagementService {
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    private pointsConversionService: PointsConversionService,
   ) {}
 
   async getLanguages(): Promise<Language[]> {
@@ -76,6 +82,39 @@ export class ManagementService {
     return await this.bankRepository.find();
   }
 
+  async getPointsDetails(): Promise<PointsDetails> {
+    const purchasedPoints = await this.getTotalPoints(1);
+    const redeemedPoints = await this.getTotalPoints(-1);
+    return {
+      purchasedPoints,
+      redeemedPoints,
+      total: {
+        dollars: purchasedPoints.dollars - redeemedPoints.dollars,
+        points: purchasedPoints.points - redeemedPoints.points,
+      },
+    };
+  }
+
+  async getTotalPoints(operation: number): Promise<PointsToDollars> {
+    const conversion = (
+      await this.pointsConversionService.getRecentPointsConversion()
+    ).onePointEqualsDollars;
+
+    const dollars =
+      (
+        await this.transactionRepository
+          .createQueryBuilder('transaction')
+          .select('SUM(transaction."rawAmount")', 'cents')
+          .innerJoin('transaction.stateTransaction', 'st')
+          .innerJoin('st.state', 's')
+          .where(`transaction.operation = ${operation}`)
+          .andWhere(`s.name  = '${StateName.VALID}'`)
+          .getRawOne()
+      ).cents / 100;
+    const points = Math.trunc(dollars / conversion);
+    return { dollars: parseFloat(dollars.toFixed(2)), points };
+  }
+
   async getStatistics(user: AuthenticatedUser): Promise<App.Statistics> {
     if (user.role === RoleEnum.CLIENT) {
       // transaction totals for a customer
@@ -92,7 +131,7 @@ export class ManagementService {
       let totalCancelledBankAccount = 0;
       let totalActiveBankAccount = 0;
       let totalPendingBankAccount = 0;
-      
+
       const transactions = await this.transactionRepository.find({
         where: `(userClient.email = '${user.email}' OR user.email= '${user.email}') AND stateTransaction.finalDate is null`,
         join: {
@@ -109,42 +148,41 @@ export class ManagementService {
         },
       });
       const clientBankAccounts = await getConnection()
-          .getRepository(ClientBankAccount)
-          .find({ 
-            where: `"userClient"."idUserClient" ='${user.id}'`,
-            join: {
-              alias: 'clientBankAccount',
-              innerJoinAndSelect: {
-                stateBankAccount: 'clientBankAccount.stateBankAccount',
-                userClient: 'clientBankAccount.userClient',
-                state: 'stateBankAccount.state',
-              },
+        .getRepository(ClientBankAccount)
+        .find({
+          where: `"userClient"."idUserClient" ='${user.id}'`,
+          join: {
+            alias: 'clientBankAccount',
+            innerJoinAndSelect: {
+              stateBankAccount: 'clientBankAccount.stateBankAccount',
+              userClient: 'clientBankAccount.userClient',
+              state: 'stateBankAccount.state',
             },
+          },
         });
 
       for (let index = 0; index < transactions.length; index++) {
-        const stateTransaction = transactions[index].stateTransaction[transactions[index].stateTransaction.length - 1].state.name;
+        const stateTransaction =
+          transactions[index].stateTransaction[
+            transactions[index].stateTransaction.length - 1
+          ].state.name;
 
-        if(transactions[index].type === TransactionType.DEPOSIT) {
-          if(stateTransaction === StateName.INVALID)
-            totalInvalidDeposit++;
-          else if(stateTransaction === StateName.VALID)
-            totalValidDeposit++;
-          else if(stateTransaction === StateName.VERIFYING)
+        if (transactions[index].type === TransactionType.DEPOSIT) {
+          if (stateTransaction === StateName.INVALID) totalInvalidDeposit++;
+          else if (stateTransaction === StateName.VALID) totalValidDeposit++;
+          else if (stateTransaction === StateName.VERIFYING)
             totalPendingDeposit++;
-        } else if(transactions[index].type === TransactionType.WITHDRAWAL) {
-          if(stateTransaction === StateName.INVALID)
-            totalInvalidWithdrawal++;
-          else if(stateTransaction === StateName.VALID)
-            totalValidWithdrawal++;
-          else if(stateTransaction === StateName.VERIFYING)
+        } else if (transactions[index].type === TransactionType.WITHDRAWAL) {
+          if (stateTransaction === StateName.INVALID) totalInvalidWithdrawal++;
+          else if (stateTransaction === StateName.VALID) totalValidWithdrawal++;
+          else if (stateTransaction === StateName.VERIFYING)
             totalPendingWithdrawal++;
-        } else if(transactions[index].type === TransactionType.THIRD_PARTY_CLIENT) {
-          if(stateTransaction === StateName.INVALID)
-            totalInvalidClient++;
-          else if(stateTransaction === StateName.VALID)
-            totalValidClient++;
-          else if(stateTransaction === StateName.VERIFYING)
+        } else if (
+          transactions[index].type === TransactionType.THIRD_PARTY_CLIENT
+        ) {
+          if (stateTransaction === StateName.INVALID) totalInvalidClient++;
+          else if (stateTransaction === StateName.VALID) totalValidClient++;
+          else if (stateTransaction === StateName.VERIFYING)
             totalPendingClient++;
         }
       }
@@ -152,9 +190,8 @@ export class ManagementService {
       for (let index = 0; index < clientBankAccounts.length; index++) {
         const stateBankAccount = await getConnection()
           .getRepository(StateBankAccount)
-          .findOne({ 
-            where: 
-            `"clientBankAccount"."idClientBankAccount" = '${clientBankAccounts[index].idClientBankAccount}' AND stateBannkAccount.finalDate is null`,
+          .findOne({
+            where: `"clientBankAccount"."idClientBankAccount" = '${clientBankAccounts[index].idClientBankAccount}' AND stateBannkAccount.finalDate is null`,
             join: {
               alias: 'stateBannkAccount',
               leftJoinAndSelect: {
@@ -163,21 +200,30 @@ export class ManagementService {
               },
             },
           });
-        
-        if(stateBankAccount.state.name === StateName.CANCELLED)
+
+        if (stateBankAccount.state.name === StateName.CANCELLED)
           totalCancelledBankAccount++;
-        else if(stateBankAccount.state.name === StateName.ACTIVE)
+        else if (stateBankAccount.state.name === StateName.ACTIVE)
           totalActiveBankAccount++;
-        else if(stateBankAccount.state.name === StateName.VERIFYING)
+        else if (stateBankAccount.state.name === StateName.VERIFYING)
           totalPendingBankAccount++;
       }
 
-      const totalTransaccionsDeposit = totalInvalidDeposit + totalValidDeposit + totalPendingDeposit;
-      const totalTransaccionsWithdrawal = totalInvalidWithdrawal + totalValidWithdrawal + totalPendingWithdrawal;
-      const totalTransaccionsClient = totalInvalidClient + totalValidClient + totalPendingClient; 
-      const totalTransaccions = totalTransaccionsDeposit + totalTransaccionsWithdrawal + totalTransaccionsClient;
+      const totalTransaccionsDeposit =
+        totalInvalidDeposit + totalValidDeposit + totalPendingDeposit;
+      const totalTransaccionsWithdrawal =
+        totalInvalidWithdrawal + totalValidWithdrawal + totalPendingWithdrawal;
+      const totalTransaccionsClient =
+        totalInvalidClient + totalValidClient + totalPendingClient;
+      const totalTransaccions =
+        totalTransaccionsDeposit +
+        totalTransaccionsWithdrawal +
+        totalTransaccionsClient;
 
-      const totalClientBankAccount = totalCancelledBankAccount + totalActiveBankAccount + totalPendingBankAccount;
+      const totalClientBankAccount =
+        totalCancelledBankAccount +
+        totalActiveBankAccount +
+        totalPendingBankAccount;
 
       return {
         transactions: {
@@ -199,14 +245,14 @@ export class ManagementService {
             totalPending: totalPendingClient,
             total: totalTransaccionsClient,
           },
-          total: totalTransaccions
+          total: totalTransaccions,
         },
         clientBankAccounts: {
           totalInvalid: totalCancelledBankAccount,
           totalValid: totalActiveBankAccount,
           totalPending: totalPendingBankAccount,
           total: totalClientBankAccount,
-        }
+        },
       };
     } else if (user.role === RoleEnum.ADMINISTRATOR) {
       // customer transaction totals
@@ -220,7 +266,7 @@ export class ManagementService {
       let totalValidClient = 0;
       let totalPendingClient = 0;
       // transaction totals for customer bank accounts
-      let totalCancelledBankAccount = 0;
+      let totalBlockedBankAccount = 0;
       let totalActiveBankAccount = 0;
       let totalPendingBankAccount = 0;
       // total users
@@ -228,7 +274,7 @@ export class ManagementService {
       let totalActiveClients = 0;
       let totalBlockedAdmins = 0;
       let totalActiveAdmins = 0;
-      
+
       const transactions = await this.transactionRepository.find({
         where: `stateTransaction.finalDate is null`,
         join: {
@@ -245,48 +291,46 @@ export class ManagementService {
         },
       });
       const clientBankAccounts = await getConnection()
-          .getRepository(ClientBankAccount)
-          .find();
+        .getRepository(ClientBankAccount)
+        .find();
       const adminUser = await getConnection()
-          .getRepository(UserAdministrator)
-          .find();
+        .getRepository(UserAdministrator)
+        .find();
       const clientUser = await getConnection()
-          .getRepository(UserClient)
-          .find();
+        .getRepository(UserClient)
+        .find();
 
       for (let index = 0; index < transactions.length; index++) {
-        const stateTransaction = transactions[index].stateTransaction[transactions[index].stateTransaction.length - 1].state.name;
+        const stateTransaction =
+          transactions[index].stateTransaction[
+            transactions[index].stateTransaction.length - 1
+          ].state.name;
 
-        if(transactions[index].type === TransactionType.DEPOSIT) {
-          if(stateTransaction === StateName.INVALID)
-            totalInvalidDeposit++;
-          else if(stateTransaction === StateName.VALID)
-            totalValidDeposit++;
-          else if(stateTransaction === StateName.VERIFYING)
+        if (transactions[index].type === TransactionType.DEPOSIT) {
+          if (stateTransaction === StateName.INVALID) totalInvalidDeposit++;
+          else if (stateTransaction === StateName.VALID) totalValidDeposit++;
+          else if (stateTransaction === StateName.VERIFYING)
             totalPendingDeposit++;
-        } else if(transactions[index].type === TransactionType.WITHDRAWAL) {
-          if(stateTransaction === StateName.INVALID)
-            totalInvalidWithdrawal++;
-          else if(stateTransaction === StateName.VALID)
-            totalValidWithdrawal++;
-          else if(stateTransaction === StateName.VERIFYING)
+        } else if (transactions[index].type === TransactionType.WITHDRAWAL) {
+          if (stateTransaction === StateName.INVALID) totalInvalidWithdrawal++;
+          else if (stateTransaction === StateName.VALID) totalValidWithdrawal++;
+          else if (stateTransaction === StateName.VERIFYING)
             totalPendingWithdrawal++;
-        } else if(transactions[index].type === TransactionType.THIRD_PARTY_CLIENT) {
-          if(stateTransaction === StateName.INVALID)
-            totalInvalidClient++;
-          else if(stateTransaction === StateName.VALID)
-            totalValidClient++;
-          else if(stateTransaction === StateName.VERIFYING)
+        } else if (
+          transactions[index].type === TransactionType.THIRD_PARTY_CLIENT
+        ) {
+          if (stateTransaction === StateName.INVALID) totalInvalidClient++;
+          else if (stateTransaction === StateName.VALID) totalValidClient++;
+          else if (stateTransaction === StateName.VERIFYING)
             totalPendingClient++;
         }
       }
-      
+
       for (let index = 0; index < clientBankAccounts.length; index++) {
         const stateBankAccount = await getConnection()
           .getRepository(StateBankAccount)
-          .findOne({ 
-            where: 
-            `"clientBankAccount"."idClientBankAccount" = '${clientBankAccounts[index].idClientBankAccount}' AND stateBannkAccount.finalDate is null`,
+          .findOne({
+            where: `"clientBankAccount"."idClientBankAccount" = '${clientBankAccounts[index].idClientBankAccount}' AND stateBannkAccount.finalDate is null`,
             join: {
               alias: 'stateBannkAccount',
               leftJoinAndSelect: {
@@ -295,43 +339,58 @@ export class ManagementService {
               },
             },
           });
-        
-        if(stateBankAccount.state.name === StateName.CANCELLED)
-          totalCancelledBankAccount++;
-        else if(stateBankAccount.state.name === StateName.ACTIVE)
+
+        if (stateBankAccount.state.name === StateName.BLOCKED)
+          totalBlockedBankAccount++;
+        else if (stateBankAccount.state.name === StateName.ACTIVE)
           totalActiveBankAccount++;
-        else if(stateBankAccount.state.name === StateName.VERIFYING)
+        else if (stateBankAccount.state.name === StateName.VERIFYING)
           totalPendingBankAccount++;
       }
 
       for (let index = 0; index < adminUser.length; index++) {
         const statusAdmin = await this.stateUserRepository.findOne({
-          where: [{ userAdministrator: adminUser[index].idUserAdministrator, finalDate: null }],
+          where: [
+            {
+              userAdministrator: adminUser[index].idUserAdministrator,
+              finalDate: null,
+            },
+          ],
         });
 
-        if(statusAdmin.state.name === StateName.BLOCKED) 
-          totalBlockedAdmins++;
-        else if(statusAdmin.state.name === StateName.ACTIVE)
+        if (statusAdmin.state.name === StateName.BLOCKED) totalBlockedAdmins++;
+        else if (statusAdmin.state.name === StateName.ACTIVE)
           totalActiveAdmins++;
       }
-    
+
       for (let index = 0; index < clientUser.length; index++) {
         const statusClient = await this.stateUserRepository.findOne({
-          where: [{ userClient: clientUser[index].idUserClient, finalDate: null }],
+          where: [
+            { userClient: clientUser[index].idUserClient, finalDate: null },
+          ],
         });
 
-        if(statusClient.state.name === StateName.BLOCKED) 
+        if (statusClient.state.name === StateName.BLOCKED)
           totalBlockedClients++;
-        else if(statusClient.state.name === StateName.ACTIVE)
+        else if (statusClient.state.name === StateName.ACTIVE)
           totalActiveClients++;
       }
-      
-      const totalTransaccionsDeposit = totalInvalidDeposit + totalValidDeposit + totalPendingDeposit;
-      const totalTransaccionsWithdrawal = totalInvalidWithdrawal + totalValidWithdrawal + totalPendingWithdrawal;
-      const totalTransaccionsClient = totalInvalidClient + totalValidClient + totalPendingClient; 
-      const totalTransaccions = totalTransaccionsDeposit + totalTransaccionsWithdrawal + totalTransaccionsClient;
 
-      const totalClientBankAccount = totalCancelledBankAccount + totalActiveBankAccount + totalPendingBankAccount;
+      const totalTransaccionsDeposit =
+        totalInvalidDeposit + totalValidDeposit + totalPendingDeposit;
+      const totalTransaccionsWithdrawal =
+        totalInvalidWithdrawal + totalValidWithdrawal + totalPendingWithdrawal;
+      const totalTransaccionsClient =
+        totalInvalidClient + totalValidClient + totalPendingClient;
+      const totalTransaccions =
+        totalTransaccionsDeposit +
+        totalTransaccionsWithdrawal +
+        totalTransaccionsClient;
+
+      const totalClientBankAccount =
+        totalBlockedBankAccount +
+        totalActiveBankAccount +
+        totalPendingBankAccount;
 
       const totalAdmins = totalBlockedAdmins + totalActiveAdmins;
       const totalClients = totalBlockedClients + totalActiveClients;
@@ -356,10 +415,10 @@ export class ManagementService {
             totalPending: totalPendingClient,
             total: totalTransaccionsClient,
           },
-          total: totalTransaccions
+          total: totalTransaccions,
         },
         clientBankAccounts: {
-          totalInvalid: totalCancelledBankAccount,
+          totalInvalid: totalBlockedBankAccount,
           totalValid: totalActiveBankAccount,
           totalPending: totalPendingBankAccount,
           total: totalClientBankAccount,
