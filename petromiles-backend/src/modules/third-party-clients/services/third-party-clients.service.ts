@@ -559,25 +559,25 @@ export class ThirdPartyClientsService {
             processingDetails,
           });
         } catch (e) {
-          console.log(e);
+          this.logger.error(logPrefix + e);
           processingDetails.result = CsvProcessResult.MAINTAIN;
           processingDetails.description.push(
             CsvProcessDescription.WRONG_TYPE_OF_VALUES,
           );
           processingDetails.state = StateName.INVALID;
         } finally {
-          logPrefix =
+          const logContent =
             logPrefix +
             `(Result: ${processingDetails.result} | Final state: ${
               processingDetails.state
             } | ${processingDetails.description.toString()})`;
 
           if (processingDetails.result === CsvProcessResult.MAINTAIN)
-            this.logger.info(logPrefix);
+            this.logger.info(logContent);
           else if (processingDetails.result === CsvProcessResult.VALID)
-            this.logger.verbose(logPrefix);
+            this.logger.verbose(logContent);
           else if (processingDetails.result === CsvProcessResult.INVALID)
-            this.logger.error(logPrefix);
+            this.logger.error(logContent);
           return {
             ...theirConfirmationTicket,
             status: processingDetails.state,

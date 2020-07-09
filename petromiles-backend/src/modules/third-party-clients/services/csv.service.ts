@@ -6,7 +6,6 @@ import { Logger } from 'winston';
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
 import { CsvApiError } from '@/enums/csv-process';
-import { ThirdPartyClientsErrorCodes } from '@/enums/third-party-clients-error-codes.enum';
 
 @Injectable()
 export class CsvService {
