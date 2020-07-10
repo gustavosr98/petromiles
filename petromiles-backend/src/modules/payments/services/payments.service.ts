@@ -18,6 +18,7 @@ import { MailsService } from '@/modules/mails/mails.service';
 import { UserClientService } from '@/modules/user/services/user-client.service';
 import { ClientBankAccountService } from '@/modules/bank-account/services/client-bank-account.service';
 import { PointsConversionService } from '@/modules/management/services/points-conversion.service';
+import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
 
 // ENTITIES
 import { Transaction } from '@/entities/transaction.entity';
@@ -48,6 +49,7 @@ export class PaymentsService {
     private paymentProviderService: PaymentProviderService,
     private mailsService: MailsService,
     private configService: ConfigService,
+    private suscriptionService: SuscriptionService,
   ) {}
 
   async getOnePointToDollars(): Promise<PointsConversion> {
@@ -87,6 +89,8 @@ export class PaymentsService {
     amount,
     amountToCharge,
     points,
+    subscriptionName,
+    infoSubscription,
   ): Promise<Transaction> {
     const interests = await this.getInterests(
       TransactionType.DEPOSIT,
@@ -94,6 +98,15 @@ export class PaymentsService {
     );
     const onePointToDollars = (await this.getOnePointToDollars())
       .onePointEqualsDollars;
+
+    let infoSubscriptionAct;
+    if (subscriptionName !== 'basic') {
+      infoSubscriptionAct = await this.suscriptionService.getSubscriptionPercentage(
+        subscriptionName,
+      );
+    } else {
+      infoSubscriptionAct = {};
+    }
 
     const rawCost = Math.round(points * onePointToDollars * 10000) / 10000;
     let result = rawCost;
@@ -103,7 +116,10 @@ export class PaymentsService {
     const costWithInterests = Math.round(result * 10000) / 10000;
     const amountToChargeAct = Math.round(costWithInterests * 10000) / 100;
 
-    if (amountToCharge !== amountToChargeAct) {
+    if (
+      amountToCharge !== amountToChargeAct ||
+      JSON.stringify(infoSubscription) !== JSON.stringify(infoSubscriptionAct)
+    ) {
       this.logger.error(
         `[${ApiModules.PAYMENTS}] The user has no updated configuration parameters`,
       );

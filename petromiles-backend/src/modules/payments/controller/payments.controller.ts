@@ -51,6 +51,8 @@ export class PaymentsController {
       amount,
       amountToCharge,
       points,
+      subscriptionName,
+      infoSubscription,
     } = paymentProperties;
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/buy-points`,
@@ -60,6 +62,8 @@ export class PaymentsController {
       amount,
       amountToCharge,
       points,
+      subscriptionName,
+      infoSubscription,
     );
   }
 

@@ -1,6 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
-
-import { Interest } from '@/modules/payments/interest.interface';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreatePaymentDTO {
   @IsNotEmpty()
@@ -14,4 +12,10 @@ export class CreatePaymentDTO {
 
   @IsNotEmpty()
   points: number;
+
+  @IsOptional()
+  subscriptionName?: string;
+
+  @IsOptional()
+  infoSubscription?;
 }

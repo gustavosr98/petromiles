@@ -146,7 +146,7 @@
                           :label="$tc('navbar.bankAccount', 0)"
                           append-outer-icon="mdi-bank"
                           :items="bankAccounts"
-                          item-value="idClientBankAccount"
+                          item-value="idBankAccount"
                           :error-messages="selectedBankAccountErrors"
                           :loading="loadingBankAccounts"
                           :disabled="
