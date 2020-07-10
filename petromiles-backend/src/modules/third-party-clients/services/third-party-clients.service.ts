@@ -297,6 +297,7 @@ export class ThirdPartyClientsService {
     addPointsRequest: AddPointsRequest,
     user: AuthenticatedUser,
   ): Promise<AddPointsResponse> {
+    const { type } = addPointsRequest;
     const userClient: UserClient = await this.userClientService.get({
       email: user.email,
       idUserClient: user.id,
@@ -345,6 +346,11 @@ export class ThirdPartyClientsService {
         100,
     );
 
+    if (type == AddPointsRequestType.CONSULT)
+      this.logger.info(
+        `[${ApiModules.THIRD_PARTY_CLIENTS}] [addPoints-${type}]  | Tentative commission= [$ ${commission} cents] `,
+      );
+
     const response: AddPointsResponse = {
       request: {
         ...addPointsRequest,
@@ -361,6 +367,7 @@ export class ThirdPartyClientsService {
     addPointsRequest: AddPointsRequest,
     user: AuthenticatedUser,
   ): Promise<AddPointsResponse> {
+    const { type } = addPointsRequest;
     const points: AddPointsResponse = await this.consultPoints(
       addPointsRequest,
       user,
@@ -421,6 +428,16 @@ export class ThirdPartyClientsService {
         StateDescription.THIRD_PARTY_CLIENT_TRANSACTION,
       operation: 1,
     };
+
+    this.logger.silly(
+      `[${
+        ApiModules.THIRD_PARTY_CLIENTS
+      }] [addPoints-${type}] Transaction to be created:  Amount to points = [$ ${Math.trunc(
+        rawAmount,
+      )} cents] | Commission= [$ ${
+        points.request.totalTentativeCommission
+      } cents] | Accumulated points= [${accumulatedPoints}] `,
+    );
 
     const transaction = await this.transactionService.createTransaction(
       options,

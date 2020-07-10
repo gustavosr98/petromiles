@@ -99,8 +99,13 @@ export class ThirdPartyClientsController {
     @Body() addPointsRequest: AddPointsRequest,
     @GetUser() user: AuthenticatedUser,
   ): Promise<AddPointsResponse> {
+    let { apiKey, type } = addPointsRequest;
     this.logger.http(
-      `[${ApiModules.THIRD_PARTY_CLIENTS}] (${HttpRequest.POST}) {${user.email}} { apiKey: ${addPointsRequest.apiKey} } asks /${baseEndpoint}/add-points`,
+      `[${ApiModules.THIRD_PARTY_CLIENTS}] [addPoints-${type}] (${
+        HttpRequest.POST
+      })  {apiKey: ${apiKey.substr(0, 2)}..${apiKey.substr(-4)}}  {${
+        user.email
+      }} asks /${baseEndpoint}/add-points`,
     );
     return await this.thirdPartyClientsService.addPoints(
       addPointsRequest,

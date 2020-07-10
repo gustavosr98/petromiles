@@ -89,7 +89,9 @@ export class ManagementService {
       purchasedPoints,
       redeemedPoints,
       total: {
-        dollars: purchasedPoints.dollars - redeemedPoints.dollars,
+        dollars: parseFloat(
+          (purchasedPoints.dollars - redeemedPoints.dollars).toFixed(2),
+        ),
         points: purchasedPoints.points - redeemedPoints.points,
       },
     };
