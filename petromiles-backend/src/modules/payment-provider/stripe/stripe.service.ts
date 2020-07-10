@@ -10,6 +10,7 @@ import Stripe from 'stripe';
 
 import { StripeFilter } from '@/modules/payment-provider/stripe/filters/stripe.filter';
 import { StripeBankAccountStatus } from './bank-account-status.enum';
+import { StripeErrors} from "@/enums/stripe-errors.enum";
 
 import { ApiSubmodules } from '@/logger/api-modules.enum';
 
@@ -22,10 +23,17 @@ export class StripeService {
   ) {}
 
   private errorHandler(err, res) {
-    if(err.raw.code === undefined) {
+    if(err.raw.param === StripeErrors.AMMOUNT && err.raw.code === undefined) {
       this.logger.error(`[${ApiSubmodules.STRIPE}] ${err.type}`);
       throw new BadRequestException(`error-messages.stripe_charge_exceeds_source_limit`);
-    } else {
+    }else if (err.raw.message === StripeErrors.NO_CONNECTION){
+      this.logger.error(`[${ApiSubmodules.STRIPE}] ${err.type}`);
+      throw new BadRequestException(`error-messages.stripe_no_connection`);
+    } else if(err.raw.param === StripeErrors.AMMOUNT && err.raw.code === StripeErrors.INVALID_INTEGER){
+      this.logger.error(`[${ApiSubmodules.STRIPE}] ${err.type}`);
+      throw new BadRequestException(`error-messages.stripe_${err.raw.code}`);
+    }
+    else {
       this.logger.error(`[${ApiSubmodules.STRIPE}] ${err.type}`);
       throw new BadRequestException(`error-messages.stripe_${err.raw.code}`);
     }
@@ -82,7 +90,8 @@ export class StripeService {
       customerId,
       bankAccountId,
       { amounts },
-    );
+    )
+        .catch(e => this.errorHandler(e, null));
     return verification;
   }
 
@@ -184,7 +193,8 @@ export class StripeService {
   async createCustomer(
     customerInfo: Stripe.CustomerCreateParams,
   ): Promise<Stripe.Customer> {
-    const customer = await this.stripe.customers.create(customerInfo);
+    const customer = await this.stripe.customers.create(customerInfo)
+        .catch(e => this.errorHandler(e, null));
     return customer;
   }
 
