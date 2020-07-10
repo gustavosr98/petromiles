@@ -31,7 +31,9 @@
                   <th class="text-center">
                     {{ $t("subscription.premiumBasicTable") }}
                   </th>
-                  <th class="text-center">{{ $t("interest.premiumConfig") }}</th>
+                  <th class="text-center">
+                    {{ $t("interest.premiumConfig") }}
+                  </th>
                   <th class="text-center">
                     {{ $t("subscription.premiumGoldTable") }}
                   </th>
@@ -50,6 +52,20 @@
                   <td>
                     <v-icon color="green">mdi-check-circle</v-icon>
                   </td>
+                  <td></td>
+                </tr>
+                <tr class="text-center">
+                  <td class="benefitDescription">
+                    {{
+                      $t("subscription.goldMorePointsTable", {
+                        percentageGold,
+                      })
+                    }}
+                    <br />
+                    {{ $t("subscription.premiumForEachPayment") }}
+                  </td>
+                  <td></td>
+                  <td></td>
                   <td>
                     <v-icon color="green">mdi-check-circle</v-icon>
                   </td>
@@ -175,6 +191,7 @@ export default {
       percentage: null,
       infoGold: null,
       extra: null,
+      percentageGold: null,
       incomes: null,
       cost: null,
     };
@@ -186,6 +203,7 @@ export default {
     this.infoGold = await this.$http.get("/suscription/information/gold");
     this.percentage = this.infoPremium.percentage;
     this.incomes = this.infoGold.amountUpgrade;
+    this.percentageGold = this.infoGold.percentage;
     this.extra = this.infoGold.points;
   },
 };
