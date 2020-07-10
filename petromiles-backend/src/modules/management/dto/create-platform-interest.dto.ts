@@ -1,11 +1,22 @@
 import { IsOptional, IsNotEmpty } from 'class-validator';
+import { Suscription } from '@/entities/suscription.entity';
+import { PlatformInterest } from '@/enums/platform-interest.enum';
 export class CreatePlatformInterestDTO {
   @IsNotEmpty()
-  name: string;
+  name: PlatformInterest;
 
   @IsOptional()
-  amount: string;
+  points?: number;
 
   @IsOptional()
-  percentage: string;
+  amount?: string;
+
+  @IsOptional()
+  percentage?: string;
+
+  @IsOptional()
+  suscription?: Suscription;
+
+  @IsOptional()
+  description?: string;
 }

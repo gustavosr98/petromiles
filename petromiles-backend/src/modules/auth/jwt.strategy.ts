@@ -6,7 +6,8 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
-import { UserService } from '../user/user.service';
+// SERVICE
+import { UserService } from '@/modules/user/services/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -23,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: App.Auth.JWTPayload) {
-    const user = await this.userService.getUserByEmail(payload);
+    const user = await this.userService.getActive(payload);
     if (!user) {
       this.logger.error(
         `[AUTH] The user ${payload.email} does not have authorization. Log in again`,

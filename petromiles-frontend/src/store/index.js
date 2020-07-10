@@ -1,8 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import * as auth from "@/store/modules/auth";
-import * as bankAccount from "@/store/modules/bankAccount";
-import * as errors from "@/store/modules/errors";
+import * as auth from "@/store/Auth/auth";
+import * as bankAccount from "@/store/BankAccounts/bankAccount";
+import * as errors from "@/store/Alerts/errors";
 
 Vue.use(Vuex);
 

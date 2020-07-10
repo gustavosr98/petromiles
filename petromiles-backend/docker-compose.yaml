@@ -1,0 +1,27 @@
+version: '3'
+services:
+  # PG DATABASE
+  db:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    ports:
+      - 5435:5432
+    environment:
+      - POSTGRES_DB=dbpetromiles
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+  # NESTJS BACKEND API
+  api:
+    depends_on:
+      - db
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - /app/node_modules
+      - .:/app

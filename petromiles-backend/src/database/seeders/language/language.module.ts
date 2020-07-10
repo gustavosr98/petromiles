@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LanguageSeederService } from './language.service';
-import { Language } from '../../../modules/user/language/language.entity';
+import { Language } from '../../../entities/language.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Language])],

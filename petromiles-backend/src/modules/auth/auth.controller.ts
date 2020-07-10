@@ -8,20 +8,27 @@ import {
   UseGuards,
   Get,
   ClassSerializerInterceptor,
+  Ip,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
+import { PasswordEncryptorInterceptor } from '@/interceptors/password-encryptor.interceptor';
+import { RolesGuard } from './guards/roles.guard';
+
+// INTERFACES
 import { CreateUserDTO } from '../user/dto/create-user.dto';
+import { ApiModules } from '@/logger/api-modules.enum';
+import { HttpRequest } from '@/logger/http-requests.enum';
+import { Role } from '@/enums/role.enum';
+
+// DECORATOR
 import { GetUser } from './decorators/get-user.decorator';
 import { Roles } from './decorators/roles.decorator';
-import { ApiModules } from '@/logger/api-modules.enum';
-import { HttpRequest } from './../../logger/http-requests.enum';
 
-import { PasswordEncryptorInterceptor } from './interceptors/password-encryptor.interceptor';
-import { RolesGuard } from './guards/roles.guard';
+// SERVICE
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -34,11 +41,12 @@ export class AuthController {
 
   @UseInterceptors(PasswordEncryptorInterceptor)
   @Post('signup')
-  async signUpClient(@Body(ValidationPipe) user: CreateUserDTO) {
+  async signUpClient(@Ip() ip, @Body(ValidationPipe) user: CreateUserDTO) {
     this.logger.http(
       `[${ApiModules.AUTH}] {${user.email}} Client is starting the sign up process`,
     );
-    return await this.authService.createUserClient(user);
+
+    return await this.authService.createUserClient(user, ip);
   }
 
   @Post('login')
@@ -53,6 +61,14 @@ export class AuthController {
     return user;
   }
 
+  @Post('recover-password')
+  async recoverPassword(@Body() credentials: App.Auth.LoginRequest) {
+    this.logger.http(
+      `[${ApiModules.AUTH}] {${credentials.email}} The user is starting the recover-password process`,
+    );
+    await this.authService.recoverPassword(credentials);
+  }
+
   @Roles()
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
@@ -62,5 +78,17 @@ export class AuthController {
       `[${ApiModules.AUTH}] (${HttpRequest.GET}) ${user?.email} asks for /auth/checkToken`,
     );
     return user;
+  }
+
+  @Roles(Role.ADMINISTRATOR)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
+  @Post('signup/administrator')
+  async signUpAdministrador(@Body(ValidationPipe) user: CreateUserDTO) {
+    this.logger.http(
+      `[${ApiModules.AUTH}] {${user.email}} Administrador is starting the sign up process`,
+    );
+
+    return await this.authService.createUserAdministrator(user);
   }
 }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SuscriptionSeederService } from './suscription.service';
-import { Suscription } from '../../../modules/suscription/suscription/suscription.entity';
+import { Suscription } from '../../../entities/suscription.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Suscription])],

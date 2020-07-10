@@ -1,9 +1,10 @@
 // NEST CORE
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 
 // CONFIGURATION
-import configuration from 'config/configuration';
+import configuration from '@/config/configuration';
 
 // LOGGER
 import { WinstonModule } from 'nest-winston';
@@ -22,14 +23,13 @@ import { SuscriptionModule } from '@/modules/suscription/suscription.module';
 import { TransactionModule } from '@/modules/transaction/transaction.module';
 import { UserModule } from '@/modules/user/user.module';
 import { PaymentsModule } from '@/modules/payments/payments.module';
+import { ThirdPartyClientsModule } from '@/modules/third-party-clients/third-party-clients.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: !process.env.NODE_ENV
-        ? ['.env.development', '.env']
-        : ['.env', '.env.development'],
+      envFilePath: ['.env.development', '.env'],
       load: [configuration],
     }),
     AuthModule,
@@ -45,7 +45,13 @@ import { PaymentsModule } from '@/modules/payments/payments.module';
     TransactionModule,
     WinstonModule.forRoot(createOptions({ fileName: 'petromiles-global.log' })),
     PaymentsModule,
+    ThirdPartyClientsModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+  ],
 })
 export class AppModule {}

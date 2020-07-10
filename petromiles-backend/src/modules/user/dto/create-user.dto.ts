@@ -5,6 +5,9 @@ import {
   IsString,
   IsOptional,
 } from 'class-validator';
+
+import { Country } from '@/entities/country.entity';
+
 export class CreateUserDTO {
   @IsEmail()
   @IsNotEmpty()
@@ -57,4 +60,7 @@ export class CreateUserDTO {
   @IsString()
   @IsOptional()
   photo?: string;
+
+  @IsOptional()
+  country?: Country;
 }

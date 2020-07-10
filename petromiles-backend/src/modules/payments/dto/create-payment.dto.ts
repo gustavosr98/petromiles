@@ -1,4 +1,5 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
+
 export class CreatePaymentDTO {
   @IsNotEmpty()
   idClientBankAccount: number;
@@ -8,4 +9,13 @@ export class CreatePaymentDTO {
 
   @IsNotEmpty()
   amountToCharge: string;
+
+  @IsNotEmpty()
+  points: number;
+
+  @IsOptional()
+  subscriptionName?: string;
+
+  @IsOptional()
+  infoSubscription?;
 }

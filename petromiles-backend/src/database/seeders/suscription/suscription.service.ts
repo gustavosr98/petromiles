@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, InsertResult } from 'typeorm';
 
 import { SUSCRIPTIONS } from './suscription.data';
-import { Suscription } from '../../../modules/suscription/suscription/suscription.entity';
+import { Suscription } from '../../../entities/suscription.entity';
 
 @Injectable()
 export class SuscriptionSeederService {

@@ -8,10 +8,6 @@ import { StripeService } from '@/modules/payment-provider/stripe/stripe.service'
 
 // INTERFACES
 import {
-  CreateBankAccountParams,
-  BankAccount,
-} from '@/modules/transaction/interfaces/bank-account.interface';
-import {
   ChargeCreateParams,
   Charge,
 } from '@/modules/transaction/interfaces/charge.interface';
@@ -51,7 +47,7 @@ export class PaymentProviderService {
       },
     });
     this.logger.verbose(
-      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account first token created ${bankAccountToken.id}`,
+      `[${ApiModules.PAYMENT_PROVIDER}] {${userClient.email}} Bank account first token created ${bankAccountToken.id}`,
     );
 
     const bankAccountSource = await this.asociateBankToCustomer(
@@ -59,7 +55,7 @@ export class PaymentProviderService {
       bankAccountToken.id,
     );
     this.logger.verbose(
-      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account asociated to CUSTOMER {last4: ${bankAccountSource.last4}} `,
+      `[${ApiModules.PAYMENT_PROVIDER}] {${userClient.email}} Bank account asociated to CUSTOMER {last4: ${bankAccountSource.last4}} `,
     );
 
     // Asocitating with Account to send money to
@@ -74,7 +70,7 @@ export class PaymentProviderService {
       },
     });
     this.logger.verbose(
-      `[${ApiModules.PAYMENT_PROVIDER}] {${bankAccountCreateParams.email}} Bank account second token created ${bankAccountToken.id}`,
+      `[${ApiModules.PAYMENT_PROVIDER}] {${userClient.email}} Bank account second token created ${bankAccountToken.id}`,
     );
 
     const asociatedBankAccount = await this.stripeService.asociateBankAccountToAccount(
@@ -115,12 +111,31 @@ export class PaymentProviderService {
   }
 
   // ACCOUNTS
-  async createAccount(user: { email: string; customerId: string }) {
+  async createAccount(user: {
+    email: string;
+    name: string;
+    lastName: string;
+    customerId: string;
+    ip: string;
+  }) {
     const account = await this.stripeService.createAccount({
       type: 'custom',
       country: 'US',
       email: user.email,
       requested_capabilities: ['transfers'],
+      business_type: 'individual',
+      individual: {
+        first_name: user.name,
+        last_name: user.lastName,
+        email: user.email,
+      },
+      business_profile: {
+        url: user.name.toLowerCase().replace(' ', '') + '.com',
+      },
+      tos_acceptance: {
+        ip: user.ip,
+        date: Math.round(new Date().getTime() / 1000),
+      },
       metadata: {
         customerId: user.customerId,
       },
@@ -133,6 +148,19 @@ export class PaymentProviderService {
     return account;
   }
 
+  async updateBankAccountOfAnAccount(
+    accountId: string,
+    bankAccountId: string,
+    accountUpdateParams: { default_for_currency: boolean },
+  ) {
+    const updatedBankAccount = await this.stripeService.updateBankAccountOfAnAccount(
+      accountId,
+      bankAccountId,
+      accountUpdateParams,
+    );
+    return updatedBankAccount;
+  }
+
   async deleteBankAccount(
     customerId: string,
     bankAccountId: string,
@@ -140,13 +168,13 @@ export class PaymentProviderService {
   ) {
     await this.stripeService.deleteBankAccount(customerId, bankAccountId);
     this.logger.verbose(
-      `[${ApiModules.PAYMENT_PROVIDER}] {${email}} deleteBankAccount(): ${bankAccountId}`,
+      `[${ApiModules.PAYMENT_PROVIDER}] {${email}} deleteBankAccount()`,
     );
   }
 
   // TRANSFERS
   async createTransfer(transferCreateParams) {
-    const transfer = await this.stripeService.createAccount(
+    const transfer = await this.stripeService.createTransfer(
       transferCreateParams,
     );
     return transfer;

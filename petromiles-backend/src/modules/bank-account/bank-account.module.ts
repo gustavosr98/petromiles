@@ -2,24 +2,27 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 // MODULES
-import { UserModule } from '../user/user.module';
-import { TransactionModule } from '../transaction/transaction.module';
-import { ManagementModule } from '../management/management.module';
+import { UserModule } from '@/modules/user/user.module';
+import { TransactionModule } from '@/modules/transaction/transaction.module';
+import { ManagementModule } from '@/modules/management/management.module';
 import { PaymentProviderModule } from '@/modules/payment-provider/payment-provider.module';
+import { MailsModule } from '@/modules/mails/mails.module';
 
 // CONTROLLER
-import { BankAccountController } from './bank-account.controller';
+import { BankAccountController } from '@/modules/bank-account/controllers/bank-account.controller';
 
 // SERVICES
-import { BankAccountService } from './bank-account.service';
-import { StateBankAccountService } from './state-bank-account/state-bank-account.service';
-import { StateService } from '../management/state/state.service';
-import { ClientBankAccountService } from './client-bank-account/client-bank-account.service';
+import { BankAccountService } from './services/bank-account.service';
+import { ClientBankAccountService } from './services/client-bank-account.service';
 
 // ENTITIES
-import { BankAccount } from './bank-account/bank-account.entity';
-import { StateBankAccount } from './state-bank-account/state-bank-account.entity';
-import { ClientBankAccount } from './client-bank-account/client-bank-account.entity';
+import { BankAccount } from '@/entities/bank-account.entity';
+import { StateBankAccount } from '@/entities/state-bank-account.entity';
+import { ClientBankAccount } from '@/entities/client-bank-account.entity';
+import { RoutingNumber } from '@/entities/routing-number.entity';
+import { UserClient } from '@/entities/user-client.entity';
+import { UserDetails } from '@/entities/user-details.entity';
+import { State } from '@/entities/state.entity';
 
 @Module({
   imports: [
@@ -27,23 +30,19 @@ import { ClientBankAccount } from './client-bank-account/client-bank-account.ent
       BankAccount,
       StateBankAccount,
       ClientBankAccount,
+      RoutingNumber,
+      UserClient,
+      UserDetails,
+      State,
     ]),
     PaymentProviderModule,
     ManagementModule,
     TransactionModule,
     UserModule,
+    MailsModule,
   ],
-  providers: [
-    BankAccountService,
-    StateBankAccountService,
-    ClientBankAccountService,
-    StateService,
-  ],
-  exports: [
-    BankAccountService,
-    StateBankAccountService,
-    ClientBankAccountService,
-  ],
+  providers: [BankAccountService, ClientBankAccountService],
+  exports: [BankAccountService, ClientBankAccountService],
   controllers: [BankAccountController],
 })
 export class BankAccountModule {}

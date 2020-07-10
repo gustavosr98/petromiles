@@ -11,8 +11,8 @@ interface createOptionsParams {
 function createOptions(params: createOptionsParams): WinstonModuleOptions {
   const actualPath =
     process.env.NODE_ENV === 'development'
-      ? `${__dirname}/../../../../`
-      : `${__dirname}/../../../../`;
+      ? `${__dirname}/../../../`
+      : `${__dirname}/../../../`;
 
   return {
     transports: [
