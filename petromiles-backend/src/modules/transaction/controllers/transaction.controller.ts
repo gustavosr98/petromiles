@@ -54,7 +54,9 @@ export class TransactionController {
     this.logger.http(
       `[${ApiModules.TRANSACTION}] (${HttpRequest.GET}) ${user?.email} asks /${baseEndpoint}/getThirdPartyTransactions/${id}`,
     );
-    return this.transactionService.getThirdPartyTransactions(id);
+    return this.transactionService.getThirdPartyTransactions({
+      idThirdPartyClient: id,
+    });
   }
 
   @Get(':idTransaction')

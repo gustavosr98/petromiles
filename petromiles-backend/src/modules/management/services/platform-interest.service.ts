@@ -1,7 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository, Not, IsNull, LessThanOrEqual } from 'typeorm';
+import { Repository, Not, IsNull } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -16,7 +16,6 @@ import { PlatformInterestType } from '@/enums/platform-interest-type.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
-import console = require('console');
 
 @Injectable()
 export class PlatformInterestService {

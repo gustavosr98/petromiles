@@ -1,3 +1,4 @@
+import { TransactionDetails } from '@/modules/transaction/interfaces/transaction-details.interface';
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -25,6 +26,9 @@ import { StateName, StateDescription } from '@/enums/state.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { UserClient } from '@/entities/user-client.entity';
+import { ConfirmationTicket } from '@/interfaces/third-party-clients/confirmation-ticket.interface';
+import { AddPointsRequestCurrency } from '@/enums/add-points-request-currency.enum';
+import { PlatformInterestType } from '@/enums/platform-interest-type.enum';
 
 @Injectable()
 export class TransactionService {
@@ -106,9 +110,26 @@ export class TransactionService {
     });
   }
 
-  async getThirdPartyTransactions(idThirdPartyClient: number) {
+  async getThirdPartyTransactions(params: {
+    idThirdPartyClient?: number;
+    apiKey?: string;
+    filter?: {
+      transactionIds?: number[];
+    };
+  }): Promise<TransactionDetails[]> {
+    let where = !!params.idThirdPartyClient
+      ? `"thirdPartyClient"."idThirdPartyClient" = ${params.idThirdPartyClient}`
+      : `"thirdPartyClient"."apiKey" = '${params.apiKey}'`;
+
+    if (!!params.filter?.transactionIds) {
+      where =
+        where +
+        ' AND ' +
+        ` transaction."idTransaction" IN( ${params.filter.transactionIds.toString()} ) `;
+    }
+
     const transactions = await this.transactionRepository.find({
-      where: `"thirdPartyClient"."idThirdPartyClient" = ${idThirdPartyClient}`,
+      where,
       join: {
         alias: 'transaction',
         innerJoinAndSelect: {
@@ -118,9 +139,9 @@ export class TransactionService {
         },
       },
     });
-
     return transactions.map(transaction => transaction.calculateDetails());
   }
+
   async getTransactionInterests(options: App.Transaction.TransactionInterests) {
     const interest = await this.platformInterestService.getInterestByName(
       options.platformInterestType,

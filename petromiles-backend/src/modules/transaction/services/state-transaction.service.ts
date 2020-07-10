@@ -40,7 +40,11 @@ export class StateTransactionService {
       .save(stateTransaction);
   }
 
-  async update(stateName: StateName, transaction: Transaction, description?) {
+  async update(
+    stateName: StateName,
+    transaction: Transaction,
+    description?: string,
+  ) {
     await this.endLastState(transaction);
 
     const newState = new StateTransaction();

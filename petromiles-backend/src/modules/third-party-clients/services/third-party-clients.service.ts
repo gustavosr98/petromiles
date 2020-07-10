@@ -1,8 +1,9 @@
+import { Transaction } from '@/entities/transaction.entity';
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository, UpdateResult, getConnection } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -15,6 +16,7 @@ import { CsvService } from '@/modules/third-party-clients/services/csv.service';
 import { TransactionService } from '@/modules/transaction/services/transaction.service';
 import { ThirdPartyInterestService } from '@/modules/management/services/third-party-interest.service';
 import { UserClientService } from '@/modules/user/services/user-client.service';
+import { StateTransactionService } from '@/modules/transaction/services/state-transaction.service';
 
 // ENTITIES
 import { ThirdPartyClient } from '@/entities/third-party-client.entity';
@@ -39,13 +41,19 @@ import { Role } from '@/enums/role.enum';
 import { ThirdPartyClientsErrorCodes } from '@/enums/third-party-clients-error-codes.enum';
 import { ThirdPartyClientResponseStatus } from '@/enums/third-party-clients-response-status.enum';
 import { MailsResponse } from '@/enums/mails-response.enum';
-
+import { TransactionDetails } from '@/modules/transaction/interfaces/transaction-details.interface';
 import { MailsSubjets } from '@/constants/mailsSubjectConst';
 import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
 import { StateName, StateDescription } from '@/enums/state.enum';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { Suscription } from '@/enums/suscription.enum';
 import { ApiModules } from '@/logger/api-modules.enum';
+import {
+  CsvProcessResult,
+  CsvApiError,
+  CsvProcessDescription,
+} from '@/enums/csv-process';
+import { CsvProcessDetails } from '@/interfaces/third-party-clients/csv-process';
 
 @Injectable()
 export class ThirdPartyClientsService {
@@ -67,6 +75,7 @@ export class ThirdPartyClientsService {
     private readonly transactionService: TransactionService,
     private readonly thirdPartyInterestService: ThirdPartyInterestService,
     private readonly userClientService: UserClientService,
+    private readonly stateTransactionService: StateTransactionService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
@@ -421,7 +430,7 @@ export class ThirdPartyClientsService {
     const confirmationTicket: ConfirmationTicket = {
       confirmationId: transaction.idTransaction.toString(),
       userEmail: user.email,
-      date: transaction.initialDate,
+      date: transaction.initialDate.toISOString(),
       currency: addPointsRequest.products[0].currency,
       pointsToDollars: Math.trunc(rawAmount),
       accumulatedPoints,
@@ -449,22 +458,246 @@ export class ThirdPartyClientsService {
   }
 
   async csvCheck(apiKey: string, file): Promise<ConfirmationTicket[]> {
-    const confirmationTickets: ConfirmationTicket[] = await this.csvService.toJSON<
+    let theirConfirmationTickets: ConfirmationTicket[] = await this.csvService.toJSON<
       ConfirmationTicket
     >(file, [
       'confirmationId',
+      'apiKey',
       'date',
       'userEmail',
-      'priceTag',
+      'pointsToDollars',
+      'commission',
       'accumulatedPoints',
     ]);
-    await this.sendPointsStatusEmail(
-      confirmationTickets[confirmationTickets.length - 1].userEmail,
-      apiKey,
-      confirmationTickets[confirmationTickets.length - 1].accumulatedPoints,
-      StateName.INVALID,
+    this.checkApiKeyConsistency({ apiKey, theirConfirmationTickets });
+
+    const theirConfirmationTicketsIds: number[] = theirConfirmationTickets.map(
+      confirmationTicket => parseInt(confirmationTicket.confirmationId),
     );
-    return confirmationTickets;
+    this.checkRepeatedTransactionIds({ apiKey, theirConfirmationTicketsIds });
+
+    const transactions: TransactionDetails[] = await this.transactionService.getThirdPartyTransactions(
+      {
+        apiKey,
+        filter: {
+          transactionIds: theirConfirmationTicketsIds,
+        },
+      },
+    );
+
+    const processedConfirmationTickets = theirConfirmationTickets.map(
+      theirConfirmationTicket => {
+        let logPrefix: string = `[${
+          ApiModules.THIRD_PARTY_CLIENTS
+        }] [CSV] {apiKey: ${apiKey.substr(0, 2)}..${apiKey.substr(
+          -4,
+        )}} (confirmationId: ${theirConfirmationTicket.confirmationId}): `;
+
+        let processingDetails: CsvProcessDetails = {
+          description: [],
+          result: null,
+          state: null,
+        };
+
+        try {
+          const ourTransaction = transactions.find(
+            transaction =>
+              transaction.id ===
+              parseInt(theirConfirmationTicket.confirmationId),
+          );
+
+          if (!!ourTransaction) {
+            const ourConfirmationTicket = {
+              confirmationId: ourTransaction.id,
+              date: new Date(ourTransaction.fullDate),
+              userEmail: ourTransaction.clientBankAccountEmail,
+              pointsToDollars: Math.trunc(ourTransaction.amount * 100),
+              commission: Math.trunc(ourTransaction.interest * 100),
+              accumulatedPoints: Math.trunc(ourTransaction.pointsEquivalent),
+              state: ourTransaction.state,
+            };
+
+            if (ourConfirmationTicket.state !== StateName.VERIFYING) {
+              processingDetails.result = CsvProcessResult.MAINTAIN;
+              processingDetails.state =
+                StateName[ourConfirmationTicket.state.toUpperCase()];
+            } else if (
+              ourConfirmationTicket.userEmail ===
+                theirConfirmationTicket.userEmail &&
+              ourConfirmationTicket.pointsToDollars ==
+                theirConfirmationTicket.pointsToDollars &&
+              ourConfirmationTicket.commission ==
+                theirConfirmationTicket.commission &&
+              ourConfirmationTicket.accumulatedPoints ==
+                theirConfirmationTicket.accumulatedPoints &&
+              ourConfirmationTicket.date.toISOString() ==
+                theirConfirmationTicket.date
+            ) {
+              processingDetails.result = CsvProcessResult.VALID;
+              processingDetails.state = StateName.VALID;
+            } else {
+              processingDetails.result = CsvProcessResult.INVALID;
+              processingDetails.state = StateName.INVALID;
+
+              this.addInvalidDescription({
+                ourConfirmationTicket,
+                theirConfirmationTicket,
+                processingDetails,
+              });
+            }
+          } else {
+            processingDetails.result = CsvProcessResult.MAINTAIN;
+            processingDetails.description.push(
+              CsvProcessDescription.NOT_EXISTING_TRANSACTION_ID,
+            );
+            processingDetails.state = StateName.INVALID;
+          }
+
+          this.internalTicketProcessing({
+            apiKey,
+            confirmationTicket: theirConfirmationTicket,
+            processingDetails,
+          });
+        } catch (e) {
+          this.logger.error(logPrefix + e);
+          processingDetails.result = CsvProcessResult.MAINTAIN;
+          processingDetails.description.push(
+            CsvProcessDescription.WRONG_TYPE_OF_VALUES,
+          );
+          processingDetails.state = StateName.INVALID;
+        } finally {
+          const logContent =
+            logPrefix +
+            `(Result: ${processingDetails.result} | Final state: ${
+              processingDetails.state
+            } | ${processingDetails.description.toString()})`;
+
+          if (processingDetails.result === CsvProcessResult.MAINTAIN)
+            this.logger.info(logContent);
+          else if (processingDetails.result === CsvProcessResult.VALID)
+            this.logger.verbose(logContent);
+          else if (processingDetails.result === CsvProcessResult.INVALID)
+            this.logger.error(logContent);
+          return {
+            ...theirConfirmationTicket,
+            status: processingDetails.state,
+          };
+        }
+      },
+    );
+
+    return processedConfirmationTickets;
+  }
+
+  private async internalTicketProcessing({
+    apiKey,
+    confirmationTicket,
+    processingDetails,
+  }: {
+    apiKey: string;
+    confirmationTicket: ConfirmationTicket;
+    processingDetails: CsvProcessDetails;
+  }): Promise<void> {
+    if (
+      processingDetails.result === CsvProcessResult.VALID ||
+      processingDetails.result === CsvProcessResult.INVALID
+    ) {
+      const transaction = await getConnection()
+        .getRepository(Transaction)
+        .findOne({
+          idTransaction: parseInt(confirmationTicket.confirmationId),
+        });
+
+      await this.stateTransactionService.update(
+        processingDetails.state,
+        transaction,
+        processingDetails.description.toString().toUpperCase(),
+      );
+
+      await this.sendPointsStatusEmail(
+        confirmationTicket.userEmail,
+        apiKey,
+        confirmationTicket.accumulatedPoints,
+        processingDetails.state,
+      );
+    }
+  }
+
+  private addInvalidDescription({
+    ourConfirmationTicket,
+    theirConfirmationTicket,
+    processingDetails,
+  }) {
+    if (ourConfirmationTicket.date !== theirConfirmationTicket.date) {
+      processingDetails.description.push(CsvProcessDescription.NO_MATCH_DATE);
+    }
+    if (ourConfirmationTicket.userEmail !== theirConfirmationTicket.userEmail) {
+      processingDetails.description.push(
+        CsvProcessDescription.NO_MATCH_USER_EMAIL,
+      );
+    }
+    if (
+      ourConfirmationTicket.pointsToDollars !=
+      theirConfirmationTicket.pointsToDollars
+    ) {
+      processingDetails.description.push(
+        CsvProcessDescription.NO_MATCH_POINTS_TO_DOLLARS,
+      );
+    }
+    if (
+      ourConfirmationTicket.commission != theirConfirmationTicket.commission
+    ) {
+      processingDetails.description.push(
+        CsvProcessDescription.NO_MATCH_COMMISSION,
+      );
+    }
+    if (
+      ourConfirmationTicket.accumulatedPoints !=
+      theirConfirmationTicket.accumulatedPoints
+    ) {
+      processingDetails.description.push(
+        CsvProcessDescription.NO_MATCH_ACCUMULATED_POINTS,
+      );
+    }
+  }
+
+  private checkApiKeyConsistency(params: {
+    apiKey: string;
+    theirConfirmationTickets: ConfirmationTicket[];
+  }): void {
+    const allEquals: boolean = params.theirConfirmationTickets.every(
+      ticket => ticket.apiKey === params.apiKey,
+    );
+
+    if (!allEquals) {
+      this.logger.error(
+        `[${
+          ApiModules.THIRD_PARTY_CLIENTS
+        }] [CSV] {apiKey: ${params.apiKey.substr(0, 2)}..${params.apiKey.substr(
+          -4,
+        )}} ${CsvApiError.APIKEY_INCONSISTENCY}`,
+      );
+      throw new BadRequestException(CsvApiError.APIKEY_INCONSISTENCY);
+    }
+  }
+
+  private checkRepeatedTransactionIds(params: {
+    apiKey: string;
+    theirConfirmationTicketsIds: number[];
+  }): void {
+    if (
+      new Set(params.theirConfirmationTicketsIds).size !==
+      params.theirConfirmationTicketsIds.length
+    ) {
+      this.logger.error(
+        `[${
+          ApiModules.THIRD_PARTY_CLIENTS
+        }] [CSV] {apiKey: ${params.apiKey.substr(0, 2)}..${params.apiKey.substr(
+          -4,
+        )}} ${CsvApiError.REPEATED_TRANSACTION_IDS}`,
+      );
+      throw new BadRequestException(CsvApiError.REPEATED_TRANSACTION_IDS);
+    }
   }
 
   private async sendPointsStatusEmail(

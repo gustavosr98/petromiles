@@ -29,7 +29,7 @@ export class Transaction extends BaseEntity {
   idUserClient?: number;
 
   @Transform(date => date.toLocaleDateString())
-  @Column({ default: () => 'CURRENT_DATE' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   initialDate: Date;
 
   @Column('decimal', { precision: 12, scale: 3 })
@@ -132,6 +132,7 @@ export class Transaction extends BaseEntity {
     return {
       id: this.idTransaction,
       date: this.initialDate.toLocaleDateString(),
+      fullDate: this.initialDate,
       type: this.type,
       bankAccount,
       bankAccountNickname,
