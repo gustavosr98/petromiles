@@ -6,10 +6,12 @@
                 <v-img 
                   :src="profileImg" 
                   alt="Avatar"     
-                  v-if="profileImg"                                  
+                  v-if="profileImg"  
+                  lazy-src="@/assets/general/spinner.gif"                                
                 ></v-img>
                 <v-img 
                   src="@/assets/profile/user-avatar.png" 
+                  lazy-src="@/assets/general/spinner.gif"
                   alt="Avatar"     
                   v-else                                  
                 ></v-img>

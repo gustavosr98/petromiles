@@ -34,6 +34,7 @@
                           contain
                           height="330px"
                           src="@/assets/membership/premium.png"
+                          lazy-src="@/assets/general/spinner.gif"
                         ></v-img>
                         <v-card-text class="text--primary">
                           <div class="pb-3">

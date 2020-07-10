@@ -29,7 +29,7 @@
         </v-col>
         <v-col>
           <v-card class="mx-auto px-3 text-xs-center" v-if="selectedItem">
-            <v-img :src="selectedItem.photo" height="150px"></v-img>
+            <v-img :src="selectedItem.photo" height="150px" lazy-src="@/assets/general/spinner.gif"></v-img>
 
             <v-card-title class="light-blue-text text--darken-4">{{selectedItem.name}}</v-card-title>
 

@@ -7,21 +7,24 @@
                   src="@/assets/membership/basic.png" 
                   alt="Avatar"     
                   width="140"   
-                  class="center bottomSeparation"                         
+                  class="center bottomSeparation"  
+                  lazy-src="@/assets/general/spinner.gif"                       
                 ></v-img> 
                 <v-img 
                   v-if="membership.name === memberships.PREMIUM"
                   src="@/assets/membership/premium.png" 
                   alt="Avatar"     
                   width="140"   
-                  class="center bottomSeparation"                            
+                  class="center bottomSeparation"     
+                  lazy-src="@/assets/general/spinner.gif"                       
                 ></v-img>                                                                                                                          
                 <v-img 
                   v-if="membership.name === memberships.GOLD"
                   src="@/assets/membership/gold.png" 
                   alt="Avatar"     
                   width="140"   
-                  class="center bottomSeparation"                              
+                  class="center bottomSeparation"     
+                  lazy-src="@/assets/general/spinner.gif"                         
                 ></v-img>    
                 <router-link to="/user-subscription" style="text-decoration: none" v-if="!isAdmin">
                   <div class="mt-n10">

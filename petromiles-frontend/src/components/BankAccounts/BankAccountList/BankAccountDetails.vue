@@ -39,7 +39,7 @@
       <v-col cols="12" md="5" class="px-0 pt-8" align="center">
         <!-- Bank photo-->
         <v-avatar size="150" tile>
-          <v-img height="120px" width="px" :src="bankAccount.photo"></v-img>
+          <v-img height="120px" width="px" :src="bankAccount.photo" lazy-src="@/assets/general/spinner.gif"></v-img>
         </v-avatar>
 
         <!-- Delete and set primary actions -->

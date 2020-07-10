@@ -87,6 +87,7 @@
               height="335px"
               contain
               src="@/assets/membership/premium.png"
+              lazy-src="@/assets/general/spinner.gif"
             ></v-img>
 
             <v-card-subtitle class="pb-5 primary--text">
@@ -131,6 +132,7 @@
               height="350px"
               contain
               src="@/assets/membership/gold.png"
+              lazy-src="@/assets/general/spinner.gif"
             ></v-img>
             <v-card-subtitle class="secondary--text text--darken-1">
               <h1>

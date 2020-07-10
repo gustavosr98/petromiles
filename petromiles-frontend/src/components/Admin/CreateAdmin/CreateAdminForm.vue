@@ -11,8 +11,8 @@
                 <div class="text-center">
                   <v-col cols="12">
                     <v-avatar size="150">
-                      <v-img :src="profileImg" alt="Avatar" v-if="profileImg"></v-img>
-                      <v-img src="@/assets/profile/user-avatar.png" alt="Avatar" v-else></v-img>
+                      <v-img :src="profileImg" alt="Avatar" v-if="profileImg" lazy-src="@/assets/general/spinner.gif"></v-img>
+                      <v-img src="@/assets/profile/user-avatar.png" alt="Avatar" lazy-src="@/assets/general/spinner.gif" v-else></v-img>
                     </v-avatar>
                   </v-col>
                   <v-col cols="12">
