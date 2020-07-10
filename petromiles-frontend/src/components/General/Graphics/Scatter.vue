@@ -1,8 +1,8 @@
 <script>
-import { Bar } from "vue-chartjs";
+import { Scatter } from "vue-chartjs";
 
 export default {
-  extends: Bar,
+  extends: Scatter,
   props: ["datacollection", "options"],
   watch: {
     chartData(oldChartData, newChartData){

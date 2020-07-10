@@ -1,8 +1,8 @@
 <script>
-import { Doughnut } from "vue-chartjs";
+import { Pie } from "vue-chartjs";
 
 export default {
-  extends: Doughnut,
+  extends: Pie,
   props: ["chartData", "options"],
   watch: {
     chartData(oldChartData, newChartData) {

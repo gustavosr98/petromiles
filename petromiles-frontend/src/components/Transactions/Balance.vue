@@ -15,7 +15,6 @@
         </div>
       </v-col>
     </v-row>
-    <v-divider></v-divider>
   </div>
 </template>
 

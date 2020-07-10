@@ -1,8 +1,8 @@
 <script>
-import { Doughnut } from "vue-chartjs";
+import { PolarArea } from "vue-chartjs";
 
 export default {
-  extends: Doughnut,
+  extends: PolarArea,
   props: ["chartData", "options"],
   watch: {
     chartData(oldChartData, newChartData) {

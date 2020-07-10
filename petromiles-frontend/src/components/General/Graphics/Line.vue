@@ -1,8 +1,8 @@
 <script>
-import { Bar } from "vue-chartjs";
+import { Line } from "vue-chartjs";
 
 export default {
-  extends: Bar,
+  extends: Line,
   props: ["datacollection", "options"],
   watch: {
     chartData(oldChartData, newChartData){

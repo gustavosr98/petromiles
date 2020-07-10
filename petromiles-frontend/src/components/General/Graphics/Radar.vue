@@ -1,8 +1,8 @@
 <script>
-import { Bar } from "vue-chartjs";
+import { Radar } from "vue-chartjs";
 
 export default {
-  extends: Bar,
+  extends: Radar,
   props: ["datacollection", "options"],
   watch: {
     chartData(oldChartData, newChartData){
