@@ -8,15 +8,16 @@
       linkTo="/transaction-details"
       :tableName="table.TRANSACTIONS"
     />
+    <loading-screen :visible="showLoadingScreen"></loading-screen>
   </div>
 </template>
 
 <script>
 import Datatable from "@/components/General/Datatable/Datatable";
 import DateRangePicker from "@/components/Transactions/DateRangePicker";
+import LoadingScreen from "@/components/General/LoadingScreen/LoadingScreen.vue";
 import Transaction from "@/constants/transaction";
 import Tables from "@/constants/table";
-
 import PlatformInterest from "@/constants/platformInterest";
 
 export default {
@@ -29,12 +30,14 @@ export default {
   components: {
     Datatable,
     "date-range-picker": DateRangePicker,
+    "loading-screen": LoadingScreen,
   },
   data() {
     return {
       transactions: [],
       fetchedData: [],
       table: Tables,
+      showLoadingScreen: true,
     };
   },
   async mounted() {
@@ -93,13 +96,16 @@ export default {
 
       return headers;
     },
-    async loadData() {
+    async loadData() {      
       if(!this.isAdmin){
-        this.fetchedData = await this.$http.get(this.url);
+        this.fetchedData = await this.$http.get(this.url).finally(() => {          
+          this.showLoadingScreen = false;          
+        });
       }
       else {
-        this.fetchedData = this.transactionsData;
+        this.fetchedData = this.transactionsData;        
       }
+      this.showLoadingScreen = false;
       this.transactions = this.fetchedData.sort((a, b) => {
         if (a.id < b.id) {
           return 1;
@@ -108,7 +114,7 @@ export default {
           return -1;
         }
         return 0;
-      });
+      });           
     },
   },
   computed: {

@@ -8,6 +8,7 @@
       linkTo="/transaction-details"
       :tableName="table.TRANSACTIONS"
     />
+    <loading-screen :visible="showLoadingScreen"></loading-screen>
   </div>
 </template>
 
@@ -17,22 +18,27 @@ import DateRangePicker from "@/components/Transactions/DateRangePicker";
 import Transaction from "@/constants/transaction";
 import Tables from "@/constants/table";
 import PlatformInterest from "@/constants/platformInterest";
+import LoadingScreen from "@/components/General/LoadingScreen/LoadingScreen.vue";
 
 export default {
   name: "transactions-table",
   components: {
     Datatable,
     "date-range-picker": DateRangePicker,
+    "loading-screen": LoadingScreen,
   },
   data() {
     return {
       transactions: [],
       fetchedData: [],
       table: Tables,
+      showLoadingScreen: true,
     };
   },
   async mounted() {
-    this.fetchedData = await this.$http.get("transaction/admin/list/all");
+    this.fetchedData = await this.$http.get("transaction/admin/list/all").finally(() => {
+      this.showLoadingScreen = false;
+    });
     this.transactions = this.fetchedData;
   },
 

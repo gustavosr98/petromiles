@@ -1,67 +1,70 @@
 <template>
-  <v-container class="ml-3 pr-0">
-    <v-row dense>
-      <v-col cols="12" md="3">
-        <v-col v-for="(item, i) in pointsData" :key="i" class="py-1">
-          <v-card :color="item.color" dark>
-            <v-card-title class="headline pb-0">{{ item.title }}</v-card-title>
-            <v-card-subtitle class="mt-1 mb-0 pb-0 font-weight-bold"
-              >{{ item.points }} {{ $t("payments.points") }}</v-card-subtitle
-            >
-            <v-card-subtitle class="my-0 py-0"
-              >{{ item.dollars }} $</v-card-subtitle
-            >
-            <v-card-actions>
-              <v-btn text to="/admin/transactions">{{
-                $t("common.seeMore")
-              }}</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-col>
-      <v-col cols="10" md="9">
-        <v-row>
-          <v-alert prominent type="info" class="mt-1 ml-4">
-            <v-row align="center">
-              <v-col class="grow">
-                <strong>{{ $t("dashboard.welcomeBack") }}</strong>
-                {{ $t("dashboard.alertWelcomeMessage") }}:
-                <strong>BuhoCenter</strong>
-                . {{ $t("dashboard.checkMessage") }}
-              </v-col>
-              <v-col class="shrink">
-                <v-btn color="primary elevation-0" to="/admin/partners">{{
-                  $t("navbar.partners")
+  <div>
+    <v-container class="ml-3 pr-0">
+      <v-row dense>
+        <v-col cols="12" md="3">
+          <v-col v-for="(item, i) in pointsData" :key="i" class="py-1">
+            <v-card :color="item.color" dark>
+              <v-card-title class="headline pb-0">{{ item.title }}</v-card-title>
+              <v-card-subtitle class="mt-1 mb-0 pb-0 font-weight-bold"
+                >{{ item.points }} {{ $t("payments.points") }}</v-card-subtitle
+              >
+              <v-card-subtitle class="my-0 py-0"
+                >{{ item.dollars }} $</v-card-subtitle
+              >
+              <v-card-actions>
+                <v-btn text to="/admin/transactions">{{
+                  $t("common.seeMore")
                 }}</v-btn>
-              </v-col>
-            </v-row>
-          </v-alert>
-        </v-row>
-        <transaction-graphic
-          :transactionData="transactionsData"
-          v-if="statistics && showTransactionGraph"
-        />
-        <without-data
-          class="mt-5"
-          :usersData="usersData"
-          v-if="statistics && !showTransactionGraph && !showBankAccountsGraph"
-        />
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-col>
+        <v-col cols="10" md="9">
+          <v-row>
+            <v-alert prominent type="info" class="mt-1 ml-4">
+              <v-row align="center">
+                <v-col class="grow">
+                  <strong>{{ $t("dashboard.welcomeBack") }}</strong>
+                  {{ $t("dashboard.alertWelcomeMessage") }}:
+                  <strong>BuhoCenter</strong>
+                  . {{ $t("dashboard.checkMessage") }}
+                </v-col>
+                <v-col class="shrink">
+                  <v-btn color="primary elevation-0" to="/admin/partners">{{
+                    $t("navbar.partners")
+                  }}</v-btn>
+                </v-col>
+              </v-row>
+            </v-alert>
+          </v-row>
+          <transaction-graphic
+            :transactionData="transactionsData"
+            v-if="statistics && showTransactionGraph"
+          />
+          <without-data
+            class="mt-5"
+            :usersData="usersData"
+            v-if="statistics && !showTransactionGraph && !showBankAccountsGraph"
+          />
 
-        <without-transaction
-          v-if="statistics && !showTransactionGraph && showBankAccountsGraph"
-          :bankAccountsData="bankAccountsData"
-          :usersData="usersData"
-        />
-      </v-col>
-    </v-row>
+          <without-transaction
+            v-if="statistics && !showTransactionGraph && showBankAccountsGraph"
+            :bankAccountsData="bankAccountsData"
+            :usersData="usersData"
+          />
+        </v-col>
+      </v-row>
 
-    <with-data
-      class="mt-8"
-      :bankAccountsData="bankAccountsData"
-      :usersData="usersData"
-      v-if="statistics && showTransactionGraph && showBankAccountsGraph"
-    />
-  </v-container>
+      <with-data
+        class="mt-8"
+        :bankAccountsData="bankAccountsData"
+        :usersData="usersData"
+        v-if="statistics && showTransactionGraph && showBankAccountsGraph"
+      />
+    </v-container>
+    <loading-screen :visible="showLoadingScreen"></loading-screen>
+  </div>
 </template>
 
 <script>
@@ -69,23 +72,33 @@ import TransactionsGraph from "@/components/Admin/Dashboard/TransactionsGraphic.
 import WithoutTransaction from "@/components/Admin/Dashboard/DashboardWithoutTransaction.vue";
 import WithoutData from "@/components/Admin/Dashboard/DashboardWithoutData.vue";
 import WithData from "@/components/Admin/Dashboard/DashboardWithData.vue";
+import LoadingScreen from "@/components/General/LoadingScreen/LoadingScreen.vue";
 export default {
   components: {
     "transaction-graphic": TransactionsGraph,
     "without-transaction": WithoutTransaction,
     "without-data": WithoutData,
     "with-data": WithData,
+    "loading-screen": LoadingScreen,
   },
   data() {
     return {
       statistics: null,
       transactionsState: [],
       pointsDetails: null,
+      showLoadingScreen: true,
     };
   },
-  mounted() {
-    this.loadPointsDetails();
-    this.loadStatistics();
+  async mounted() {
+    try {
+      await this.loadPointsDetails();
+      await this.loadStatistics(); 
+    } catch (error) {
+      console.log(error);
+    }
+    finally{
+      this.showLoadingScreen = false;
+    }       
   },
   methods: {
     async loadStatistics() {

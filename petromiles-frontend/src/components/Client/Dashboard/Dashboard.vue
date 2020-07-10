@@ -1,71 +1,74 @@
 <template>
-  <client-layout>
-    <client-points></client-points>
-    <v-row class="pa-9">
-      <h3 class="px-2">
-        {{ $t("dashboard.transactionsStats") }}
-      </h3>
+  <div>
+    <client-layout>
+      <client-points></client-points>
+      <v-row class="pa-9">
+        <h3 class="px-2">
+          {{ $t("dashboard.transactionsStats") }}
+        </h3>
+        <v-row align="center" justify="center">
+          <v-col cols="11" md="4" sm="4" lg="3" xs="6">
+            <div class="mx-1">
+              <TotalTransactionsChart
+                v-if="statistics"
+                :totalTransactionsData="totalTransactionsData"
+              />
+            </div>
+          </v-col>
+          <v-col cols="11" sm="4" lg="3" xs="6">
+            <div class="mx-1">
+              <AddPointsChart v-if="statistics" :addPointsData="addPointsData" />
+            </div>
+          </v-col>
+          <v-col cols="11" sm="4" lg="3" xs="6">
+            <div class="mx-1">
+              <ExchangePointsChart
+                v-if="statistics"
+                :exchangePointsData="exchangePointsData"
+              />
+            </div>
+          </v-col>
+          <v-col cols="11" sm="4" lg="3" xs="6">
+            <div class="mx-1">
+              <ThirdPartyChart
+                v-if="statistics"
+                :thirdPartyData="thirdPartyData"
+              />
+            </div>
+          </v-col>
+        </v-row>
+      </v-row>
+      <div class="px-8">
+        <h3 class="">
+          {{ $t("dashboard.transactionsBank") }}
+        </h3>
+      </div>
       <v-row align="center" justify="center">
-        <v-col cols="11" md="4" sm="4" lg="3" xs="6">
-          <div class="mx-1">
-            <TotalTransactionsChart
-              v-if="statistics"
-              :totalTransactionsData="totalTransactionsData"
-            />
-          </div>
-        </v-col>
-        <v-col cols="11" sm="4" lg="3" xs="6">
-          <div class="mx-1">
-            <AddPointsChart v-if="statistics" :addPointsData="addPointsData" />
-          </div>
-        </v-col>
-        <v-col cols="11" sm="4" lg="3" xs="6">
-          <div class="mx-1">
-            <ExchangePointsChart
-              v-if="statistics"
-              :exchangePointsData="exchangePointsData"
-            />
-          </div>
-        </v-col>
-        <v-col cols="11" sm="4" lg="3" xs="6">
-          <div class="mx-1">
-            <ThirdPartyChart
-              v-if="statistics"
-              :thirdPartyData="thirdPartyData"
-            />
+        <v-col cols="10" sm="4" lg="3" xs="6">
+          <div class="mx-1 pb-4">
+            <BankAccountsChart v-if="statistics" :bankAccounts="bankAccounts" />
           </div>
         </v-col>
       </v-row>
-    </v-row>
-    <div class="px-8">
-      <h3 class="">
-        {{ $t("dashboard.transactionsBank") }}
-      </h3>
-    </div>
-    <v-row align="center" justify="center">
-      <v-col cols="10" sm="4" lg="3" xs="6">
-        <div class="mx-1 pb-4">
-          <BankAccountsChart v-if="statistics" :bankAccounts="bankAccounts" />
-        </div>
-      </v-col>
-    </v-row>
-    <div class="px-8">
-      <h3 class="pt-3">
-        {{ $t("dashboard.enjoyServices") }}
-      </h3>
-    </div>
-    <v-row class="px-9" justify="center" align="center">
-      <v-col justify="center" align="center">
-        <buy-points-card></buy-points-card>
-      </v-col>
-      <v-col justify="center" align="center">
-        <exchange-card></exchange-card>
-      </v-col>
-      <v-col justify="center" align="center">
-        <membership-card></membership-card>
-      </v-col>
-    </v-row>
-  </client-layout>
+      <div class="px-8">
+        <h3 class="pt-3">
+          {{ $t("dashboard.enjoyServices") }}
+        </h3>
+      </div>
+      <v-row class="px-9" justify="center" align="center">
+        <v-col justify="center" align="center">
+          <buy-points-card></buy-points-card>
+        </v-col>
+        <v-col justify="center" align="center">
+          <exchange-card></exchange-card>
+        </v-col>
+        <v-col justify="center" align="center">
+          <membership-card></membership-card>
+        </v-col>
+      </v-row>
+    </client-layout>
+    <loading-screen :visible="showLoadingScreen"></loading-screen>
+  </div>
 </template>
 
 <script>
@@ -79,6 +82,7 @@ import ExchangePointsChart from "@/components/Client/Dashboard/ClientCharts/Tran
 import ThirdPartyChart from "@/components/Client/Dashboard/ClientCharts/Transactions/ThirdPartyChart";
 import TotalTransactionsChart from "@/components/Client/Dashboard/ClientCharts/Transactions/TotalTransactionsChart";
 import BankAccountsChart from "@/components/Client/Dashboard/ClientCharts/BankAccounts/BankAccountsChart";
+import LoadingScreen from "@/components/General/LoadingScreen/LoadingScreen.vue";
 export default {
   name: "client-dashboard",
   components: {
@@ -87,6 +91,7 @@ export default {
     "exchange-card": ExchangeCard,
     "membership-card": MembershipCard,
     "buy-points-card": BuyPointsCard,
+    "loading-screen": LoadingScreen,
     AddPointsChart,
     ExchangePointsChart,
     ThirdPartyChart,
@@ -100,6 +105,7 @@ export default {
       exchangeTransactions: null,
       thirdPartyTransactions: null,
       clientBankAccounts: null,
+      showLoadingScreen: true,
     };
   },
   mounted() {
@@ -107,11 +113,13 @@ export default {
   },
   methods: {
     async loadStatistics() {
-      this.statistics = await this.$http.get("management/statistics");
+      this.statistics = await this.$http.get("management/statistics").finally(() => {
+        this.showLoadingScreen = false;
+      });
       this.addPointsTransactions = this.statistics.transactions.addPoints;
       this.exchangeTransactions = this.statistics.transactions.exchangePoints;
       this.thirdPartyTransactions = this.statistics.transactions.thirdPartyClient;
-      this.clientBankAccounts = this.statistics.clientBankAccounts;
+      this.clientBankAccounts = this.statistics.clientBankAccounts;      
     },
   },
   computed: {

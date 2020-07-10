@@ -165,6 +165,7 @@
         v-if="paymentIsReady"
       />
     </v-row>
+    <loading-screen :visible="showLoadingScreen"></loading-screen>
   </div>
 </template>
 
@@ -175,12 +176,14 @@ import bankAccountsMixin from "@/mixins/load/bank-accounts.mixin.js";
 import clientRoutes from "@/router/clientRoutes";
 import PaymentInvoice from "@/components/Payments/PaymentInvoice";
 import typeTransaction from "@/constants/transaction";
+import LoadingScreen from "@/components/General/LoadingScreen/LoadingScreen.vue";
 
 export default {
   name: "buy-points-form",
   mixins: [buyPointsValidationMixin, bankAccountsMixin],
   components: {
     "payments-invoice": PaymentInvoice,
+    "loading-screen": LoadingScreen,
   },
   data: function() {
     return {
@@ -202,6 +205,7 @@ export default {
       typeInvoice: typeTransaction.DEPOSIT,
       subscription: {},
       infoSubscription: {},
+      showLoadingScreen: true,
     };
   },
   computed: {
@@ -244,10 +248,18 @@ export default {
     },
   },
   async mounted() {
-    await this.loadBankAccounts();
-    await this.loadRate();
-    await this.loadInterests();
-    await this.loadSubscription();
+    try {
+      await this.loadBankAccounts();
+      await this.loadRate();
+      await this.loadInterests();
+      await this.loadSubscription();  
+    } catch (error) {
+      console.log(error);
+    }
+    finally{
+      this.showLoadingScreen = false;
+    }
+      
   },
   methods: {
     async submitButton() {

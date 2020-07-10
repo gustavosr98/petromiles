@@ -1,23 +1,27 @@
 <template>
-  <v-row align="center" justify="center" class="mx-auto">
-    <v-col cols="12" md="10">
-      <datatable
-        :title="title"
-        :headers="headers"
-        :fetchedData="mungedData"
-        @deleteItem="deleteItem"
-        @updateBankAccountState="updateBankAccountState"
-        tableName="bank-accounts"
-        :isAdmin="isAdmin"
-        :clientID="clientID"
-      ></datatable>
-    </v-col>
-  </v-row>
+  <div>
+    <v-row align="center" justify="center" class="mx-auto">
+      <v-col cols="12" md="10">
+        <datatable
+          :title="title"
+          :headers="headers"
+          :fetchedData="mungedData"
+          @deleteItem="deleteItem"
+          @updateBankAccountState="updateBankAccountState"
+          tableName="bank-accounts"
+          :isAdmin="isAdmin"
+          :clientID="clientID"
+        ></datatable>
+      </v-col>
+    </v-row>
+    <loading-screen :visible="showLoadingScreen"></loading-screen>
+  </div>
 </template>
 
 <script>
 import Datatable from "@/components/General/Datatable/Datatable";
 import { states } from "@/constants/state";
+import LoadingScreen from "@/components/General/LoadingScreen/LoadingScreen.vue";
 
 export default {
   name: "bank-accounts-table",
@@ -34,19 +38,24 @@ export default {
   },
   components: {
     Datatable,
+    "loading-screen": LoadingScreen,
   },
   data() {
     return {
       fetchedData: [],
+      showLoadingScreen: true,
     };
   },
   async mounted() {
     if (!this.bankAccounts) {
-      this.fetchedData = await this.$http.get("/bank-account");
+      this.fetchedData = await this.$http.get("/bank-account").finally(() => {
+        this.showLoadingScreen = false;
+      });
       this.$store.commit("bankAccount/SET_BANK_ACCOUNTS", this.fetchedData);
     } else {
       this.fetchedData = this.bankAccounts;
-    }
+    }    
+    this.showLoadingScreen = false;
   },
   computed: {
     title() {
@@ -118,6 +127,7 @@ export default {
       this.fetchedData.splice(this.fetchedData.indexOf(bankAccount), 1);
     },
     async updateBankAccountState(item) {
+      this.showLoadingScreen = true;
       let state = "";
       let stateTranslated = "";
       if (item.bankAccountState.name === states.ACTIVE.name) {
@@ -131,9 +141,11 @@ export default {
         idUserClient: item.clientBankAccount[0].userClient.idUserClient,
         idBankAccount: item.idBankAccount,
         state: state,
+      }).finally(() => {
+        this.showLoadingScreen = false;
       });
       item.bankAccountState.name = state;
-      item.bankAccountState.translated = stateTranslated;
+      item.bankAccountState.translated = stateTranslated;      
     },
   },
 };
