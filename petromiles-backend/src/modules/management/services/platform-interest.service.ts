@@ -1,13 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import {
-  Repository,
-  Not,
-  IsNull,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-} from 'typeorm';
+import { Repository, Not, IsNull } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -35,30 +29,11 @@ export class PlatformInterestService {
 
   async getInterestByName(
     name: PlatformInterestEnum,
-    date?: Date,
   ): Promise<PlatformInterest> {
-    if (!!date) {
-      // Fixes TypeORM caveat for dates comparison
-      // const MoreThanOrEqualDate = (date: Date) =>
-      //   MoreThanOrEqual(format(date, 'YYYY-MM-DD HH:MM:SS'));
-      // const LessThanOrEqualDate = (date: Date) =>
-      //   LessThanOrEqual(format(date, 'YYYY-MM-DD HH:MM:SS'));
-
-      // return await this.platformInterestRepository.findOne({
-      //   where: {
-      //     name,
-      //     initialDate: LessThanOrEqualDate(date),
-      //     finalDate: null,
-      //   },
-      // });
-
-      return null;
-    } else {
-      return await this.platformInterestRepository.findOne({
-        name,
-        finalDate: null,
-      });
-    }
+    return await this.platformInterestRepository.findOne({
+      name,
+      finalDate: null,
+    });
   }
 
   async getInterests(type: PlatformInterestType): Promise<PlatformInterest[]> {
