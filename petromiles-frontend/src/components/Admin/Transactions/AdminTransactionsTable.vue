@@ -36,9 +36,11 @@ export default {
     };
   },
   async mounted() {
-    this.fetchedData = await this.$http.get("transaction/admin/list/all").finally(() => {
-      this.showLoadingScreen = false;
-    });
+    this.fetchedData = await this.$http
+      .get("transaction/admin/list/all")
+      .finally(() => {
+        this.showLoadingScreen = false;
+      });
     this.transactions = this.fetchedData;
   },
 
@@ -83,12 +85,6 @@ export default {
           align: "center",
           value: "state",
         },
-
-        {
-          text: this.$tc("common.seeMore"),
-          align: "center",
-          value: "details",
-        },
       ];
     },
     mungedData() {
@@ -97,7 +93,6 @@ export default {
           name: data.state,
           translated: this.$tc(`state-name.${data.state}`),
         };
-
         return {
           ...data,
           transactionAmount:
