@@ -41,7 +41,15 @@ export default {
       .finally(() => {
         this.showLoadingScreen = false;
       });
-    this.transactions = this.fetchedData;
+    this.transactions = this.fetchedData.sort((a, b) => {
+      if (a.id < b.id) {
+        return 1;
+      }
+      if (a.id > b.id) {
+        return -1;
+      }
+      return 0;
+    });
   },
 
   methods: {
