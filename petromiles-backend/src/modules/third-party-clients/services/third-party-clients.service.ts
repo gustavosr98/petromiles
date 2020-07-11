@@ -530,7 +530,9 @@ export class ThirdPartyClientsService {
               userEmail: ourTransaction.clientBankAccountEmail,
               pointsToDollars: Math.trunc(ourTransaction.amount * 100),
               commission: Math.trunc(ourTransaction.interest * 100),
-              accumulatedPoints: Math.trunc(ourTransaction.pointsEquivalent),
+              accumulatedPoints: Math.trunc(
+                ourTransaction.pointsEquivalent + ourTransaction.extra,
+              ),
               state: ourTransaction.state,
             };
 
@@ -645,12 +647,21 @@ export class ThirdPartyClientsService {
     theirConfirmationTicket,
     processingDetails,
   }) {
-    if (ourConfirmationTicket.date !== theirConfirmationTicket.date) {
-      processingDetails.description.push(CsvProcessDescription.NO_MATCH_DATE);
+    if (
+      ourConfirmationTicket.date.toISOString() !== theirConfirmationTicket.date
+    ) {
+      processingDetails.description.push(
+        CsvProcessDescription.NO_MATCH_DATE +
+          `: ${ourConfirmationTicket.date.toISOString()} != ${
+            theirConfirmationTicket.date
+          }`,
+      );
     }
+
     if (ourConfirmationTicket.userEmail !== theirConfirmationTicket.userEmail) {
       processingDetails.description.push(
-        CsvProcessDescription.NO_MATCH_USER_EMAIL,
+        CsvProcessDescription.NO_MATCH_USER_EMAIL +
+          `: ${ourConfirmationTicket.userEmail} != ${theirConfirmationTicket.userEmail}`,
       );
     }
     if (
@@ -658,14 +669,16 @@ export class ThirdPartyClientsService {
       theirConfirmationTicket.pointsToDollars
     ) {
       processingDetails.description.push(
-        CsvProcessDescription.NO_MATCH_POINTS_TO_DOLLARS,
+        CsvProcessDescription.NO_MATCH_POINTS_TO_DOLLARS +
+          `: ${ourConfirmationTicket.pointsToDollars} != ${theirConfirmationTicket.pointsToDollars}`,
       );
     }
     if (
       ourConfirmationTicket.commission != theirConfirmationTicket.commission
     ) {
       processingDetails.description.push(
-        CsvProcessDescription.NO_MATCH_COMMISSION,
+        CsvProcessDescription.NO_MATCH_COMMISSION +
+          `: ${ourConfirmationTicket.commission} != ${theirConfirmationTicket.commission}`,
       );
     }
     if (
@@ -673,7 +686,8 @@ export class ThirdPartyClientsService {
       theirConfirmationTicket.accumulatedPoints
     ) {
       processingDetails.description.push(
-        CsvProcessDescription.NO_MATCH_ACCUMULATED_POINTS,
+        CsvProcessDescription.NO_MATCH_ACCUMULATED_POINTS +
+          `: ${ourConfirmationTicket.accumulatedPoints} != ${theirConfirmationTicket.accumulatedPoints}`,
       );
     }
   }
