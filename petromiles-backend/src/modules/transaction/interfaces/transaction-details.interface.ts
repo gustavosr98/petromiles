@@ -4,6 +4,7 @@ interface TransactionDetails {
   id: number;
   date: string;
   fullDate?: string;
+  extra?: number;
   type: TransactionType;
   bankAccount: string;
   clientBankAccountEmail: string;
