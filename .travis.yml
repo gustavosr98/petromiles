@@ -15,7 +15,8 @@ jobs:
       script:
         - npm run test
         - npm run test:e2e
-        - npm run test:cov
+        # Coveralls.io
+        # - npm run test:cov
 deploy:
   provider: heroku
   api_key:
