@@ -1,0 +1,26 @@
+language: node_js
+node_js:
+  - 12.16.2
+branches:
+  only:
+    - master
+    - develop
+    - FASE3-028
+jobs:
+  include:
+    - name: Backend | NestJS
+      install:
+        - cd petromiles-backend
+        - npm install
+      script:
+        - npm run test
+        - npm run test:e2e
+        - npm run test:cov
+deploy:
+  provider: heroku
+  api_key:
+    secure: UQXmQvKaeW0G62vX3U7PO0FkHfYL0KadevtbCwEFPYrYk6L6VeUT1+C+EfoX1CcIRtTlYmyvQbTaAsoon78xQjJ9QnkdvjoUWA/vWko6MtkzK291BOJXTh08sRk4Pl4gGPYoQx8WQesSqIrrNzZVrmoMTPbB1t4I79wo/sr7f2yrXSbuBmFfBjcGp2S4uEy6fsvQgq9h5gdTi35Ik76viMZafrNKT6DnXQNgL+o36jqy9DveSjJjSIWzPS9Zgy/vlpiNtLqT4bAWHnl6jxUzVKNaE1y1uh/bwsBCVwu6hiSdJ0FegKRktZOK8PQEueO7Q0vZ6CsNKxL6v/U6BDM5GJhiNW2hruPBxPYCzR+vTujU6EPFGPd95UaWdgTAX58pTjlN7oF9HhB1rN7a7307ixbfdAEDEavmN5FxS5EkNSluy+RZMde6RymQcAXm9DyuKqUzn3ydRfJA74nMoaZsJOkFkrfS3V5Deo2E+nzLPz3UGJPeCFwrqZuYMAFmFW00Q5dh1LqHTTqSONfXV6T1AhMw3Ka2+suQ3Q3vSV/K6pVqyD7FOlIySZQB3NIJdLRmHaDmjnyl2AKaTb7digol4VKvJtUJdtjN2/9DEQS2W3XSCvSxcywUwaANLPtMO2A7ivFr5+HrQsWJG2TKoi9sR379CRD0tDEPsrv+P0cZNfE=
+  app: petromiles-backend
+  on:
+    repo: ingswucab/consorcio2-petromiles
+  skip_cleanup: "true"
