@@ -38,7 +38,6 @@ import { Interest } from '@/modules/payments/interest.interface';
 export class PaymentsService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
-    private clientBankAccountService: ClientBankAccountService,
     @InjectRepository(ClientBankAccount)
     private clientBankAccountRepository: Repository<ClientBankAccount>,
     private transactionService: TransactionService,
@@ -137,7 +136,7 @@ export class PaymentsService {
       amount: Math.round(amountToCharge),
     });
 
-    let currentUserSuscription = clientBankAccount.userClient.userSuscription.find(
+    let currentUserSuscription = await clientBankAccount.userClient.userSuscription.find(
       suscription => !suscription.finalDate,
     );
 
@@ -216,11 +215,13 @@ export class PaymentsService {
         source_type: 'bank_account',
       });
 
-      return this.transactionService.createWithdrawalTransaction(
+      const withdrawal = await this.transactionService.createWithdrawalTransaction(
         clientBankAccount,
         amount,
         transfer.id,
       );
+
+      return withdrawal;
     }
 
     this.logger.error(
