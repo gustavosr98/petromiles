@@ -40,6 +40,10 @@ export class PaymentsService {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     @InjectRepository(ClientBankAccount)
     private clientBankAccountRepository: Repository<ClientBankAccount>,
+    @InjectRepository(UserClient)
+    private userClientRepository: Repository<UserClient>,
+    @InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,
     private transactionService: TransactionService,
     private thirdPartyInterestService: ThirdPartyInterestService,
     private platformInterestService: PlatformInterestService,
@@ -261,19 +265,17 @@ export class PaymentsService {
   }
 
   async sendPaymentInvoiceEmail(user, file) {
-    const userClient = await getConnection()
-      .getRepository(UserClient)
-      .findOne({ email: user.email });
+    const userClient = await this.userClientRepository.findOne({
+      email: user.email,
+    });
 
     const transactionCode = await this.transactionService.getTransactions(
       userClient.idUserClient,
     );
 
-    const transaction = await getConnection()
-      .getRepository(Transaction)
-      .findOne({
-        idTransaction: (await transactionCode[transactionCode.length - 1]).id,
-      });
+    const transaction = await this.transactionRepository.findOne({
+      idTransaction: (await transactionCode[transactionCode.length - 1]).id,
+    });
 
     const languageMails = userClient.userDetails.language.name;
 
@@ -301,19 +303,17 @@ export class PaymentsService {
   }
 
   async sendWithdrawalInvoiceEmail(user, file, points, total) {
-    let userClient = await getConnection()
-      .getRepository(UserClient)
-      .findOne({ email: user.email });
+    const userClient = await this.userClientRepository.findOne({
+      email: user.email,
+    });
 
     const transactionCode = await this.transactionService.getTransactions(
       userClient.idUserClient,
     );
 
-    const transaction = await getConnection()
-      .getRepository(Transaction)
-      .findOne({
-        idTransaction: (await transactionCode[transactionCode.length - 1]).id,
-      });
+    const transaction = await this.transactionRepository.findOne({
+      idTransaction: (await transactionCode[transactionCode.length - 1]).id,
+    });
 
     const languageMails = userClient.userDetails.language.name;
 

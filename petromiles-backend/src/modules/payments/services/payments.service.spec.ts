@@ -1,10 +1,9 @@
-import { PaymentProvider } from '@/enums/payment-provider.enum';
-import { ClientPoints } from '@/entities/user-points.entity';
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, DeepPartial } from 'typeorm';
+import { Repository, getConnection, Connection, getRepository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import { mocked } from 'ts-jest/utils';
 
 import { PaymentsService } from './payments.service';
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
@@ -18,12 +17,16 @@ import { SuscriptionService } from '@/modules/suscription/service/suscription.se
 
 import { Transaction } from '@/entities/transaction.entity';
 import { ClientBankAccount } from '@/entities/client-bank-account.entity';
+import { UserClient } from '@/entities/user-client.entity';
 import { ThirdPartyInterest } from '@/entities/third-party-interest.entity';
+import { ClientPoints } from '@/entities/user-points.entity';
+import { PointsConversion } from '@/entities/points-conversion.entity';
 
 import { Interest } from '@/modules/payments/interest.interface';
 import { PlatformInterest } from '@/enums/platform-interest.enum';
 import { TransactionType } from '@/enums/transaction.enum';
-import { PointsConversion } from '@/entities/points-conversion.entity';
+import { PaymentProvider } from '@/enums/payment-provider.enum';
+import { MailsSubjets } from '@/constants/mailsSubjectConst';
 
 import { WinstonModule } from 'nest-winston';
 import createOptions from '../../../logger/winston/winston-config';
@@ -32,6 +35,8 @@ describe('PaymentsService', () => {
   let paymentsService: PaymentsService;
   let RepositoryMock: jest.Mock;
   let clientBankAccountRepository: Repository<ClientBankAccount>;
+  let userClientRepository: Repository<UserClient>;
+  let transactionRepository: Repository<Transaction>;
   let PaymentProviderServiceMock: jest.Mock<Partial<PaymentProviderService>>;
   let paymentProviderService: PaymentProviderService;
   let TransactionServiceMock: jest.Mock<Partial<TransactionService>>;
@@ -131,6 +136,14 @@ describe('PaymentsService', () => {
           useClass: RepositoryMock,
         },
         {
+          provide: getRepositoryToken(UserClient),
+          useClass: RepositoryMock,
+        },
+        {
+          provide: getRepositoryToken(Transaction),
+          useClass: RepositoryMock,
+        },
+        {
           provide: PaymentProviderService,
           useClass: PaymentProviderServiceMock,
         },
@@ -173,6 +186,8 @@ describe('PaymentsService', () => {
     clientBankAccountRepository = module.get(
       getRepositoryToken(ClientBankAccount),
     );
+    userClientRepository = module.get(getRepositoryToken(UserClient));
+    transactionRepository = module.get(getRepositoryToken(Transaction));
     paymentProviderService = module.get<PaymentProviderService>(
       PaymentProviderService,
     );
@@ -192,7 +207,98 @@ describe('PaymentsService', () => {
     suscriptionService = module.get<SuscriptionService>(SuscriptionService);
   });
 
-  describe('buyPoints(idClientBankAccount, amount, amountToCharge, points, subscriptionName, infoSubscription,)', () => {
+  describe('getOnePointToDollars()', () => {
+    let expectedOnePointToDollars;
+    let result;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          expectedOnePointToDollars = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedOnePointToDollars,
+          );
+
+          result = await paymentsService.getOnePointToDollars();
+        });
+
+        it('should invoke pointsConversionService.getRecentPointsConversion()', () => {
+          expect(
+            pointsConversionService.getRecentPointsConversion,
+          ).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return a pointsConversion', () => {
+          expect(result).toStrictEqual(expectedOnePointToDollars);
+        });
+      });
+    });
+  });
+
+  describe('getInterests(trasactionType, platformInterestType)', () => {
+    let expectedThirdPartyInterest;
+    let expectedPlatformInterest;
+    let expectedInterests: Interest[];
+    let result: Interest[];
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          expectedThirdPartyInterest = { amountDollarCents: 75, percentage: 0 };
+          expectedPlatformInterest = { amount: 0, percentage: 0.1 };
+          expectedInterests = [
+            {
+              operation: 1,
+              amount: expectedThirdPartyInterest.amountDollarCents,
+              percentage: expectedThirdPartyInterest.percentage,
+            },
+            { operation: 1, ...expectedPlatformInterest },
+          ];
+
+          (thirdPartyInterestService.get as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+          (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
+            expectedPlatformInterest,
+          );
+
+          result = await paymentsService.getInterests(
+            TransactionType.DEPOSIT,
+            PlatformInterest.BUY,
+          );
+        });
+
+        it('should invoke thirdPartyInterestService.get()', () => {
+          expect(thirdPartyInterestService.get).toHaveBeenCalledTimes(1);
+          expect(thirdPartyInterestService.get).toHaveBeenCalledWith(
+            PaymentProvider.STRIPE,
+            TransactionType.DEPOSIT,
+          );
+        });
+
+        it('should invoke platformInterestService.getInterestByName()', () => {
+          expect(
+            platformInterestService.getInterestByName,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            platformInterestService.getInterestByName,
+          ).toHaveBeenCalledWith(PlatformInterest.BUY);
+        });
+
+        it('should return an array with the interests', () => {
+          expect(result).toStrictEqual(expectedInterests);
+        });
+      });
+    });
+  });
+
+  describe('buyPoints(idClientBankAccount, amount, amountToCharge, points, subscriptionName, infoSubscription)', () => {
     let idClientBankAccount: number;
     let amount: number;
     let amountToCharge: number;
@@ -228,7 +334,7 @@ describe('PaymentsService', () => {
             {
               operation: 1,
               amount: expectedThirdPartyInterest.amountDollarCents,
-              ...expectedThirdPartyInterest,
+              percentage: expectedThirdPartyInterest.percentage,
             },
             { operation: 1, ...expectedPlatformInterest },
           ];
@@ -249,8 +355,8 @@ describe('PaymentsService', () => {
               email: 'prueba@gmail.com',
               userDetails: {
                 idUserDetails: 1,
-                firstName: 'prueba',
-                lastName: 'prueba',
+                firstName: 'Pedro',
+                lastName: 'Perez',
                 customerId: 'prueba',
                 accountId: 'prueba',
               },
@@ -411,7 +517,7 @@ describe('PaymentsService', () => {
             {
               operation: 1,
               amount: expectedThirdPartyInterest.amountDollarCents,
-              ...expectedThirdPartyInterest,
+              percentage: expectedThirdPartyInterest.percentage,
             },
             { operation: 1, ...expectedPlatformInterest },
           ];
@@ -495,7 +601,7 @@ describe('PaymentsService', () => {
             {
               operation: 1,
               amount: expectedThirdPartyInterest.amountDollarCents,
-              ...expectedThirdPartyInterest,
+              percentage: expectedThirdPartyInterest.percentage,
             },
             { operation: 1, ...expectedPlatformInterest },
           ];
@@ -593,7 +699,7 @@ describe('PaymentsService', () => {
             {
               operation: 1,
               amount: expectedThirdPartyInterest.amountDollarCents,
-              ...expectedThirdPartyInterest,
+              percentage: expectedThirdPartyInterest.percentage,
             },
             { operation: 1, ...expectedPlatformInterest },
           ];
@@ -617,8 +723,8 @@ describe('PaymentsService', () => {
               email: 'prueba@gmail.com',
               userDetails: {
                 idUserDetails: 1,
-                firstName: 'prueba',
-                lastName: 'prueba',
+                firstName: 'Pedro',
+                lastName: 'Perez',
                 customerId: 'prueba',
                 accountId: 'prueba',
               },
@@ -767,7 +873,7 @@ describe('PaymentsService', () => {
             {
               operation: 1,
               amount: expectedThirdPartyInterest.amountDollarCents,
-              ...expectedThirdPartyInterest,
+              percentage: expectedThirdPartyInterest.percentage,
             },
             { operation: 1, ...expectedPlatformInterest },
           ];
@@ -879,8 +985,8 @@ describe('PaymentsService', () => {
               email: 'prueba@gmail.com',
               userDetails: {
                 idUserDetails: 1,
-                firstName: 'prueba',
-                lastName: 'prueba',
+                firstName: 'Pedro',
+                lastName: 'Perez',
                 customerId: 'prueba',
                 accountId: 'prueba',
               },
@@ -961,6 +1067,271 @@ describe('PaymentsService', () => {
           expect(
             transactionService.createWithdrawalTransaction,
           ).not.toHaveBeenCalled();
+        });
+      });
+    });
+  });
+
+  describe('sendPaymentInvoiceEmail(user, file)', () => {
+    let user;
+    let file;
+    let expectedUserClient;
+    let expectedTransactionCode;
+    let expectedTransaction;
+    let languageMails;
+    let template;
+    let subject;
+    let mailParameters;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          user = {
+            email: 'prueba@gmail.com',
+            id: 1,
+            role: 'CLIENT',
+          };
+          file = {
+            fieldname: 'file',
+            originalname: '2020 2:59',
+            encoding: '7bit',
+            mimetype: 'application/pdf',
+            buffer: new Buffer('prueba'),
+            size: 150239,
+          };
+          expectedUserClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+            userDetails: {
+              firstName: 'Pedro',
+              lastName: 'Perez',
+              language: {
+                idLanguage: 1,
+                name: 'english',
+                shortname: 'en',
+              },
+            },
+          };
+          expectedTransactionCode = [
+            {
+              id: 1,
+              paymentProviderTransactionId: 'prueba',
+            },
+          ];
+          expectedTransaction = {
+            idTransaction: 1,
+            paymentProviderTransactionId: 'prueba',
+          };
+
+          languageMails = expectedUserClient.userDetails.language.name;
+          template = `invoice[${languageMails}]`;
+          subject = MailsSubjets.invoice[languageMails];
+          mailParameters = {
+            to: expectedUserClient.email,
+            subject: subject,
+            templateId: 'prueba',
+            dynamic_template_data: {
+              user: expectedUserClient.userDetails.firstName,
+            },
+            attachments: [
+              {
+                filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${
+                  expectedTransaction.paymentProviderTransactionId
+                }`,
+                type: file.mimetype,
+                content: file.buffer.toString('base64'),
+              },
+            ],
+          };
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (transactionService.getTransactions as jest.Mock).mockResolvedValue(
+            expectedTransactionCode,
+          );
+
+          (transactionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+
+          (configService.get as jest.Mock).mockReturnValue('prueba');
+
+          (mailsService.sendEmail as jest.Mock).mockImplementation();
+
+          await paymentsService.sendPaymentInvoiceEmail(user, file);
+        });
+
+        it('should invoke userClientRepository.findOne()', () => {
+          expect(userClientRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userClientRepository.findOne).toHaveBeenCalledWith({
+            email: user.email,
+          });
+        });
+
+        it('should invoke transactionService.getTransactions()', () => {
+          expect(transactionService.getTransactions).toHaveBeenCalledTimes(1);
+          expect(transactionService.getTransactions).toHaveBeenCalledWith(
+            expectedUserClient.idUserClient,
+          );
+        });
+
+        it('should invoke transactionRepository.findOne()', () => {
+          expect(transactionRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(transactionRepository.findOne).toHaveBeenCalledWith({
+            idTransaction: expectedTransactionCode[0].id,
+          });
+        });
+
+        it('should invoke configService.get()', () => {
+          expect(configService.get).toHaveBeenCalledTimes(1);
+          expect(configService.get).toHaveBeenCalledWith(
+            `mails.sendgrid.templates.${template}`,
+          );
+        });
+
+        it('should invoke mailsService.sendEmail()', () => {
+          expect(mailsService.sendEmail).toHaveBeenCalledTimes(1);
+          expect(mailsService.sendEmail).toHaveBeenCalledWith(mailParameters);
+        });
+      });
+    });
+  });
+
+  describe('sendWithdrawalInvoiceEmail(user, file, points, total)', () => {
+    let user;
+    let file;
+    let points;
+    let total;
+    let expectedUserClient;
+    let expectedTransactionCode;
+    let expectedTransaction;
+    let languageMails;
+    let template;
+    let subject;
+    let mailParameters;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          user = {
+            email: 'prueba@gmail.com',
+            id: 1,
+            role: 'CLIENT',
+          };
+          file = {
+            fieldname: 'file',
+            originalname: '2020 2:59',
+            encoding: '7bit',
+            mimetype: 'application/pdf',
+            buffer: new Buffer('prueba'),
+            size: 150239,
+          };
+          points = 1000;
+          total = 1.15;
+          expectedUserClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+            userDetails: {
+              firstName: 'Pedro',
+              lastName: 'Perez',
+              language: {
+                idLanguage: 1,
+                name: 'english',
+                shortname: 'en',
+              },
+            },
+          };
+          expectedTransactionCode = [
+            {
+              id: 1,
+              paymentProviderTransactionId: 'prueba',
+            },
+          ];
+          expectedTransaction = {
+            idTransaction: 1,
+            paymentProviderTransactionId: 'prueba',
+          };
+
+          languageMails = expectedUserClient.userDetails.language.name;
+          template = `withdrawal[${languageMails}]`;
+          subject = MailsSubjets.invoice[languageMails];
+          mailParameters = {
+            to: expectedUserClient.email,
+            subject: subject,
+            templateId: 'prueba',
+            dynamic_template_data: {
+              user: expectedUserClient.userDetails.firstName,
+              numberPoints: points,
+              dollarWithdrawal: total,
+            },
+            attachments: [
+              {
+                filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${
+                  expectedTransaction.paymentProviderTransactionId
+                }`,
+                type: file.mimetype,
+                content: file.buffer.toString('base64'),
+              },
+            ],
+          };
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (transactionService.getTransactions as jest.Mock).mockResolvedValue(
+            expectedTransactionCode,
+          );
+
+          (transactionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+
+          (configService.get as jest.Mock).mockReturnValue('prueba');
+
+          (mailsService.sendEmail as jest.Mock).mockImplementation();
+
+          await paymentsService.sendWithdrawalInvoiceEmail(
+            user,
+            file,
+            points,
+            total,
+          );
+        });
+
+        it('should invoke userClientRepository.findOne()', () => {
+          expect(userClientRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userClientRepository.findOne).toHaveBeenCalledWith({
+            email: user.email,
+          });
+        });
+
+        it('should invoke transactionService.getTransactions()', () => {
+          expect(transactionService.getTransactions).toHaveBeenCalledTimes(1);
+          expect(transactionService.getTransactions).toHaveBeenCalledWith(
+            expectedUserClient.idUserClient,
+          );
+        });
+
+        it('should invoke transactionRepository.findOne()', () => {
+          expect(transactionRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(transactionRepository.findOne).toHaveBeenCalledWith({
+            idTransaction: expectedTransactionCode[0].id,
+          });
+        });
+
+        it('should invoke configService.get()', () => {
+          expect(configService.get).toHaveBeenCalledTimes(1);
+          expect(configService.get).toHaveBeenCalledWith(
+            `mails.sendgrid.templates.${template}`,
+          );
+        });
+
+        it('should invoke mailsService.sendEmail()', () => {
+          expect(mailsService.sendEmail).toHaveBeenCalledTimes(1);
+          expect(mailsService.sendEmail).toHaveBeenCalledWith(mailParameters);
         });
       });
     });
