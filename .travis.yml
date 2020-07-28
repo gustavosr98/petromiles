@@ -21,12 +21,9 @@ jobs:
       deploy:
         provider: heroku
         api_key:
-          FASE3-028:
-            secure: pdbRLugME+NMJDllo/q8XCKcpKa1hg95hKSL3hfbRQYwfj6kJdh3HeO3QaXn/BCsQd6bwx2lIQGj5cDW+2v124l3bGiVgLhgniaFWceXny9TP2G2hRX+Cce11pNn99qfLln+eKz7iUOTKd4r8LbTMe4N26QxY1wtGNJXgV/2T7UBubHhWMDaAHNt4c7i/YJbZSmXLo7XSKjKaMAQpvwhdtrFafIt5gjBmHgKIP9tTJwGCXZOX1KZUra4j8zqv0efZ1PYF2BbpIk/ifh8ylCUEWVvJCb7pcHDeTKmrSfNmAVwjV3xkLjSuBSnyovmH5LKd6bsaWdVVRPbAfR/ZNbcvazlur+6JXLbRq3XQgCQak9HsvxIytQNWIcb7444USXiMjuKqXDNYxiB3cY8/su5NlsMr+UtB0gOjoImoP/5jBGcf0YZlaMydf3xfTaq4gFmVLfcvUe7Np59t/td/8k+VoP3O4EdNtevfwkRNUixBWMbIoqcryJZ/yV0EP2OEu3atCiueUQSG9p2Je1rmVN1Ea2l6l4Nzmt5lc39lyDhS6ubx3Cu7o6aLNTD1DlDGuZx2mtjIVBzMOdD56mfrXikORy/NTX2kevKhTn6kRVsxNo54ERGH3kluBTtcVmoIJ5csJFJzWNARpl/fxiZ/LiT7rVimZpcdzXAsS1cdq/Wqxs=
-          develop:
-            secure: $HEROKU_APIKEY_B
-          master:
-            secure: $HEROKU_APIKEY_A
+          FASE3-028: $HEROKU_APIKEY
+          develop: $HEROKU_APIKEY
+          master: $HEROKU_APIKEY
         app:
           FASE3-028: prepro-petromiles-backend
           develop: staging-petromiles-backend
