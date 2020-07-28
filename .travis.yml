@@ -20,12 +20,9 @@ jobs:
         # - npm run test:cov
       deploy:
         provider: heroku
-        api_key:
-          FASE3-028: $HEROKU_APIKEY
-          develop: $HEROKU_APIKEY
-          master: $HEROKU_APIKEY
+        api_key: $HEROKU_APIKEY
         app:
-          FASE3-028: prepro-petromiles-backend
+          FASE3-028: staging-petromiles-backend
           develop: staging-petromiles-backend
           master: prepro-petromiles-backend
         on:
