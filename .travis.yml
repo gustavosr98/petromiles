@@ -22,13 +22,13 @@ jobs:
         provider: heroku
         api_key:
           FASE3-028:
-            secure: $HEROKU_APIKEY_B
+            secure: $HEROKU_APIKEY_A
           develop:
             secure: $HEROKU_APIKEY_B
           master:
             secure: $HEROKU_APIKEY_A
         app:
-          FASE3-028: staging-petromiles-backend
+          FASE3-028: prepro-petromiles-backend
           develop: staging-petromiles-backend
           master: prepro-petromiles-backend
         on:
