@@ -3,9 +3,9 @@ node_js:
   - 12.16.2
 branches:
   only:
-    - master
-    - develop
     - FASE3-028
+    - develop
+    - master
 jobs:
   include:
     - name: Backend | NestJS
@@ -14,10 +14,7 @@ jobs:
         - npm install
       script:
         - npm run test
-        - npm run test:e2e
         - npm run build
-        # Coveralls.io
-        # - npm run test:cov
       deploy:
         provider: heroku
         api_key: $HEROKU_APIKEY
@@ -28,11 +25,20 @@ jobs:
         on:
           repo: ingswucab/consorcio2-petromiles
         skip_cleanup: "true"
-      after_deploy:
-        - echo "after"
-      # - name: Frontend | Vue
-      #   install:
-      #     - cd petromiles-frontend
-      #     - npm install
-      #   script:
-      #     - npm run build
+    - name: Frontend | Vue
+      install:
+        - cd petromiles-frontend
+        - npm install
+      script:
+        - npm run test
+        - npm run build
+      deploy:
+        provider: heroku
+        api_key: $HEROKU_APIKEY
+        app:
+          FASE3-028: staging-petromiles-frontend
+          develop: staging-petromiles-frontend
+          master: prepro-petromiles-frontend
+        on:
+          repo: ingswucab/consorcio2-petromiles
+        skip_cleanup: "true"
