@@ -21,9 +21,12 @@ jobs:
       deploy:
         provider: heroku
         api_key:
-          FASE3-028: $HEROKU_APIKEY_B
-          develop: $HEROKU_APIKEY_B
-          master: $HEROKU_APIKEY_A
+          FASE3-028:
+            secure: $HEROKU_APIKEY_B
+          develop:
+            secure: $HEROKU_APIKEY_B
+          master:
+            secure: $HEROKU_APIKEY_A
         app:
           FASE3-028: prepro-petromiles-backend
           develop: staging-petromiles-backend
@@ -31,6 +34,8 @@ jobs:
         on:
           repo: ingswucab/consorcio2-petromiles
         skip_cleanup: "true"
+      after_deploy:
+        - echo "after"
       # - name: Frontend | Vue
       #   install:
       #     - cd petromiles-frontend
