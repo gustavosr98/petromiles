@@ -16,7 +16,6 @@ jobs:
         - npm run test
         - npm run test:e2e
         - npm run build
-
         # Coveralls.io
         # - npm run test:cov
       deploy:
