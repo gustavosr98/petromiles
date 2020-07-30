@@ -33,6 +33,7 @@
                 <v-row justify="center">
                   <v-col cols="8">
                     <v-text-field
+                      name='points'
                       v-model="$v.points.$model"
                       :label="$t('payments.points')"
                       append-icon="mdi-coins"
@@ -60,6 +61,7 @@
                 <v-row justify="center">
                   <v-col cols="8">
                     <v-select
+                      name='accounts'
                       v-model="selectedBankAccount"
                       :label="$tc('navbar.bankAccount', 0)"
                       append-outer-icon="mdi-bank"
@@ -85,6 +87,7 @@
                 <v-row justify="center">
                   <v-col cols="12" class="text-center">
                     <v-btn
+                      name='exchange'
                       @click="submitButton"
                       class="primary"
                       :loading="loading"
@@ -113,7 +116,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">
+                <v-btn name='success' color="secondary" dark :to="{ name: comeBackRoute }">
                   {{
                   $t("common.ok")
                   }}
