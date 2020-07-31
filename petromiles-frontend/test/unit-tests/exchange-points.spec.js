@@ -21,3 +21,4 @@ describe("ExchangePointsForm", () => {
     await wrapper.find({name: 'success'}).click();
   });
 });
+ 
