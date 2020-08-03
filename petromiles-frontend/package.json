@@ -7,6 +7,7 @@
     "serve": "vue-cli-service serve",
     "prebuild": "npm run i18n:load",
     "build": "vue-cli-service build --mode production",
+    "test": "jest",
     "test:unit": "vue-cli-service test:unit",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -20,7 +21,11 @@
   "dependencies": {
     "@mdi/font": "^3.6.95",
     "@mdi/js": "^5.2.45",
+    "@vue/cli-plugin-unit-jest": "^4.4.6",
+    "@vue/test-utils": "^1.0.3",
     "axios": "^0.19.2",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^26.2.2",
     "change-case": "^4.1.1",
     "chart.js": "^2.9.3",
     "core-js": "^3.6.4",
@@ -38,6 +43,7 @@
     "vue-chartjs": "^3.5.0",
     "vue-html2pdf": "^1.3.6",
     "vue-i18n": "^8.17.3",
+    "vue-jest": "^3.0.6",
     "vue-lodash": "^2.1.2",
     "vue-meta": "^2.3.3",
     "vue-router": "^3.1.6",
@@ -70,12 +76,20 @@
   "jest": {
     "moduleFileExtensions": [
       "js",
-      "json"
+      "jsx",
+      "json",
+      "vue"
+    ],
+    "transform": {
+      "^.+\\.vue$": "vue-jest",
+      ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
+      "^.+\\.(js|jsx)?$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "./node_modules/"
     ],
     "rootDir": ".",
     "testRegex": ".spec.js$",
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node",
     "moduleNameMapper": {
       "@/(.*)$": "<rootDir>/$1"
     }
