@@ -200,4 +200,44 @@ describe('TransactionService', () => {
       });
     });
   });
+
+  describe('getTransactionsAdmin()', () => {
+    let expectedTransactions: DeepPartial<App.Transaction.TransactionDetails>[];
+    let result: DeepPartial<App.Transaction.TransactionDetails>[];
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          expectedTransactions = [
+            {
+              id: 1,
+              type: TransactionType.DEPOSIT,
+              bankAccount: 'prueba',
+              state: StateName.VALID,
+              amount: 100,
+              interest: 10,
+              pointsEquivalent: 50000,
+              pointsConversion: 0.002,
+              total: 110,
+              clientBankAccountEmail: 'prueba@gmail.com',
+            },
+          ];
+
+          (transactionRepository.find as jest.Mock).mockResolvedValue(
+            expectedTransactions,
+          );
+
+          result = await transactionService.getTransactionsAdmin();
+        });
+
+        it('should invoke transactionRepository.find()', () => {
+          expect(transactionRepository.find).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return an array of transactions', () => {
+          expect(result).toStrictEqual(expectedTransactions);
+        });
+      });
+    });
+  });
 });
