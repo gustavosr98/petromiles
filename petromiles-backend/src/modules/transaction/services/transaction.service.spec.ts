@@ -1,3 +1,4 @@
+import { TransactionDetails } from '@/modules/transaction/interfaces/transaction-details.interface';
 import { TransactionType } from '@/enums/transaction.enum';
 import { StateName } from '@/enums/state.enum';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
@@ -228,6 +229,58 @@ describe('TransactionService', () => {
           );
 
           result = await transactionService.getTransactionsAdmin();
+        });
+
+        it('should invoke transactionRepository.find()', () => {
+          expect(transactionRepository.find).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return an array of transactions', () => {
+          expect(result).toStrictEqual(expectedTransactions);
+        });
+      });
+    });
+  });
+
+  describe('getThirdPartyTransactions(idThirdPartyClient, apiKey, filter)', () => {
+    let expectedTransactions: DeepPartial<TransactionDetails>[];
+    let result: DeepPartial<TransactionDetails>[];
+    let idThirdPartyClient: number;
+    let apiKey: string;
+    let filter;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idThirdPartyClient = 1;
+          apiKey = 'prueba';
+          filter = {
+            transactionIds: [1],
+          };
+          expectedTransactions = [
+            {
+              id: 1,
+              type: TransactionType.DEPOSIT,
+              bankAccount: 'prueba',
+              state: StateName.VALID,
+              amount: 100,
+              interest: 10,
+              pointsEquivalent: 50000,
+              pointsConversion: 0.002,
+              total: 110,
+              clientBankAccountEmail: 'prueba@gmail.com',
+            },
+          ];
+
+          (transactionRepository.find as jest.Mock).mockResolvedValue(
+            expectedTransactions,
+          );
+
+          result = await transactionService.getThirdPartyTransactions({
+            idThirdPartyClient,
+            apiKey,
+            filter,
+          });
         });
 
         it('should invoke transactionRepository.find()', () => {
