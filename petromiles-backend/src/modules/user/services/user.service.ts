@@ -32,6 +32,8 @@ import { UserInfo } from '@/interfaces/user/user-info.interface';
 import { StateName } from '@/enums/state.enum';
 import { ClientBankAccountService } from '@/modules/bank-account/services/client-bank-account.service';
 import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
+import { Role } from '@/entities/role.entity';
+import { StateUser } from '../../../entities/state-user.entity';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -123,67 +125,69 @@ export class UserService implements OnModuleInit {
     }
   }
 
-  async deletePersonalInfo(user: AuthenticatedUser): Promise<UpdateResult> {
-    const { id, email, role } = user;
+  async closeAccount(
+    user: AuthenticatedUser,
+    deteleData: boolean,
+  ): Promise<StateUser> {
+    const { id, role } = user;
     const clientBankAccounts = await this.clientBankAccountService.getClientBankAccounts(
-      id,
+      user.id,
     );
-    const roleType = await this.managementService.getRoleByName(role);
-
-    if (
-      !(await this.checkPendingTransactions(id, clientBankAccounts)) ||
-      roleType.isAdministrator()
-    ) {
-      await this.clientBankAccountService.encryptBankAccount(
-        clientBankAccounts,
+    if (!(await this.checkPendingTransactions(id, clientBankAccounts))) {
+      const stateUser = await this.managementService.updateUserState(
+        role,
+        StateName.DELETED,
+        id,
       );
-      await this.managementService.updateUserState(role, StateName.DELETED, id);
-      const userDetail = await this.userDetailsRepository.findOne(id);
+      if (deteleData)
+        await this.deletePersonalInformation(user, clientBankAccounts);
 
-      // UserDetails will be encrypted
-      const encrypedData: UpdateDetailsDTO = {
-        firstName: await this.encrypt(userDetail.firstName),
-        middleName: await this.encrypt(userDetail.middleName),
-        lastName: await this.encrypt(userDetail.lastName),
-        secondLastName: await this.encrypt(userDetail.secondLastName),
-        birthdate: null,
-        address: await this.encrypt(userDetail.address),
-        phone: await this.encrypt(userDetail.phone),
-        photo: await this.encrypt(userDetail.photo),
-        country: null,
-        role: role.toLowerCase(),
-        accountId: await this.encrypt(userDetail.accountId),
-        customerId: await this.encrypt(userDetail.customerId),
-      };
-
-      await this.updateDetails(id, encrypedData, true);
-
-      // Email will be encrypted
-      let updatedResult;
-      if (roleType.isClient())
-        updatedResult = await this.userClientService.updateClient(
-          { email: `EncryptedEmail${id}@petromiles.com` },
-          id,
-        );
-      else if (roleType.isAdministrator())
-        updatedResult = await this.userAdministratorService.updateAdministrator(
-          { email: `EncryptedEmail${id}@petromiles.com` },
-          id,
-        );
-
-      this.logger.silly(
-        `[${ApiModules.USER}]  Delete data request sucessfully processed`,
-      );
-      return updatedResult;
+      return stateUser;
     }
 
     throw new BadRequestException('error-messages.couldNotDeleteAccount');
   }
 
+  async deletePersonalInformation(
+    user: AuthenticatedUser,
+    clientBankAccounts: BankAccount[],
+  ): Promise<UpdateResult> {
+    const { id, email, role } = user;
+
+    await this.clientBankAccountService.encryptBankAccount(clientBankAccounts);
+    const userDetail = await this.userDetailsRepository.findOne(id);
+
+    const encrypedData: UpdateDetailsDTO = {
+      firstName: await this.encrypt(userDetail.firstName),
+      middleName: await this.encrypt(userDetail.middleName),
+      lastName: await this.encrypt(userDetail.lastName),
+      secondLastName: await this.encrypt(userDetail.secondLastName),
+      birthdate: null,
+      address: await this.encrypt(userDetail.address),
+      phone: await this.encrypt(userDetail.phone),
+      photo: await this.encrypt(userDetail.photo),
+      country: null,
+      role: role.toLowerCase(),
+      accountId: await this.encrypt(userDetail.accountId),
+      customerId: await this.encrypt(userDetail.customerId),
+    };
+
+    await this.updateDetails(id, encrypedData, true);
+
+    let updatedResult = await this.userClientService.updateClient(
+      { email: await this.encrypt(email) },
+      id,
+    );
+    this.logger.silly(
+      `[${ApiModules.USER}]  Delete data request sucessfully processed`,
+    );
+    return updatedResult;
+  }
+
   async checkPendingTransactions(
     idUserClient: number,
     clientBankAccounts: BankAccount[],
-  ) {
+  ): Promise<boolean> {
     const pendingArray = await Promise.all(
       clientBankAccounts.map(async clientBankAccount => {
         const isPending = await this.clientBankAccountService.hasPendingTransaction(
@@ -199,8 +203,17 @@ export class UserService implements OnModuleInit {
     return pendingArray.includes(true) ? true : false;
   }
 
-  async encrypt(dataToEncrypt){
-    const encrypted = await bcrypt.hash(dataToEncrypt, bcrypt.genSatl());
-    return encrypted;
+  async encrypt(dataToEncrypt) {
+    if (
+      dataToEncrypt === null ||
+      typeof dataToEncrypt === 'undefined' ||
+      dataToEncrypt === ''
+    ) {
+      console.log('entro');
+      return dataToEncrypt;
+    }
+
+    console.log(dataToEncrypt);
+    return await bcrypt.hash(dataToEncrypt, bcrypt.genSalt());
   }
 }

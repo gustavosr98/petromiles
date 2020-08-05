@@ -14,8 +14,6 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
-import { UpdateResult } from 'typeorm';
-
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -31,6 +29,7 @@ import { UpdateDetailsDTO } from '@/modules/user/dto/update-details.dto';
 import { UpdatePasswordDTO } from '@/modules/user/dto/update-password.dto';
 import { UserInfo } from '@/interfaces/user/user-info.interface';
 import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
+import { CloseAccount } from '@/interfaces/user/close-account.interface';
 
 // SERVICES
 import { UserService } from '@/modules/user/services/user.service';
@@ -38,6 +37,7 @@ import { UserClientService } from '@/modules/user/services/user-client.service';
 
 // ENTITIES
 import { ClientPoints } from '@/entities/user-points.entity';
+import { StateUser } from '@/entities/state-user.entity';
 
 import { PasswordEncryptorInterceptor } from '@/interceptors/password-encryptor.interceptor';
 
@@ -103,14 +103,15 @@ export class UserController {
     return this.userService.updateDetails(id, details, false);
   }
 
-  @Put('delete-personal-info')
-  deletePersonalInfo(
+  @Put('close-account')
+  closeAccount(
     @GetUser() user: AuthenticatedUser,
-  ): Promise<UpdateResult> {
+    @Body() closeAccount: CloseAccount,
+  ): Promise<StateUser> {
     this.logger.http(
       `[${ApiModules.USER}] (${HttpRequest.PUT}) ${user?.email} asks /${baseEndpoint}/delete-personal-info`,
     );
-    return this.userService.deletePersonalInfo(user);
+    return this.userService.closeAccount(user, closeAccount.deleteUserData);
   }
 
   @Roles(Role.ADMINISTRATOR)
