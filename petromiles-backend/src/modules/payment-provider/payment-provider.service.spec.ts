@@ -54,4 +54,106 @@ describe('PaymentProviderService', () => {
     );
     stripeService = module.get<StripeService>(StripeService);
   });
+
+  describe('createBankAccount(userClient, bankAccountCreateParams)', () => {
+    let result;
+    let expectedResult;
+    let userClient;
+    let bankAccountCreateParams;
+    let expectedBankAccountToken;
+    let expectedBankAccountSource;
+    let expectedAsociatedBankAccount;
+    let bankAccount;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          userClient = {
+            email: 'prueba@gmail.com',
+            userDetails: {
+              customerId: 'prueba',
+              accountId: 'prueba',
+            },
+          };
+          bankAccountCreateParams = {
+            userDetails: {
+              firstName: 'Pedro',
+              lastName: 'Perez',
+            },
+            routingNumber: 'prueba',
+            accountNumber: 'prueba',
+          };
+          (bankAccount = {
+            country: 'US',
+            currency: 'usd',
+            account_holder_name: `${bankAccountCreateParams.userDetails.firstName} ${bankAccountCreateParams.userDetails.lastName}`,
+            account_holder_type: 'individual',
+            routing_number: bankAccountCreateParams.routingNumber,
+            account_number: bankAccountCreateParams.accountNumber,
+          }),
+            (expectedBankAccountToken = {
+              id: 'prueba',
+            });
+          expectedBankAccountSource = {
+            id: 'prueba',
+          };
+          expectedAsociatedBankAccount = {
+            id: 'prueba',
+          };
+          expectedResult = {
+            transferId: expectedAsociatedBankAccount.id,
+            chargeId: expectedBankAccountSource.id,
+          };
+
+          (stripeService.createBankAccountByToken as jest.Mock).mockResolvedValue(
+            expectedBankAccountToken,
+          );
+          (stripeService.asociateBankToCustomer as jest.Mock).mockResolvedValue(
+            expectedBankAccountSource,
+          );
+          (stripeService.asociateBankAccountToAccount as jest.Mock).mockResolvedValue(
+            expectedAsociatedBankAccount,
+          );
+
+          result = await paymentProviderService.createBankAccount(
+            userClient,
+            bankAccountCreateParams,
+          );
+        });
+
+        it('should invoke stripeService.createBankAccountByToken()', () => {
+          expect(stripeService.createBankAccountByToken).toHaveBeenCalledTimes(
+            2,
+          );
+          expect(stripeService.createBankAccountByToken).toHaveBeenCalledWith({
+            bank_account: bankAccount,
+          });
+        });
+
+        it('should invoke stripeService.asociateBankToCustomer()', () => {
+          expect(stripeService.asociateBankToCustomer).toHaveBeenCalledTimes(1);
+          expect(stripeService.asociateBankToCustomer).toHaveBeenCalledWith(
+            userClient.userDetails.customerId,
+            expectedBankAccountToken.id,
+          );
+        });
+
+        it('should invoke stripeService.asociateBankAccountToAccount()', () => {
+          expect(
+            stripeService.asociateBankAccountToAccount,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            stripeService.asociateBankAccountToAccount,
+          ).toHaveBeenCalledWith(
+            userClient.userDetails.accountId,
+            expectedBankAccountToken.id,
+          );
+        });
+
+        it('should return the info of the Stripe', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
 });
