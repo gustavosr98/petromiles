@@ -19,6 +19,7 @@ import { UserClient } from '@/entities/user-client.entity';
 
 import { WinstonModule } from 'nest-winston';
 import createOptions from '../../../logger/winston/winston-config';
+import { PlatformInterest } from '@/enums/platform-interest.enum';
 
 describe('TransactionService', () => {
   let transactionService: TransactionService;
@@ -289,6 +290,88 @@ describe('TransactionService', () => {
 
         it('should return an array of transactions', () => {
           expect(result).toStrictEqual(expectedTransactions);
+        });
+      });
+    });
+  });
+
+  describe('getTransactionInterests(options)', () => {
+    let expectedTransactionInterests;
+    let result;
+    let options;
+    let expectedPlatformInterest;
+    let expectedExtraPoints;
+    let expectedThirdPartyInterest;
+    let expectedOnePointToDollars;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          options = {
+            platformInterestType: PlatformInterest.BUY,
+            //platformInterestExtraPointsType: PlatformInterest.PREMIUM_EXTRA,
+            thirdPartyInterestType: PaymentProvider.STRIPE,
+            type: TransactionType.DEPOSIT,
+          };
+          expectedPlatformInterest = { amount: 0, percentage: 0.1 };
+          //expectedExtraPoints = { amount: 0, percentage: 0.2 };
+          expectedOnePointToDollars = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedThirdPartyInterest = { amount: 75, percentage: 0 };
+
+          expectedTransactionInterests = {
+            interest: expectedPlatformInterest,
+            //extraPoints: expectedExtraPoints,
+            pointsConversion: expectedOnePointToDollars,
+            thirdPartyInterest: expectedThirdPartyInterest,
+          };
+
+          (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
+            expectedPlatformInterest,
+          );
+          (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
+            expectedExtraPoints,
+          );
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedOnePointToDollars,
+          );
+          (thirdPartyInterestService.getCurrentInterest as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+
+          result = await transactionService.getTransactionInterests(options);
+        });
+
+        it('should invoke platformInterestService.getInterestByName()', () => {
+          expect(
+            platformInterestService.getInterestByName,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            platformInterestService.getInterestByName,
+          ).toHaveBeenCalledWith(options.platformInterestType);
+        });
+
+        it('should invoke pointsConversionService.getRecentPointsConversion()', () => {
+          expect(
+            pointsConversionService.getRecentPointsConversion,
+          ).toHaveBeenCalledTimes(1);
+        });
+
+        it('should invoke thirdPartyInterestService.getCurrentInterest()', () => {
+          expect(
+            thirdPartyInterestService.getCurrentInterest,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            thirdPartyInterestService.getCurrentInterest,
+          ).toHaveBeenCalledWith(options.thirdPartyInterestType, options.type);
+        });
+
+        it('should return an array of transactions', () => {
+          expect(result).toStrictEqual(expectedTransactionInterests);
         });
       });
     });
