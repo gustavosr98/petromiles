@@ -199,4 +199,94 @@ describe('PaymentProviderService', () => {
       });
     });
   });
+
+  describe('createCharge(chargeCreateParams)', () => {
+    let result;
+    let expectedResult;
+    let chargeCreateParams;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          chargeCreateParams = {
+            customer: 'prueba',
+            source: 'prueba',
+            currency: 'usd',
+            amount: 100,
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'charge',
+            amount: 100,
+            source: 'prueba',
+            customer: 'prueba',
+            currency: 'usd',
+          };
+
+          (stripeService.createCharge as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await paymentProviderService.createCharge(
+            chargeCreateParams,
+          );
+        });
+
+        it('should invoke stripeService.createCharge()', () => {
+          expect(stripeService.createCharge).toHaveBeenCalledTimes(1);
+          expect(stripeService.createCharge).toHaveBeenCalledWith(
+            chargeCreateParams,
+          );
+        });
+
+        it('should return the info of the Stripe', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('createPayout(payoutCreateParams)', () => {
+    let result;
+    let expectedResult;
+    let payoutCreateParams;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          payoutCreateParams = {
+            currency: 'usd',
+            amount: 100,
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'payout',
+            amount: 100,
+            currency: 'usd',
+          };
+
+          (stripeService.createPayout as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await paymentProviderService.createPayout(
+            payoutCreateParams,
+          );
+        });
+
+        it('should invoke stripeService.createPayout()', () => {
+          expect(stripeService.createPayout).toHaveBeenCalledTimes(1);
+          expect(stripeService.createPayout).toHaveBeenCalledWith(
+            payoutCreateParams,
+          );
+        });
+
+        it('should return the info of the Stripe', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
 });
