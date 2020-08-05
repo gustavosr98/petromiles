@@ -204,13 +204,16 @@ describe('TransactionService', () => {
   });
 
   describe('getTransactionsAdmin()', () => {
-    let expectedTransactions: DeepPartial<App.Transaction.TransactionDetails>[];
+    let expectedTransactionsDetails: DeepPartial<
+      App.Transaction.TransactionDetails
+    >[];
     let result: DeepPartial<App.Transaction.TransactionDetails>[];
+    let expectedTransactions;
 
     describe('case: success', () => {
       describe('when everything works well', () => {
         beforeEach(async () => {
-          expectedTransactions = [
+          expectedTransactionsDetails = [
             {
               id: 1,
               type: TransactionType.DEPOSIT,
@@ -222,6 +225,11 @@ describe('TransactionService', () => {
               pointsConversion: 0.002,
               total: 110,
               clientBankAccountEmail: 'prueba@gmail.com',
+            },
+          ];
+          expectedTransactions = [
+            {
+              calculateDetails: () => expectedTransactionsDetails[0],
             },
           ];
 
@@ -237,18 +245,19 @@ describe('TransactionService', () => {
         });
 
         it('should return an array of transactions', () => {
-          expect(result).toStrictEqual(expectedTransactions);
+          expect(result).toStrictEqual(expectedTransactionsDetails);
         });
       });
     });
   });
 
   describe('getThirdPartyTransactions(idThirdPartyClient, apiKey, filter)', () => {
-    let expectedTransactions: DeepPartial<TransactionDetails>[];
+    let expectedTransactionsDetails: DeepPartial<TransactionDetails>[];
     let result: DeepPartial<TransactionDetails>[];
     let idThirdPartyClient: number;
     let apiKey: string;
     let filter;
+    let expectedTransactions;
 
     describe('case: success', () => {
       describe('when everything works well', () => {
@@ -258,7 +267,7 @@ describe('TransactionService', () => {
           filter = {
             transactionIds: [1],
           };
-          expectedTransactions = [
+          expectedTransactionsDetails = [
             {
               id: 1,
               type: TransactionType.DEPOSIT,
@@ -270,6 +279,11 @@ describe('TransactionService', () => {
               pointsConversion: 0.002,
               total: 110,
               clientBankAccountEmail: 'prueba@gmail.com',
+            },
+          ];
+          expectedTransactions = [
+            {
+              calculateDetails: () => expectedTransactionsDetails[0],
             },
           ];
 
@@ -289,7 +303,7 @@ describe('TransactionService', () => {
         });
 
         it('should return an array of transactions', () => {
-          expect(result).toStrictEqual(expectedTransactions);
+          expect(result).toStrictEqual(expectedTransactionsDetails);
         });
       });
     });
@@ -300,7 +314,6 @@ describe('TransactionService', () => {
     let result;
     let options;
     let expectedPlatformInterest;
-    let expectedExtraPoints;
     let expectedThirdPartyInterest;
     let expectedOnePointToDollars;
 
@@ -309,12 +322,10 @@ describe('TransactionService', () => {
         beforeEach(async () => {
           options = {
             platformInterestType: PlatformInterest.BUY,
-            //platformInterestExtraPointsType: PlatformInterest.PREMIUM_EXTRA,
             thirdPartyInterestType: PaymentProvider.STRIPE,
             type: TransactionType.DEPOSIT,
           };
           expectedPlatformInterest = { amount: 0, percentage: 0.1 };
-          //expectedExtraPoints = { amount: 0, percentage: 0.2 };
           expectedOnePointToDollars = {
             idPointsConversion: 1,
             onePointEqualsDollars: 0.002,
@@ -325,16 +336,13 @@ describe('TransactionService', () => {
 
           expectedTransactionInterests = {
             interest: expectedPlatformInterest,
-            //extraPoints: expectedExtraPoints,
+            extraPoints: null,
             pointsConversion: expectedOnePointToDollars,
             thirdPartyInterest: expectedThirdPartyInterest,
           };
 
           (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
             expectedPlatformInterest,
-          );
-          (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
-            expectedExtraPoints,
           );
           (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
             expectedOnePointToDollars,
@@ -370,8 +378,232 @@ describe('TransactionService', () => {
           ).toHaveBeenCalledWith(options.thirdPartyInterestType, options.type);
         });
 
-        it('should return an array of transactions', () => {
+        it('should return a TransactionInterests data', () => {
           expect(result).toStrictEqual(expectedTransactionInterests);
+        });
+      });
+    });
+  });
+
+  describe('getTransactions(idUserClient)', () => {
+    let expectedTransactionsDetails: DeepPartial<TransactionDetails>[];
+    let result: DeepPartial<TransactionDetails>[];
+    let idUserClient: number;
+    let expectedUserClient;
+    let expectedTransactions;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idUserClient = 1;
+          expectedUserClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+          };
+          expectedTransactionsDetails = [
+            {
+              id: 1,
+              type: TransactionType.DEPOSIT,
+              bankAccount: 'prueba',
+              state: StateName.VALID,
+              amount: 100,
+              interest: 10,
+              pointsEquivalent: 50000,
+              pointsConversion: 0.002,
+              total: 110,
+              clientBankAccountEmail: 'prueba@gmail.com',
+            },
+          ];
+          expectedTransactions = [
+            {
+              calculateDetails: () => expectedTransactionsDetails[0],
+            },
+          ];
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (transactionRepository.find as jest.Mock).mockResolvedValue(
+            expectedTransactions,
+          );
+
+          result = await transactionService.getTransactions(idUserClient);
+        });
+
+        it('should invoke userClientRepository.findOne()', () => {
+          expect(userClientRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userClientRepository.findOne).toHaveBeenCalledWith({
+            idUserClient,
+          });
+        });
+
+        it('should invoke transactionRepository.find()', () => {
+          expect(transactionRepository.find).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return an array of transactions', () => {
+          expect(result).toStrictEqual(expectedTransactionsDetails);
+        });
+      });
+    });
+  });
+
+  describe('get(idTransaction)', () => {
+    let expectedTransactionsDetails: DeepPartial<TransactionDetails>;
+    let result: DeepPartial<TransactionDetails>;
+    let idTransaction: number;
+    let expectedTransactions;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idTransaction = 1;
+          expectedTransactionsDetails = {
+            id: 1,
+            type: TransactionType.DEPOSIT,
+            bankAccount: 'prueba',
+            state: StateName.VALID,
+            amount: 100,
+            interest: 10,
+            pointsEquivalent: 50000,
+            pointsConversion: 0.002,
+            total: 110,
+            clientBankAccountEmail: 'prueba@gmail.com',
+          };
+          expectedTransactions = {
+            calculateDetails: () => expectedTransactionsDetails,
+          };
+
+          (transactionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedTransactions,
+          );
+
+          result = await transactionService.get(idTransaction);
+        });
+
+        it('should invoke transactionRepository.findOne()', () => {
+          expect(transactionRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(transactionRepository.findOne).toHaveBeenCalledWith(
+            idTransaction,
+          );
+        });
+
+        it('should return a transactions', () => {
+          expect(result).toStrictEqual(expectedTransactionsDetails);
+        });
+      });
+    });
+  });
+
+  describe('getClientBankAccountTransaction(clientBankAccount)', () => {
+    let expectedTransactions;
+    let result;
+    let clientBankAccount;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          clientBankAccount = {
+            idClientBankAccount: 1,
+            paymentProvider: PaymentProvider.STRIPE,
+            primary: true,
+          };
+          expectedTransactions = [
+            {
+              idTransaction: 1,
+              totalAmountWithInterest: 77,
+              rawAmount: 524,
+              type: TransactionType.DEPOSIT,
+              clientBankAccount: clientBankAccount,
+              paymentProviderTransactionId: null,
+              stateTransaction: [
+                {
+                  idStateTransaction: 1,
+                  finalDate: null,
+                },
+              ],
+            },
+          ];
+
+          (transactionRepository.find as jest.Mock).mockResolvedValue(
+            expectedTransactions,
+          );
+
+          result = await transactionService.getClientBankAccountTransaction(
+            clientBankAccount,
+          );
+        });
+
+        it('should invoke transactionRepository.find()', () => {
+          expect(transactionRepository.find).toHaveBeenCalledTimes(1);
+          expect(transactionRepository.find).toHaveBeenCalledWith({
+            clientBankAccount,
+          });
+        });
+
+        it('should return a transactions', () => {
+          expect(result).toStrictEqual(expectedTransactions);
+        });
+      });
+    });
+  });
+
+  describe('getExtraPointsOfATransaction(idTransaction)', () => {
+    let result;
+    let idTransaction: number;
+    let expectedTransaction;
+    let expectedExtraPoints: string;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idTransaction = 1;
+          expectedExtraPoints = 'GOLD';
+          expectedTransaction = {
+            idTransaction: 1,
+            totalAmountWithInterest: 77,
+            rawAmount: 524,
+            type: TransactionType.DEPOSIT,
+            paymentProviderTransactionId: null,
+            stateTransaction: [
+              {
+                idStateTransaction: 1,
+                finalDate: null,
+              },
+            ],
+          };
+
+          (transactionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+          (transactionInterestService.getExtraPointsTypeByTransaction as jest.Mock).mockResolvedValue(
+            expectedExtraPoints,
+          );
+
+          result = await transactionService.getExtraPointsOfATransaction(
+            idTransaction,
+          );
+        });
+
+        it('should invoke transactionRepository.findOne()', () => {
+          expect(transactionRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(transactionRepository.findOne).toHaveBeenCalledWith(
+            idTransaction,
+          );
+        });
+
+        it('should invoke transactionInterestService.getExtraPointsTypeByTransaction()', () => {
+          expect(
+            transactionInterestService.getExtraPointsTypeByTransaction,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            transactionInterestService.getExtraPointsTypeByTransaction,
+          ).toHaveBeenCalledWith(expectedTransaction);
+        });
+
+        it('should return tne name of the extra points of a transaction', () => {
+          expect(result).toStrictEqual(expectedExtraPoints);
         });
       });
     });

@@ -101,6 +101,9 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "@/(.*)$": "<rootDir>/$1"
+    }
   }
 }
