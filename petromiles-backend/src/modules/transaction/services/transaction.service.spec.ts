@@ -1,8 +1,3 @@
-import { TransactionDetails } from '@/modules/transaction/interfaces/transaction-details.interface';
-import { TransactionType } from '@/enums/transaction.enum';
-import { StateName, StateDescription } from '@/enums/state.enum';
-import { PaymentProvider } from '@/enums/payment-provider.enum';
-import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DeepPartial } from 'typeorm';
@@ -17,9 +12,14 @@ import { TransactionInterestService } from '@/modules/transaction/services/trans
 import { Transaction } from '@/entities/transaction.entity';
 import { UserClient } from '@/entities/user-client.entity';
 
+import { TransactionType } from '@/enums/transaction.enum';
+import { StateName, StateDescription } from '@/enums/state.enum';
+import { PaymentProvider } from '@/enums/payment-provider.enum';
+import { PlatformInterest } from '@/enums/platform-interest.enum';
+import { TransactionDetails } from '@/modules/transaction/interfaces/transaction-details.interface';
+
 import { WinstonModule } from 'nest-winston';
 import createOptions from '../../../logger/winston/winston-config';
-import { PlatformInterest } from '@/enums/platform-interest.enum';
 
 describe('TransactionService', () => {
   let transactionService: TransactionService;
@@ -779,7 +779,7 @@ describe('TransactionService', () => {
             initialDate: new Date(),
             finalDate: null,
           };
-          expectedThirdPartyInterest = { amount: 75, percentage: 0 };
+          expectedThirdPartyInterest = { amountDollarCents: 75, percentage: 0 };
           expectedTransactionInterestGroup = {
             interest: expectedPlatformInterest,
             extraPoints: null,
@@ -837,6 +837,220 @@ describe('TransactionService', () => {
           await transactionService.createUpgradeSuscriptionTransaction(
             clientBankAccount,
             suscription,
+            paymentProviderTransactionId,
+          );
+        });
+        it('should invoke transactionService.getTransactionInterests()', () => {
+          expect(spyGetTransactionInterests).toHaveBeenCalledTimes(1);
+        });
+        it('should invoke transactionService.createTransaction()', () => {
+          expect(spyCreateTransaction).toHaveBeenCalledTimes(1);
+        });
+      });
+    });
+  });
+
+  describe('createDeposit(clientBankAccount, extraPointsType, amount, paymentProviderTransactionId)', () => {
+    let expectedTransaction;
+    let expectedPlatformInterest;
+    let expectedPointsConversion;
+    let expectedStateTransaction;
+    let expectedTransactionInterest;
+    let clientBankAccount;
+    let expectedThirdPartyInterest;
+    let expectedTransactionInterestGroup;
+    let spyGetTransactionInterests;
+    let spyCreateTransaction;
+    let amount;
+    let paymentProviderTransactionId;
+    let extraPointsType;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          clientBankAccount = {
+            idClientBankAccount: 1,
+            bankAccount: {
+              accountNumber: '11111111',
+            },
+          };
+          extraPointsType = PlatformInterest.PREMIUM_EXTRA;
+          amount = 100;
+          paymentProviderTransactionId = 'prueba';
+
+          expectedPlatformInterest = { amount: 200, percentage: 0 };
+          expectedPointsConversion = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedThirdPartyInterest = {
+            amountDollarCents: 75,
+            percentage: 0,
+          };
+          expectedTransactionInterestGroup = {
+            interest: expectedPlatformInterest,
+            extraPoints: expectedPlatformInterest,
+            pointsConversion: expectedPointsConversion,
+            thirdPartyInterest: expectedThirdPartyInterest,
+          };
+
+          expectedTransaction = {
+            totalAmountWithInterest: 100,
+            rawAmount: 0,
+            type: TransactionType.DEPOSIT,
+            pointsConversion: expectedPointsConversion,
+            platformInterest: expectedPlatformInterest,
+            stateTransactionDescription: StateDescription.DEPOSIT,
+            thirdPartyInterest: expectedThirdPartyInterest,
+            promotion: null,
+            platformInterestExtraPoints: null,
+          };
+          expectedStateTransaction = {
+            idStateTransaction: 1,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedTransactionInterest = {
+            idTransactionInterest: 1,
+            platformInterest: expectedPlatformInterest,
+          };
+
+          (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
+            expectedPlatformInterest,
+          );
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedPointsConversion,
+          );
+          (thirdPartyInterestService.getCurrentInterest as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+          spyGetTransactionInterests = jest
+            .spyOn(transactionService, 'getTransactionInterests')
+            .mockResolvedValue(expectedTransactionInterestGroup);
+
+          (transactionRepository.save as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+          (stateTransactionService.createStateTransaction as jest.Mock).mockResolvedValue(
+            expectedStateTransaction,
+          );
+          (transactionInterestService.createTransactionInterest as jest.Mock).mockResolvedValue(
+            expectedTransactionInterest,
+          );
+          spyCreateTransaction = jest
+            .spyOn(transactionService, 'createTransaction')
+            .mockResolvedValue(expectedTransaction);
+
+          await transactionService.createDeposit(
+            clientBankAccount,
+            extraPointsType,
+            amount,
+            paymentProviderTransactionId,
+          );
+        });
+        it('should invoke transactionService.getTransactionInterests()', () => {
+          expect(spyGetTransactionInterests).toHaveBeenCalledTimes(1);
+        });
+        it('should invoke transactionService.createTransaction()', () => {
+          expect(spyCreateTransaction).toHaveBeenCalledTimes(1);
+        });
+      });
+    });
+  });
+
+  describe('createWithdrawalTransaction(clientBankAccount, amount, paymentProviderTransactionId)', () => {
+    let expectedTransaction;
+    let expectedPlatformInterest;
+    let expectedPointsConversion;
+    let expectedStateTransaction;
+    let expectedTransactionInterest;
+    let clientBankAccount;
+    let expectedThirdPartyInterest;
+    let expectedTransactionInterestGroup;
+    let spyGetTransactionInterests;
+    let spyCreateTransaction;
+    let amount;
+    let paymentProviderTransactionId;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          clientBankAccount = {
+            idClientBankAccount: 1,
+            bankAccount: {
+              accountNumber: '11111111',
+            },
+          };
+          amount = 100;
+          paymentProviderTransactionId = 'prueba';
+
+          expectedPlatformInterest = { amount: 200, percentage: 0 };
+          expectedPointsConversion = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedThirdPartyInterest = { amountDollarCents: 75, percentage: 0 };
+          expectedTransactionInterestGroup = {
+            interest: expectedPlatformInterest,
+            extraPoints: null,
+            pointsConversion: expectedPointsConversion,
+            thirdPartyInterest: expectedThirdPartyInterest,
+          };
+
+          expectedTransaction = {
+            totalAmountWithInterest: 100,
+            rawAmount: 0,
+            type: TransactionType.WITHDRAWAL,
+            pointsConversion: expectedPointsConversion,
+            platformInterest: expectedPlatformInterest,
+            stateTransactionDescription: StateDescription.WITHDRAWAL,
+            thirdPartyInterest: expectedThirdPartyInterest,
+            promotion: null,
+            platformInterestExtraPoints: null,
+          };
+          expectedStateTransaction = {
+            idStateTransaction: 1,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedTransactionInterest = {
+            idTransactionInterest: 1,
+            platformInterest: expectedPlatformInterest,
+          };
+
+          (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
+            expectedPlatformInterest,
+          );
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedPointsConversion,
+          );
+          (thirdPartyInterestService.getCurrentInterest as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+          spyGetTransactionInterests = jest
+            .spyOn(transactionService, 'getTransactionInterests')
+            .mockResolvedValue(expectedTransactionInterestGroup);
+
+          (transactionRepository.save as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+          (stateTransactionService.createStateTransaction as jest.Mock).mockResolvedValue(
+            expectedStateTransaction,
+          );
+          (transactionInterestService.createTransactionInterest as jest.Mock).mockResolvedValue(
+            expectedTransactionInterest,
+          );
+          spyCreateTransaction = jest
+            .spyOn(transactionService, 'createTransaction')
+            .mockResolvedValue(expectedTransaction);
+
+          await transactionService.createWithdrawalTransaction(
+            clientBankAccount,
+            amount,
             paymentProviderTransactionId,
           );
         });
