@@ -645,6 +645,211 @@ describe('TransactionService', () => {
     });
   });
 
+  describe('createVerificationTransaction(clientBankAccount)', () => {
+    let expectedTransaction;
+    let expectedPlatformInterest;
+    let expectedPointsConversion;
+    let expectedStateTransaction;
+    let expectedTransactionInterest;
+    let clientBankAccount;
+    let expectedThirdPartyInterest;
+    let expectedTransactionInterestGroup;
+    let spyGetTransactionInterests;
+    let spyCreateTransaction;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          clientBankAccount = {
+            idClientBankAccount: 1,
+            bankAccount: {
+              accountNumber: '11111111',
+            },
+          };
+          expectedPlatformInterest = { amount: 250, percentage: 0 };
+          expectedPointsConversion = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedThirdPartyInterest = { amount: 75, percentage: 0 };
+          expectedTransactionInterestGroup = {
+            interest: expectedPlatformInterest,
+            extraPoints: null,
+            pointsConversion: expectedPointsConversion,
+            thirdPartyInterest: expectedThirdPartyInterest,
+          };
+
+          expectedTransaction = {
+            totalAmountWithInterest: 100,
+            rawAmount: 0,
+            type: TransactionType.BANK_ACCOUNT_VALIDATION,
+            pointsConversion: expectedPointsConversion,
+            platformInterest: expectedPlatformInterest,
+            stateTransactionDescription:
+              StateDescription.VERIFICATION_TRANSACTION_CREATION,
+            thirdPartyInterest: expectedThirdPartyInterest,
+            promotion: null,
+            platformInterestExtraPoints: null,
+          };
+          expectedStateTransaction = {
+            idStateTransaction: 1,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedTransactionInterest = {
+            idTransactionInterest: 1,
+            platformInterest: expectedPlatformInterest,
+          };
+
+          (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
+            expectedPlatformInterest,
+          );
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedPointsConversion,
+          );
+          (thirdPartyInterestService.getCurrentInterest as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+          spyGetTransactionInterests = jest
+            .spyOn(transactionService, 'getTransactionInterests')
+            .mockResolvedValue(expectedTransactionInterestGroup);
+
+          (transactionRepository.save as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+          (stateTransactionService.createStateTransaction as jest.Mock).mockResolvedValue(
+            expectedStateTransaction,
+          );
+          (transactionInterestService.createTransactionInterest as jest.Mock).mockResolvedValue(
+            expectedTransactionInterest,
+          );
+          spyCreateTransaction = jest
+            .spyOn(transactionService, 'createTransaction')
+            .mockResolvedValue(expectedTransaction);
+
+          await transactionService.createVerificationTransaction(
+            clientBankAccount,
+          );
+        });
+        it('should invoke transactionService.getTransactionInterests()', () => {
+          expect(spyGetTransactionInterests).toHaveBeenCalledTimes(1);
+        });
+        it('should invoke transactionService.createTransaction()', () => {
+          expect(spyCreateTransaction).toHaveBeenCalledTimes(2);
+        });
+      });
+    });
+  });
+
+  describe('createUpgradeSuscriptionTransaction(clientBankAccount, suscription, paymentProviderTransactionId)', () => {
+    let expectedTransaction;
+    let expectedPlatformInterest;
+    let expectedPointsConversion;
+    let expectedStateTransaction;
+    let expectedTransactionInterest;
+    let clientBankAccount;
+    let expectedThirdPartyInterest;
+    let expectedTransactionInterestGroup;
+    let spyGetTransactionInterests;
+    let spyCreateTransaction;
+    let suscription;
+    let paymentProviderTransactionId;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          clientBankAccount = {
+            idClientBankAccount: 1,
+            bankAccount: {
+              accountNumber: '11111111',
+            },
+          };
+          suscription = {
+            idSuscription: 1,
+            cost: 20,
+          };
+          paymentProviderTransactionId = 'prueba';
+
+          expectedPlatformInterest = { amount: 200, percentage: 0 };
+          expectedPointsConversion = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedThirdPartyInterest = { amount: 75, percentage: 0 };
+          expectedTransactionInterestGroup = {
+            interest: expectedPlatformInterest,
+            extraPoints: null,
+            pointsConversion: expectedPointsConversion,
+            thirdPartyInterest: expectedThirdPartyInterest,
+          };
+
+          expectedTransaction = {
+            totalAmountWithInterest: 100,
+            rawAmount: 0,
+            type: TransactionType.SUSCRIPTION_PAYMENT,
+            pointsConversion: expectedPointsConversion,
+            platformInterest: expectedPlatformInterest,
+            stateTransactionDescription: StateDescription.SUSCRIPTION_UPGRADE,
+            thirdPartyInterest: expectedThirdPartyInterest,
+            promotion: null,
+            platformInterestExtraPoints: null,
+          };
+          expectedStateTransaction = {
+            idStateTransaction: 1,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedTransactionInterest = {
+            idTransactionInterest: 1,
+            platformInterest: expectedPlatformInterest,
+          };
+
+          (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
+            expectedPlatformInterest,
+          );
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedPointsConversion,
+          );
+          (thirdPartyInterestService.getCurrentInterest as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+          spyGetTransactionInterests = jest
+            .spyOn(transactionService, 'getTransactionInterests')
+            .mockResolvedValue(expectedTransactionInterestGroup);
+
+          (transactionRepository.save as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+          (stateTransactionService.createStateTransaction as jest.Mock).mockResolvedValue(
+            expectedStateTransaction,
+          );
+          (transactionInterestService.createTransactionInterest as jest.Mock).mockResolvedValue(
+            expectedTransactionInterest,
+          );
+          spyCreateTransaction = jest
+            .spyOn(transactionService, 'createTransaction')
+            .mockResolvedValue(expectedTransaction);
+
+          await transactionService.createUpgradeSuscriptionTransaction(
+            clientBankAccount,
+            suscription,
+            paymentProviderTransactionId,
+          );
+        });
+        it('should invoke transactionService.getTransactionInterests()', () => {
+          expect(spyGetTransactionInterests).toHaveBeenCalledTimes(1);
+        });
+        it('should invoke transactionService.createTransaction()', () => {
+          expect(spyCreateTransaction).toHaveBeenCalledTimes(1);
+        });
+      });
+    });
+  });
+
   describe('getExtraPointsOfATransaction(idTransaction)', () => {
     let result;
     let idTransaction: number;
