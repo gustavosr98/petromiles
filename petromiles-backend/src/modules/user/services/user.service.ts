@@ -146,8 +146,11 @@ export class UserService implements OnModuleInit {
     const { id, email, role } = user;
 
     await this.clientBankAccountService.encryptBankAccount(clientBankAccounts);
-    const userDetail = await this.userDetailsRepository.findOne(id);
-
+    const userDetail = await this.userDetailsRepository.findOne({
+      where: [
+        { userClient: id }
+      ]});
+    console.log(userDetail)
     const encrypedData: UpdateDetailsDTO = {
       firstName: await this.encrypt(userDetail.firstName),
       middleName: await this.encrypt(userDetail.middleName),
