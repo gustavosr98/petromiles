@@ -193,7 +193,7 @@ describe('PaymentProviderService', () => {
           );
         });
 
-        it('should return the info of the Stripe', () => {
+        it('should return a verified bank account', () => {
           expect(result).toStrictEqual(expectedResult);
         });
       });
@@ -240,7 +240,7 @@ describe('PaymentProviderService', () => {
           );
         });
 
-        it('should return the info of the Stripe', () => {
+        it('should return a charge', () => {
           expect(result).toStrictEqual(expectedResult);
         });
       });
@@ -283,7 +283,7 @@ describe('PaymentProviderService', () => {
           );
         });
 
-        it('should return the info of the Stripe', () => {
+        it('should return a payout', () => {
           expect(result).toStrictEqual(expectedResult);
         });
       });
