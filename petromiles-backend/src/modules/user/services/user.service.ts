@@ -5,6 +5,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import * as bcrypt from 'bcrypt';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
@@ -137,21 +138,22 @@ export class UserService implements OnModuleInit {
         clientBankAccounts,
       );
       await this.managementService.updateUserState(role, StateName.DELETED, id);
+      const userDetail = await this.userDetailsRepository.findOne(id);
 
       // UserDetails will be encrypted
       const encrypedData: UpdateDetailsDTO = {
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        secondLastName: '',
+        firstName: await this.encrypt(userDetail.firstName),
+        middleName: await this.encrypt(userDetail.middleName),
+        lastName: await this.encrypt(userDetail.lastName),
+        secondLastName: await this.encrypt(userDetail.secondLastName),
         birthdate: null,
-        address: '',
-        phone: '',
-        photo: '',
+        address: await this.encrypt(userDetail.address),
+        phone: await this.encrypt(userDetail.phone),
+        photo: await this.encrypt(userDetail.photo),
         country: null,
         role: role.toLowerCase(),
-        accountId: '',
-        customerId: '',
+        accountId: await this.encrypt(userDetail.accountId),
+        customerId: await this.encrypt(userDetail.customerId),
       };
 
       await this.updateDetails(id, encrypedData, true);
@@ -195,5 +197,10 @@ export class UserService implements OnModuleInit {
     );
 
     return pendingArray.includes(true) ? true : false;
+  }
+
+  async encrypt(dataToEncrypt){
+    const encrypted = await bcrypt.hash(dataToEncrypt, bcrypt.genSatl());
+    return encrypted;
   }
 }
