@@ -125,27 +125,18 @@ export class UserService implements OnModuleInit {
     }
   }
 
-  async closeAccount(
-    user: AuthenticatedUser,
-    deteleData: boolean,
-  ): Promise<StateUser> {
+  async closeAccount(user: AuthenticatedUser, deteleData: boolean) {
     const { id, role } = user;
     const clientBankAccounts = await this.clientBankAccountService.getClientBankAccounts(
       user.id,
     );
     if (!(await this.checkPendingTransactions(id, clientBankAccounts))) {
-      const stateUser = await this.managementService.updateUserState(
-        role,
-        StateName.DELETED,
-        id,
-      );
+      await this.managementService.updateUserState(role, StateName.DELETED, id);
       if (deteleData)
         await this.deletePersonalInformation(user, clientBankAccounts);
-
-      return stateUser;
+    } else {
+      throw new BadRequestException('error-messages.couldNotDeleteAccount');
     }
-
-    throw new BadRequestException('error-messages.couldNotDeleteAccount');
   }
 
   async deletePersonalInformation(
@@ -203,17 +194,14 @@ export class UserService implements OnModuleInit {
     return pendingArray.includes(true) ? true : false;
   }
 
-  async encrypt(dataToEncrypt) {
+  async encrypt(dataToEncrypt: string): Promise<string> {
     if (
       dataToEncrypt === null ||
       typeof dataToEncrypt === 'undefined' ||
       dataToEncrypt === ''
-    ) {
-      console.log('entro');
+    )
       return dataToEncrypt;
-    }
 
-    console.log(dataToEncrypt);
-    return await bcrypt.hash(dataToEncrypt, bcrypt.genSalt());
+    return await bcrypt.hash(dataToEncrypt, 10);
   }
 }

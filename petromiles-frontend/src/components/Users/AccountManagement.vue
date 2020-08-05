@@ -14,21 +14,62 @@
           <strong>Advertencia:</strong> Si cierras tu cuenta, se cancelará tu suscripción en PetroMiles y perderás el acceso para siempre.
         </p>
         <v-checkbox v-model="deleteUserData" :label="checkBoxMessage"></v-checkbox>
-        <v-btn outlined color="indigo">Cerrar cuenta</v-btn>
+        <v-btn outlined @click="openModal" color="indigo">Cerrar cuenta</v-btn>
       </v-col>
 
       <v-spacer></v-spacer>
+      <are-you-sure-modal
+        :showModal="showModal"
+        @makeAction="closeAccount"
+        @closeModal="closeModal"
+        :loading="loading"
+      ></are-you-sure-modal>
     </v-row>
   </div>
 </template>
 <script>
+import AreYouSureModal from "@/components/General/Modals/WarningModals/AreYouSureModal";
+
+import { createNamespacedHelpers } from "vuex";
+const { mapMutations } = createNamespacedHelpers("auth");
 export default {
+  name: "account-management",
+  components: {
+    "are-you-sure-modal": AreYouSureModal,
+  },
   data() {
     return {
       deleteUserData: false,
+      showModal: false,
+      loading: false,
       checkBoxMessage:
         "I want to close my account and delete all my information",
     };
+  },
+  methods: {
+    ...mapMutations(["logout"]),
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+      this.loading = false;
+    },
+    async closeAccount() {
+      this.loading = true;
+
+      await this.$http
+        .put("user/close-account", {
+          deleteUserData: this.deleteUserData,
+        })
+        .then(() => {
+          this.logout();
+        })
+        .finally(() => {
+          this.showModal = false;
+          this.loading = false;
+        });
+    },
   },
 };
 </script>

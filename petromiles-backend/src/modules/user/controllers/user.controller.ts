@@ -107,9 +107,9 @@ export class UserController {
   closeAccount(
     @GetUser() user: AuthenticatedUser,
     @Body() closeAccount: CloseAccount,
-  ): Promise<StateUser> {
+  ) {
     this.logger.http(
-      `[${ApiModules.USER}] (${HttpRequest.PUT}) ${user?.email} asks /${baseEndpoint}/delete-personal-info`,
+      `[${ApiModules.USER}] (${HttpRequest.PUT}) ${user?.email} asks /${baseEndpoint}/close-account`,
     );
     return this.userService.closeAccount(user, closeAccount.deleteUserData);
   }

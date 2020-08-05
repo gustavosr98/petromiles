@@ -527,7 +527,7 @@ export class ClientBankAccountService {
 
       // This will be encrypted
       const encryptedData = {
-        accountNumber:  await this.encrypt(bankAccount.accountNumber),
+        accountNumber: await this.encrypt(bankAccount.accountNumber),
         checkNumber: await this.encrypt(bankAccount.checkNumber),
         nickname: await this.encrypt(bankAccount.nickname),
       };
@@ -541,8 +541,7 @@ export class ClientBankAccountService {
     });
   }
 
-  async encrypt(dataToEncrypt){
-    const encrypted = await bcrypt.hash(dataToEncrypt, bcrypt.genSatl());
-    return encrypted;
+  async encrypt(dataToEncrypt: string): Promise<string> {
+    return await bcrypt.hash(dataToEncrypt, 10);
   }
 }
