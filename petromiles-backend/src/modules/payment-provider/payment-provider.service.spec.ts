@@ -83,17 +83,18 @@ describe('PaymentProviderService', () => {
             routingNumber: 'prueba',
             accountNumber: 'prueba',
           };
-          (bankAccount = {
+          bankAccount = {
             country: 'US',
             currency: 'usd',
             account_holder_name: `${bankAccountCreateParams.userDetails.firstName} ${bankAccountCreateParams.userDetails.lastName}`,
             account_holder_type: 'individual',
             routing_number: bankAccountCreateParams.routingNumber,
             account_number: bankAccountCreateParams.accountNumber,
-          }),
-            (expectedBankAccountToken = {
-              id: 'prueba',
-            });
+          };
+
+          expectedBankAccountToken = {
+            id: 'prueba',
+          };
           expectedBankAccountSource = {
             id: 'prueba',
           };
@@ -147,6 +148,48 @@ describe('PaymentProviderService', () => {
           ).toHaveBeenCalledWith(
             userClient.userDetails.accountId,
             expectedBankAccountToken.id,
+          );
+        });
+
+        it('should return the info of the Stripe', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('verifyBankAccount(verificationRequest)', () => {
+    let result;
+    let expectedResult;
+    let verificationRequest;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          verificationRequest = {
+            customerId: 'prueba',
+            bankAccountId: 'prueba',
+            amounts: [125, 125],
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            status: 'verified',
+          };
+
+          (stripeService.verifyBankAccount as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await paymentProviderService.verifyBankAccount(
+            verificationRequest,
+          );
+        });
+
+        it('should invoke stripeService.verifyBankAccount()', () => {
+          expect(stripeService.verifyBankAccount).toHaveBeenCalledTimes(1);
+          expect(stripeService.verifyBankAccount).toHaveBeenCalledWith(
+            verificationRequest,
           );
         });
 
