@@ -1,6 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 import { Repository, getConnection, UpdateResult } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -526,9 +527,9 @@ export class ClientBankAccountService {
 
       // This will be encrypted
       const encryptedData = {
-        accountNumber: bankAccount.accountNumber + 'en',
-        checkNumber: bankAccount.checkNumber + 'en',
-        nickname: bankAccount.nickname + 'en',
+        accountNumber:  await this.encrypt(bankAccount.accountNumber),
+        checkNumber: await this.encrypt(bankAccount.checkNumber),
+        nickname: await this.encrypt(bankAccount.nickname),
       };
 
       await this.bankAccountRepository
@@ -538,5 +539,10 @@ export class ClientBankAccountService {
         .where(`idBankAccount = :id`, { id: bankAccount.idBankAccount })
         .execute();
     });
+  }
+
+  async encrypt(dataToEncrypt){
+    const encrypted = await bcrypt.hash(dataToEncrypt, bcrypt.genSatl());
+    return encrypted;
   }
 }
