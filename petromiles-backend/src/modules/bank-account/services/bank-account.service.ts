@@ -9,6 +9,7 @@ import { Repository, getConnection } from 'typeorm';
 import { BankAccount } from '@/entities/bank-account.entity';
 import { RoutingNumber } from '@/entities/routing-number.entity';
 import { Bank } from '@/entities/bank.entity';
+import { UserClient } from '@/entities/user-client.entity';
 
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
@@ -36,6 +37,7 @@ export class BankAccountService {
 
   async create(
     bankAccountCreateParams: CreateBankAccountDTO,
+    userClient: UserClient,
   ): Promise<BankAccount> {
     const { routingNumber, ...bankAccount } = bankAccountCreateParams;
     const routingNumberFound = await this.getValidRoutingNumber(
@@ -46,7 +48,8 @@ export class BankAccountService {
     //  Verify if the account is of a Petromiles User. If it isn't, create the person in the entity UserDetails
     if (bankAccount.userDetails) {
       bankAccount.userDetails = await this.userClientService.createDetails(
-        bankAccount.userDetails,
+        { ...bankAccount.userDetails, userClient },
+        'yes',
       );
     }
 
@@ -127,5 +130,4 @@ export class BankAccountService {
       .andWhere('sba."finalDate" IS NULL')
       .execute();
   }
-
 }

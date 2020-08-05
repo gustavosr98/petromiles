@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
+import { UpdateResult } from 'typeorm';
+
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -28,6 +30,7 @@ import { ApiModules } from '@/logger/api-modules.enum';
 import { UpdateDetailsDTO } from '@/modules/user/dto/update-details.dto';
 import { UpdatePasswordDTO } from '@/modules/user/dto/update-password.dto';
 import { UserInfo } from '@/interfaces/user/user-info.interface';
+import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
 
 // SERVICES
 import { UserService } from '@/modules/user/services/user.service';
@@ -97,7 +100,17 @@ export class UserController {
       `[${ApiModules.USER}] (${HttpRequest.PUT}) ${user?.email} asks /${baseEndpoint}/update-details`,
     );
     const id = idUserClient ? idUserClient : user.id;
-    return this.userService.updateDetails(id, details);
+    return this.userService.updateDetails(id, details, false);
+  }
+
+  @Put('delete-personal-info')
+  deletePersonalInfo(
+    @GetUser() user: AuthenticatedUser,
+  ): Promise<UpdateResult> {
+    this.logger.http(
+      `[${ApiModules.USER}] (${HttpRequest.PUT}) ${user?.email} asks /${baseEndpoint}/delete-personal-info`,
+    );
+    return this.userService.deletePersonalInfo(user);
   }
 
   @Roles(Role.ADMINISTRATOR)

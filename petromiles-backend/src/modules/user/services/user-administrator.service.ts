@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-import { getConnection, Repository } from 'typeorm';
+import { getConnection, Repository, UpdateResult } from 'typeorm';
 
 // SERVICES
 import { ManagementService } from '@/modules/management/services/management.service';
@@ -23,6 +23,7 @@ import { Language as LanguageEnum } from '@/enums/language.enum';
 import { CreateUserDTO } from '@/modules/user/dto/create-user.dto';
 import { Role } from '@/enums/role.enum';
 import { UserInfo } from '@/interfaces/user/user-info.interface';
+import { UpdateUserDTO } from '@/modules/user/dto/update-user.dto';
 
 @Injectable()
 export class UserAdministratorService {
@@ -116,9 +117,10 @@ export class UserAdministratorService {
   }
 
   async createDetails(userAdministratorDetails): Promise<UserDetails> {
-    const result = await this.userDetailsRepository.save(
-      userAdministratorDetails,
-    );
+    const result = await this.userDetailsRepository.save({
+      ...userAdministratorDetails,
+      accountOwner: null,
+    });
     result.userAdministrator = null;
     return result;
   }
@@ -195,16 +197,25 @@ export class UserAdministratorService {
     const { password, salt } = credentials;
     const userAdmin = await this.get({ idUserAdministrator: user.id });
 
-    await this.userAdministratorRepository
-      .createQueryBuilder()
-      .update(UserAdministrator)
-      .set({ password, salt })
-      .where('idUserAdministrator = :id', { id: userAdmin.idUserAdministrator })
-      .execute();
-
+    await this.updateAdministrator(
+      { password, salt },
+      userAdmin.idUserAdministrator,
+    );
     this.logger.silly(
       `[${ApiModules.USER}] {${user.email}} Password successfully updated`,
     );
     return userAdmin;
+  }
+
+  async updateAdministrator(
+    options: UpdateUserDTO,
+    id: number,
+  ): Promise<UpdateResult> {
+    return await this.userAdministratorRepository
+      .createQueryBuilder()
+      .update(UserAdministrator)
+      .set({ ...options })
+      .where('idUserAdministrator = :id', { id })
+      .execute();
   }
 }
