@@ -1,6 +1,6 @@
 import { TransactionDetails } from '@/modules/transaction/interfaces/transaction-details.interface';
 import { TransactionType } from '@/enums/transaction.enum';
-import { StateName } from '@/enums/state.enum';
+import { StateName, StateDescription } from '@/enums/state.enum';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -491,6 +491,102 @@ describe('TransactionService', () => {
 
         it('should return a transactions', () => {
           expect(result).toStrictEqual(expectedTransactionsDetails);
+        });
+      });
+    });
+  });
+
+  describe('createTransaction(options, state)', () => {
+    let expectedTransaction;
+    let result;
+    let options;
+    let state;
+    let expectedPlatformInterest;
+    let expectedPointsConversion;
+    let expectedStateTransaction;
+    let expectedTransactionInterest;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          expectedPlatformInterest = { amount: 0, percentage: 0.1 };
+          expectedPointsConversion = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedTransaction = {
+            totalAmountWithInterest: 77,
+            rawAmount: 524,
+            type: TransactionType.DEPOSIT,
+            pointsConversion: expectedPointsConversion,
+            platformInterest: expectedPlatformInterest,
+            stateTransactionDescription: StateDescription.DEPOSIT,
+            thirdPartyInterest: null,
+            promotion: null,
+            platformInterestExtraPoints: null,
+          };
+          options = expectedTransaction;
+          state = StateName.VALID;
+          expectedStateTransaction = {
+            idStateTransaction: 1,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedTransactionInterest = {
+            idTransactionInterest: 1,
+            platformInterest: expectedPlatformInterest,
+          };
+
+          (transactionRepository.save as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+          (stateTransactionService.createStateTransaction as jest.Mock).mockResolvedValue(
+            expectedStateTransaction,
+          );
+          (transactionInterestService.createTransactionInterest as jest.Mock).mockResolvedValue(
+            expectedTransactionInterest,
+          );
+
+          result = await transactionService.createTransaction(options, state);
+        });
+
+        it('should invoke transactionRepository.save()', () => {
+          expect(transactionRepository.save).toHaveBeenCalledTimes(1);
+          expect(transactionRepository.save).toHaveBeenCalledWith(options);
+        });
+
+        it('should invoke stateTransactionService.createStateTransaction()', () => {
+          expect(
+            stateTransactionService.createStateTransaction,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            stateTransactionService.createStateTransaction,
+          ).toHaveBeenCalledWith(
+            expectedTransaction,
+            options.stateTransactionDescription,
+            state,
+          );
+        });
+
+        it('should invoke transactionInterestService.createTransactionInterest()', () => {
+          expect(
+            transactionInterestService.createTransactionInterest,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            transactionInterestService.createTransactionInterest,
+          ).toHaveBeenCalledWith(
+            expectedTransaction,
+            options.thirdPartyInterest,
+            options.platformInterest,
+            options.promotion,
+            options.platformInterestExtraPoints,
+          );
+        });
+
+        it('should return a transactions', () => {
+          expect(result).toStrictEqual(expectedTransaction);
         });
       });
     });
