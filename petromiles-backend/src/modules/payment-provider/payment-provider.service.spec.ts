@@ -460,4 +460,50 @@ describe('PaymentProviderService', () => {
       });
     });
   });
+
+  describe('createTransfer(transferCreateParams)', () => {
+    let result;
+    let expectedResult;
+    let transferCreateParams;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          transferCreateParams = {
+            destination: 'prueba',
+            currency: 'usd',
+            amount: 100,
+            source_type: 'bank_account',
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'transfer',
+            amount: 100,
+            currency: 'usd',
+            destination: 'prueba',
+          };
+
+          (stripeService.createTransfer as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await paymentProviderService.createTransfer(
+            transferCreateParams,
+          );
+        });
+
+        it('should invoke stripeService.createTransfer()', () => {
+          expect(stripeService.createTransfer).toHaveBeenCalledTimes(1);
+          expect(stripeService.createTransfer).toHaveBeenCalledWith(
+            transferCreateParams,
+          );
+        });
+
+        it('should return a transfer', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
 });
