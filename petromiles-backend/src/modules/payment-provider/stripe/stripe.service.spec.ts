@@ -651,4 +651,448 @@ describe('StripeService', () => {
       });
     });
   });
+
+  describe('createAccount(accountCreateParams)', () => {
+    let result;
+    let expectedResult;
+    let accountCreateParams;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          accountCreateParams = {
+            type: 'custom',
+            country: 'US',
+            email: 'prueba@gmail.com',
+            requested_capabilities: ['transfers'],
+            business_type: 'individual',
+            individual: {
+              first_name: 'Pedro',
+              last_name: 'Perez',
+              email: 'prueba@gmail.com',
+            },
+            business_profile: {
+              url: 'pedro.com',
+            },
+            tos_acceptance: {
+              ip: '192.168.1.2',
+              date: Math.round(new Date().getTime() / 1000),
+            },
+            metadata: {
+              customerId: 'prueba',
+            },
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'account',
+            country: 'US',
+            email: 'prueba@gmail.com',
+            type: 'custom',
+            business_type: 'individual',
+            individual: {
+              first_name: 'Pedro',
+              last_name: 'Perez',
+              email: 'prueba@gmail.com',
+            },
+            business_profile: {
+              url: 'pedro.com',
+            },
+            tos_acceptance: {
+              ip: '192.168.1.2',
+              date: Math.round(new Date().getTime() / 1000),
+            },
+            metadata: {
+              customerId: 'prueba',
+            },
+          };
+
+          (stripe.accounts.create as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await stripeService.createAccount(accountCreateParams);
+        });
+
+        it('should invoke stripe.accounts.create()', () => {
+          expect(stripe.accounts.create).toHaveBeenCalledTimes(1);
+          expect(stripe.accounts.create).toHaveBeenCalledWith(
+            accountCreateParams,
+          );
+        });
+
+        it('should return an account', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the connection fails', () => {
+        beforeEach(async () => {
+          accountCreateParams = {
+            type: 'custom',
+            country: 'US',
+            email: 'prueba@gmail.com',
+            requested_capabilities: ['transfers'],
+            business_type: 'individual',
+            individual: {
+              first_name: 'Pedro',
+              last_name: 'Perez',
+              email: 'prueba@gmail.com',
+            },
+            business_profile: {
+              url: 'pedro.com',
+            },
+            tos_acceptance: {
+              ip: '192.168.1.2',
+              date: Math.round(new Date().getTime() / 1000),
+            },
+            metadata: {
+              customerId: 'prueba',
+            },
+          };
+
+          expectedError = new BadRequestException();
+
+          (stripe.accounts.create as jest.Mock).mockRejectedValue(
+            expectedError,
+          );
+
+          jest
+            .spyOn(stripeService, 'createAccount')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the connection fails', async () => {
+          await expect(
+            stripeService.createAccount(accountCreateParams),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
+
+  describe('asociateBankAccountToAccount(accountId, bankAccountId)', () => {
+    let result;
+    let expectedResult;
+    let accountId;
+    let bankAccountId;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          accountId = 'prueba';
+          bankAccountId = 'prueba';
+
+          expectedResult = {
+            id: 'prueba',
+          };
+
+          (stripe.accounts
+            .createExternalAccount as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await stripeService.asociateBankAccountToAccount(
+            accountId,
+            bankAccountId,
+          );
+        });
+
+        it('should invoke stripe.accounts.createExternalAccount()', () => {
+          expect(stripe.accounts.createExternalAccount).toHaveBeenCalledTimes(
+            1,
+          );
+          expect(stripe.accounts.createExternalAccount).toHaveBeenCalledWith(
+            accountId,
+            {
+              external_account: bankAccountId,
+            },
+          );
+        });
+
+        it('should return an external account', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the connection fails', () => {
+        beforeEach(async () => {
+          accountId = 'prueba';
+          bankAccountId = 'prueba';
+
+          expectedError = new BadRequestException();
+
+          (stripe.accounts
+            .createExternalAccount as jest.Mock).mockRejectedValue(
+            expectedError,
+          );
+
+          jest
+            .spyOn(stripeService, 'asociateBankAccountToAccount')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the connection fails', async () => {
+          await expect(
+            stripeService.asociateBankAccountToAccount(
+              accountId,
+              bankAccountId,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
+
+  describe('updateBankAccountOfAnAccount(accountId, bankAccountId, accountUpdateParams)', () => {
+    let result;
+    let expectedResult;
+    let accountId;
+    let bankAccountId;
+    let accountUpdateParams;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          accountId = 'prueba';
+          bankAccountId = 'prueba';
+          accountUpdateParams = { default_for_currency: true };
+
+          expectedResult = {
+            id: bankAccountId,
+            object: 'bank_account',
+            account: accountId,
+            default_for_currency: true,
+          };
+
+          (stripe.accounts
+            .updateExternalAccount as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await stripeService.updateBankAccountOfAnAccount(
+            accountId,
+            bankAccountId,
+            accountUpdateParams,
+          );
+        });
+
+        it('should invoke stripe.accounts.updateExternalAccount()', () => {
+          expect(stripe.accounts.updateExternalAccount).toHaveBeenCalledTimes(
+            1,
+          );
+          expect(stripe.accounts.updateExternalAccount).toHaveBeenCalledWith(
+            accountId,
+            bankAccountId,
+            accountUpdateParams,
+          );
+        });
+
+        it('should return an updated account', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the connection fails', () => {
+        beforeEach(async () => {
+          accountId = 'prueba';
+          bankAccountId = 'prueba';
+          accountUpdateParams = { default_for_currency: true };
+
+          expectedError = new BadRequestException();
+
+          (stripe.accounts
+            .updateExternalAccount as jest.Mock).mockRejectedValue(
+            expectedError,
+          );
+
+          jest
+            .spyOn(stripeService, 'updateBankAccountOfAnAccount')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the connection fails', async () => {
+          await expect(
+            stripeService.updateBankAccountOfAnAccount(
+              accountId,
+              bankAccountId,
+              accountUpdateParams,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
+
+  describe('deleteBankAccount(customerId, bankAccountId)', () => {
+    let result;
+    let expectedResult;
+    let customerId;
+    let bankAccountId;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          customerId = 'prueba';
+          bankAccountId = 'prueba';
+
+          expectedResult = {
+            id: bankAccountId,
+            object: 'bank_account',
+            deleted: true,
+          };
+
+          (stripe.customers.deleteSource as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          await stripeService.deleteBankAccount(customerId, bankAccountId);
+        });
+
+        it('should invoke stripe.customers.deleteSource()', () => {
+          expect(stripe.customers.deleteSource).toHaveBeenCalledTimes(1);
+          expect(stripe.customers.deleteSource).toHaveBeenCalledWith(
+            customerId,
+            bankAccountId,
+          );
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the connection fails', () => {
+        beforeEach(async () => {
+          customerId = 'prueba';
+          bankAccountId = 'prueba';
+
+          expectedError = new BadRequestException();
+
+          (stripe.customers.deleteSource as jest.Mock).mockRejectedValue(
+            expectedError,
+          );
+
+          jest
+            .spyOn(stripeService, 'deleteBankAccount')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the connection fails', async () => {
+          await expect(
+            stripeService.deleteBankAccount(customerId, bankAccountId),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
+
+  describe('createTransfer(transferCreateParams)', () => {
+    let result;
+    let expectedResult;
+    let transferCreateParams;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          transferCreateParams = {
+            destination: 'prueba',
+            currency: 'usd',
+            amount: 100,
+            source_type: 'bank_account',
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'transfer',
+            amount: 100,
+            currency: 'usd',
+            destination: 'prueba',
+          };
+
+          (stripe.transfers.create as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await stripeService.createTransfer(transferCreateParams);
+        });
+
+        it('should invoke stripe.transfers.create()', () => {
+          expect(stripe.transfers.create).toHaveBeenCalledTimes(1);
+          expect(stripe.transfers.create).toHaveBeenCalledWith(
+            transferCreateParams,
+          );
+        });
+
+        it('should return a transfer', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the connection fails', () => {
+        beforeEach(async () => {
+          transferCreateParams = {
+            destination: 'prueba',
+            currency: 'usd',
+            amount: 100,
+            source_type: 'bank_account',
+          };
+
+          expectedError = new BadRequestException();
+
+          (stripe.transfers.create as jest.Mock).mockRejectedValue(
+            expectedError,
+          );
+
+          jest
+            .spyOn(stripeService, 'createTransfer')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the connection fails', async () => {
+          await expect(
+            stripeService.createTransfer(transferCreateParams),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+
+      describe('when the amount is not integer', () => {
+        beforeEach(async () => {
+          transferCreateParams = {
+            destination: 'prueba',
+            currency: 'usd',
+            amount: 1.5,
+            source_type: 'bank_account',
+          };
+
+          expectedError = new BadRequestException();
+
+          (stripe.transfers.create as jest.Mock).mockRejectedValue(
+            expectedError,
+          );
+
+          jest
+            .spyOn(stripeService, 'createTransfer')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the amount is not integer', async () => {
+          await expect(
+            stripeService.createTransfer(transferCreateParams),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
 });
