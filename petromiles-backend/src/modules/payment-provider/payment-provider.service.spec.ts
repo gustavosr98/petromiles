@@ -506,4 +506,71 @@ describe('PaymentProviderService', () => {
       });
     });
   });
+
+  describe('findAllCustomers()', () => {
+    let result;
+    let expectedResult;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          expectedResult = [
+            {
+              id: 'prueba',
+              object: 'customer',
+              email: 'prueba@gmail.com',
+            },
+          ];
+
+          (stripeService.findAllCustomers as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await paymentProviderService.findAllCustomers();
+        });
+
+        it('should invoke stripeService.findAllCustomers()', () => {
+          expect(stripeService.findAllCustomers).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return an array of customers', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('findCustomer(id)', () => {
+    let result;
+    let expectedResult;
+    let id;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          id = 'prueba';
+          expectedResult = {
+            id,
+            object: 'customer',
+            email: 'prueba@gmail.com',
+          };
+
+          (stripeService.findCustomer as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await paymentProviderService.findCustomer(id);
+        });
+
+        it('should invoke stripeService.findCustomer()', () => {
+          expect(stripeService.findCustomer).toHaveBeenCalledTimes(1);
+          expect(stripeService.findCustomer).toHaveBeenCalledWith(id);
+        });
+
+        it('should return a customer', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
 });
