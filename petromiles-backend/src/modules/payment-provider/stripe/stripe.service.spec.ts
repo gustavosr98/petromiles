@@ -425,4 +425,230 @@ describe('StripeService', () => {
       });
     });
   });
+
+  describe('getCharge(chargeId)', () => {
+    let result;
+    let expectedResult;
+    let chargeId;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          chargeId = 'prueba';
+
+          expectedResult = {
+            id: chargeId,
+            object: 'charge',
+            amount: 100,
+            source: 'prueba',
+            customer: 'prueba',
+            currency: 'usd',
+          };
+
+          (stripe.charges.retrieve as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await stripeService.getCharge(chargeId);
+        });
+
+        it('should invoke stripe.charges.retrieve()', () => {
+          expect(stripe.charges.retrieve).toHaveBeenCalledTimes(1);
+          expect(stripe.charges.retrieve).toHaveBeenCalledWith(chargeId);
+        });
+
+        it('should return a charge of Stripe', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('createCharge(chargeCreateParams)', () => {
+    let result;
+    let expectedResult;
+    let chargeCreateParams;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          chargeCreateParams = {
+            customer: 'prueba',
+            source: 'prueba',
+            currency: 'usd',
+            amount: 100,
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'charge',
+            amount: 100,
+            source: 'prueba',
+            customer: 'prueba',
+            currency: 'usd',
+          };
+
+          (stripe.charges.create as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await stripeService.createCharge(chargeCreateParams);
+        });
+
+        it('should invoke stripe.charges.create()', () => {
+          expect(stripe.charges.create).toHaveBeenCalledTimes(1);
+          expect(stripe.charges.create).toHaveBeenCalledWith(
+            chargeCreateParams,
+          );
+        });
+
+        it('should return a charge', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the connection fails', () => {
+        beforeEach(async () => {
+          chargeCreateParams = {
+            customer: 'prueba',
+            source: 'prueba',
+            currency: 'usd',
+            amount: 100,
+          };
+
+          expectedError = new BadRequestException();
+
+          (stripe.charges.create as jest.Mock).mockRejectedValue(expectedError);
+
+          jest
+            .spyOn(stripeService, 'createCharge')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the connection fails', async () => {
+          await expect(
+            stripeService.createCharge(chargeCreateParams),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+
+      describe('when the amount is not integer', () => {
+        beforeEach(async () => {
+          chargeCreateParams = {
+            customer: 'prueba',
+            source: 'prueba',
+            currency: 'usd',
+            amount: 1.5,
+          };
+
+          expectedError = new BadRequestException();
+
+          (stripe.charges.create as jest.Mock).mockRejectedValue(expectedError);
+
+          jest
+            .spyOn(stripeService, 'createCharge')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the amount is not integer', async () => {
+          await expect(
+            stripeService.createCharge(chargeCreateParams),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
+
+  describe('createPayout(payoutCreateParams)', () => {
+    let result;
+    let expectedResult;
+    let payoutCreateParams;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          payoutCreateParams = {
+            currency: 'usd',
+            amount: 100,
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'payout',
+            amount: 100,
+            currency: 'usd',
+          };
+
+          (stripe.payouts.create as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await stripeService.createPayout(payoutCreateParams);
+        });
+
+        it('should invoke stripe.payouts.create()', () => {
+          expect(stripe.payouts.create).toHaveBeenCalledTimes(1);
+          expect(stripe.payouts.create).toHaveBeenCalledWith(
+            payoutCreateParams,
+          );
+        });
+
+        it('should return a payout', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the connection fails', () => {
+        beforeEach(async () => {
+          payoutCreateParams = {
+            currency: 'usd',
+            amount: 100,
+          };
+
+          expectedError = new BadRequestException();
+
+          (stripe.payouts.create as jest.Mock).mockRejectedValue(expectedError);
+
+          jest
+            .spyOn(stripeService, 'createPayout')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the connection fails', async () => {
+          await expect(
+            stripeService.createPayout(payoutCreateParams),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+
+      describe('when the amount is not integer', () => {
+        beforeEach(async () => {
+          payoutCreateParams = {
+            currency: 'usd',
+            amount: 1.5,
+          };
+
+          expectedError = new BadRequestException();
+
+          (stripe.payouts.create as jest.Mock).mockRejectedValue(expectedError);
+
+          jest
+            .spyOn(stripeService, 'createPayout')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the amount is not integer', async () => {
+          await expect(
+            stripeService.createPayout(payoutCreateParams),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
 });
