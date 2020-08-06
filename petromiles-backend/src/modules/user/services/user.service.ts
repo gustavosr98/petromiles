@@ -150,7 +150,7 @@ export class UserService implements OnModuleInit {
       where: [
         { userClient: id }
       ]});
-    console.log(userDetail)
+
     const encrypedData: UpdateDetailsDTO = {
       firstName: await this.encrypt(userDetail.firstName),
       middleName: await this.encrypt(userDetail.middleName),
