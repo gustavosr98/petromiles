@@ -289,4 +289,175 @@ describe('PaymentProviderService', () => {
       });
     });
   });
+
+  describe('createAccount(user)', () => {
+    let result;
+    let expectedResult;
+    let user;
+    let params;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          user = {
+            email: 'prueba@gmail.com',
+            name: 'Pedro',
+            lastName: 'Perez',
+            customerId: 'prueba',
+            ip: '192.168.1.2',
+          };
+          params = {
+            type: 'custom',
+            country: 'US',
+            email: user.email,
+            requested_capabilities: ['transfers'],
+            business_type: 'individual',
+            individual: {
+              first_name: user.name,
+              last_name: user.lastName,
+              email: user.email,
+            },
+            business_profile: {
+              url: user.name.toLowerCase().replace(' ', '') + '.com',
+            },
+            tos_acceptance: {
+              ip: user.ip,
+              date: Math.round(new Date().getTime() / 1000),
+            },
+            metadata: {
+              customerId: user.customerId,
+            },
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'account',
+            country: 'US',
+            email: user.email,
+            type: 'custom',
+            business_type: 'individual',
+            individual: {
+              first_name: user.name,
+              last_name: user.lastName,
+              email: user.email,
+            },
+            business_profile: {
+              url: user.name.toLowerCase().replace(' ', '') + '.com',
+            },
+            tos_acceptance: {
+              ip: user.ip,
+              date: Math.round(new Date().getTime() / 1000),
+            },
+            metadata: {
+              customerId: user.customerId,
+            },
+          };
+
+          (stripeService.createAccount as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await paymentProviderService.createAccount(user);
+        });
+
+        it('should invoke stripeService.createAccount()', () => {
+          expect(stripeService.createAccount).toHaveBeenCalledTimes(1);
+          expect(stripeService.createAccount).toHaveBeenCalledWith(params);
+        });
+
+        it('should return an account', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('updateBankAccountOfAnAccount(accountId, bankAccountId, accountUpdateParams)', () => {
+    let result;
+    let expectedResult;
+    let accountId;
+    let bankAccountId;
+    let accountUpdateParams;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          accountId = 'prueba';
+          bankAccountId = 'prueba';
+          accountUpdateParams = { default_for_currency: true };
+
+          expectedResult = {
+            id: bankAccountId,
+            object: 'bank_account',
+            account: accountId,
+            default_for_currency: true,
+          };
+
+          (stripeService.updateBankAccountOfAnAccount as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await paymentProviderService.updateBankAccountOfAnAccount(
+            accountId,
+            bankAccountId,
+            accountUpdateParams,
+          );
+        });
+
+        it('should invoke stripeService.updateBankAccountOfAnAccount()', () => {
+          expect(
+            stripeService.updateBankAccountOfAnAccount,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            stripeService.updateBankAccountOfAnAccount,
+          ).toHaveBeenCalledWith(accountId, bankAccountId, accountUpdateParams);
+        });
+
+        it('should return an updated account', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('deleteBankAccount(customerId, bankAccountId, email)', () => {
+    let expectedResult;
+    let customerId;
+    let bankAccountId;
+    let email;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          customerId = 'prueba';
+          bankAccountId = 'prueba';
+          email = 'prueba@gmail.com';
+
+          expectedResult = {
+            id: bankAccountId,
+            object: 'bank_account',
+            deleted: true,
+          };
+
+          (stripeService.deleteBankAccount as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          await paymentProviderService.deleteBankAccount(
+            customerId,
+            bankAccountId,
+            email,
+          );
+        });
+
+        it('should invoke stripeService.deleteBankAccount()', () => {
+          expect(stripeService.deleteBankAccount).toHaveBeenCalledTimes(1);
+          expect(stripeService.deleteBankAccount).toHaveBeenCalledWith(
+            customerId,
+            bankAccountId,
+          );
+        });
+      });
+    });
+  });
 });
