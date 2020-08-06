@@ -10,6 +10,7 @@ import { DeepPartial } from 'typeorm';
 describe('StripeService', () => {
   let stripeService: StripeService;
   let StripeMock: jest.Mock<DeepPartial<Stripe>>;
+  let stripe: Stripe;
 
   beforeEach(() => {
     StripeMock = jest.fn<DeepPartial<Stripe>, Stripe[]>(() => ({
@@ -58,12 +59,61 @@ describe('StripeService', () => {
       providers: [
         StripeService,
         {
-          provide: Stripe,
+          provide: 'STRIPE',
           useClass: StripeMock,
         },
       ],
     }).compile();
 
     stripeService = module.get<StripeService>(StripeService);
+    stripe = await module.resolve('STRIPE');
+  });
+
+  describe('getBankAccount(customerId, bankAccountId)', () => {
+    let result;
+    let expectedResult;
+    let expectedBankAccount;
+    let customerId;
+    let bankAccountId;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          customerId = 'prueba';
+          bankAccountId = 'prueba';
+
+          expectedBankAccount = {
+            id: bankAccountId,
+            customer: customerId,
+            status: 'verified',
+          };
+          expectedResult = {
+            id: expectedBankAccount.id,
+            status: expectedBankAccount.status,
+          };
+
+          (stripe.customers.retrieveSource as jest.Mock).mockResolvedValue(
+            expectedBankAccount,
+          );
+
+          result = await stripeService.getBankAccount({
+            customerId,
+            bankAccountId,
+          });
+        });
+
+        it('should invoke stripe.customers.retrieveSource()', () => {
+          expect(stripe.customers.retrieveSource).toHaveBeenCalledTimes(1);
+          expect(stripe.customers.retrieveSource).toHaveBeenCalledWith(
+            customerId,
+            bankAccountId,
+          );
+        });
+
+        it('should return a bank account of Stripe', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
   });
 });
