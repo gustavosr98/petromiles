@@ -12,6 +12,7 @@ import { RoutingNumber } from '@/entities/routing-number.entity';
 
 import createOptions from '@/logger/winston/winston-config';
 import { BadRequestException } from '@nestjs/common';
+import { Bank } from '../../../enums/bank.enum';
 
 describe('BankAccountService', () => {
   let bankAccountService: BankAccountService;
@@ -146,7 +147,7 @@ describe('BankAccountService', () => {
 
           bank = {
             idBank: 2,
-            name: 'Ally Bank',
+            name: Bank.ALLY_BANK,
             photo:
               'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FAlly%20Bank.png?alt=media&token=a5063494-5235-4fcd-8bbb-cc0ead5ea862',
             country: { idCountry: 1, name: 'UNITED STATES' },
@@ -157,7 +158,7 @@ describe('BankAccountService', () => {
             number: '124003116',
             bank: {
               idBank: 2,
-              name: 'Ally Bank',
+              name: Bank.ALLY_BANK,
               photo:
                 'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FAlly%20Bank.png?alt=media&token=a5063494-5235-4fcd-8bbb-cc0ead5ea862',
               country: { idCountry: 1, name: 'UNITED STATES' },
@@ -192,7 +193,7 @@ describe('BankAccountService', () => {
 
           bank = {
             idBank: 2,
-            name: 'Ally Bank',
+            name: Bank.ALLY_BANK,
             photo:
               'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FAlly%20Bank.png?alt=media&token=a5063494-5235-4fcd-8bbb-cc0ead5ea862',
             country: { idCountry: 1, name: 'UNITED STATES' },
@@ -241,7 +242,7 @@ describe('BankAccountService', () => {
               initialDate: '2020-08-06T18:02:32.486Z',
               number: '082000073',
               idRoutingNumber: 2,
-              bankName: 'Bank of America',
+              bankName: Bank.BANK_OF_AMERICA,
               idBank: 1,
               photo:
                 'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FBank%20of%20America.png?alt=media&token=84f6581d-cffe-47e7-a846-0b185460cc44',
@@ -289,7 +290,7 @@ describe('BankAccountService', () => {
             },
             bank: {
               idBank: 2,
-              name: 'Ally Bank',
+              name: Bank.ALLY_BANK,
               photo:
                 'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FAlly%20Bank.png?alt=media&token=a5063494-5235-4fcd-8bbb-cc0ead5ea862',
               country: { idCountry: 1, name: 'UNITED STATES' },
@@ -301,7 +302,7 @@ describe('BankAccountService', () => {
             number: '124003116',
             bank: {
               idBank: 2,
-              name: 'Ally Bank',
+              name: Bank.ALLY_BANK,
               photo:
                 'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FAlly%20Bank.png?alt=media&token=a5063494-5235-4fcd-8bbb-cc0ead5ea862',
               country: { idCountry: 1, name: 'UNITED STATES' },
@@ -348,7 +349,7 @@ describe('BankAccountService', () => {
               number: '124003116',
               bank: {
                 idBank: 2,
-                name: 'Ally Bank',
+                name: Bank.ALLY_BANK,
                 photo:
                   'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FAlly%20Bank.png?alt=media&token=a5063494-5235-4fcd-8bbb-cc0ead5ea862',
                 country: { idCountry: 1, name: 'UNITED STATES' },
