@@ -1103,13 +1103,15 @@ describe('StripeService', () => {
     describe('case: success', () => {
       describe('when everything works well', () => {
         beforeEach(async () => {
-          expectedResult = [
-            {
-              id: 'prueba',
-              object: 'customer',
-              email: 'prueba@gmail.com',
-            },
-          ];
+          expectedResult = {
+            data: [
+              {
+                id: 'prueba',
+                object: 'customer',
+                email: 'prueba@gmail.com',
+              },
+            ],
+          };
 
           (stripe.customers.list as jest.Mock).mockResolvedValue(
             expectedResult,
@@ -1123,7 +1125,7 @@ describe('StripeService', () => {
         });
 
         it('should return an array of customers', () => {
-          expect(result).toStrictEqual(expectedResult);
+          expect(result).toStrictEqual(expectedResult.data);
         });
       });
     });
@@ -1157,6 +1159,145 @@ describe('StripeService', () => {
         });
 
         it('should return a customer', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('createCustomer(customerInfo)', () => {
+    let result;
+    let expectedResult;
+    let customerInfo;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          customerInfo = {
+            email: 'prueba@gmail.com',
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'customer',
+            email: 'prueba@gmail.com',
+          };
+
+          (stripe.customers.create as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await stripeService.createCustomer(customerInfo);
+        });
+
+        it('should invoke stripe.customers.create()', () => {
+          expect(stripe.customers.create).toHaveBeenCalledTimes(1);
+          expect(stripe.customers.create).toHaveBeenCalledWith(customerInfo);
+        });
+
+        it('should return a customer', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the connection fails', () => {
+        beforeEach(async () => {
+          customerInfo = {
+            email: 'prueba@gmail.com',
+          };
+
+          expectedError = new BadRequestException();
+
+          (stripe.customers.create as jest.Mock).mockRejectedValue(
+            expectedError,
+          );
+
+          jest
+            .spyOn(stripeService, 'createCustomer')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the connection fails', async () => {
+          await expect(
+            stripeService.createCustomer(customerInfo),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
+
+  describe('updateCustomer(id, customerInfo)', () => {
+    let result;
+    let expectedResult;
+    let id;
+    let customerInfo;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          id = 'prueba';
+          customerInfo = {
+            email: 'prueba@gmail.com',
+          };
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'customer',
+            email: 'prueba@gmail.com',
+          };
+
+          (stripe.customers.update as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await stripeService.updateCustomer(id, customerInfo);
+        });
+
+        it('should invoke stripe.customers.update()', () => {
+          expect(stripe.customers.update).toHaveBeenCalledTimes(1);
+          expect(stripe.customers.update).toHaveBeenCalledWith(
+            id,
+            customerInfo,
+          );
+        });
+
+        it('should return an updated customer', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('deleteCustomer(id)', () => {
+    let result;
+    let expectedResult;
+    let id;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          id = 'prueba';
+
+          expectedResult = {
+            id: 'prueba',
+            object: 'customer',
+            deleted: true,
+          };
+
+          (stripe.customers.del as jest.Mock).mockResolvedValue(expectedResult);
+
+          result = await stripeService.deleteCustomer(id);
+        });
+
+        it('should invoke stripe.customers.del()', () => {
+          expect(stripe.customers.del).toHaveBeenCalledTimes(1);
+          expect(stripe.customers.del).toHaveBeenCalledWith(id);
+        });
+
+        it('should return a deleted customer', () => {
           expect(result).toStrictEqual(expectedResult);
         });
       });
