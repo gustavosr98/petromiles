@@ -9,11 +9,11 @@ branches:
     - FASE3-028
     - develop
     - master
-before_install:
-  - openssl aes-256-cbc -K $encrypted_b0d51b9ff91b_key -iv $encrypted_b0d51b9ff91b_iv -in deploy.enc -out deploy -d
 jobs:
   include:
     - name: Backend | NestJS
+      before_install:
+        - openssl aes-256-cbc -K $encrypted_b0d51b9ff91b_key -iv $encrypted_b0d51b9ff91b_iv -in deploy.enc -out deploy -d
       install:
         - chmod 600 deploy && mv deploy ~/.ssh/id_rsa
         - cd petromiles-backend
