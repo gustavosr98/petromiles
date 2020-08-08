@@ -11,7 +11,9 @@ import { Observable } from 'rxjs';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import {ApiModules} from "@/logger/api-modules.enum";
-
+import {StateBankAccount} from "@/entities/state-bank-account.entity";
+import {State} from "@/entities/state.entity";
+import {Repository} from "typeorm";
 
 
 export interface Response<T> {
@@ -22,6 +24,10 @@ export interface Response<T> {
 export class AuditBankAccountInterceptor<T> implements NestInterceptor<T, Response<T>>{
     constructor(
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+        @InjectRepository(StateBankAccount)
+        private stateBankAccountRepository: Repository<StateBankAccount>,
+        @InjectRepository(State)
+        private stateRepository: Repository<State>,
     ) {}
 
     async intercept(
@@ -31,9 +37,17 @@ export class AuditBankAccountInterceptor<T> implements NestInterceptor<T, Respon
         const req = context.switchToHttp().getRequest();
 
         const body = JSON.stringify(req.body)
+        const stateBa = await this.stateRepository
+            .createQueryBuilder('s')
+            .innerJoin('s.stateBankAccount','sba')
+            .innerJoin('sba.clientBankAccount','cba')
+            .where('cba.fk_user_client = :id',{id: req.body.idUserClient})
+            .andWhere('sba."finalDate" IS NULL')
+            .getOne()
 
-        this.logger.info(`Change made to [${ApiModules.BANK_ACCOUNT}] module by email: [${req.user.email}] with role: [${req.user.role}]`)
-        this.logger.info(`Changes: [${body}]`)
+        this.logger.verbose(`[@Audit] Change made to ${ApiModules.BANK_ACCOUNT} module by email: [${req.user.email}] with role: [${req.user.role}]`)
+        this.logger.verbose(`[@Audit] Previous data: [idUserClient: ${req.body.idUserClient}, idBankAccount: ${req.body.idBankAccount}, state: ${stateBa.name}]`)
+        this.logger.verbose(`[@Audit] Changes: [${body}]`)
 
         return next.handle().pipe();
     }

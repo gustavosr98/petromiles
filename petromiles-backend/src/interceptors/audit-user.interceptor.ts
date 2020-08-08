@@ -14,6 +14,8 @@ import {ApiModules} from "@/logger/api-modules.enum";
 import {UserDetails} from "@/entities/user-details.entity";
 import {Repository} from "typeorm";
 import {stringify} from "querystring";
+import {audit} from "rxjs/operators";
+import * as winston from "winston";
 
 
 export interface Response<T> {
@@ -34,15 +36,13 @@ export class AuditUserInterceptor<T> implements NestInterceptor<T, Response<T>>{
     ): Promise<Observable<Response<T>>> {
         const req = context.switchToHttp().getRequest();
 
-        req.body.customerId = '';
-        req.body.accountId = '';
-
         const body = JSON.stringify(req.body)
         const userData = await this.userDetailsRepository.find({where: [{idUserDetails: req.body.idUserDetails}]})
 
-        this.logger.info(`Change made to [${ApiModules.USER}] module by email: [${req.user.email}] with role: [${req.user.role}]`)
-        this.logger.info(`Previous data: [${JSON.stringify(userData)}]`)
-        this.logger.info(`Changes: [${body}]`)
+        this.logger.verbose(`[@Audit] Change made to ${ApiModules.USER} module by email: [${req.user.email}] with role: [${req.user.role}]`)
+        this.logger.verbose(`[@Audit] Previous data: ${JSON.stringify(userData)}`)
+        this.logger.verbose(`[@Audit] Changes: ${body}`)
+
 
         return next.handle().pipe();
     }
