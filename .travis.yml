@@ -10,12 +10,12 @@ branches:
     - develop
     - master
 before_install:
-  - openssl aes-256-cbc -K $encrypted_b0d51b9ff91b_key -iv $encrypted_b0d51b9ff91b_iv -in deploy.enc -out deploy -d
+  - echo "$SSH_KEY" > "temp"
+  - chmod 600 temp && mv temp ~/.ssh/id_rsa
 jobs:
   include:
     - name: Backend | NestJS
       install:
-        - chmod 600 deploy && mv deploy ~/.ssh/id_rsa
         - cd petromiles-backend
         - npm install
       script:
