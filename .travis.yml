@@ -1,6 +1,9 @@
 language: node_js
 node_js:
   - 12.16.2
+addons:
+  sshknownhosts:
+    - 134.122.113.181
 branches:
   only:
     - FASE3-028
@@ -8,37 +11,26 @@ branches:
     - master
 jobs:
   include:
-    - name: Backend | NestJS
+    - name: Backend NestJS
+      beforeinstall:
+        - openssl aes-256-cbc -K $encrypted_b0d51b9ff91b_key -iv $encrypted_b0d51b9ff91b_iv
+        - in deploy.enc -out deploy -d
+        - chmod 600 deploy && mv deploy ~/.ssh/id_rsa
       install:
         - cd petromiles-backend
         - npm install
       script:
         - npm run test
         - npm run build
-      deploy:
-        provider: heroku
-        api_key: $HEROKU_APIKEY
-        app:
-          FASE3-028: staging-petromiles-backend
-          develop: staging-petromiles-backend
-          master: prepro-petromiles-backend
-        on:
-          repo: ingswucab/consorcio2-petromiles
-        skip_cleanup: "true"
-    - name: Frontend | Vue
+      after_success:
+        - less deploy
+    - name: Frontend Vue
+      beforeinstall:
+        - openssl aes-256-cbc -K $encrypted_b0d51b9ff91b_key -iv $encrypted_b0d51b9ff91b_iv
+        - in deploy.enc -out deploy -d
       install:
         - cd petromiles-frontend
         - npm install
       script:
         - npm run test
         - npm run build
-      deploy:
-        provider: heroku
-        api_key: $HEROKU_APIKEY
-        app:
-          FASE3-028: staging-petromiles-frontend
-          develop: staging-petromiles-frontend
-          master: prepro-petromiles-frontend
-        on:
-          repo: ingswucab/consorcio2-petromiles
-        skip_cleanup: "true"
