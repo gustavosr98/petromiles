@@ -37,6 +37,7 @@ import { UpdateAccountStateDto } from '@/modules/bank-account/dto/update-account
 import { ClientBankAccountService } from '../services/client-bank-account.service';
 import { BankAccountService } from '../services/bank-account.service';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
+import {AuditBankAccountInterceptor} from "@/interceptors/audit-bank-account.interceptor";
 
 
 const baseEndpoint = Object.freeze('bank-account');
@@ -104,6 +105,7 @@ export class BankAccountController {
     return await this.bankAccountService.getAll();
   }
 
+  @UseInterceptors(AuditBankAccountInterceptor)
   @Delete('cancel/:id')
   async cancelBankAccount(
     @GetUser() user,
@@ -120,6 +122,7 @@ export class BankAccountController {
     );
   }
 
+  @UseInterceptors(AuditBankAccountInterceptor)
   @Roles(Role.ADMINISTRATOR)
   @UseGuards(RolesGuard)
   @Delete('cancel')
@@ -167,6 +170,7 @@ export class BankAccountController {
     return this.clientBankAccountService.updateCurrentPrimary(primary, user.id);
   }
 
+  @UseInterceptors(AuditBankAccountInterceptor)
   @Roles(Role.ADMINISTRATOR)
   @UseGuards(RolesGuard)
   @Put('state')
