@@ -38,9 +38,10 @@ export class AuditUserInterceptor<T> implements NestInterceptor<T, Response<T>>{
         req.body.accountId = '';
 
         const body = JSON.stringify(req.body)
-        const userData = this.userDetailsRepository.find({where: [{idUserDetails: req.body.idUserDetails}]})
+        const userData = await this.userDetailsRepository.find({where: [{idUserDetails: req.body.idUserDetails}]})
 
         this.logger.info(`Change made to [${ApiModules.USER}] module by email: [${req.user.email}] with role: [${req.user.role}]`)
+        this.logger.info(`Previous data: [${JSON.stringify(userData)}]`)
         this.logger.info(`Changes: [${body}]`)
 
         return next.handle().pipe();
