@@ -1,7 +1,11 @@
+import { Role } from '@/enums/role.enum';
+import { BadRequestException } from '@nestjs/common';
+import { ThirdPartyClientResponseStatus } from '@/enums/third-party-clients-response-status.enum';
+import { MailsResponse } from '@/enums/mails-response.enum';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ThirdPartyClientsService } from './third-party-clients.service';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
 import { StateTransactionService } from '@/modules/transaction/services/state-transaction.service';
@@ -200,5 +204,632 @@ describe('ThirdPartyClientsService', () => {
     stateTransactionService = module.get<StateTransactionService>(
       StateTransactionService,
     );
+  });
+
+  describe('get(apiKey)', () => {
+    let expectedResult;
+    let result;
+    let apiKey: string;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          apiKey = 'prueba';
+          expectedResult = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey,
+            accumulatePercentage: 25,
+          };
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await thirdPartyClientsService.get(apiKey);
+        });
+
+        it('should invoke thirdPartyClientsRepository.findOne()', () => {
+          expect(thirdPartyClientsRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(thirdPartyClientsRepository.findOne).toHaveBeenCalledWith({
+            apiKey,
+          });
+        });
+
+        it('should return a thirdPartyClient', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('getAll()', () => {
+    let expectedResult;
+    let result;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          expectedResult = [
+            {
+              idThirdPartyClient: 1,
+              name: 'prueba',
+              apiKey: 'prueba',
+              accumulatePercentage: 25,
+            },
+          ];
+
+          (thirdPartyClientsRepository.find as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await thirdPartyClientsService.getAll();
+        });
+
+        it('should invoke thirdPartyClientsRepository.find()', () => {
+          expect(thirdPartyClientsRepository.find).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return an array of thirdPartyClient', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('update(idThirdPartyClient, accumulatePercentage)', () => {
+    let updateResult;
+    let result;
+    let idThirdPartyClient;
+    let accumulatePercentage;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idThirdPartyClient = 1;
+          accumulatePercentage = 100;
+          updateResult = new UpdateResult();
+
+          (thirdPartyClientsRepository.update as jest.Mock).mockResolvedValue(
+            updateResult,
+          );
+
+          result = await thirdPartyClientsService.update(
+            idThirdPartyClient,
+            accumulatePercentage,
+          );
+        });
+
+        it('should invoke thirdPartyClientsRepository.update()', () => {
+          expect(thirdPartyClientsRepository.update).toHaveBeenCalledTimes(1);
+          expect(thirdPartyClientsRepository.update).toHaveBeenCalledWith(
+            {
+              idThirdPartyClient,
+            },
+            {
+              accumulatePercentage,
+            },
+          );
+        });
+
+        it('should update a thirdPartyClient', () => {
+          expect(result).toStrictEqual(updateResult);
+        });
+      });
+    });
+  });
+
+  describe('associateUserCode(associateUserCodeRequest)', () => {
+    let expectedResult;
+    let result;
+    let associateUserCodeRequest;
+    let expectedThirdPartyClient;
+    let expectedUserClient;
+    let expectedClientOnThirdParty;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          associateUserCodeRequest = {
+            apiKey: 'prueba',
+            userEmail: 'pruebagmail.com',
+          };
+
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: associateUserCodeRequest.apiKey,
+            accumulatePercentage: 25,
+          };
+          expectedUserClient = {
+            idUserClient: 1,
+            email: associateUserCodeRequest.userEmail,
+            userDetails: {
+              firstName: 'Pedro',
+              lastName: 'Perez',
+              language: {
+                idLanguage: 1,
+                name: 'english',
+                shortname: 'en',
+              },
+            },
+          };
+          expectedClientOnThirdParty = {
+            idClientOnThirdParty: 1,
+            code: 'prueba',
+            expirationDate: new Date().setHours(new Date().getHours() + 1),
+          };
+
+          expectedResult = {
+            request: associateUserCodeRequest,
+            responseStatus: ThirdPartyClientResponseStatus.SUCCESSFUL,
+          };
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+          (clientOnThirdPartyRepository.save as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+
+          (mailsService.sendEmail as jest.Mock).mockResolvedValue(
+            MailsResponse.SUCCESS,
+          );
+
+          result = await thirdPartyClientsService.associateUserCode(
+            associateUserCodeRequest,
+          );
+        });
+
+        it('should invoke userClientRepository.findOne()', () => {
+          expect(userClientRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userClientRepository.findOne).toHaveBeenCalledWith({
+            email: associateUserCodeRequest.userEmail,
+          });
+        });
+
+        it('should return an AssociateUserCodeResponse', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the user does not exist', () => {
+        beforeEach(async () => {
+          associateUserCodeRequest = {
+            apiKey: 'prueba',
+            userEmail: 'pruebagmail.com',
+          };
+
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: associateUserCodeRequest.apiKey,
+            accumulatePercentage: 25,
+          };
+          expectedUserClient = {};
+
+          expectedError = new BadRequestException();
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          jest
+            .spyOn(thirdPartyClientsService, 'associateUserCode')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the user does not exist', async () => {
+          await expect(
+            thirdPartyClientsService.associateUserCode(
+              associateUserCodeRequest,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+
+      describe('when mailing fails', () => {
+        beforeEach(async () => {
+          associateUserCodeRequest = {
+            apiKey: 'prueba',
+            userEmail: 'pruebagmail.com',
+          };
+
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: associateUserCodeRequest.apiKey,
+            accumulatePercentage: 25,
+          };
+          expectedUserClient = {
+            idUserClient: 1,
+            email: associateUserCodeRequest.userEmail,
+            userDetails: {
+              firstName: 'Pedro',
+              lastName: 'Perez',
+              language: {
+                idLanguage: 1,
+                name: 'english',
+                shortname: 'en',
+              },
+            },
+          };
+          expectedClientOnThirdParty = {
+            idClientOnThirdParty: 1,
+            code: 'prueba',
+            expirationDate: new Date().setHours(new Date().getHours() + 1),
+          };
+
+          expectedResult = {
+            request: associateUserCodeRequest,
+            responseStatus: ThirdPartyClientResponseStatus.FAILD,
+          };
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+          (clientOnThirdPartyRepository.save as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+
+          (mailsService.sendEmail as jest.Mock).mockResolvedValue(
+            MailsResponse.ERROR,
+          );
+
+          result = await thirdPartyClientsService.associateUserCode(
+            associateUserCodeRequest,
+          );
+        });
+
+        it('should invoke userClientRepository.findOne()', () => {
+          expect(userClientRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userClientRepository.findOne).toHaveBeenCalledWith({
+            email: associateUserCodeRequest.userEmail,
+          });
+        });
+
+        it('should return an AssociateUserCodeResponse', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('associateUserToken(associateUserTokenRequest)', () => {
+    let expectedResult;
+    let result;
+    let associateUserTokenRequest;
+    let expectedThirdPartyClient;
+    let expectedUserClient;
+    let expectedClientOnThirdParty;
+    let expectedToken;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          associateUserTokenRequest = {
+            apiKey: 'prueba',
+            userEmail: 'pruebagmail.com',
+            userCode: 'prueba',
+          };
+
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: associateUserTokenRequest.apiKey,
+            accumulatePercentage: 25,
+          };
+          expectedUserClient = {
+            idUserClient: 1,
+            email: associateUserTokenRequest.userEmail,
+          };
+          expectedClientOnThirdParty = {
+            idClientOnThirdParty: 1,
+            code: 'prueba',
+            expirationDate: new Date(),
+            isCodeValid: userCode => ({ valid: true }),
+          };
+          expectedToken = 'prueba';
+
+          expectedResult = {
+            request: associateUserTokenRequest,
+            userToken: expectedToken,
+          };
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+          (clientOnThirdPartyRepository.save as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+
+          (authService.createToken as jest.Mock).mockReturnValue(expectedToken);
+
+          result = await thirdPartyClientsService.associateUserToken(
+            associateUserTokenRequest,
+          );
+        });
+
+        it('should invoke userClientRepository.findOne()', () => {
+          expect(userClientRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userClientRepository.findOne).toHaveBeenCalledWith({
+            email: associateUserTokenRequest.userEmail,
+          });
+        });
+
+        it('should invoke clientOnThirdPartyRepository.findOne()', () => {
+          expect(clientOnThirdPartyRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(clientOnThirdPartyRepository.findOne).toHaveBeenCalledWith({
+            userClient: expectedUserClient,
+            thirdPartyClient: expectedThirdPartyClient,
+          });
+        });
+
+        it('should invoke clientOnThirdPartyRepository.save()', () => {
+          expect(clientOnThirdPartyRepository.save).toHaveBeenCalledTimes(1);
+          expect(clientOnThirdPartyRepository.save).toHaveBeenCalledWith(
+            expectedClientOnThirdParty,
+          );
+        });
+
+        it('should invoke authService.createToken()', () => {
+          expect(authService.createToken).toHaveBeenCalledTimes(1);
+          expect(authService.createToken).toHaveBeenCalledWith(
+            associateUserTokenRequest.userEmail,
+            Role.THIRD_PARTY,
+          );
+        });
+
+        it('should return an AssociateUserTokenResponse', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the user does not exist', () => {
+        beforeEach(async () => {
+          associateUserTokenRequest = {
+            apiKey: 'prueba',
+            userEmail: 'pruebagmail.com',
+            userCode: 'prueba',
+          };
+
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: associateUserTokenRequest.apiKey,
+            accumulatePercentage: 25,
+          };
+          expectedUserClient = {};
+
+          expectedError = new BadRequestException();
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          jest
+            .spyOn(thirdPartyClientsService, 'associateUserToken')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the user does not exist', async () => {
+          await expect(
+            thirdPartyClientsService.associateUserToken(
+              associateUserTokenRequest,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+
+      describe('when the clientOnThirdParty does not exist', () => {
+        beforeEach(async () => {
+          associateUserTokenRequest = {
+            apiKey: 'prueba',
+            userEmail: 'pruebagmail.com',
+            userCode: 'prueba',
+          };
+
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: associateUserTokenRequest.apiKey,
+            accumulatePercentage: 25,
+          };
+          expectedUserClient = {
+            idUserClient: 1,
+            email: associateUserTokenRequest.userEmail,
+          };
+          expectedClientOnThirdParty = {};
+
+          expectedError = new BadRequestException();
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+
+          jest
+            .spyOn(thirdPartyClientsService, 'associateUserToken')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when clientOnThirdParty does not exist', async () => {
+          await expect(
+            thirdPartyClientsService.associateUserToken(
+              associateUserTokenRequest,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+
+      describe('when the code is not valid', () => {
+        beforeEach(async () => {
+          associateUserTokenRequest = {
+            apiKey: 'prueba',
+            userEmail: 'pruebagmail.com',
+            userCode: 'prueba',
+          };
+
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: associateUserTokenRequest.apiKey,
+            accumulatePercentage: 25,
+          };
+          expectedUserClient = {
+            idUserClient: 1,
+            email: associateUserTokenRequest.userEmail,
+          };
+          expectedClientOnThirdParty = {
+            idClientOnThirdParty: 1,
+            code: 'prueba',
+            expirationDate: new Date(),
+            isCodeValid: userCode => ({ valid: false }),
+          };
+
+          expectedError = new BadRequestException();
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+
+          jest
+            .spyOn(thirdPartyClientsService, 'associateUserToken')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when code is not valid', async () => {
+          await expect(
+            thirdPartyClientsService.associateUserToken(
+              associateUserTokenRequest,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
+
+  describe('getClientOnThirdPartyByUserId(userClient, thirdPartyClient)', () => {
+    let expectedResult;
+    let result;
+    let userClient;
+    let thirdPartyClient;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          userClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+          };
+          thirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: 'prueba',
+            accumulatePercentage: 25,
+          };
+          expectedResult = {
+            idClientOnThirdParty: 1,
+            code: 'prueba',
+            expirationDate: new Date(),
+          };
+
+          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await thirdPartyClientsService.getClientOnThirdPartyByUserId(
+            userClient,
+            thirdPartyClient,
+          );
+        });
+
+        it('should invoke clientOnThirdPartyRepository.findOne()', () => {
+          expect(clientOnThirdPartyRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(clientOnThirdPartyRepository.findOne).toHaveBeenCalledWith({
+            userClient,
+            thirdPartyClient,
+          });
+        });
+
+        it('should return a clientOnThirdParty', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
   });
 });
