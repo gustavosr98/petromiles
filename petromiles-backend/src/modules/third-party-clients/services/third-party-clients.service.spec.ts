@@ -1,3 +1,4 @@
+import { AddPointsRequestType } from '@/enums/add-points-request-type.enum';
 import { Role } from '@/enums/role.enum';
 import { BadRequestException } from '@nestjs/common';
 import { ThirdPartyClientResponseStatus } from '@/enums/third-party-clients-response-status.enum';
@@ -807,6 +808,132 @@ describe('ThirdPartyClientsService', () => {
             code: 'prueba',
             expirationDate: new Date(),
           };
+
+          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedResult,
+          );
+
+          result = await thirdPartyClientsService.getClientOnThirdPartyByUserId(
+            userClient,
+            thirdPartyClient,
+          );
+        });
+
+        it('should invoke clientOnThirdPartyRepository.findOne()', () => {
+          expect(clientOnThirdPartyRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(clientOnThirdPartyRepository.findOne).toHaveBeenCalledWith({
+            userClient,
+            thirdPartyClient,
+          });
+        });
+
+        it('should return a clientOnThirdParty', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('consultPoints(addPointsRequest, user)', () => {
+    let expectedResult;
+    let result;
+    let addPointsRequest;
+    let user;
+    let expectedUserClient;
+    let expectedOnePointToDollars;
+    let expectedThirdPartyClient;
+    let expectedInterests;
+    let expectedTransactionInterest;
+    let products;
+    let commission;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          addPointsRequest = {
+            apiKey: 'prueba',
+            type: AddPointsRequestType.CONSULT,
+            products: [
+              {
+                id: 1,
+                priceTag: 10000,
+                currency: 'usd',
+              },
+            ],
+          };
+          user = {
+            id: 1,
+            email: 'prueba@gmail.com',
+          };
+          expectedUserClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+            userSuscription: [
+              {
+                idUserSuscription: 1,
+                initialDate: new Date(),
+                finalDate: null,
+                suscription: {
+                  idSuscription: 1,
+                  name: 'BASIC',
+                },
+              },
+            ],
+          };
+          expectedOnePointToDollars = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: addPointsRequest.apiKey,
+            accumulatePercentage: 25,
+          };
+          expectedInterests = [
+            {
+              operation: 1,
+              amount: 75,
+              percentage: 0,
+            },
+            { operation: 1, amount: 0, percentage: 0.1 },
+          ];
+          expectedTransactionInterest = {
+            interest: { amount: 0, percentage: 0.1 },
+            extraPoints: null,
+            pointsConversion: expectedOnePointToDollars,
+            thirdPartyInterest: {
+              operation: 1,
+              amount: 75,
+              percentage: 0,
+            },
+          };
+          products = [
+            {
+              id: 1,
+              priceTag: 10000,
+              currency: 'usd',
+            },
+          ];
+          commission = 0;
+
+          expectedResult = {
+            request: {
+              ...addPointsRequest,
+              products,
+              totalTentativeCommission: commission,
+            },
+            confirmationTicket: null,
+          };
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
 
           (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
             expectedResult,
