@@ -19,7 +19,6 @@ context("Buy points", () => {
   });
 
   it("trying to let the points field empty", () => {
-    cy.get(".buy-points-btn").click();
     cy.get(".accounts-selector").click();
     cy.contains("XXXX").click();
     cy.get(".submit-btn").click();
