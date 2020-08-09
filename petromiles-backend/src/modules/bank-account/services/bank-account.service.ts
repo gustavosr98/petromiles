@@ -30,9 +30,7 @@ export class BankAccountService {
   ) {}
 
   async getAll(): Promise<BankAccount[]> {
-    return await getConnection()
-      .getRepository(BankAccount)
-      .find();
+    return await this.bankAccountRepository.find();
   }
 
   async create(
@@ -53,12 +51,10 @@ export class BankAccountService {
       );
     }
 
-    const bankAccountCreated = await this.bankAccountRepository
-      .create({
-        routingNumber: routingNumberFound,
-        ...bankAccount,
-      })
-      .save();
+    const bankAccountCreated = await this.bankAccountRepository.save({
+      routingNumber: routingNumberFound,
+      ...bankAccount,
+    });
 
     this.logger.silly(
       `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: %s was created`,
@@ -68,7 +64,7 @@ export class BankAccountService {
   }
 
   // Only validates American bank routing numbers
-  private async getValidRoutingNumber(
+  async getValidRoutingNumber(
     number: string,
     bank: Bank,
   ): Promise<RoutingNumber> {
@@ -85,29 +81,6 @@ export class BankAccountService {
     }
 
     return routingNumberFound;
-  }
-
-  async existsBankAccount(accountNumber): Promise<BankAccount> {
-    return await this.bankAccountRepository.findOne({ accountNumber });
-  }
-
-  async getAllAccounts() {
-    const accounts = await this.bankAccountRepository
-      .createQueryBuilder('ba')
-      .select(
-        'rn.number, ba."accountNumber", ba."idBankAccount", ba.nickname ,uc.email, s.name',
-      )
-      .distinct(true)
-      .leftJoin('ba.clientBankAccount', 'cba')
-      .leftJoin('ba.routingNumber', 'rn')
-      .leftJoin('ba.userDetails', 'ud')
-      .leftJoin('cba.userClient', 'uc')
-      .leftJoin('cba.stateBankAccount', 'sba')
-      .leftJoin('sba.state', 's')
-      .where('sba."finalDate" IS NULL')
-      .getRawMany();
-
-    return accounts;
   }
 
   async accountInfo(accountId: number) {

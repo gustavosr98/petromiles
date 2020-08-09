@@ -18,10 +18,14 @@ import { PaymentsService } from '@/modules/payments/services/payments.service';
 
 //ENTITIES
 import { ClientBankAccount } from '@/entities/client-bank-account.entity';
+import { UserClient } from '@/entities/user-client.entity';
+import { Transaction } from '@/entities/transaction.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ClientBankAccount]),
+    TypeOrmModule.forFeature([UserClient]),
+    TypeOrmModule.forFeature([Transaction]),
     TransactionModule,
     BankAccountModule,
     SuscriptionModule,

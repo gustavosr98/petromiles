@@ -147,16 +147,6 @@ export class BankAccountController {
     return this.bankAccountService.accountInfo(accountId);
   }
 
-  @Roles(Role.ADMINISTRATOR)
-  @UseGuards(RolesGuard)
-  @Get('accounts')
-  allAccountInfo() {
-    this.logger.http(
-      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ask /${baseEndpoint}/accounts all`,
-    );
-    return this.bankAccountService.getAllAccounts();
-  }
-
   @Put('primary')
   updatePrimary(@Body() primary: updatePrimaryAccountDTO, @GetUser() user) {
     this.logger.http(

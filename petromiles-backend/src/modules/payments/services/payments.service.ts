@@ -38,9 +38,12 @@ import { Interest } from '@/modules/payments/interest.interface';
 export class PaymentsService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
-    private clientBankAccountService: ClientBankAccountService,
     @InjectRepository(ClientBankAccount)
     private clientBankAccountRepository: Repository<ClientBankAccount>,
+    @InjectRepository(UserClient)
+    private userClientRepository: Repository<UserClient>,
+    @InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,
     private transactionService: TransactionService,
     private thirdPartyInterestService: ThirdPartyInterestService,
     private platformInterestService: PlatformInterestService,
@@ -141,7 +144,7 @@ export class PaymentsService {
       amount: Math.round(amountToCharge),
     });
 
-    let currentUserSuscription = clientBankAccount.userClient.userSuscription.find(
+    let currentUserSuscription = await clientBankAccount.userClient.userSuscription.find(
       suscription => !suscription.finalDate,
     );
 
@@ -223,11 +226,13 @@ export class PaymentsService {
         source_type: 'bank_account',
       });
 
-      return this.transactionService.createWithdrawalTransaction(
+      const withdrawal = await this.transactionService.createWithdrawalTransaction(
         clientBankAccount,
         amount,
         transfer.id,
       );
+
+      return withdrawal;
     }
 
     this.logger.error(
@@ -267,9 +272,9 @@ export class PaymentsService {
   }
 
   async sendPaymentInvoiceEmail(user, file) {
-    const userClient = await getConnection()
-      .getRepository(UserClient)
-      .findOne({ email: user.email });
+    const userClient = await this.userClientRepository.findOne({
+      email: user.email,
+    });
 
     const userDetails = userClient.userDetails.find(
       details => details.accountOwner === null,
@@ -278,11 +283,9 @@ export class PaymentsService {
       userClient.idUserClient,
     );
 
-    const transaction = await getConnection()
-      .getRepository(Transaction)
-      .findOne({
-        idTransaction: (await transactionCode[transactionCode.length - 1]).id,
-      });
+    const transaction = await this.transactionRepository.findOne({
+      idTransaction: (await transactionCode[transactionCode.length - 1]).id,
+    });
 
     const languageMails = userDetails.language.name;
 
@@ -310,9 +313,9 @@ export class PaymentsService {
   }
 
   async sendWithdrawalInvoiceEmail(user, file, points, total) {
-    let userClient = await getConnection()
-      .getRepository(UserClient)
-      .findOne({ email: user.email });
+    const userClient = await this.userClientRepository.findOne({
+      email: user.email,
+    });
 
     const userDetails = userClient.userDetails.find(
       details => details.accountOwner === null,
@@ -321,11 +324,9 @@ export class PaymentsService {
       userClient.idUserClient,
     );
 
-    const transaction = await getConnection()
-      .getRepository(Transaction)
-      .findOne({
-        idTransaction: (await transactionCode[transactionCode.length - 1]).id,
-      });
+    const transaction = await this.transactionRepository.findOne({
+      idTransaction: (await transactionCode[transactionCode.length - 1]).id,
+    });
 
     const languageMails = userDetails.language.name;
 
