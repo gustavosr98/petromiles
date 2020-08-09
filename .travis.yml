@@ -17,8 +17,7 @@ jobs:
         - npm run build
       deploy:
         provider: heroku
-        api_key:
-          secure: knXmDB4bSzYum9kC2jUGFv+CpYJGeuzZbKUI9vYwSpyE9lKo8KoPbsHYeh71aLv1oaWsMTsrAJMNGoNLysXkIp8pcincq627lWWOzGZGYzcMAkP4gZNlotdWbgrskeAa3PnK8iUAko+rIyWBMSMHA6JqNe+u3xsAQZin2HRex4YaCYmPijG7GyVBfp7xmb1Kic2Ot1bg6qt0KpsUcbwpd+IZXfXbOw6RBYORj5flr2b9vZAdj31Of76HaU51Vk2dVKHr34O5ahBgE5Kz1GFU3+0sebYCbp/Fbp0dqDbNxzqCFNMXnExQb/USTWXruTeDV/Ew4ZKy1fdWBizVGSk3Tb/8t6vs9EEToOfTtwwc3+4eJzgsLxe+yyy0KWgA+nWJrCkyly9L6Vq7BdJzupN8JWRDWFqQqht1hl6YQpAJMED6eOETVImy00Rp5Lm/7a+AyGCupkILjsk5xgCoqN6RO/sj0nmMNj1wCS/p0j0BAnof79tLhsDVbw/uLfGpGl5HYgLjLeTwdmnRErKeg3ZcQ0DmaXArnTohZh37nb1RjBeq96UC7+4g2CsIuO+X8uZPCoIkRIB/CcIDYlULo5W06R4WFfqug0UbYDEElTbALreOuAlAuXE63AdDnRtAKCcYtpEvc86NdXRpQPsqm+r3Gdn5Sg7WNuX3iGlg+OKX7F8=
+        api_key: $HEROKU_APIKEY
         app:
           FASE3-028: staging-petromiles-backend
           develop: staging-petromiles-backend
@@ -32,8 +31,7 @@ jobs:
         - npm run build
       deploy:
         provider: heroku
-        api_key:
-          secure: knXmDB4bSzYum9kC2jUGFv+CpYJGeuzZbKUI9vYwSpyE9lKo8KoPbsHYeh71aLv1oaWsMTsrAJMNGoNLysXkIp8pcincq627lWWOzGZGYzcMAkP4gZNlotdWbgrskeAa3PnK8iUAko+rIyWBMSMHA6JqNe+u3xsAQZin2HRex4YaCYmPijG7GyVBfp7xmb1Kic2Ot1bg6qt0KpsUcbwpd+IZXfXbOw6RBYORj5flr2b9vZAdj31Of76HaU51Vk2dVKHr34O5ahBgE5Kz1GFU3+0sebYCbp/Fbp0dqDbNxzqCFNMXnExQb/USTWXruTeDV/Ew4ZKy1fdWBizVGSk3Tb/8t6vs9EEToOfTtwwc3+4eJzgsLxe+yyy0KWgA+nWJrCkyly9L6Vq7BdJzupN8JWRDWFqQqht1hl6YQpAJMED6eOETVImy00Rp5Lm/7a+AyGCupkILjsk5xgCoqN6RO/sj0nmMNj1wCS/p0j0BAnof79tLhsDVbw/uLfGpGl5HYgLjLeTwdmnRErKeg3ZcQ0DmaXArnTohZh37nb1RjBeq96UC7+4g2CsIuO+X8uZPCoIkRIB/CcIDYlULo5W06R4WFfqug0UbYDEElTbALreOuAlAuXE63AdDnRtAKCcYtpEvc86NdXRpQPsqm+r3Gdn5Sg7WNuX3iGlg+OKX7F8=
+        api_key: $HEROKU_APIKEY
         app:
           FASE3-028: staging-petromiles-frontend
           develop: staging-petromiles-frontend
