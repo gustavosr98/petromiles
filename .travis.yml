@@ -1,9 +1,6 @@
 language: node_js
 node_js:
   - 12.16.2
-addons:
-  sshknownhosts:
-    - 134.122.113.181
 branches:
   only:
     - FASE3-028
@@ -12,15 +9,20 @@ branches:
 jobs:
   include:
     - name: Backend | NestJS
-      before_install:
-        - openssl aes-256-cbc -K $encrypted_b0d51b9ff91b_key -iv $encrypted_b0d51b9ff91b_iv -in deploy.enc -out deploy -d
       install:
-        - chmod 600 deploy && mv deploy ~/.ssh/id_rsa
         - cd petromiles-backend
         - npm install
       script:
         - npm run test
         - npm run build
+      deploy:
+        provider: heroku
+        api_key:
+          secure: CFYAQcfMlui8BR7T3NRRbt6JboIvY8XREIsxjYdWGQODJcxmg8kscpHUWM/bkR1Vqko/n+v4Dx7TyMVgrPxqi+tzBnMyswEkoLdiNdvGXISKXXYYMPmxcemUP+CPsGJ6vsDAcv5tRQsUOJWsCB209FwA3yUuifRyZ8m4ID+GNEdQGSrOY5K4JzrPLggLniECdzXStqQGpSL3RrxYBQ3hDc2EDVz3JcIEyy/WqoNLV6orvQxbjk8ZDFoibKFUv4f0T7ud8+JE96Tpnjk33AtSgF9ILj5ETEYG4o1NJAxp0OydaEDqOh5B3p1P+KZz8DhFtAVut8LU4LAUgYzjlez8m30aTvyzexTqC464OXatQes6zHh92Dy4kCFuVhWVt4JhzQtTPQGuUb+2g+Z2q0O8pwLJdMMA8EgcDp3T/IcLTeSA3v7zI78Z/6aIGuEUdgBmO373YSn+9lOBIsqWkEgI1z09k0iKlC8NLuHrGNpp6sdDNzF7btubdNRvCwgvMPv3PqIcWnxfXjW87mNYNv3N/md0LjhChOcWle5vN5/BliL6TShTCHem0JNG8wNuLUK2PsggpWL2ZdQHJuU9eluOwI/Oe74AcOtXwXSNBh835pCDSQH0yzfdu42/6kZPC1NBsdCEzkMY6VEcKHPL0hFRw4tzHglEvALLf4L3xZzBYHI=
+        app:
+          FASE3-028: staging-petromiles-backend
+          develop: staging-petromiles-backend
+          master: prepro-petromiles-backend
     - name: Frontend | Vue
       install:
         - cd petromiles-frontend
@@ -28,3 +30,11 @@ jobs:
       script:
         - npm run test
         - npm run build
+      deploy:
+        provider: heroku
+        api_key:
+          secure: CFYAQcfMlui8BR7T3NRRbt6JboIvY8XREIsxjYdWGQODJcxmg8kscpHUWM/bkR1Vqko/n+v4Dx7TyMVgrPxqi+tzBnMyswEkoLdiNdvGXISKXXYYMPmxcemUP+CPsGJ6vsDAcv5tRQsUOJWsCB209FwA3yUuifRyZ8m4ID+GNEdQGSrOY5K4JzrPLggLniECdzXStqQGpSL3RrxYBQ3hDc2EDVz3JcIEyy/WqoNLV6orvQxbjk8ZDFoibKFUv4f0T7ud8+JE96Tpnjk33AtSgF9ILj5ETEYG4o1NJAxp0OydaEDqOh5B3p1P+KZz8DhFtAVut8LU4LAUgYzjlez8m30aTvyzexTqC464OXatQes6zHh92Dy4kCFuVhWVt4JhzQtTPQGuUb+2g+Z2q0O8pwLJdMMA8EgcDp3T/IcLTeSA3v7zI78Z/6aIGuEUdgBmO373YSn+9lOBIsqWkEgI1z09k0iKlC8NLuHrGNpp6sdDNzF7btubdNRvCwgvMPv3PqIcWnxfXjW87mNYNv3N/md0LjhChOcWle5vN5/BliL6TShTCHem0JNG8wNuLUK2PsggpWL2ZdQHJuU9eluOwI/Oe74AcOtXwXSNBh835pCDSQH0yzfdu42/6kZPC1NBsdCEzkMY6VEcKHPL0hFRw4tzHglEvALLf4L3xZzBYHI=
+        app:
+          FASE3-028: staging-petromiles-frontend
+          develop: staging-petromiles-frontend
+          master: prepro-petromiles-frontend

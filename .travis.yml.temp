@@ -1,8 +1,0 @@
-deploy:
-  provider: heroku
-  api_key:
-    secure: f2wZ4IE5tBDA1RiTuLogBf8B4WJULPkRWX+NHS+bdfyWYZHmbCYCu7S0I2DCPcbZKyURatXLkPSlmvrNC/hspxdcJhGbY36vWBK5Xo295AUyhIgyfxPBPT7NwOp8AK0ezPSZAcSbYk4xnQZMEyFmiplT90SY2YGPfCV8h+9JeTuZiqCuPjB7lmNI8k2fI6QUx9tGM1XCgmlObeeuvgyt7GDQqktLrN5/nSujnRyVPCxzJHk7sqUHCz8bW6TqRjyf8mP3QnwKTdUvGsLzMXzUtiFUTsfjS+eNxnT/F1mOZj1jzlblr/lpq6NapnyrK0Qw4yZw/C5ePDI4W9g95x0Ce++Gik1b3nR9JMeXQDyxpSb0rErH/rMWmyz/bf7D6GKpqybhn7kmGzqzwljOsqaGXZqvY549nbyuLXzJxcyCtkHM9yrm+5qt2M5pQS0leAEue12cTiQlcaxyB68yzN3ZtiCH/Kd69Km1NDT2VVNPUoATxgnkrxDpmDwQlCRImMe76EafD234DFgnyoMwzo3swI325VVnfLh1mu4ZBmmhvTJowSE3kI2PAZRmJmToXA6iLCRrO/IzBx0HrAg84qXEPH+tI5UvMVBFoDkWzLlAhq/b9Hez7Pnv/MuXdznSON4FFOgaTdaabr45/iRKMswjL/g4ZVf/yaa2I+SXBZY7/gs=
-  app: petromiles-frontend
-  on:
-    repo: ingswucab/consorcio2-petromiles
-  skip_cleanup: "true"
