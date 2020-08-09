@@ -19,10 +19,10 @@ export class MailsService {
   ) {}
 
   async sendEmail(msg: MailsStructure): Promise<MailsResponse> {
-    if (process.env.SENDGRID_ON === 'true' && !!msg.templateId) {
+    if((!process.env.PETROMILES_ENV || process.env.SENDGRID_ON === 'true') && !!msg.templateId ) {
       const from = this.sendGridConfig.emailFrom;
       try {
-        await this.sendGridClient.send({ ...msg, from });
+        console.log(await this.sendGridClient.send({ ...msg, from }));
         this.logger.verbose(
           `[${ApiModules.MAILS}] {${msg.to}} An email with the subject "${msg.subject}" has been sent`,
         );
