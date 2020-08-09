@@ -22,7 +22,7 @@ export class MailsService {
     if((!process.env.PETROMILES_ENV || process.env.SENDGRID_ON === 'true') && !!msg.templateId ) {
       const from = this.sendGridConfig.emailFrom;
       try {
-        console.log(await this.sendGridClient.send({ ...msg, from }));
+        await this.sendGridClient.send({ ...msg, from });
         this.logger.verbose(
           `[${ApiModules.MAILS}] {${msg.to}} An email with the subject "${msg.subject}" has been sent`,
         );
