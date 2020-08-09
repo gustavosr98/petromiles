@@ -1,12 +1,3 @@
-import { PaymentProvider } from '@/enums/payment-provider.enum';
-import { StateName, StateDescription } from '@/enums/state.enum';
-import { PlatformInterest } from '@/enums/platform-interest.enum';
-import { TransactionType } from '@/enums/transaction.enum';
-import { AddPointsRequestType } from '@/enums/add-points-request-type.enum';
-import { Role } from '@/enums/role.enum';
-import { BadRequestException } from '@nestjs/common';
-import { ThirdPartyClientResponseStatus } from '@/enums/third-party-clients-response-status.enum';
-import { MailsResponse } from '@/enums/mails-response.enum';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ThirdPartyClientsService } from './third-party-clients.service';
@@ -25,6 +16,16 @@ import { MailsService } from '@/modules/mails/mails.service';
 import { ClientOnThirdParty } from '@/entities/client-on-third-party.entity';
 import { UserClient } from '@/entities/user-client.entity';
 import { ThirdPartyClient } from '@/entities/third-party-client.entity';
+
+import { PaymentProvider } from '@/enums/payment-provider.enum';
+import { StateName, StateDescription } from '@/enums/state.enum';
+import { PlatformInterest } from '@/enums/platform-interest.enum';
+import { TransactionType } from '@/enums/transaction.enum';
+import { AddPointsRequestType } from '@/enums/add-points-request-type.enum';
+import { Role } from '@/enums/role.enum';
+import { BadRequestException } from '@nestjs/common';
+import { ThirdPartyClientResponseStatus } from '@/enums/third-party-clients-response-status.enum';
+import { MailsResponse } from '@/enums/mails-response.enum';
 
 import { WinstonModule } from 'nest-winston';
 import createOptions from '../../../logger/winston/winston-config';
@@ -1117,13 +1118,6 @@ describe('ThirdPartyClientsService', () => {
             amount: 75,
             percentage: 0,
           };
-          expectedTransaction = {
-            idTransaction: 1,
-            initialDate: new Date(),
-            type: TransactionType.WITHDRAWAL,
-            stateTransactionDescription:
-              StateDescription.THIRD_PARTY_CLIENT_TRANSACTION,
-          };
           options = {
             clientOnThirdParty: expectedClientOnThirdParty,
             totalAmountWithInterest: commission,
@@ -1139,16 +1133,18 @@ describe('ThirdPartyClientsService', () => {
             operation: 1,
           };
           expectedTransaction = {
+            idTransaction: 1,
             totalAmountWithInterest: commission,
             rawAmount: 2500,
+            initialDate: new Date(),
             type: TransactionType.THIRD_PARTY_CLIENT,
+            stateTransactionDescription:
+              StateDescription.THIRD_PARTY_CLIENT_TRANSACTION,
             pointsConversion: expectedTransactionInterest.pointsConversion,
             platformInterest: expectedTransactionInterest.interest,
             thirdPartyInterest: expectedThirdPartyInterest,
             platformInterestExtraPoints:
               expectedTransactionInterest.extraPoints,
-            stateTransactionDescription:
-              StateDescription.THIRD_PARTY_CLIENT_TRANSACTION,
           };
 
           confirmationTicket = {
@@ -1202,6 +1198,10 @@ describe('ThirdPartyClientsService', () => {
             expectedThirdPartyInterest,
           );
 
+          (transactionService.createTransaction as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+
           result = await thirdPartyClientsService.createTransaction(
             addPointsRequest,
             user,
@@ -1248,6 +1248,146 @@ describe('ThirdPartyClientsService', () => {
 
         it('should return an AddPointsResponse of a CREATION', () => {
           expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the api key is unknown', () => {
+        beforeEach(async () => {
+          addPointsRequest = {
+            apiKey: 'prueba',
+            type: AddPointsRequestType.CREATION,
+            products: [
+              {
+                id: 1,
+                priceTag: 10000,
+                currency: 'usd',
+              },
+            ],
+          };
+          user = {
+            id: 1,
+            email: 'prueba@gmail.com',
+          };
+
+          expectedUserClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+            userSuscription: [
+              {
+                idUserSuscription: 1,
+                initialDate: new Date(),
+                finalDate: null,
+                suscription: {
+                  idSuscription: 1,
+                  name: 'BASIC',
+                },
+              },
+            ],
+          };
+          expectedOnePointToDollars = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: addPointsRequest.apiKey,
+            accumulatePercentage: 0.25,
+          };
+          expectedInterests = [
+            {
+              operation: 1,
+              amount: 75,
+              percentage: 0,
+            },
+            { operation: 1, amount: 0, percentage: 0.06 },
+          ];
+          expectedTransactionInterest = {
+            interest: {
+              idPlatformInterest: 1,
+              name: 'withdrawal',
+              amount: 0,
+              percentage: 0.06,
+            },
+            extraPoints: null,
+            pointsConversion: expectedOnePointToDollars,
+            thirdPartyInterest: {
+              idThirdPartyInterest: 1,
+              transactionType: 'withdrawal',
+              paymentProvider: 'STRIPE',
+              operation: 1,
+              amount: 75,
+              percentage: 0,
+            },
+          };
+
+          products = [
+            {
+              id: 1,
+              priceTag: 10000,
+              currency: 'usd',
+              tentativePoints: 12500,
+            },
+          ];
+          commission = 225;
+          expectedConsultPoints = {
+            request: {
+              ...addPointsRequest,
+              products,
+              totalTentativeCommission: commission,
+            },
+            confirmationTicket: null,
+          };
+
+          expectedClientOnThirdParty = {};
+
+          (userClientService.get as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedOnePointToDollars,
+          );
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
+
+          (paymentsService.getInterests as jest.Mock).mockResolvedValue(
+            expectedInterests,
+          );
+          (transactionService.getTransactionInterests as jest.Mock).mockResolvedValue(
+            expectedTransactionInterest,
+          );
+
+          jest
+            .spyOn(thirdPartyClientsService, 'consultPoints')
+            .mockResolvedValue(expectedConsultPoints);
+
+          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'getClientOnThirdPartyByUserId')
+            .mockResolvedValue(expectedClientOnThirdParty);
+
+          expectedError = new BadRequestException();
+          jest
+            .spyOn(thirdPartyClientsService, 'createTransaction')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the api key is unknown', async () => {
+          await expect(
+            thirdPartyClientsService.createTransaction(addPointsRequest, user),
+          ).rejects.toThrow(BadRequestException);
         });
       });
     });
