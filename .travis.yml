@@ -3,7 +3,6 @@ node_js:
   - 12.16.2
 branches:
   only:
-    - FASE3-028
     - develop
     - master
 jobs:
@@ -20,7 +19,6 @@ jobs:
         provider: heroku
         api_key: $HEROKU_APIKEY
         app:
-          FASE3-028: staging-petromiles-backend
           develop: staging-petromiles-backend
           master: prepro-petromiles-backend
     - name: Frontend | Vue
@@ -34,6 +32,5 @@ jobs:
         provider: heroku
         api_key: $HEROKU_APIKEY
         app:
-          FASE3-028: staging-petromiles-frontend
           develop: staging-petromiles-frontend
           master: prepro-petromiles-frontend
