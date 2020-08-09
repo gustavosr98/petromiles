@@ -1034,6 +1034,7 @@ describe('ThirdPartyClientsService', () => {
             id: 1,
             email: 'prueba@gmail.com',
           };
+
           expectedUserClient = {
             idUserClient: 1,
             email: 'prueba@gmail.com',
@@ -1087,6 +1088,7 @@ describe('ThirdPartyClientsService', () => {
               percentage: 0,
             },
           };
+
           products = [
             {
               id: 1,
@@ -1104,6 +1106,7 @@ describe('ThirdPartyClientsService', () => {
             },
             confirmationTicket: null,
           };
+
           expectedClientOnThirdParty = {
             idClientOnThirdParty: 1,
             code: 'prueba',
@@ -1117,6 +1120,9 @@ describe('ThirdPartyClientsService', () => {
           expectedTransaction = {
             idTransaction: 1,
             initialDate: new Date(),
+            type: TransactionType.WITHDRAWAL,
+            stateTransactionDescription:
+              StateDescription.THIRD_PARTY_CLIENT_TRANSACTION,
           };
           options = {
             clientOnThirdParty: expectedClientOnThirdParty,
@@ -1132,6 +1138,19 @@ describe('ThirdPartyClientsService', () => {
               StateDescription.THIRD_PARTY_CLIENT_TRANSACTION,
             operation: 1,
           };
+          expectedTransaction = {
+            totalAmountWithInterest: commission,
+            rawAmount: 2500,
+            type: TransactionType.THIRD_PARTY_CLIENT,
+            pointsConversion: expectedTransactionInterest.pointsConversion,
+            platformInterest: expectedTransactionInterest.interest,
+            thirdPartyInterest: expectedThirdPartyInterest,
+            platformInterestExtraPoints:
+              expectedTransactionInterest.extraPoints,
+            stateTransactionDescription:
+              StateDescription.THIRD_PARTY_CLIENT_TRANSACTION,
+          };
+
           confirmationTicket = {
             confirmationId: expectedTransaction.idTransaction.toString(),
             userEmail: user.email,
