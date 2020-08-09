@@ -57,7 +57,7 @@ context("Buy points", () => {
   });
 
   it("when everything goes well", () => {
-    cy.get(".points-input").type("5000");
+    cy.get(".points-input").type("500000");
     cy.get(".accounts-selector").click();
     cy.contains("XXXX").click();
     cy.get(".submit-btn").click();
