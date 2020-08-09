@@ -1,8 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { BadRequestException } from '@nestjs/common';
 
 import { Repository } from 'typeorm';
 import { WinstonModule } from 'nest-winston';
+
+import createOptions from '@/logger/winston/winston-config';
 
 import { BankAccountService } from '@/modules/bank-account/services/bank-account.service';
 import { UserClientService } from '@/modules/user/services/user-client.service';
@@ -10,9 +13,7 @@ import { UserClientService } from '@/modules/user/services/user-client.service';
 import { BankAccount } from '@/entities/bank-account.entity';
 import { RoutingNumber } from '@/entities/routing-number.entity';
 
-import createOptions from '@/logger/winston/winston-config';
-import { BadRequestException } from '@nestjs/common';
-import { Bank } from '../../../enums/bank.enum';
+import { Bank } from '@/enums/bank.enum';
 
 describe('BankAccountService', () => {
   let bankAccountService: BankAccountService;
