@@ -30,6 +30,7 @@
                       @blur="$v.points.$touch()"
                       :error-messages="pointsErrors"
                       :disabled="loading"
+                      class="points-input"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -76,6 +77,7 @@
                       :error-messages="selectedBankAccountErrors"
                       :loading="loadingBankAccounts"
                       :disabled="loadingBankAccounts || loading"
+                      class="accounts-selector"
                     >
                       <template slot="selection" slot-scope="data">
                         {{ data.item.nickname }} -
@@ -92,7 +94,7 @@
                   <v-col cols="12" class="text-center">
                     <v-btn
                       @click="submitButton"
-                      class="primary"
+                      class="primary submit-btn"
                       :loading="loading"
                       dark
                     >{{ $t("buy-points-form.getPoints") }}</v-btn>
@@ -105,7 +107,7 @@
 
         <!-- Final Dialog -->
         <v-row justify="center">
-          <v-dialog v-model="dialog" persistent max-width="50%">
+          <v-dialog v-model="dialog" persistent max-width="50%" class="confirm-dialog">
             <v-card>
               <v-card-title class="headline">
                 {{
@@ -119,7 +121,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">
+                <v-btn color="secondary" dark :to="{ name: comeBackRoute }" class="ok-btn">
                   {{
                   $t("common.ok")
                   }}
@@ -145,7 +147,7 @@
                   $t("common.cancel")
                   }}
                 </v-btn>
-                <v-btn color="success" dark @click="buyPoints">
+                <v-btn color="success" dark @click="buyPoints" class="confirm-btn">
                   {{
                   $t("common.yes")
                   }}
@@ -185,7 +187,7 @@ export default {
     "payments-invoice": PaymentInvoice,
     "loading-screen": LoadingScreen,
   },
-  data: function() {
+  data: function () {
     return {
       piggyImage: piggyImage,
       formValidity: false,
@@ -215,7 +217,7 @@ export default {
     costWithInterests() {
       if (this.points) {
         let result = this.rawCost;
-        this.interests.map(i => {
+        this.interests.map((i) => {
           result = result + this.rawCost * i.percentage + i.amount / 100;
         });
         return Math.round(result * 10000) / 10000;
@@ -252,14 +254,12 @@ export default {
       await this.loadBankAccounts();
       await this.loadRate();
       await this.loadInterests();
-      await this.loadSubscription();  
+      await this.loadSubscription();
     } catch (error) {
       console.log(error);
-    }
-    finally{
+    } finally {
       this.showLoadingScreen = false;
     }
-      
   },
   methods: {
     async submitButton() {
@@ -280,11 +280,11 @@ export default {
           subscriptionName: this.subscription.name.toLowerCase(),
           infoSubscription: this.infoSubscription,
         })
-        .then(res => {
+        .then((res) => {
           this.transaction = res;
           this.paymentIsReady = true;
         })
-        .catch(err => {
+        .catch((err) => {
           this.loading = false;
         });
     },
