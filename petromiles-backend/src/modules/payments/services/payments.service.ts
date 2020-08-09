@@ -133,8 +133,10 @@ export class PaymentsService {
       idClientBankAccount,
     });
 
-    const customer = clientBankAccount.userClient.userDetails.find(
-      details => details.accountOwner === null,
+    const customer = (
+      await clientBankAccount.userClient.userDetails.find(
+        details => details.accountOwner === null,
+      )
     ).customerId;
 
     const charge = await this.paymentProviderService.createCharge({
@@ -208,8 +210,10 @@ export class PaymentsService {
     });
 
     if (await this.verifyEnoughPoints(id, amount)) {
-      const accountId = clientBankAccount.userClient.userDetails.find(
-        details => details.accountOwner === null,
+      const accountId = (
+        await clientBankAccount.userClient.userDetails.find(
+          details => details.accountOwner === null,
+        )
       ).accountId;
       await this.paymentProviderService.updateBankAccountOfAnAccount(
         accountId,
@@ -276,7 +280,7 @@ export class PaymentsService {
       email: user.email,
     });
 
-    const userDetails = userClient.userDetails.find(
+    const userDetails = await userClient.userDetails.find(
       details => details.accountOwner === null,
     );
     const transactionCode = await this.transactionService.getTransactions(
@@ -317,7 +321,7 @@ export class PaymentsService {
       email: user.email,
     });
 
-    const userDetails = userClient.userDetails.find(
+    const userDetails = await userClient.userDetails.find(
       details => details.accountOwner === null,
     );
     const transactionCode = await this.transactionService.getTransactions(

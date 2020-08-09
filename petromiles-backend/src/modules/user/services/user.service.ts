@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import * as bcrypt from 'bcrypt';
-
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { Repository, UpdateResult } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -32,8 +32,6 @@ import { UserInfo } from '@/interfaces/user/user-info.interface';
 import { StateName } from '@/enums/state.enum';
 import { ClientBankAccountService } from '@/modules/bank-account/services/client-bank-account.service';
 import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
-import { Role } from '@/entities/role.entity';
-import { StateUser } from '../../../entities/state-user.entity';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -134,6 +132,9 @@ export class UserService implements OnModuleInit {
       await this.managementService.updateUserState(role, StateName.DELETED, id);
       if (deteleData)
         await this.deletePersonalInformation(user, clientBankAccounts);
+      this.logger.silly(
+        `[${ApiModules.USER}]  Request to close account has been successfully processed`,
+      );
     } else {
       throw new BadRequestException('error-messages.couldNotDeleteAccount');
     }
@@ -147,9 +148,8 @@ export class UserService implements OnModuleInit {
 
     await this.clientBankAccountService.encryptBankAccount(clientBankAccounts);
     const userDetail = await this.userDetailsRepository.findOne({
-      where: [
-        { userClient: id }
-      ]});
+      where: [{ userClient: id }],
+    });
 
     const encrypedData: UpdateDetailsDTO = {
       firstName: await this.encrypt(userDetail.firstName),
@@ -173,7 +173,7 @@ export class UserService implements OnModuleInit {
       id,
     );
     this.logger.silly(
-      `[${ApiModules.USER}]  Delete data request sucessfully processed`,
+      `[${ApiModules.USER}]  Request to delete data has been successfully processed`,
     );
     return updatedResult;
   }

@@ -50,7 +50,7 @@ export class PaymentProviderService {
       `[${ApiModules.PAYMENT_PROVIDER}] {${userClient.email}} Bank account first token created ${bankAccountToken.id}`,
     );
 
-    const userDetails = userClient.userDetails.find(
+    const userDetails = await userClient.userDetails.find(
       details => details.accountOwner === null,
     );
 
