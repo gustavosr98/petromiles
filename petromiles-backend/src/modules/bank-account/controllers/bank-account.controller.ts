@@ -16,14 +16,14 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
-import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 import { GetUser } from '@/modules/auth/decorators/get-user.decorator';
-import {UserClient} from "@/entities/user-client.entity";
+import { UserClient } from '@/entities/user-client.entity';
 
 // INTERFACES
 import { Role } from '@/enums/role.enum';
@@ -37,7 +37,6 @@ import { UpdateAccountStateDto } from '@/modules/bank-account/dto/update-account
 import { ClientBankAccountService } from '../services/client-bank-account.service';
 import { BankAccountService } from '../services/bank-account.service';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
-
 
 const baseEndpoint = Object.freeze('bank-account');
 
@@ -124,20 +123,19 @@ export class BankAccountController {
   @UseGuards(RolesGuard)
   @Delete('cancel')
   async adminCancelBankAccount(
-      @Query('id') idBankAccount: number,
-      @Query('userId') idUserClient: number,
+    @Query('id') idBankAccount: number,
+    @Query('userId') idUserClient: number,
   ) {
     const email = this.userClientRepository.findOne(idUserClient);
-    console.log(email)
     this.logger.http(
-        `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.PUT}) ${email} asks /${baseEndpoint}/cancel/${idBankAccount}&${idUserClient}`,
+      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.PUT}) ${email} asks /${baseEndpoint}/cancel/${idBankAccount}&${idUserClient}`,
     );
     const id = idBankAccount ? idBankAccount : idBankAccount;
     const idUser = idUserClient ? idUserClient : idUserClient;
     return await this.clientBankAccountService.cancelBankAccount(
-        idUser,
-        id,
-        email,
+      idUser,
+      id,
+      email,
     );
   }
 
@@ -147,16 +145,6 @@ export class BankAccountController {
       `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ask /${baseEndpoint}/account/${accountId}`,
     );
     return this.bankAccountService.accountInfo(accountId);
-  }
-
-  @Roles(Role.ADMINISTRATOR)
-  @UseGuards(RolesGuard)
-  @Get('accounts')
-  allAccountInfo() {
-    this.logger.http(
-      `[${ApiModules.BANK_ACCOUNT}] (${HttpRequest.GET}) ask /${baseEndpoint}/accounts all`,
-    );
-    return this.bankAccountService.getAllAccounts();
   }
 
   @Put('primary')
