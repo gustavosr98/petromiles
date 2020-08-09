@@ -303,14 +303,18 @@ export class ThirdPartyClientsService {
       idUserClient: user.id,
     });
     const mostRecentRate = await this.pointsConversionService.getRecentPointsConversion();
+    console.log('mostRecentRate', mostRecentRate);
     const accumulatePercentage = parseFloat(
       (await this.get(addPointsRequest.apiKey)).accumulatePercentage,
     );
+    console.log('accumulatePercentage', accumulatePercentage);
     const interests = await this.paymentsService.getInterests(
       TransactionType.WITHDRAWAL,
       PlatformInterest.WITHDRAWAL,
     );
+    console.log('interests', interests);
     const extras = await this.calculateExtras(userClient);
+    console.log('extras', extras);
 
     let tentativePoints: number = 0;
     let accumulatedPoints: number = 0;
@@ -444,6 +448,8 @@ export class ThirdPartyClientsService {
       StateName.VERIFYING,
     );
 
+    console.log('rawAmount', rawAmount);
+    console.log('accumulatedPoints', accumulatedPoints);
     const confirmationTicket: ConfirmationTicket = {
       confirmationId: transaction.idTransaction.toString(),
       userEmail: user.email,

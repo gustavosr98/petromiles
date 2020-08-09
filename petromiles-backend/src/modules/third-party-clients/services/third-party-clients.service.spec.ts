@@ -1,3 +1,7 @@
+import { PaymentProvider } from '@/enums/payment-provider.enum';
+import { StateName, StateDescription } from '@/enums/state.enum';
+import { PlatformInterest } from '@/enums/platform-interest.enum';
+import { TransactionType } from '@/enums/transaction.enum';
 import { AddPointsRequestType } from '@/enums/add-points-request-type.enum';
 import { Role } from '@/enums/role.enum';
 import { BadRequestException } from '@nestjs/common';
@@ -890,7 +894,7 @@ describe('ThirdPartyClientsService', () => {
             idThirdPartyClient: 1,
             name: 'prueba',
             apiKey: addPointsRequest.apiKey,
-            accumulatePercentage: 25,
+            accumulatePercentage: 0.25,
           };
           expectedInterests = [
             {
@@ -898,13 +902,21 @@ describe('ThirdPartyClientsService', () => {
               amount: 75,
               percentage: 0,
             },
-            { operation: 1, amount: 0, percentage: 0.1 },
+            { operation: 1, amount: 0, percentage: 0.06 },
           ];
           expectedTransactionInterest = {
-            interest: { amount: 0, percentage: 0.1 },
+            interest: {
+              idPlatformInterest: 1,
+              name: 'withdrawal',
+              amount: 0,
+              percentage: 0.06,
+            },
             extraPoints: null,
             pointsConversion: expectedOnePointToDollars,
             thirdPartyInterest: {
+              idThirdPartyInterest: 1,
+              transactionType: 'withdrawal',
+              paymentProvider: 'STRIPE',
               operation: 1,
               amount: 75,
               percentage: 0,
@@ -915,9 +927,10 @@ describe('ThirdPartyClientsService', () => {
               id: 1,
               priceTag: 10000,
               currency: 'usd',
+              tentativePoints: 12500,
             },
           ];
-          commission = 0;
+          commission = 225;
 
           expectedResult = {
             request: {
@@ -928,6 +941,13 @@ describe('ThirdPartyClientsService', () => {
             confirmationTicket: null,
           };
 
+          (userClientService.get as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedOnePointToDollars,
+          );
+
           (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
             expectedThirdPartyClient,
           );
@@ -935,25 +955,279 @@ describe('ThirdPartyClientsService', () => {
             .spyOn(thirdPartyClientsService, 'get')
             .mockResolvedValue(expectedThirdPartyClient);
 
-          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
-            expectedResult,
+          (paymentsService.getInterests as jest.Mock).mockResolvedValue(
+            expectedInterests,
+          );
+          (transactionService.getTransactionInterests as jest.Mock).mockResolvedValue(
+            expectedTransactionInterest,
           );
 
-          result = await thirdPartyClientsService.getClientOnThirdPartyByUserId(
-            userClient,
-            thirdPartyClient,
+          result = await thirdPartyClientsService.consultPoints(
+            addPointsRequest,
+            user,
           );
         });
 
-        it('should invoke clientOnThirdPartyRepository.findOne()', () => {
-          expect(clientOnThirdPartyRepository.findOne).toHaveBeenCalledTimes(1);
-          expect(clientOnThirdPartyRepository.findOne).toHaveBeenCalledWith({
-            userClient,
-            thirdPartyClient,
+        it('should invoke userClientService.get()', () => {
+          expect(userClientService.get).toHaveBeenCalledTimes(1);
+          expect(userClientService.get).toHaveBeenCalledWith({
+            email: user.email,
+            idUserClient: user.id,
           });
         });
 
-        it('should return a clientOnThirdParty', () => {
+        it('should invoke pointsConversionService.getRecentPointsConversion()', () => {
+          expect(
+            pointsConversionService.getRecentPointsConversion,
+          ).toHaveBeenCalledTimes(1);
+        });
+
+        it('should invoke paymentsService.getInterests()', () => {
+          expect(paymentsService.getInterests).toHaveBeenCalledTimes(1);
+          expect(paymentsService.getInterests).toHaveBeenCalledWith(
+            TransactionType.WITHDRAWAL,
+            PlatformInterest.WITHDRAWAL,
+          );
+        });
+
+        it('should return an AddPointsResponse of a CONSULT', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('createTransaction(addPointsRequest, user)', () => {
+    let expectedResult;
+    let result;
+    let addPointsRequest;
+    let user;
+    let expectedUserClient;
+    let expectedOnePointToDollars;
+    let expectedThirdPartyClient;
+    let expectedInterests;
+    let expectedTransactionInterest;
+    let products;
+    let commission;
+    let expectedConsultPoints;
+    let expectedClientOnThirdParty;
+    let expectedThirdPartyInterest;
+    let expectedTransaction;
+    let confirmationTicket;
+    let options;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          addPointsRequest = {
+            apiKey: 'prueba',
+            type: AddPointsRequestType.CREATION,
+            products: [
+              {
+                id: 1,
+                priceTag: 10000,
+                currency: 'usd',
+              },
+            ],
+          };
+          user = {
+            id: 1,
+            email: 'prueba@gmail.com',
+          };
+          expectedUserClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+            userSuscription: [
+              {
+                idUserSuscription: 1,
+                initialDate: new Date(),
+                finalDate: null,
+                suscription: {
+                  idSuscription: 1,
+                  name: 'BASIC',
+                },
+              },
+            ],
+          };
+          expectedOnePointToDollars = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+          expectedThirdPartyClient = {
+            idThirdPartyClient: 1,
+            name: 'prueba',
+            apiKey: addPointsRequest.apiKey,
+            accumulatePercentage: 0.25,
+          };
+          expectedInterests = [
+            {
+              operation: 1,
+              amount: 75,
+              percentage: 0,
+            },
+            { operation: 1, amount: 0, percentage: 0.06 },
+          ];
+          expectedTransactionInterest = {
+            interest: {
+              idPlatformInterest: 1,
+              name: 'withdrawal',
+              amount: 0,
+              percentage: 0.06,
+            },
+            extraPoints: null,
+            pointsConversion: expectedOnePointToDollars,
+            thirdPartyInterest: {
+              idThirdPartyInterest: 1,
+              transactionType: 'withdrawal',
+              paymentProvider: 'STRIPE',
+              operation: 1,
+              amount: 75,
+              percentage: 0,
+            },
+          };
+          products = [
+            {
+              id: 1,
+              priceTag: 10000,
+              currency: 'usd',
+              tentativePoints: 12500,
+            },
+          ];
+          commission = 225;
+          expectedConsultPoints = {
+            request: {
+              ...addPointsRequest,
+              products,
+              totalTentativeCommission: commission,
+            },
+            confirmationTicket: null,
+          };
+          expectedClientOnThirdParty = {
+            idClientOnThirdParty: 1,
+            code: 'prueba',
+            expirationDate: new Date(),
+          };
+          expectedThirdPartyInterest = {
+            operation: 1,
+            amount: 75,
+            percentage: 0,
+          };
+          expectedTransaction = {
+            idTransaction: 1,
+            initialDate: new Date(),
+          };
+          options = {
+            clientOnThirdParty: expectedClientOnThirdParty,
+            totalAmountWithInterest: commission,
+            rawAmount: 2500,
+            type: TransactionType.THIRD_PARTY_CLIENT,
+            pointsConversion: expectedTransactionInterest.pointsConversion,
+            platformInterest: expectedTransactionInterest.interest,
+            thirdPartyInterest: expectedThirdPartyInterest,
+            platformInterestExtraPoints:
+              expectedTransactionInterest.extraPoints,
+            stateTransactionDescription:
+              StateDescription.THIRD_PARTY_CLIENT_TRANSACTION,
+            operation: 1,
+          };
+          confirmationTicket = {
+            confirmationId: expectedTransaction.idTransaction.toString(),
+            userEmail: user.email,
+            date: expectedTransaction.initialDate.toISOString(),
+            currency: addPointsRequest.products[0].currency,
+            pointsToDollars: 2500,
+            accumulatedPoints: 12500,
+            commission: commission,
+            status: StateName.VERIFYING,
+          };
+          expectedResult = {
+            request: expectedConsultPoints.request,
+            confirmationTicket: confirmationTicket,
+          };
+
+          (userClientService.get as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedOnePointToDollars,
+          );
+
+          (thirdPartyClientsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedThirdPartyClient,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'get')
+            .mockResolvedValue(expectedThirdPartyClient);
+
+          (paymentsService.getInterests as jest.Mock).mockResolvedValue(
+            expectedInterests,
+          );
+          (transactionService.getTransactionInterests as jest.Mock).mockResolvedValue(
+            expectedTransactionInterest,
+          );
+
+          jest
+            .spyOn(thirdPartyClientsService, 'consultPoints')
+            .mockResolvedValue(expectedConsultPoints);
+
+          (clientOnThirdPartyRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientOnThirdParty,
+          );
+          jest
+            .spyOn(thirdPartyClientsService, 'getClientOnThirdPartyByUserId')
+            .mockResolvedValue(expectedClientOnThirdParty);
+
+          (thirdPartyInterestService.get as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+
+          result = await thirdPartyClientsService.createTransaction(
+            addPointsRequest,
+            user,
+          );
+        });
+
+        it('should invoke userClientService.get()', () => {
+          expect(userClientService.get).toHaveBeenCalledTimes(1);
+          expect(userClientService.get).toHaveBeenCalledWith({
+            email: user.email,
+            idUserClient: user.id,
+          });
+        });
+
+        it('should invoke pointsConversionService.getRecentPointsConversion()', () => {
+          expect(
+            pointsConversionService.getRecentPointsConversion,
+          ).toHaveBeenCalledTimes(1);
+        });
+
+        it('should invoke thirdPartyInterestService.get()', () => {
+          expect(thirdPartyInterestService.get).toHaveBeenCalledTimes(1);
+          expect(thirdPartyInterestService.get).toHaveBeenCalledWith(
+            PaymentProvider.STRIPE,
+            TransactionType.WITHDRAWAL,
+          );
+        });
+
+        it('should invoke paymentsService.getInterests()', () => {
+          expect(paymentsService.getInterests).toHaveBeenCalledTimes(1);
+          expect(paymentsService.getInterests).toHaveBeenCalledWith(
+            TransactionType.WITHDRAWAL,
+            PlatformInterest.WITHDRAWAL,
+          );
+        });
+
+        it('should invoke transactionService.createTransaction()', () => {
+          expect(transactionService.createTransaction).toHaveBeenCalledTimes(1);
+          expect(transactionService.createTransaction).toHaveBeenCalledWith(
+            options,
+            StateName.VERIFYING,
+          );
+        });
+
+        it('should return an AddPointsResponse of a CREATION', () => {
           expect(result).toStrictEqual(expectedResult);
         });
       });
