@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog :value="!!errorMessage" persistent width="300px">
+    <v-dialog :value="!!errorMessage" class="error-modal" persistent width="300px">
       <v-card>
         <v-card-title class="headline">
           <v-icon color="red" size="50">mdi-alert</v-icon>

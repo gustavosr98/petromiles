@@ -3,7 +3,7 @@
     <!-- Horizontal App Bar  -->
 
     <v-app-bar app class="app-bar" color="primary">
-      <v-app-bar-nav-icon @click="drawer = true" color="white"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon class="nav-btn" @click="drawer = true" color="white"></v-app-bar-nav-icon>
       <v-toolbar-title>PetroMiles</v-toolbar-title>
       <v-spacer></v-spacer>
       <div class="text-center" v-if="!isAdmin">
@@ -79,8 +79,8 @@ export default {
       ],
     },
     isAdmin: {
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
