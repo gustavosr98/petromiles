@@ -5,7 +5,7 @@ import {
     CallHandler,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, Inject } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 
 import { Observable } from 'rxjs';
 import { Logger } from 'winston';
@@ -13,9 +13,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import {ApiModules} from "@/logger/api-modules.enum";
 import {UserDetails} from "@/entities/user-details.entity";
 import {Repository} from "typeorm";
-import {stringify} from "querystring";
-import {audit} from "rxjs/operators";
-import * as winston from "winston";
+import { transform, isEqual, isObject} from 'lodash';
 
 
 export interface Response<T> {
@@ -36,14 +34,26 @@ export class AuditUserInterceptor<T> implements NestInterceptor<T, Response<T>>{
     ): Promise<Observable<Response<T>>> {
         const req = context.switchToHttp().getRequest();
 
-        const body = JSON.stringify(req.body)
-        const userData = await this.userDetailsRepository.find({where: [{idUserDetails: req.body.idUserDetails}]})
-
-        this.logger.verbose(`[@Audit] Change made to ${ApiModules.USER} module by email: [${req.user.email}] with role: [${req.user.role}]`)
-        this.logger.verbose(`[@Audit] Previous data: ${JSON.stringify(userData)}`)
-        this.logger.verbose(`[@Audit] Changes: ${body}`)
-
+        const previousData = await this.userDetailsRepository.find({where: [{idUserDetails: req.body.idUserDetails}]})
+        const newData = await this.differenceBetween(previousData, req.body);
+        this.logger.verbose(`[@Audit] Change made to ${ApiModules.USER} module by email: [${req.user.email}] with role: [${req.user.role}] \n 
+        Changes: %o`,{previousData ,newData})
 
         return next.handle().pipe();
     }
+
+    private differenceBetween(baseObject, newObject) {
+        return this.changes(baseObject, newObject);
+    }
+    private changes(baseObject, newObject) {
+        return transform(newObject, (result, value, key) => {
+            if (!isEqual(value, baseObject[key])) {
+                result[key] =
+                    isObject(value) && isObject(baseObject[key])
+                        ? this.changes(value, baseObject[key])
+                        : value;
+            }
+        });
+    }
+
 }

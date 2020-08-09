@@ -5,7 +5,7 @@ import {
     CallHandler,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, Inject } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 
 import { Observable } from 'rxjs';
 import { Logger } from 'winston';
@@ -36,18 +36,22 @@ export class AuditBankAccountInterceptor<T> implements NestInterceptor<T, Respon
     ): Promise<Observable<Response<T>>> {
         const req = context.switchToHttp().getRequest();
 
-        const body = JSON.stringify(req.body)
+
         const stateBa = await this.stateRepository
             .createQueryBuilder('s')
             .innerJoin('s.stateBankAccount','sba')
             .innerJoin('sba.clientBankAccount','cba')
             .where('cba.fk_user_client = :id',{id: req.body.idUserClient})
             .andWhere('sba."finalDate" IS NULL')
+            .andWhere('cba.fk_bank_account = :idBA',{idBA: req.body.idBankAccount})
             .getOne()
 
-        this.logger.verbose(`[@Audit] Change made to ${ApiModules.BANK_ACCOUNT} module by email: [${req.user.email}] with role: [${req.user.role}]`)
-        this.logger.verbose(`[@Audit] Previous data: [idUserClient: ${req.body.idUserClient}, idBankAccount: ${req.body.idBankAccount}, state: ${stateBa.name}]`)
-        this.logger.verbose(`[@Audit] Changes: [${body}]`)
+        const newData = req.body
+
+        this.logger.verbose(`[@Audit] Change made to ${ApiModules.BANK_ACCOUNT} module by email: [${req.user.email}] with role: [${req.user.role}] \n
+         Previous data: [idUserClient: ${req.body.idUserClient}, idBankAccount: ${req.body.idBankAccount}, state: ${stateBa.name}]\n
+         Changes: %o`,{newData})
+
 
         return next.handle().pipe();
     }
