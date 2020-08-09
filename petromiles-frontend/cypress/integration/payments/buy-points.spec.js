@@ -8,6 +8,15 @@ context("Buy points", () => {
     cy.get(".login-btn").click();
   });
 
+  it("trying to let the points field empty", () => {
+    cy.get(".buy-points-btn").click();
+    cy.get(".accounts-selector").click();
+    cy.contains("XXXX").click();
+    cy.get(".submit-btn").click();
+    cy.url().should("include", "/buy-points");
+    cy.get(".v-messages__message").should("be.visible");
+  });
+
   it("trying to put letters into points field", () => {
     cy.get(".buy-points-btn").click();
     cy.get(".points-input").type("letters");
