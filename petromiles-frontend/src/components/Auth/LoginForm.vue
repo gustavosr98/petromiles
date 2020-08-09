@@ -20,6 +20,7 @@
           type="text"
           color="light-blue darken-4"
           @keyup.enter="buildUser"
+          class="email-input"
         ></v-text-field>
         <v-text-field
           id="password"
@@ -30,6 +31,7 @@
           type="password"
           color="light-blue darken-4"
           @keyup.enter="buildUser"
+          class="password-input"
         ></v-text-field>
       </v-form>
     </v-card-text>
@@ -49,7 +51,13 @@
       </v-col>
     </v-row>
     <div class="text-center mt-3 mb-8">
-      <v-btn @click="buildUser()" color="light-blue darken-4" dark :loading="loading">Login</v-btn>
+      <v-btn
+        @click="buildUser()"
+        class="login-btn"
+        color="light-blue darken-4"
+        dark
+        :loading="loading"
+      >Login</v-btn>
     </div>
   </v-col>
 </template>
@@ -96,12 +104,14 @@ export default {
     },
 
     login(user) {
-      store.dispatch("auth/logIn", user).then(() => {
-        this.$router.push({ name: this.dashboardRoute });
-      })
-      .finally(() => {
-        this.loading = false;
-      });
+      store
+        .dispatch("auth/logIn", user)
+        .then(() => {
+          this.$router.push({ name: this.dashboardRoute });
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
   },
 };
