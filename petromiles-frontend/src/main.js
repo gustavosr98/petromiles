@@ -18,6 +18,12 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "roboto-fontface/css/roboto/roboto-fontface.css";
 import "@mdi/font/css/materialdesignicons.css";
+import LogRocket from 'logrocket';
+
+LogRocket.identify(store.getters.id, {
+  name: store.getters.name,
+  email: store.getters.email,
+});
 
 Vue.config.productionTip = false;
 Vue.prototype.$http = httpClient;
@@ -27,6 +33,7 @@ new Vue({
   store,
   vuetify,
   i18n,
+  LogRocket,
   created() {
     firebase.initializeApp(firebaseConfig);
   },
