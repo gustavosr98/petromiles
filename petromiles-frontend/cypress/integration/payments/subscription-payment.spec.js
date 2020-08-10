@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context("Buy points", () => {
+context("Payment Subscription", () => {
   beforeEach(() => {
     cy.visit("/");
     cy.get(".email-input").type("test@petromiles.com");
