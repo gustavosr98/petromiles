@@ -22,6 +22,22 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { BankAccountService } from './bank-account.service';
 
 import { PaymentProvider } from '@/enums/payment-provider.enum';
+import { StateName } from '@/enums/state.enum';
+import { TransactionType } from '@/enums/transaction.enum';
+import { StateDescription } from '@/enums/state.enum';
+import {
+  expectedClientBankAccount,
+  expectedUserClient,
+  createBankAccountDTO,
+  expectedBankAccount,
+  expectedPaymentProviderBankAccount,
+  expectedChangeBankAccount,
+  expectedVerification,
+  expectedVerificationTransactions,
+  expectedTransactions,
+  verifyingState,
+  expectedStateBankAccount,
+} from '@/modules/bank-account/services/mocks/client-bank-account.mock';
 
 describe('ClientBankAccountService', () => {
   let clientBankAccountService: ClientBankAccountService;
@@ -53,6 +69,7 @@ describe('ClientBankAccountService', () => {
       save: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      query: jest.fn(),
     }));
 
     StateTransactionServiceMock = jest.fn<
@@ -183,6 +200,10 @@ describe('ClientBankAccountService', () => {
       PaymentProviderService,
     );
 
+    stateTransactionService = module.get<StateTransactionService>(
+      StateTransactionService,
+    );
+
     clientBankAccountService = module.get<ClientBankAccountService>(
       ClientBankAccountService,
     );
@@ -198,331 +219,16 @@ describe('ClientBankAccountService', () => {
     let bankAccountCreateParams;
     let user;
     let expectedNicknameIsTaken;
-    let expectedUserClient;
-    let expectedBankAccount;
-    let expectedPaymentProviderBankAccount;
-    let expectedClientBankAccount;
-    let expectedVerificationTransaction;
     let expectedChangeState;
     let result;
 
     describe('case: success', () => {
       describe('when everything works well', () => {
         beforeEach(async () => {
-          bankAccountCreateParams = {
-            routingNumber: '121000358',
-            type: 'Checking',
-            accountNumber: '000123456789',
-            checkNumber: '1234',
-            nickname: 'test 9',
-            bank: {
-              idBank: 1,
-              name: 'Bank of America',
-              photo:
-                'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FBank%20of%20America.png?alt=media&token=84f6581d-cffe-47e7-a846-0b185460cc44',
-              country: { idCountry: 1, name: 'UNITED STATES' },
-            },
-            userDetails: {
-              firstName: 'petro',
-              lastName: 'miles',
-              email: 'test@petromiles.com',
-              phone: '123456',
-            },
-          };
-
+          bankAccountCreateParams = createBankAccountDTO;
           user = { email: 'test@petromiles.com', id: 1, role: 'CLIENT' };
-
           expectedNicknameIsTaken = false;
-
-          expectedUserClient = {
-            idUserClient: 1,
-            salt: '$2b$10$4WQNzcG4y7h864.R8X3Pxu',
-            googleToken: null,
-            facebookToken: null,
-            email: 'alleyne.michelle333@hotmail.com',
-            password:
-              '$2b$10$4WQNzcG4y7h864.R8X3PxuV5scq/pm1RX3yPfy.j4iBtS/RUvBTn2',
-            stateUser: [
-              {
-                idStateUser: 2,
-                initialDate: '2020-08-08T01:07:29.899Z',
-                finalDate: null,
-                description: null,
-                state: {
-                  idState: 1,
-                  name: 'active',
-                  description:
-                    'This state indicates that the object is ready to be used',
-                },
-              },
-            ],
-            userDetails: {
-              idUserDetails: 2,
-              firstName: 'michelle',
-              middleName: null,
-              lastName: 'alleyne',
-              secondLastName: null,
-              birthdate: null,
-              address: null,
-              phone: null,
-              photo: null,
-              customerId: 'cus_HnH5q9EbgFVsVZ',
-              accountId: 'acct_1HDgX2G8HeGWvCPH',
-              language: { idLanguage: 1, name: 'english', shortname: 'en' },
-              country: null,
-            },
-            userSuscription: [
-              {
-                idUserSuscription: 1,
-                initialDate: '2020-08-08T01:07:29.940Z',
-                upgradedAmount: 0,
-                finalDate: null,
-                suscription: {
-                  idSuscription: 1,
-                  name: 'BASIC',
-                  cost: 0,
-                  upgradedAmount: null,
-                  description: 'Suscription initial of every new client',
-                },
-              },
-            ],
-          };
-
-          expectedBankAccount = {
-            accountNumber: '000123456789',
-            checkNumber: '1234',
-            nickname: 'test 5',
-            type: 'Checking',
-            userDetails: {
-              idUserDetails: 6,
-              firstName: 'petro',
-              middleName: null,
-              lastName: 'miles',
-              secondLastName: null,
-              birthdate: null,
-              address: null,
-              phone: '12345',
-              photo: null,
-              customerId: null,
-              accountId: null,
-              userClient: null,
-            },
-            routingNumber: {
-              idRoutingNumber: 1,
-              number: '124003116',
-              bank: {
-                idBank: 2,
-                name: 'Ally Bank',
-                photo:
-                  'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FAlly%20Bank.png?alt=media&token=a5063494-5235-4fcd-8bbb-cc0ead5ea862',
-                country: { idCountry: 1, name: 'UNITED STATES' },
-              },
-            },
-            idBankAccount: 4,
-          };
-
-          expectedPaymentProviderBankAccount = {
-            transferId: 'ba_1HDsZkAT8OF6QY3PkYrXsXOW',
-            chargeId: 'ba_1HDsZiDfwU0tej1wIaM46rN4',
-          };
-
-          expectedClientBankAccount = {
-            bankAccount: {
-              accountNumber: '000123456789',
-              checkNumber: '1234',
-              nickname: 'test 5',
-              type: 'Checking',
-              userDetails: {
-                idUserDetails: 6,
-                firstName: 'petro',
-                middleName: null,
-                lastName: 'miles',
-                secondLastName: null,
-                birthdate: null,
-                address: null,
-                phone: '12345',
-                photo: null,
-                customerId: null,
-                accountId: null,
-                userClient: null,
-              },
-              routingNumber: {
-                idRoutingNumber: 1,
-                number: '124003116',
-                bank: {
-                  idBank: 2,
-                  name: 'Ally Bank',
-                  photo:
-                    'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FAlly%20Bank.png?alt=media&token=a5063494-5235-4fcd-8bbb-cc0ead5ea862',
-                  country: { idCountry: 1, name: 'UNITED STATES' },
-                },
-              },
-              idBankAccount: 4,
-            },
-            userClient: {
-              idUserClient: 1,
-              salt: '$2b$10$p3OjA33PAfndN9rC1LBlfe',
-              googleToken: null,
-              facebookToken: null,
-              email: 'test@petromiles.com',
-              password:
-                '$2b$10$p3OjA33PAfndN9rC1LBlfeG3dKutdB1eY4odnyfbzUGKVmVY4JFqO',
-              stateUser: [
-                {
-                  idStateUser: 2,
-                  initialDate: '2020-08-08T04:38:07.095Z',
-                  finalDate: null,
-                  description: null,
-                  state: {
-                    idState: 1,
-                    name: 'active',
-                    description:
-                      'This state indicates that the object is ready to be used',
-                  },
-                },
-              ],
-              userDetails: {
-                idUserDetails: 2,
-                firstName: 'petro',
-                middleName: null,
-                lastName: 'miles',
-                secondLastName: null,
-                birthdate: null,
-                address: null,
-                phone: null,
-                photo: null,
-                customerId: 'cus_HnKTQxWH43d4sg',
-                accountId: 'acct_1HDjonAT8OF6QY3P',
-                language: { idLanguage: 1, name: 'english', shortname: 'en' },
-                country: null,
-              },
-              userSuscription: [
-                {
-                  idUserSuscription: 1,
-                  initialDate: '2020-08-08T04:38:07.130Z',
-                  upgradedAmount: 0,
-                  finalDate: null,
-                  suscription: {
-                    idSuscription: 1,
-                    name: 'BASIC',
-                    cost: 0,
-                    upgradedAmount: null,
-                    description: 'Suscription initial of every new client',
-                  },
-                },
-              ],
-            },
-            transferId: 'ba_1HDsZkAT8OF6QY3PkYrXsXOW',
-            chargeId: 'ba_1HDsZiDfwU0tej1wIaM46rN4',
-            paymentProvider: 'STRIPE',
-            primary: false,
-            idClientBankAccount: 2,
-          };
-
-          expectedChangeState = {
-            clientBankAccount: {
-              bankAccount: {
-                accountNumber: '000123456789',
-                checkNumber: '1234',
-                nickname: 'test 5',
-                type: 'Checking',
-                userDetails: {
-                  idUserDetails: 6,
-                  firstName: 'petro',
-                  middleName: null,
-                  lastName: 'miles',
-                  secondLastName: null,
-                  birthdate: null,
-                  address: null,
-                  phone: '12345',
-                  photo: null,
-                  customerId: null,
-                  accountId: null,
-                  userClient: null,
-                },
-                routingNumber: {
-                  idRoutingNumber: 1,
-                  number: '124003116',
-                  bank: {
-                    idBank: 2,
-                    name: 'Ally Bank',
-                    photo:
-                      'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FAlly%20Bank.png?alt=media&token=a5063494-5235-4fcd-8bbb-cc0ead5ea862',
-                    country: { idCountry: 1, name: 'UNITED STATES' },
-                  },
-                },
-                idBankAccount: 4,
-              },
-              userClient: {
-                idUserClient: 1,
-                salt: '$2b$10$p3OjA33PAfndN9rC1LBlfe',
-                googleToken: null,
-                facebookToken: null,
-                email: 'test@petromiles.com',
-                password:
-                  '$2b$10$p3OjA33PAfndN9rC1LBlfeG3dKutdB1eY4odnyfbzUGKVmVY4JFqO',
-                stateUser: [
-                  {
-                    idStateUser: 2,
-                    initialDate: '2020-08-08T04:38:07.095Z',
-                    finalDate: null,
-                    description: null,
-                    state: {
-                      idState: 1,
-                      name: 'active',
-                      description:
-                        'This state indicates that the object is ready to be used',
-                    },
-                  },
-                ],
-                userDetails: {
-                  idUserDetails: 2,
-                  firstName: 'petro',
-                  middleName: null,
-                  lastName: 'miles',
-                  secondLastName: null,
-                  birthdate: null,
-                  address: null,
-                  phone: null,
-                  photo: null,
-                  customerId: 'cus_HnKTQxWH43d4sg',
-                  accountId: 'acct_1HDjonAT8OF6QY3P',
-                  language: { idLanguage: 1, name: 'english', shortname: 'en' },
-                  country: null,
-                },
-                userSuscription: [
-                  {
-                    idUserSuscription: 1,
-                    initialDate: '2020-08-08T04:38:07.130Z',
-                    upgradedAmount: 0,
-                    finalDate: null,
-                    suscription: {
-                      idSuscription: 1,
-                      name: 'BASIC',
-                      cost: 0,
-                      upgradedAmount: null,
-                      description: 'Suscription initial of every new client',
-                    },
-                  },
-                ],
-              },
-              transferId: 'ba_1HDsZkAT8OF6QY3PkYrXsXOW',
-              chargeId: 'ba_1HDsZiDfwU0tej1wIaM46rN4',
-              paymentProvider: 'STRIPE',
-              primary: false,
-              idClientBankAccount: 2,
-            },
-            description: 'NEWLY_CREATED_ACCOUNT',
-            state: {
-              idState: 2,
-              name: 'verifying',
-              description:
-                'This state indicates that the object is in the verification process',
-            },
-            finalDate: null,
-            idStateBankAccount: 2,
-            initialDate: '2020-08-08T13:59:09.927Z',
-          };
+          expectedChangeState = expectedChangeBankAccount;
 
           jest
             .spyOn(clientBankAccountService, 'nicknameIsTaken')
@@ -600,7 +306,7 @@ describe('ClientBankAccountService', () => {
           ).toHaveBeenCalledWith(expectedClientBankAccount);
         });
 
-        it('should return a transaction', () => {
+        it('should return a client bank account', () => {
           expect(result).toStrictEqual(expectedClientBankAccount);
         });
       });
@@ -611,28 +317,7 @@ describe('ClientBankAccountService', () => {
       describe('when nickname is taken', () => {
         beforeEach(() => {
           expectedNicknameIsTaken = true;
-
-          bankAccountCreateParams = {
-            routingNumber: '121000358',
-            type: 'Checking',
-            accountNumber: '000123456789',
-            checkNumber: '1234',
-            nickname: 'test 9',
-            bank: {
-              idBank: 1,
-              name: 'Bank of America',
-              photo:
-                'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FBank%20of%20America.png?alt=media&token=84f6581d-cffe-47e7-a846-0b185460cc44',
-              country: { idCountry: 1, name: 'UNITED STATES' },
-            },
-            userDetails: {
-              firstName: 'petro',
-              lastName: 'miles',
-              email: 'test@petromiles.com',
-              phone: '123456',
-            },
-          };
-
+          bankAccountCreateParams = createBankAccountDTO;
           user = { email: 'test@petromiles.com', id: 1, role: 'CLIENT' };
 
           jest
@@ -680,6 +365,615 @@ describe('ClientBankAccountService', () => {
           expect(
             transactionService.createVerificationTransaction,
           ).not.toHaveBeenCalled();
+        });
+      });
+    });
+  });
+
+  describe('getClientBankAccounts(idUserClient)', () => {
+    let idUserClient;
+    let expectedBankAccounts;
+    let result;
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idUserClient = 1;
+          expectedBankAccounts = Array(expectedBankAccount);
+
+          (bankAccountRepository.find as jest.Mock).mockResolvedValue(
+            expectedBankAccounts,
+          );
+
+          result = await clientBankAccountService.getClientBankAccounts(
+            idUserClient,
+          );
+        });
+
+        it('should invoke bankAccountRepository.find()', () => {
+          expect(bankAccountRepository.find).toHaveBeenCalledTimes(1);
+          expect(bankAccountRepository.find).toHaveBeenCalledWith({
+            where: `"userClient"."idUserClient" ='${idUserClient}' and "stateBankAccount"."finalDate" is null and state.name != '${StateName.CANCELLED}'`,
+            join: {
+              alias: 'bankAccount',
+              innerJoinAndSelect: {
+                clientBankAccount: 'bankAccount.clientBankAccount',
+                stateBankAccount: 'clientBankAccount.stateBankAccount',
+                userClient: 'clientBankAccount.userClient',
+                state: 'stateBankAccount.state',
+                routingNumber: 'bankAccount.routingNumber',
+                bank: 'routingNumber.bank',
+              },
+            },
+          });
+        });
+
+        it('should return an array of bank accounts', () => {
+          expect(result).toStrictEqual(expectedBankAccounts);
+        });
+      });
+    });
+    describe('case: failure', () => {
+      let idUserClient;
+      describe('When idUserClient is undefined', () => {
+        beforeEach(async () => {
+          idUserClient = undefined;
+
+          (clientBankAccountRepository.find as jest.Mock).mockImplementation(
+            () => {
+              throw new Error('Error');
+            },
+          );
+
+          result = await clientBankAccountService.getClientBankAccounts(
+            idUserClient,
+          );
+        });
+
+        it('should throw an error when client bank accounts are not found', () => {
+          expect(clientBankAccountRepository.find).toThrow(new Error('Error'));
+        });
+      });
+    });
+  });
+
+  describe('getOne(idUserClient,idBankAccount)', () => {
+    let idUserClient: number;
+    let idBankAccount: number;
+    let result;
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idUserClient = 1;
+          idBankAccount = 1;
+
+          (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientBankAccount,
+          );
+
+          result = await clientBankAccountService.getOne(
+            idUserClient,
+            idBankAccount,
+          );
+        });
+
+        it('should invoke clientBankAccountRepository.findOne()', () => {
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledWith({
+            where: `userClient.idUserClient = ${idUserClient} AND bankAccount.idBankAccount = ${idBankAccount}`,
+            join: {
+              alias: 'clientBankAccount',
+              innerJoin: {
+                bankAccount: 'clientBankAccount.bankAccount',
+                userClient: 'clientBankAccount.userClient',
+              },
+            },
+          });
+        });
+
+        it('should return a client bank account object', () => {
+          expect(result).toStrictEqual(expectedClientBankAccount);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      describe('when idUserClient is undefined', () => {
+        beforeEach(async () => {
+          idUserClient = undefined;
+          idBankAccount = 1;
+          (clientBankAccountRepository.findOne as jest.Mock).mockImplementation(
+            () => {
+              throw new Error('Error');
+            },
+          );
+
+          result = async () =>
+            await clientBankAccountService.getOne(idUserClient, idBankAccount);
+        });
+
+        it('should throw an error when client bank account is not found', () => {
+          expect(clientBankAccountRepository.findOne).toThrow(
+            new Error('Error'),
+          );
+        });
+      });
+
+      describe('when idBankAccount is undefined', () => {
+        beforeEach(async () => {
+          idUserClient = 1;
+          idBankAccount = undefined;
+
+          (clientBankAccountRepository.findOne as jest.Mock).mockImplementation(
+            () => {
+              throw new Error('Error');
+            },
+          );
+
+          result = async () =>
+            await clientBankAccountService.getOne(idUserClient, idBankAccount);
+        });
+
+        it('should throw an error when client bank account is not found', async () => {
+          expect(clientBankAccountRepository.findOne).toThrow(
+            new Error('Error'),
+          );
+        });
+      });
+    });
+  });
+
+  describe('getByState(states)', () => {
+    let states;
+    let expectedBankAccounts;
+    let result;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          states = ['active'];
+          expectedBankAccounts = Array(expectedBankAccount);
+
+          (clientBankAccountRepository.query as jest.Mock).mockResolvedValue(
+            expectedBankAccounts,
+          );
+
+          result = await clientBankAccountService.getByState(states);
+        });
+
+        it('should invoke clientBankAccountRepository.query()', () => {
+          expect(clientBankAccountRepository.query).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return an array of bank accounts', () => {
+          expect(result).toStrictEqual(expectedBankAccounts);
+        });
+      });
+    });
+  });
+
+  describe('verify(clientBankAccountId,amounts)', () => {
+    let clientBankAccountId;
+    let amounts;
+    let expectedCheckVerificationAmounts;
+    let expectedChangeState;
+    let expectedFirstTransactionState;
+    let expectedSecondTransactionState;
+    let expectedResult;
+    let result;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          clientBankAccountId = 1;
+          amounts = [1, 1.5];
+          expectedCheckVerificationAmounts = true;
+
+          expectedChangeState = expectedChangeBankAccount;
+
+          expectedFirstTransactionState = {
+            transaction: {
+              idTransaction: 8,
+              initialDate: '2020-08-09T20:06:28.661Z',
+              rawAmount: '0.000',
+              totalAmountWithInterest: '94.000',
+              type: 'bankAccountValidation',
+              operation: null,
+              paymentProviderTransactionId: null,
+              fk_transaction: null,
+              fk_points_conversion: 1,
+              fk_client_bank_account: 3,
+              fk_client_on_third_party: null,
+              idUserClient: 1,
+            },
+            description: 'CHANGE_VERIFICATION_TO_VALID',
+            state: {
+              idState: 5,
+              name: 'valid',
+              description:
+                'This state indicates that the transaction has been made successful',
+            },
+            finalDate: null,
+            idStateTransaction: 16,
+            initialDate: '2020-08-09T20:06:46.240Z',
+          };
+
+          expectedSecondTransactionState = {
+            transaction: {
+              idTransaction: 8,
+              initialDate: '2020-08-09T20:06:28.661Z',
+              rawAmount: '0.000',
+              totalAmountWithInterest: '94.000',
+              type: 'bankAccountValidation',
+              operation: null,
+              paymentProviderTransactionId: null,
+              fk_transaction: null,
+              fk_points_conversion: 1,
+              fk_client_bank_account: 3,
+              fk_client_on_third_party: null,
+              idUserClient: 1,
+            },
+            description: 'CHANGE_VERIFICATION_TO_VALID',
+            state: {
+              idState: 5,
+              name: 'valid',
+              description:
+                'This state indicates that the transaction has been made successful',
+            },
+            finalDate: null,
+            idStateTransaction: 16,
+            initialDate: '2020-08-09T20:06:46.240Z',
+          };
+
+          (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientBankAccount,
+          );
+
+          jest
+            .spyOn(clientBankAccountService, 'checkVerificationAmounts')
+            .mockResolvedValue(expectedCheckVerificationAmounts);
+
+          (paymentProviderService.verifyBankAccount as jest.Mock).mockResolvedValue(
+            expectedVerification,
+          );
+
+          jest
+            .spyOn(clientBankAccountService, 'changeState')
+            .mockResolvedValue(expectedChangeState);
+
+          (transactionService.getAllFiltered as jest.Mock).mockResolvedValue(
+            expectedVerificationTransactions,
+          );
+
+          (stateTransactionService.update as jest.Mock).mockResolvedValue(
+            expectedFirstTransactionState,
+          );
+
+          (stateTransactionService.update as jest.Mock).mockResolvedValue(
+            expectedSecondTransactionState,
+          );
+
+          result = await clientBankAccountService.verify({
+            clientBankAccountId,
+            amounts,
+          });
+        });
+
+        it('should invoke clientBankAccountRepository.findOne()', () => {
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledWith({
+            idClientBankAccount: clientBankAccountId,
+          });
+        });
+
+        it('should invoke paymentProviderService.verifyBankAccount()', () => {
+          expect(
+            paymentProviderService.verifyBankAccount,
+          ).toHaveBeenCalledTimes(1);
+          expect(paymentProviderService.verifyBankAccount).toHaveBeenCalledWith(
+            {
+              customerId:
+                expectedClientBankAccount.userClient.userDetails.customerId,
+              bankAccountId: expectedClientBankAccount.chargeId,
+              amounts,
+            },
+          );
+        });
+
+        it('should invoke transactionService.getAllFiltered()', () => {
+          expect(transactionService.getAllFiltered).toHaveBeenCalledTimes(1);
+          expect(transactionService.getAllFiltered).toHaveBeenCalledWith(
+            [StateName.VERIFYING],
+            [TransactionType.BANK_ACCOUNT_VALIDATION],
+            [PaymentProvider.STRIPE],
+            expectedClientBankAccount.idClientBankAccount,
+            true,
+          );
+        });
+
+        it('should invoke stateTransactionService.update()', () => {
+          expect(stateTransactionService.update).toHaveBeenCalledTimes(2);
+        });
+
+        it('should invoke stateTransactionService.update() with amounts[0]', () => {
+          expect(stateTransactionService.update).toHaveBeenCalledWith(
+            StateName.VALID,
+            expectedVerificationTransactions[0],
+            StateDescription.CHANGE_VERIFICATION_TO_VALID,
+          );
+        });
+
+        it('should invoke stateTransactionService.update() with amounts[1]', () => {
+          expect(stateTransactionService.update).toHaveBeenCalledWith(
+            StateName.VALID,
+            expectedVerificationTransactions[1],
+            StateDescription.CHANGE_VERIFICATION_TO_VALID,
+          );
+        });
+
+        it('should return a Stripe Response', () => {
+          const {
+            id,
+            account_holder_type,
+            last4: accountNumber_last4,
+            routing_number,
+            customer,
+            fingerprint,
+            ...verification
+          } = expectedVerification;
+
+          expectedResult = {
+            ...verification,
+            accountNumber_last4,
+          };
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError;
+      describe('when the verification amounts are invalid', () => {
+        beforeEach(async () => {
+          clientBankAccountId = 1;
+          amounts = [1, 3.23];
+          expectedCheckVerificationAmounts = false;
+
+          jest
+            .spyOn(clientBankAccountService, 'checkVerificationAmounts')
+            .mockResolvedValue(expectedCheckVerificationAmounts);
+
+          expectedError = new BadRequestException();
+
+          jest
+            .spyOn(clientBankAccountService, 'verify')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the verification amounts is no valid', async () => {
+          await expect(
+            clientBankAccountService.verify({ clientBankAccountId, amounts }),
+          ).rejects.toThrow(BadRequestException);
+        });
+
+        it('should not invoke paymentProviderService.verifyBankAccount()', () => {
+          expect(
+            paymentProviderService.verifyBankAccount,
+          ).not.toHaveBeenCalled();
+        });
+
+        it('should not invoke transactionService.getAllFiltered()', () => {
+          expect(transactionService.getAllFiltered).not.toHaveBeenCalled();
+        });
+
+        it('should not invoke stateTransactionService.update()', () => {
+          expect(stateTransactionService.update).not.toHaveBeenCalled();
+        });
+      });
+    });
+  });
+
+  describe('checkVerificationAmounts(clientBankAccount, amounts)', () => {
+    describe('case: success', () => {
+      let correctValues = true;
+      let clientBankAccount;
+      let amounts;
+      let result;
+
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          clientBankAccount = 1;
+          amounts = [1, 1.5];
+
+          (transactionService.getClientBankAccountTransaction as jest.Mock).mockResolvedValue(
+            expectedTransactions,
+          );
+
+          result = await clientBankAccountService.checkVerificationAmounts(
+            clientBankAccount,
+            amounts,
+          );
+        });
+
+        it('should invoke transactionService.getClientBankAccountTransaction()', () => {
+          expect(
+            transactionService.getClientBankAccountTransaction,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            transactionService.getClientBankAccountTransaction,
+          ).toHaveBeenCalledWith(clientBankAccount);
+        });
+        it('should return true', () => {
+          expect(result).toStrictEqual(correctValues);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let correctValues = false;
+      let clientBankAccount;
+      let amounts;
+      let result;
+
+      describe('when amounts are no valid', () => {
+        beforeEach(async () => {
+          clientBankAccount = 1;
+          amounts = [0.7, 1.1];
+
+          (transactionService.getClientBankAccountTransaction as jest.Mock).mockResolvedValue(
+            expectedTransactions,
+          );
+
+          result = await clientBankAccountService.checkVerificationAmounts(
+            clientBankAccount,
+            amounts,
+          );
+        });
+
+        it('transactionService.getClientBankAccountTransaction()', () => {
+          expect(
+            transactionService.getClientBankAccountTransaction,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            transactionService.getClientBankAccountTransaction,
+          ).toHaveBeenCalledWith(clientBankAccount);
+        });
+        it('should return a false', () => {
+          expect(result).toStrictEqual(correctValues);
+        });
+      });
+
+      describe('when amounts.lenght = 0', () => {
+        beforeEach(async () => {
+          clientBankAccount = 1;
+          amounts = [];
+
+          (transactionService.getClientBankAccountTransaction as jest.Mock).mockResolvedValue(
+            expectedTransactions,
+          );
+
+          result = await clientBankAccountService.checkVerificationAmounts(
+            clientBankAccount,
+            amounts,
+          );
+        });
+
+        it('transactionService.getClientBankAccountTransaction()', () => {
+          expect(
+            transactionService.getClientBankAccountTransaction,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            transactionService.getClientBankAccountTransaction,
+          ).toHaveBeenCalledWith(clientBankAccount);
+        });
+        it('should return a false', () => {
+          expect(result).toStrictEqual(correctValues);
+        });
+      });
+
+      describe('when amounts.lenght = 1', () => {
+        beforeEach(async () => {
+          clientBankAccount = 1;
+          amounts = [1.6];
+
+          (transactionService.getClientBankAccountTransaction as jest.Mock).mockResolvedValue(
+            expectedTransactions,
+          );
+
+          result = await clientBankAccountService.checkVerificationAmounts(
+            clientBankAccount,
+            amounts,
+          );
+        });
+
+        it('transactionService.getClientBankAccountTransaction()', () => {
+          expect(
+            transactionService.getClientBankAccountTransaction,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            transactionService.getClientBankAccountTransaction,
+          ).toHaveBeenCalledWith(clientBankAccount);
+        });
+        it('should return a false', () => {
+          expect(result).toStrictEqual(correctValues);
+        });
+      });
+    });
+  });
+
+  describe('updateState(idClientBankAccount, state, description)', () => {
+    let expectedChangeState;
+    let idClientBankAccount;
+    let state;
+    let description;
+    let result;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idClientBankAccount = 3;
+          state = StateName.ACTIVE;
+          description =
+            'This state indicates that the object is ready to be used';
+
+          expectedChangeState = expectedChangeBankAccount;
+
+          (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientBankAccount,
+          );
+
+          jest
+            .spyOn(clientBankAccountService, 'changeState')
+            .mockResolvedValue(expectedChangeState);
+
+          result = await clientBankAccountService.updateState(
+            idClientBankAccount,
+            state,
+            description,
+          );
+        });
+
+        it('should invoke clientBankAccountRepository.findOne()', () => {
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledWith({
+            idClientBankAccount,
+          });
+        });
+        it('should return a active state bank account object', () => {
+          expect(result).toStrictEqual(expectedChangeState);
+        });
+      });
+
+      describe('when description is null', () => {
+        beforeEach(async () => {
+          idClientBankAccount = 3;
+          state = StateName.ACTIVE;
+
+          expectedChangeState = { ...expectedChangeBankAccount };
+          expectedChangeState.state.description = null;
+
+          (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClientBankAccount,
+          );
+
+          jest
+            .spyOn(clientBankAccountService, 'changeState')
+            .mockResolvedValue(expectedChangeState);
+
+          result = await clientBankAccountService.updateState(
+            idClientBankAccount,
+            state,
+            null,
+          );
+        });
+
+        it('should invoke clientBankAccountRepository.findOne()', () => {
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledWith({
+            idClientBankAccount,
+          });
+        });
+        it('should return a active state bank account object', () => {
+          expect(result).toStrictEqual(expectedChangeState);
         });
       });
     });
