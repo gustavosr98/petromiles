@@ -2,21 +2,23 @@
 
 context("Recover Password", () => {
 
-//   before(() => {
-//     cy.visit("/");
-//     cy.get(".link-to-signup").click();
-//     cy.url().should("include", "/sign-up");
-//     cy.get(".name-input").type("John");
-//     cy.get(".last-name-input").type("Doe");
-//     cy.get(".email-input").type("test2@petromiles.com");
-//     cy.get(".password-input").type("test1234");
-//     cy.get(".submit-btn").click();
-//     cy.wait(6000);
-//     cy.url().should("include", "/dashboard");
-//     // ESTAS LINEAS SIGUIENTE NO QUIEREN FUNCIONAR
-//     // cy.get(".nav-btn").click({force: true });
-//     // cy.get(".logout-btn").click({multiple: true});
-// });
+  before(() => {
+    cy.visit("/");
+    cy.get(".link-to-signup").click();
+    cy.url().should("include", "/sign-up");
+    cy.get(".name-input").type("John");
+    cy.get(".last-name-input").type("Doe");
+    cy.get(".email-input").type("test2@petromiles.com");
+    cy.get(".password-input").type("test1234");
+    cy.get(".submit-btn").click();
+    cy.wait(8000);
+    cy.url().should("include", "/dashboard");
+    cy.get(
+      ":nth-child(2) > .pt-0 > :nth-child(1) > :nth-child(1) > .app-bar > .v-toolbar__content > .v-app-bar__nav-icon > .v-btn__content > .v-icon"
+    ).click();
+    cy.get(":nth-child(2) > .pt-0 > :nth-child(1) > :nth-child(1) > .v-navigation-drawer > .v-navigation-drawer__append > .pa-2 > .logout-btn > :nth-child(1)").click();
+
+});
 
   beforeEach(() => {
     cy.visit("/");
