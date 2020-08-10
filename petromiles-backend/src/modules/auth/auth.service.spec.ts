@@ -152,40 +152,93 @@ describe( 'AuthService', () => {
         let expectedUser;
         let expectedCreateUserSuscription;
         let result;
-        let expectedResult
+        let expectedResult;
+        let user;
+        let ip;
+        let createdUser;
+        let Suscription;
 
         describe('case: success', ()=>{
             describe('whe everything works well', ()=>{
                 beforeEach( async () => {
-                    expectedUser =[{
-                        user:
-                            {
+                    expectedUser ={
+                        email: 'petro@petromiles.com',
+                        firstName: 'Petro',
+                        middleName: null,
+                        lastName: 'Miles',
+                        secondLastName: null,
+                        password: 'prueba',
+                        salt: '$2b$10$iUCj0m4iW03/7csR8XdYDe',
+                        birthdate: null,
+                        address: null,
+                        phone: '+12222311',
+                        photo: null,
+                        country: null,
+                        ip: '127.0.0.0',
+                     };
+                    expectedCreateUserSuscription = [
+                        {
+                          user: {
+                              email: 'petro@petromiles.com',
+                              firstName: 'Petro',
+                              lastName: 'Miles',
+                              password: 'prueba',
+                              ip: '127.0.0.0'
+                          },
+                          Suscription: 'BASIC',
+                        },
+                    ];
+                    expectedResult = [
+                        {
+                            email: 'petro@petromiles.com',
+                            userDetails: {
+                                idUserDetails: 1,
+                                firstName: 'Petro',
+                                middleName: null,
+                                lastName: 'Miles',
+                                secondLastName: null,
+                                birthdate: null,
+                                address: null,
+                                phone: '+12222311',
+                                photo: null,
+                                customerId: null,
+                                accountId: null,
+                                userClient: null,
+                            },
+                            role: 'CLIENT',
+                            toke: 'TokenTest',
+                            id: '1',
+                            federated: false,
+                        },
+                    ];
+                    user = {
+                            email: 'petro@petromiles.com',
+                            firstName: 'Petro',
+                            middleName: null,
+                            lastName: 'Miles',
+                            secondLastName: null,
+                            password: 'prueba',
+                            salt: '$2b$10$iUCj0m4iW03/7csR8XdYDe',
+                            birthdate: null,
+                            address: null,
+                            phone: '+12222311',
+                            photo: null,
+                            country: null,
+                        },
+                    ip = {
+                            ip: '127.0.0.0'
+                        },
+                    createdUser = {
+                            user: {
                                 email: 'petro@petromiles.com',
                                 firstName: 'Petro',
                                 lastName: 'Miles',
-                                password: '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW',
-                                salt: '$2b$10$iUCj0m4iW03/7csR8XdYDe'
+                                password: 'prueba',
                             },
-                        ip:
-                            {
-                                ip: '127.0.0.1'
-                            },
-                     }
-                    ];
-                    expectedCreateUserSuscription = [
-                        {
-                          user: expectedUser.user,
-                          subscription: 'BASIC',
                         },
-                    ];
-                    expectedUser = [
+                    Suscription = [
                         {
-                            email: expectedUser.user.email,
-                            userDetails: expectedUser.user,
-                            role: 'CLIENT',
-                            id: 'prueba',
-                            federated: false,
-
+                            BASIC :'BASIC'
                         },
                     ];
                     (userClientService.create as jest.Mock).mockResolvedValue(
@@ -196,28 +249,29 @@ describe( 'AuthService', () => {
                     );
 
                     result = await authService.createUserClient(
-                        expectedUser.user, expectedUser.ip
+                        user, ip
                     );
                 });
 
                 it('should invoke userClientService.create()',  () => {
                     expect(userClientService.create).toHaveBeenCalledTimes(1);
-                    expect(userClientService.create).toHaveBeenCalledWith(
-                        expectedUser.user,
-                        expectedUser.ip
+                    expect(userClientService.create).toHaveBeenCalledWith({
+                        user,
+                        ip,
+                        }
                     );
                 });
 
                 it('shouldinvoke userClientService.createUserSuscriptioin() ',  ()=> {
                     expect(suscriptionService.createUserSuscription).toHaveBeenCalledTimes(1);
                     expect(suscriptionService.createUserSuscription).toHaveBeenCalledWith(
-                        expectedCreateUserSuscription.user,
-                        expectedCreateUserSuscription.subscription)
+                        createdUser.user,
+                        Suscription.BASIC,
+                        null)
                 });
                 it('should return a created user', () => {
                     expect(result).toStrictEqual(expectedResult);
                 });
-
             });
         });
     });
