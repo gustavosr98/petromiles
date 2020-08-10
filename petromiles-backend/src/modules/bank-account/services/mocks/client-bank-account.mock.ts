@@ -368,56 +368,6 @@ export const expectedTransactions = [
     clientOnThirdParty: null,
   },
 ];
-
-export const expectedStateBankAccount = {
-  clientBankAccount: {
-    idClientBankAccount: 2,
-    paymentProvider: 'STRIPE',
-    chargeId: 'ba_1HEK3VDfwU0tej1wPOAuwK6N',
-    primary: false,
-    transferId: 'ba_1HEK3XJPZXGZidTblvfQYd9k',
-    userClient: {
-      idUserClient: 1,
-      salt: '$2b$10$yWGg/CN1MIr.kWNeeKDDDO',
-      googleToken: null,
-      facebookToken: null,
-      email: 'test@petromiles.com',
-      password: '$2b$10$yWGg/CN1MIr.kWNeeKDDDO3W9aq2g0K/d1JOG8iPTrIokXtUEDze2',
-      stateUser,
-      userDetails,
-      userSuscription,
-    },
-    bankAccount,
-    stateBankAccount,
-  },
-  description: 'BANK_ACCOUNT_VERIFYING',
-  state: verifyingState,
-  finalDate: null,
-  idStateBankAccount: 13,
-  initialDate: '2020-08-09T23:51:43.355Z',
-};
-
-export const expectedClientBankAccountToBePrimary = {
-  idClientBankAccount: 4,
-  paymentProvider: 'STRIPE',
-  chargeId: 'ba_1HEKmkDfwU0tej1wAWeUIPNN',
-  primary: false,
-  transferId: 'ba_1HEKmmJPZXGZidTbJQlcIAOw',
-  userClient: {
-    idUserClient: 1,
-    salt: '$2b$10$yWGg/CN1MIr.kWNeeKDDDO',
-    googleToken: null,
-    facebookToken: null,
-    email: 'test@petromiles.com',
-    password: '$2b$10$yWGg/CN1MIr.kWNeeKDDDO3W9aq2g0K/d1JOG8iPTrIokXtUEDze2',
-    stateUser,
-    userDetails,
-    userSuscription,
-  },
-  bankAccount,
-  stateBankAccount,
-};
-
 export const bankAccountWithUserDetails = {
   idBankAccount: 3,
   accountNumber: '000123456789',

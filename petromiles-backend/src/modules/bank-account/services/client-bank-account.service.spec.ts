@@ -35,7 +35,6 @@ import {
   userSuscription,
   bankAccount,
   stateBankAccount,
-  blockedState,
 } from './mocks/client-bank-account.mock';
 import {
   expectedClientBankAccount,
@@ -47,9 +46,6 @@ import {
   expectedVerification,
   expectedVerificationTransactions,
   expectedTransactions,
-  verifyingState,
-  expectedStateBankAccount,
-  expectedClientBankAccountToBePrimary,
 } from '@/modules/bank-account/services/mocks/client-bank-account.mock';
 
 describe('ClientBankAccountService', () => {
@@ -1394,7 +1390,10 @@ describe('ClientBankAccountService', () => {
             .mockResolvedValue(expectedCBA);
 
           jest
-            .spyOn(clientBankAccountService, 'hasPendingTransaction')
+            .spyOn<any, string>(
+              clientBankAccountService,
+              'hasPendingTransaction',
+            )
             .mockResolvedValue(false);
 
           jest
@@ -1431,7 +1430,10 @@ describe('ClientBankAccountService', () => {
             .mockResolvedValue(expectedCBA);
 
           jest
-            .spyOn(clientBankAccountService, 'hasPendingTransaction')
+            .spyOn<any, string>(
+              clientBankAccountService,
+              'hasPendingTransaction',
+            )
             .mockResolvedValue(false);
 
           jest

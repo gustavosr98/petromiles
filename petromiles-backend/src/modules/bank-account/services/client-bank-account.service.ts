@@ -402,7 +402,7 @@ export class ClientBankAccountService {
     );
   }
 
-  async hasPendingTransaction(
+  private async hasPendingTransaction(
     clientBankAccount: ClientBankAccount,
   ): Promise<boolean> {
     const pendingValidations = await this.transactionService.getAllFiltered(
