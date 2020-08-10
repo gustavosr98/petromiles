@@ -18,12 +18,21 @@ context("Buy points", () => {
     //     cy.get(".ok-btn").click();
     // });
 
-    it("trying to let the email field empty", () => {
+    // it("trying to let the email field empty", () => {
+    //     cy.get(".password-input").type("test1234");
+    //     cy.get(".login-btn").click();
+    //     cy.wait(3000);
+    //     cy.get(".ok-btn").click();
+    // });
+
+    it("trying to login with a wrong email", () => {
+        cy.get(".email-input").type("test182@petromiles.com");
         cy.get(".password-input").type("test1234");
         cy.get(".login-btn").click();
         cy.wait(3000);
         cy.get(".ok-btn").click();
     });
+
 
   });
   
