@@ -13,6 +13,7 @@
           @change="$v.email.$touch()"
           @blur="$v.email.$touch()"
           :error-messages="emailErrors"
+          class="email-input"
         ></v-text-field>
       </v-form>
     </v-card-text>
@@ -37,6 +38,7 @@
         color="light-blue darken-4"
         :loading="loading"
         dark
+        class="recover-btn"
       >Recover Password</v-btn>
     </div>
     <snackbar @close="closeSnackbar" :show="snackbar" :text="text"></snackbar>
