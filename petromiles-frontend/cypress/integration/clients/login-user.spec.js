@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context("Buy points", () => {
+context("Login User", () => {
     beforeEach(() => {
       cy.visit("/");
     });
