@@ -1245,136 +1245,222 @@ describe('ClientBankAccountService', () => {
       });
     });
   });
-  // describe('updateAccountState(updateAccountStateDto)', () => {
-  //   let updateAccountStateDTO;
-  //   let expectedHasPendingTransaction;
-  //   let expectedNewBankAccountState;
-  //   let result;
+  describe('updateAccountState(updateAccountStateDto)', () => {
+    let updateAccountStateDTO;
+    let expectedHasPendingTransaction;
+    let expectedNewBankAccountState;
+    let result;
+    let expectedCBA;
 
-  //   describe('case: success', () => {
-  //     describe('when the new state is BLOCKED', () => {
-  //       beforeEach(async () => {
-  //         updateAccountStateDTO = {
-  //           idUserClient: 1,
-  //           idBankAccount: 1,
-  //           state: StateName.BLOCKED,
-  //         };
-  //         expectedHasPendingTransaction = false;
-  //         jest
-  //           .spyOn(clientBankAccountService, 'getOne')
-  //           .mockRejectedValue(expectedClientBankAccount);
+    describe('case: success', () => {
+      describe('when the new state is BLOCKED', () => {
+        beforeEach(async () => {
+          updateAccountStateDTO = {
+            idUserClient: 1,
+            idBankAccount: 1,
+            state: StateName.BLOCKED,
+          };
+          expectedCBA = expectedClientBankAccount;
+          expectedHasPendingTransaction = false;
+          expectedNewBankAccountState = {
+            idStateBankAccount: 1,
+            initialDate: new Date(),
+            finalDate: null,
+            description: StateDescription.BANK_ACCOUNT_BLOCKED,
+          };
 
-  //         jest
-  //           .spyOn(clientBankAccountService, 'hasPendingTransaction')
-  //           .mockRejectedValue(false);
+          jest
+            .spyOn(clientBankAccountService, 'getOne')
+            .mockResolvedValue(expectedCBA);
 
-  //         jest
-  //           .spyOn(clientBankAccountService, 'changeState')
-  //           .mockRejectedValue(expectedNewBankAccountState);
+          jest
+            .spyOn(clientBankAccountService, 'hasPendingTransaction')
+            .mockResolvedValue(false);
 
-  //         result = await clientBankAccountService.updateAccountState(
-  //           updateAccountStateDTO,
-  //         );
-  //       });
+          jest
+            .spyOn(clientBankAccountService, 'changeState')
+            .mockResolvedValue(expectedNewBankAccountState);
 
-  //       it('should return a state bank account with a state = blocked', () => {
-  //         expect(result).toStrictEqual(expectedNewBankAccountState);
-  //       });
-  //     });
-  //   });
-  //   describe('case: failure', () => {
-  //     let expectedError: BadRequestException;
-  //     describe('user has pending transactions', () => {
-  //       beforeEach(async () => {
-  //         updateAccountStateDTO = {
-  //           idUserClient: 1,
-  //           idBankAccount: 1,
-  //           state: StateName.BLOCKED,
-  //         };
-  //         expectedHasPendingTransaction = true;
-  //         jest
-  //           .spyOn(clientBankAccountService, 'getOne')
-  //           .mockRejectedValue(expectedClientBankAccount);
+          result = await clientBankAccountService.updateAccountState(
+            updateAccountStateDTO,
+          );
+        });
 
-  //         jest
-  //           .spyOn<any, string>(
-  //             clientBankAccountService,
-  //             'hasPendingTransaction',
-  //           )
-  //           .mockResolvedValue(expectedHasPendingTransaction);
+        it('should return a state bank account with a state = blocked', () => {
+          expect(result).toStrictEqual(expectedNewBankAccountState);
+        });
+      });
+      describe('when the new state is ACTIVE', () => {
+        beforeEach(async () => {
+          updateAccountStateDTO = {
+            idUserClient: 1,
+            idBankAccount: 1,
+            state: StateName.ACTIVE,
+          };
+          expectedCBA = expectedClientBankAccount;
+          expectedHasPendingTransaction = false;
+          expectedNewBankAccountState = {
+            idStateBankAccount: 1,
+            initialDate: new Date(),
+            finalDate: null,
+            description: StateDescription.BANK_ACCOUNT_ACTIVATED,
+          };
 
-  //         expectedError = new BadRequestException();
+          jest
+            .spyOn(clientBankAccountService, 'getOne')
+            .mockResolvedValue(expectedCBA);
 
-  //         jest
-  //           .spyOn(clientBankAccountService, 'updateAccountState')
-  //           .mockRejectedValue(expectedError);
-  //       });
-  //       it('should throw when the user has pending transactions', async () => {
-  //         await expect(
-  //           clientBankAccountService.updateAccountState(updateAccountStateDTO),
-  //         ).rejects.toThrow(BadRequestException);
-  //       });
-  //     });
-  //   });
-  // });
+          jest
+            .spyOn(clientBankAccountService, 'hasPendingTransaction')
+            .mockResolvedValue(false);
 
-  // describe('updateCurrentPrimary(updatePrimaryAccountDTO,idUserClient)', () => {
-  //   let updatePrimaryAccountDTO;
-  //   let idUserClient;
-  //   let result;
-  //   describe('case: success', () => {
-  //     let expectedPrimaryBankAccount;
-  //     let expectedClientBankAccountUpdated;
-  //     describe('when user change to primary account', () => {
-  //       beforeEach(async () => {
-  //         updatePrimaryAccountDTO = {
-  //           primary: true,
-  //           idBankAccount: 1,
-  //         };
-  //         idUserClient = 1;
-  //         expectedPrimaryBankAccount = { ...expectedClientBankAccount };
-  //         expectedPrimaryBankAccount.primary = true;
+          jest
+            .spyOn(clientBankAccountService, 'changeState')
+            .mockResolvedValue(expectedNewBankAccountState);
 
-  //         (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
-  //           expectedPrimaryBankAccount,
-  //         );
+          result = await clientBankAccountService.updateAccountState(
+            updateAccountStateDTO,
+          );
+        });
 
-  //         expectedPrimaryBankAccount.primary = false;
-  //         jest
-  //           .spyOn(clientBankAccountService, 'updatePrimary')
-  //           .mockResolvedValue(expectedPrimaryBankAccount);
+        it('should return a state bank account with a state = active', () => {
+          expect(result).toStrictEqual(expectedNewBankAccountState);
+        });
+      });
+    });
 
-  //         (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
-  //           expectedClientBankAccountToBePrimary,
-  //         );
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('user has pending transactions', () => {
+        beforeEach(async () => {
+          updateAccountStateDTO = {
+            idUserClient: 1,
+            idBankAccount: 1,
+            state: StateName.BLOCKED,
+          };
+          expectedCBA = expectedClientBankAccount;
+          expectedHasPendingTransaction = true;
+          jest
+            .spyOn(clientBankAccountService, 'getOne')
+            .mockResolvedValue(expectedCBA);
 
-  //         expectedClientBankAccountUpdated = {
-  //           ...expectedClientBankAccountToBePrimary,
-  //         };
+          jest
+            .spyOn<any, string>(
+              clientBankAccountService,
+              'hasPendingTransaction',
+            )
+            .mockResolvedValue(expectedHasPendingTransaction);
 
-  //         expectedClientBankAccountUpdated.primary = true;
-  //         jest
-  //           .spyOn(clientBankAccountService, 'updatePrimary')
-  //           .mockResolvedValue(expectedClientBankAccountUpdated);
+          expectedError = new BadRequestException();
 
-  //         result = await clientBankAccountService.updateCurrentPrimary(
-  //           updatePrimaryAccountDTO,
-  //           idUserClient,
-  //         );
-  //       });
+          jest
+            .spyOn(clientBankAccountService, 'updateAccountState')
+            .mockRejectedValue(expectedError);
+        });
+        it('should throw when the user has pending transactions', async () => {
+          await expect(
+            clientBankAccountService.updateAccountState(updateAccountStateDTO),
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+    });
+  });
 
-  //       it('should invoke clientBankAccountRepository.findOne()', () => {
-  //         expect(clientBankAccountRepository.findOne).toHaveBeenCalledTimes(2);
-  //       });
-  //       it('should invoke clientBankAccountRepository.findOne()', () => {
-  //         expect(clientBankAccountRepository.findOne).toHaveBeenLastCalledWith({
-  //           bankAccount: expectedClientBankAccountToBePrimary.bankAccount,
-  //         });
-  //       });
-  //       it('should return a primary client bank account', () => {
-  //         expect(result).toStrictEqual(expectedClientBankAccountUpdated);
-  //       });
-  //     });
-  //   });
-  // });
+  describe('updateCurrentPrimary(updatePrimaryAccountDTO,idUserClient)', () => {
+    let updatePrimaryAccountDTO;
+    let idUserClient;
+    let result;
+    describe('case: success', () => {
+      let expectedCBA;
+      let expectedBA;
+      describe('when user change to primary account', () => {
+        beforeEach(async () => {
+          updatePrimaryAccountDTO = {
+            primary: true,
+            idBankAccount: 1,
+          };
+          idUserClient = 1;
+          expectedCBA = { ...expectedClientBankAccount };
+          expectedCBA.primary = true;
+          expectedBA = expectedBankAccount;
+
+          (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedCBA,
+          );
+
+          (bankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedBA,
+          );
+
+          jest
+            .spyOn(clientBankAccountService, 'updatePrimary')
+            .mockResolvedValue(expectedCBA);
+
+          result = await clientBankAccountService.updateCurrentPrimary(
+            updatePrimaryAccountDTO,
+            idUserClient,
+          );
+        });
+
+        it('should invoke clientBankAccountRepository.findOne()', () => {
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledTimes(2);
+        });
+        it('should invoke bankAccountRepository.findOne()', () => {
+          expect(bankAccountRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(bankAccountRepository.findOne).toHaveBeenCalledWith({
+            idBankAccount: updatePrimaryAccountDTO.idBankAccount,
+          });
+        });
+        it('should return a primary client bank account', () => {
+          expect(result).toStrictEqual(expectedCBA);
+        });
+      });
+
+      describe('when user change to not primary account', () => {
+        beforeEach(async () => {
+          updatePrimaryAccountDTO = {
+            primary: false,
+            idBankAccount: 1,
+          };
+          idUserClient = 1;
+          expectedCBA = { ...expectedClientBankAccount };
+          expectedCBA.primary = false;
+          expectedBA = expectedBankAccount;
+
+          (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedCBA,
+          );
+
+          (bankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedBA,
+          );
+
+          jest
+            .spyOn(clientBankAccountService, 'updatePrimary')
+            .mockResolvedValue(expectedCBA);
+
+          result = await clientBankAccountService.updateCurrentPrimary(
+            updatePrimaryAccountDTO,
+            idUserClient,
+          );
+        });
+
+        it('should invoke clientBankAccountRepository.findOne()', () => {
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(clientBankAccountRepository.findOne).toHaveBeenCalledWith({
+            bankAccount: expectedBA,
+          });
+        });
+        it('should invoke bankAccountRepository.findOne()', () => {
+          expect(bankAccountRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(bankAccountRepository.findOne).toHaveBeenCalledWith({
+            idBankAccount: updatePrimaryAccountDTO.idBankAccount,
+          });
+        });
+        it('should return a not primary client bank account', () => {
+          expect(result).toStrictEqual(expectedCBA);
+        });
+      });
+    });
+  });
 });
