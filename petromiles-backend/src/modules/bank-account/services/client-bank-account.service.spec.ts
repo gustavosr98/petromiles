@@ -26,6 +26,10 @@ import { StateName } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { StateDescription } from '@/enums/state.enum';
 import {
+  state,
+  bankAccountWithUserDetails,
+} from './mocks/client-bank-account.mock';
+import {
   stateUser,
   userDetails,
   userSuscription,
@@ -1127,6 +1131,7 @@ describe('ClientBankAccountService', () => {
         });
       });
     });
+
     describe('case: failure', () => {
       describe('nickname is taken', () => {
         beforeEach(async () => {
@@ -1245,136 +1250,232 @@ describe('ClientBankAccountService', () => {
       });
     });
   });
-  // describe('updateAccountState(updateAccountStateDto)', () => {
-  //   let updateAccountStateDTO;
-  //   let expectedHasPendingTransaction;
-  //   let expectedNewBankAccountState;
-  //   let result;
 
-  //   describe('case: success', () => {
-  //     describe('when the new state is BLOCKED', () => {
-  //       beforeEach(async () => {
-  //         updateAccountStateDTO = {
-  //           idUserClient: 1,
-  //           idBankAccount: 1,
-  //           state: StateName.BLOCKED,
-  //         };
-  //         expectedHasPendingTransaction = false;
-  //         jest
-  //           .spyOn(clientBankAccountService, 'getOne')
-  //           .mockRejectedValue(expectedClientBankAccount);
+  describe('changeState(stateName,clientBankAccount,description)', () => {
+    let expectedNewStateBankAccount;
+    let stateName;
+    let clientBankAccount;
+    let description;
+    let result;
 
-  //         jest
-  //           .spyOn(clientBankAccountService, 'hasPendingTransaction')
-  //           .mockRejectedValue(false);
+    describe('case: success', () => {
+      describe('when description is not null', () => {
+        beforeEach(async () => {
+          stateName = StateName.VALID;
+          clientBankAccount = expectedClientBankAccount;
+          description = 'PRUEBA';
+          expectedNewStateBankAccount = {
+            clientBankAccount,
+            description,
+            state,
+            finalDate: null,
+            idStateBankAccount: 13,
+            initialDate: '2020-08-10T21:35:15.065Z',
+          };
 
-  //         jest
-  //           .spyOn(clientBankAccountService, 'changeState')
-  //           .mockRejectedValue(expectedNewBankAccountState);
+          jest
+            .spyOn<any, string>(clientBankAccountService, 'endLastState')
+            .mockImplementation(() => {
+              return null;
+            });
 
-  //         result = await clientBankAccountService.updateAccountState(
-  //           updateAccountStateDTO,
-  //         );
-  //       });
+          (managementService.getState as jest.Mock).mockResolvedValue(state);
 
-  //       it('should return a state bank account with a state = blocked', () => {
-  //         expect(result).toStrictEqual(expectedNewBankAccountState);
-  //       });
-  //     });
-  //   });
-  //   describe('case: failure', () => {
-  //     let expectedError: BadRequestException;
-  //     describe('user has pending transactions', () => {
-  //       beforeEach(async () => {
-  //         updateAccountStateDTO = {
-  //           idUserClient: 1,
-  //           idBankAccount: 1,
-  //           state: StateName.BLOCKED,
-  //         };
-  //         expectedHasPendingTransaction = true;
-  //         jest
-  //           .spyOn(clientBankAccountService, 'getOne')
-  //           .mockRejectedValue(expectedClientBankAccount);
+          jest.spyOn(clientBankAccountService, 'sendStatusBankAccount');
 
-  //         jest
-  //           .spyOn<any, string>(
-  //             clientBankAccountService,
-  //             'hasPendingTransaction',
-  //           )
-  //           .mockResolvedValue(expectedHasPendingTransaction);
+          (stateBankAccountRepository.save as jest.Mock).mockResolvedValue(
+            expectedNewStateBankAccount,
+          );
 
-  //         expectedError = new BadRequestException();
+          result = await clientBankAccountService.changeState(
+            stateName,
+            clientBankAccount,
+            description,
+          );
+        });
 
-  //         jest
-  //           .spyOn(clientBankAccountService, 'updateAccountState')
-  //           .mockRejectedValue(expectedError);
-  //       });
-  //       it('should throw when the user has pending transactions', async () => {
-  //         await expect(
-  //           clientBankAccountService.updateAccountState(updateAccountStateDTO),
-  //         ).rejects.toThrow(BadRequestException);
-  //       });
-  //     });
-  //   });
-  // });
+        it('should invoke stateBankAccountRepository.save()', () => {
+          expect(stateBankAccountRepository.save).toHaveBeenCalledTimes(1);
+          expect(stateBankAccountRepository.save).toHaveBeenCalledWith({
+            clientBankAccount,
+            description: 'PRUEBA',
+            state,
+          });
+        });
+        it('should invoke managementService.getState()', () => {
+          expect(managementService.getState).toHaveBeenCalledTimes(1);
+          expect(managementService.getState).toHaveBeenCalledWith(stateName);
+        });
+        it('should return a valid state bank account', () => {
+          expect(result).toStrictEqual(expectedNewStateBankAccount);
+        });
+      });
 
-  // describe('updateCurrentPrimary(updatePrimaryAccountDTO,idUserClient)', () => {
-  //   let updatePrimaryAccountDTO;
-  //   let idUserClient;
-  //   let result;
-  //   describe('case: success', () => {
-  //     let expectedPrimaryBankAccount;
-  //     let expectedClientBankAccountUpdated;
-  //     describe('when user change to primary account', () => {
-  //       beforeEach(async () => {
-  //         updatePrimaryAccountDTO = {
-  //           primary: true,
-  //           idBankAccount: 1,
-  //         };
-  //         idUserClient = 1;
-  //         expectedPrimaryBankAccount = { ...expectedClientBankAccount };
-  //         expectedPrimaryBankAccount.primary = true;
+      describe('when description is null', () => {
+        beforeEach(async () => {
+          stateName = StateName.VALID;
+          clientBankAccount = expectedClientBankAccount;
 
-  //         (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
-  //           expectedPrimaryBankAccount,
-  //         );
+          expectedNewStateBankAccount = {
+            clientBankAccount,
+            description: undefined,
+            state,
+            finalDate: null,
+            idStateBankAccount: 13,
+            initialDate: '2020-08-10T21:35:15.065Z',
+          };
 
-  //         expectedPrimaryBankAccount.primary = false;
-  //         jest
-  //           .spyOn(clientBankAccountService, 'updatePrimary')
-  //           .mockResolvedValue(expectedPrimaryBankAccount);
+          jest
+            .spyOn<any, string>(clientBankAccountService, 'endLastState')
+            .mockImplementation(() => {
+              return null;
+            });
 
-  //         (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
-  //           expectedClientBankAccountToBePrimary,
-  //         );
+          (managementService.getState as jest.Mock).mockResolvedValue(state);
 
-  //         expectedClientBankAccountUpdated = {
-  //           ...expectedClientBankAccountToBePrimary,
-  //         };
+          jest.spyOn(clientBankAccountService, 'sendStatusBankAccount');
 
-  //         expectedClientBankAccountUpdated.primary = true;
-  //         jest
-  //           .spyOn(clientBankAccountService, 'updatePrimary')
-  //           .mockResolvedValue(expectedClientBankAccountUpdated);
+          (stateBankAccountRepository.save as jest.Mock).mockResolvedValue(
+            expectedNewStateBankAccount,
+          );
 
-  //         result = await clientBankAccountService.updateCurrentPrimary(
-  //           updatePrimaryAccountDTO,
-  //           idUserClient,
-  //         );
-  //       });
+          result = await clientBankAccountService.changeState(
+            stateName,
+            clientBankAccount,
+          );
+        });
 
-  //       it('should invoke clientBankAccountRepository.findOne()', () => {
-  //         expect(clientBankAccountRepository.findOne).toHaveBeenCalledTimes(2);
-  //       });
-  //       it('should invoke clientBankAccountRepository.findOne()', () => {
-  //         expect(clientBankAccountRepository.findOne).toHaveBeenLastCalledWith({
-  //           bankAccount: expectedClientBankAccountToBePrimary.bankAccount,
-  //         });
-  //       });
-  //       it('should return a primary client bank account', () => {
-  //         expect(result).toStrictEqual(expectedClientBankAccountUpdated);
-  //       });
-  //     });
-  //   });
-  // });
+        it('should invoke stateBankAccountRepository.save()', () => {
+          expect(stateBankAccountRepository.save).toHaveBeenCalledTimes(1);
+          expect(stateBankAccountRepository.save).toHaveBeenCalledWith({
+            clientBankAccount,
+            description: undefined,
+            state,
+          });
+        });
+
+        it('should invoke managementService.getState()', () => {
+          expect(managementService.getState).toHaveBeenCalledTimes(1);
+          expect(managementService.getState).toHaveBeenCalledWith(stateName);
+        });
+        it('should return a valid state bank account', () => {
+          expect(result).toStrictEqual(expectedNewStateBankAccount);
+        });
+      });
+    });
+  });
+
+  describe('sendStatusBankAccount(bankAccountStatus,clientBankAccount)', () => {
+    describe('case: success', () => {
+      let bankAccountStatus;
+      let clientBankAccount;
+      let expectedTemplate;
+      let expectedMsg;
+      describe('when state name is verifying', () => {
+        beforeEach(async () => {
+          clientBankAccount = expectedClientBankAccount;
+          clientBankAccount.bankAccount = bankAccountWithUserDetails;
+          bankAccountStatus = StateName.VERIFYING;
+          expectedTemplate: 'd-84f8c29c45e74e28972044261d024d2b';
+          expectedMsg = {
+            to: 'test@petromiles.com',
+            subject: 'Bank Account Registration',
+            templateId: expectedTemplate,
+            dynamic_template_data: {
+              user: 'petro',
+              bank: 'Bank of America',
+              accountHolderName: 'petro miles',
+              accountNumber: '6789',
+            },
+          };
+
+          (configService.get as jest.Mock).mockResolvedValue(expectedTemplate);
+
+          (mailsService.sendEmail as jest.Mock).mockResolvedValue(state);
+          await clientBankAccountService.sendStatusBankAccount(
+            bankAccountStatus,
+            clientBankAccount,
+          );
+        });
+        it('should invoke configService.get()', () => {
+          expect(configService.get).toHaveBeenCalledTimes(1);
+          expect(configService.get).toHaveBeenCalledWith(
+            'mails.sendgrid.templates.bankAccountRegistration[english]',
+          );
+        });
+        it('should invoke mailsService.sendEmail()', () => {
+          expect(mailsService.sendEmail).toHaveBeenCalledTimes(1);
+          expect(mailsService.sendEmail).toHaveBeenCalledWith(expectedMsg);
+        });
+      });
+
+      describe('when state name is active', () => {
+        beforeEach(async () => {
+          clientBankAccount = expectedClientBankAccount;
+          clientBankAccount.bankAccount = bankAccountWithUserDetails;
+          bankAccountStatus = StateName.ACTIVE;
+          expectedTemplate: 'd-ffd64348bbfb462ea3e681d883ce8d23';
+          expectedMsg = {
+            to: 'test@petromiles.com',
+            subject: 'Bank Account Verification',
+            templateId: expectedTemplate,
+            dynamic_template_data: {
+              user: 'petro',
+              bank: 'Bank of America',
+              accountNumber: '6789',
+            },
+          };
+          (configService.get as jest.Mock).mockResolvedValue(expectedTemplate);
+
+          (mailsService.sendEmail as jest.Mock).mockResolvedValue(state);
+          await clientBankAccountService.sendStatusBankAccount(
+            bankAccountStatus,
+            clientBankAccount,
+          );
+        });
+        it('should invoke configService.get()', () => {
+          expect(configService.get).toHaveBeenCalledTimes(1);
+          expect(configService.get).toHaveBeenCalledWith(
+            'mails.sendgrid.templates.bankAccountVerified[english]',
+          );
+        });
+        it('should invoke mailsService.sendEmail()', () => {
+          expect(mailsService.sendEmail).toHaveBeenCalledTimes(1);
+          expect(mailsService.sendEmail).toHaveBeenCalledWith(expectedMsg);
+        });
+      });
+
+      describe('when state name is cancelled', () => {
+        beforeEach(async () => {
+          clientBankAccount = expectedClientBankAccount;
+          clientBankAccount.bankAccount = bankAccountWithUserDetails;
+          bankAccountStatus = StateName.CANCELLED;
+          expectedTemplate: 'd-1ac3b31df47842f4bd9cd81b41437e97';
+          expectedMsg = {
+            to: 'test@petromiles.com',
+            subject: 'Bank account deleted',
+            templateId: expectedTemplate,
+            dynamic_template_data: { user: 'petro', accountNumber: '6789' },
+          };
+          (configService.get as jest.Mock).mockResolvedValue(expectedTemplate);
+
+          (mailsService.sendEmail as jest.Mock).mockResolvedValue(state);
+          await clientBankAccountService.sendStatusBankAccount(
+            bankAccountStatus,
+            clientBankAccount,
+          );
+        });
+        it('should invoke configService.get()', () => {
+          expect(configService.get).toHaveBeenCalledTimes(1);
+          expect(configService.get).toHaveBeenCalledWith(
+            'mails.sendgrid.templates.bankAccountDeletion[english]',
+          );
+        });
+        it('should invoke mailsService.sendEmail()', () => {
+          expect(mailsService.sendEmail).toHaveBeenCalledTimes(1);
+          expect(mailsService.sendEmail).toHaveBeenCalledWith(expectedMsg);
+        });
+      });
+    });
+  });
 });

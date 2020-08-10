@@ -283,7 +283,7 @@ export class ClientBankAccountService {
     return await this.stateBankAccountRepository.save(stateBankAccount);
   }
 
-  sendStatusBankAccount(
+  async sendStatusBankAccount(
     bankAccountStatus: StateName,
     clientBankAccount: ClientBankAccount,
   ) {
@@ -300,7 +300,7 @@ export class ClientBankAccountService {
       const msg = {
         to: clientBankAccount.userClient.email,
         subject: subject,
-        templateId: this.configService.get<string>(
+        templateId: await this.configService.get<string>(
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
@@ -324,7 +324,7 @@ export class ClientBankAccountService {
       const msg = {
         to: clientBankAccount.userClient.email,
         subject: subject,
-        templateId: this.configService.get<string>(
+        templateId: await this.configService.get<string>(
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
@@ -344,7 +344,7 @@ export class ClientBankAccountService {
       const msg = {
         to: clientBankAccount.userClient.email,
         subject: subject,
-        templateId: this.configService.get<string>(
+        templateId: await this.configService.get<string>(
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {

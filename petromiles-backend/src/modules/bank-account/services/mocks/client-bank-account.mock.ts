@@ -417,3 +417,13 @@ export const expectedClientBankAccountToBePrimary = {
   bankAccount,
   stateBankAccount,
 };
+
+export const bankAccountWithUserDetails = {
+  idBankAccount: 3,
+  accountNumber: '000123456789',
+  checkNumber: '1234',
+  nickname: 'test 5',
+  type: 'Saving',
+  routingNumber,
+  userDetails,
+};
