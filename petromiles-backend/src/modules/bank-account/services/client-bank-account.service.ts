@@ -241,11 +241,11 @@ export class ClientBankAccountService {
     let correctValues = true;
 
     if (
-      this.configService.get<boolean>('QAEnviroment') &&
+      this.configService.get<boolean>('QAEnvironment') &&
       amounts[0] === 1.5 &&
       amounts[1] === 1
     ) {
-      this.logger.warn(`[${ApiModules.BANK_ACCOUNT}] QA Enviroment active`);
+      this.logger.warn(`[${ApiModules.BANK_ACCOUNT}] QA Environment active`);
       return correctValues;
     }
 
