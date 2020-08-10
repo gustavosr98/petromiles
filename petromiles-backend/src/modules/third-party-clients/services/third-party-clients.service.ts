@@ -261,7 +261,7 @@ export class ThirdPartyClientsService {
     return PlatformInterest.GOLD_EXTRA;
   }
 
-  async calculateExtras(userClient: UserClient) {
+  private async calculateExtras(userClient: UserClient) {
     const currentUserSuscription = await userClient.userSuscription.find(
       suscription => !suscription.finalDate,
     );
