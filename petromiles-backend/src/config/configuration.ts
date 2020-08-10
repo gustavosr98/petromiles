@@ -109,5 +109,5 @@ export default () => ({
     },
   },
 
-  QAEnviroment: process.env.QA_MODE_ENVIRONMENT == 'true' ? true : false,
+  QAEnviroment: process.env.QA_ENVIRONMENT == 'true' ? true : false,
 });
