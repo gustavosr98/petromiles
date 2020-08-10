@@ -33,7 +33,7 @@
                 <v-row justify="center">
                   <v-col cols="8">
                     <v-text-field
-                      name='points'
+                      name="points"
                       v-model="$v.points.$model"
                       :label="$t('payments.points')"
                       append-icon="mdi-coins"
@@ -62,7 +62,7 @@
                 <v-row justify="center">
                   <v-col cols="8">
                     <v-select
-                      name='accounts'
+                      name="accounts"
                       v-model="selectedBankAccount"
                       :label="$tc('navbar.bankAccount', 0)"
                       append-outer-icon="mdi-bank"
@@ -89,7 +89,7 @@
                 <v-row justify="center">
                   <v-col cols="12" class="text-center">
                     <v-btn
-                      name='exchange'
+                      name="exchange"
                       @click="submitButton"
                       class="primary submit-btn"
                       :loading="loading"
@@ -118,7 +118,13 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn name='success' color="secondary" dark :to="{ name: comeBackRoute }" class="ok-btn">
+                <v-btn
+                  name="success"
+                  color="secondary"
+                  dark
+                  :to="{ name: comeBackRoute }"
+                  class="ok-btn"
+                >
                   {{
                   $t("common.ok")
                   }}
@@ -185,7 +191,7 @@ export default {
     "payments-invoice": PaymentInvoice,
     "loading-screen": LoadingScreen,
   },
-  data: function() {
+  data: function () {
     return {
       makeItRainImage: MakeItRain,
       formValidity: false,
@@ -214,7 +220,7 @@ export default {
     costWithInterests() {
       if (this.points) {
         let result = this.rawCost;
-        this.interests.map(i => {
+        this.interests.map((i) => {
           result = result - (this.rawCost * i.percentage + i.amount / 100);
         });
         return Math.round(result * 10000) / 10000;
@@ -227,16 +233,15 @@ export default {
   },
   async mounted() {
     try {
-      await this.loadBankAccounts();
-      await this.loadRate();
-      await this.loadInterests();
-      await this.loadPoints();
+      this.bankAccounts = await this.loadBankAccounts();
+      this.onePointToDollars = await this.loadRate();
+      this.interests = await this.loadInterests();
+      this.totalPoints = await this.loadPoints();
     } catch (error) {
       console.log(error);
-    }
-    finally{
+    } finally {
       this.showLoadingScreen = false;
-    }    
+    }
   },
   methods: {
     async submitButton() {
@@ -253,30 +258,25 @@ export default {
           idClientBankAccount: this.selectedBankAccount,
           amount: Math.round(this.rawCost * 10000) / 100,
           amountToCharge: Math.round(this.costWithInterests * 10000) / 100,
-          points: this.points
+          points: this.points,
         })
-        .then(res => {
+        .then((res) => {
           this.transaction = res;
           this.paymentIsReady = true;
         })
-        .catch(err => {
+        .catch((err) => {
           this.loading = false;
         });
     },
     async loadPoints() {
-      this.totalPoints = (
-        await this.$http.get("/user/points/conversion")
-      ).points;
+      return (await this.$http.get("/user/points/conversion")).points;
     },
     async loadRate() {
-      this.onePointToDollars = (
-        await this.$http.get("/payments/one-point-to-dollars")
-      ).onePointEqualsDollars;
+      return (await this.$http.get("/payments/one-point-to-dollars"))
+        .onePointEqualsDollars;
     },
     async loadInterests() {
-      this.interests = await this.$http.get(
-        "/payments/interests/withdrawal/withdrawal"
-      );
+      return await this.$http.get("/payments/interests/withdrawal/withdrawal");
     },
     pdfWasCreated() {
       this.dialog = true;

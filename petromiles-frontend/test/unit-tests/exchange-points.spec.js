@@ -1,23 +1,23 @@
 import { shallowMount } from "@vue/test-utils";
 import ExchangePointsForm from "@/components/Withdrawal/ExchangePointsForm";
 
+//import Vue from "vue";
 import App from "@/App.vue";
 import router from "@/router";
 import store from "@/store";
-import vuetify from "@/plugins/vuetify";
-import i18n from "@/i18n";
-import httpClient from "@/http/http-client";
+//import vuetify from "@/plugins/vuetify";
+//import i18n from "@/i18n";
+//import httpClient from "@/http/http-client";
 
-Vue.config.productionTip = false;
-Vue.prototype.$http = httpClient;
-
-const wrapper = shallowMount(ExchangePointsForm, {
-  router,
-  store,
-  vuetify,
-  i18n,
-  render: h => h(App),
-});
+//Vue.config.productionTip = false;
+//Vue.prototype.$http = httpClient;
+import Vue from "vue";
+import VueI18n from "vue-i18n";
+import Vuetify from "vuetify/lib";
+Vue.use(VueI18n);
+Vue.use(Vuetify);
+const i18n = new VueI18n();
+const vuetify = new Vuetify();
 
 describe("ExchangePointsForm", () => {
   let bankAccounts;
@@ -28,12 +28,19 @@ describe("ExchangePointsForm", () => {
   let loadRate;
   let loadInterests;
   let loadPoints;
+  let wrapper;
 
   beforeEach(async () => {
-    loadBankAccounts = jest.fn();
-    loadRate = jest.fn();
-    loadInterests = jest.fn();
-    loadPoints = jest.fn();
+    const $t = () => {};
+    const $tc = () => {};
+    wrapper = shallowMount(ExchangePointsForm, {
+      router,
+      store,
+      vuetify,
+      i18n,
+      render: h => h(App),
+    });
+    //wrapper = new Vue(ExchangePointsForm).$mount();
   });
 
   describe("case: success", () => {
@@ -58,8 +65,14 @@ describe("ExchangePointsForm", () => {
         //  interests,
         //  totalPoints,
         //});
+        wrapper.$el.loadBankAccounts = jest
+          .fn()
+          .mockResolvedValue(bankAccounts);
+        wrapper.loadRate = jest.fn().mockResolvedValue(onePointToDollars);
+        wrapper.loadInterests = jest.fn().mockResolvedValue(interests);
+        wrapper.loadPoints = jest.fn().mockResolvedValue(totalPoints);
 
-        loadBankAccounts.mockImplementation(() => {
+        /*loadBankAccounts.mockImplementation(() => {
           this.bankAccounts = bankAccounts;
         });
         loadRate.mockImplementation(() => {
@@ -70,13 +83,7 @@ describe("ExchangePointsForm", () => {
         });
         loadPoints.mockImplementation(() => {
           this.totalPoints = totalPoints;
-        });
-        wrapper.setMethods({
-          loadBankAccounts,
-          loadRate,
-          loadInterests,
-          loadPoints,
-        });
+        });*/
       });
 
       it("has a created hook", () => {
@@ -84,6 +91,7 @@ describe("ExchangePointsForm", () => {
       });
 
       it("check default values", () => {
+        expect(wrapper.vm.loadBankAccounts).toHaveBeenCalledTimes(1);
         expect(wrapper.vm.bankAccounts).toBe(bankAccounts);
         expect(wrapper.vm.onePointToDollars).toBe(onePointToDollars);
         expect(wrapper.vm.interests).toBe(interests);
@@ -95,7 +103,7 @@ describe("ExchangePointsForm", () => {
           points: "2000",
           selectedBankAccount: bankAccounts[0].idClientBankAccount,
         });
-        await wrapper.find({ name: "exchange" }).trigger("click");
+        await wrapper.findComponent({ name: "exchange" }).trigger("click");
       });
     });
   });

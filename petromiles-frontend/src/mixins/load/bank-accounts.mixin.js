@@ -5,7 +5,7 @@ export default {
     async loadBankAccounts() {
       const bankAccounts = await this.$http.get("/bank-account");
 
-      this.bankAccounts = bankAccounts
+      const bankAccountsResult = bankAccounts
         .filter(b => {
           const isActive = !!b?.clientBankAccount[0].stateBankAccount.find(
             sba => !sba.finalDate && sba.state.name === states.ACTIVE.name
@@ -23,6 +23,8 @@ export default {
         });
 
       this.loadingBankAccounts = false;
+
+      return bankAccountsResult;
     },
   },
 };
