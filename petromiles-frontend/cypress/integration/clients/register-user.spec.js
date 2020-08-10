@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context("Buy points", () => {
+context("Register User", () => {
     beforeEach(() => {
         cy.visit("/");
         cy.get(".link-to-signup").click();
