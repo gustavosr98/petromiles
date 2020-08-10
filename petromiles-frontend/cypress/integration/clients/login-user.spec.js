@@ -5,7 +5,13 @@ context("Buy points", () => {
       cy.visit("/");
     });
   
-    it("trying to let all the fields empty", () => {
+    // it("trying to let all the fields empty", () => {
+    //     cy.get(".login-btn").click();
+    //     cy.get(".ok-btn").click();
+    // });
+    
+    it("trying to let the password field empty", () => {
+        cy.get(".email-input").type("test@petromiles.com");
         cy.get(".login-btn").click();
         cy.get(".ok-btn").click();
     });
