@@ -1,10 +1,5 @@
 /// <reference types="cypress" />
 
-//Routing numbers:
-//[0] = Bank of America
-//[1] = Ally Bank
-//[2] = Invalid
-
 const errorMessages = {
   type: "Type is can't be empty",
   phoneNumber: "Phone can't be empty",
@@ -13,6 +8,13 @@ const errorMessages = {
   routingNumber: "Routing number can't be empty",
   checkNumber: "Check number can't be empty",
   nickname: "Nickname can't be empty",
+};
+const modalMessages = {
+  nicknameIsTaken:
+    "You already have a bank account with this nickname. Please try with another one",
+  combinationTaken: "This bank account is already asociated with the customer",
+  invalidAccountNumber: "Account number is invalid",
+  invalidRoutingNumber: "Invalid bank account routing number",
 };
 const accountNumbers = ["000123456789", "000111111116", "1234"];
 const banks = ["Bank of America", "Ally Bank"];
@@ -97,7 +99,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.get(".error-modal").should("exist");
+    cy.contains(modalMessages.invalidAccountNumber).should("be.visible");
   });
 
   it("trying to create a bank account without a routing number", () => {
@@ -128,7 +130,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.get(".error-modal").should("exist");
+    cy.contains(modalMessages.invalidRoutingNumber).should("be.visible");
   });
 
   it("trying to create a bank account with a routing number that doesn't match with the bank", () => {
@@ -144,7 +146,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.get(".error-modal").should("exist");
+    cy.contains(modalMessages.invalidRoutingNumber).should("be.visible");
   });
 
   it("trying to create a bank account without a check number", () => {
@@ -206,7 +208,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.get(".error-modal").should("exist");
+    cy.contains(modalMessages.combinationTaken).should("be.visible");
   });
 
   it("trying to create a bank account with a nickname already in use", () => {
@@ -219,9 +221,9 @@ context("Bank Account Creation", () => {
     cy.get(".account-number-input").type(accountNumbers[0]);
     cy.get(".routing-number-input").type(routingNumbers[1]);
     cy.get(".check-input").type("2255");
-    cy.get(".continue-btn").click();
     cy.get(".nickname-input").type(nicknames[1]);
+    cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.get(".error-modal").should("exist");
+    cy.contains(modalMessages.nicknameIsTaken).should("be.visible");
   });
 });
