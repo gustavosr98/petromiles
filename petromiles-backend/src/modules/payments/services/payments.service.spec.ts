@@ -1,9 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, getConnection, Connection, getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { mocked } from 'ts-jest/utils';
 
 import { PaymentsService } from './payments.service';
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
@@ -18,9 +17,7 @@ import { SuscriptionService } from '@/modules/suscription/service/suscription.se
 import { Transaction } from '@/entities/transaction.entity';
 import { ClientBankAccount } from '@/entities/client-bank-account.entity';
 import { UserClient } from '@/entities/user-client.entity';
-import { ThirdPartyInterest } from '@/entities/third-party-interest.entity';
 import { ClientPoints } from '@/entities/user-points.entity';
-import { PointsConversion } from '@/entities/points-conversion.entity';
 
 import { Interest } from '@/modules/payments/interest.interface';
 import { PlatformInterest } from '@/enums/platform-interest.enum';
