@@ -15,15 +15,15 @@ context("Bank Account Verification", () => {
     cy.get(".verify-btn").click();
   });
 
-  //   it("trying to verify an account without any amount", () => {
-  //     cy.get(".verify-account").click();
-  //     cy.url().should("include", "/bank-accounts");
-  //     cy.contains(
-  //       "The combination you have provided is invalid. Please try again"
-  //     ).should("be.visible");
-  //   });
+  it("trying to verify an account without any amount", () => {
+    cy.get(".verify-account").click();
+    cy.url().should("include", "/bank-accounts");
+    cy.contains(
+      "The combination you have provided is invalid. Please try again"
+    ).should("be.visible");
+  });
 
-  it("trying to verify an account with just first amount", () => {
+  it("trying to verify an account with just the first amount", () => {
     cy.get(".first-amount").type("1.5");
     cy.get(".verify-account").click();
     cy.url().should("include", "/bank-accounts");
@@ -31,7 +31,7 @@ context("Bank Account Verification", () => {
       "The combination you have provided is invalid. Please try again"
     ).should("be.visible");
   });
-  it("trying to verify an account with just first amount", () => {
+  it("trying to verify an account with just the second amount", () => {
     cy.get(".second-amount").type("1.5");
     cy.get(".verify-account").click();
     cy.url().should("include", "/bank-accounts");
@@ -55,6 +55,9 @@ context("Bank Account Verification", () => {
     cy.get(".second-amount").type("1");
     cy.get(".verify-account").click();
     cy.wait(10000);
+    cy.contains(
+      "The combination you have provided is invalid. Please try again"
+    ).should("not.be.visible");
     cy.get(".verify-modal").should("not.be.visible");
   });
 });
