@@ -18,7 +18,7 @@
         </v-img>
         <v-row align="center" justify="center">
           <router-link to="/sell-points" class="text-decoration-none">
-            <v-btn large dark color="primary" class="my-4">
+            <v-btn large dark color="primary" class="my-4 exchange-points-btn">
               <b> {{ $t("navbar.exchangePoints") }} </b>
             </v-btn>
           </router-link>

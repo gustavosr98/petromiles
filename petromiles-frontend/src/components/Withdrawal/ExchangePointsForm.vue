@@ -41,6 +41,7 @@
                       @blur="$v.points.$touch()"
                       :error-messages="pointsErrors"
                       :disabled="loading"
+                      class="points-input"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -70,6 +71,7 @@
                       :error-messages="selectedBankAccountErrors"
                       :loading="loadingBankAccounts"
                       :disabled="loadingBankAccounts || loading"
+                      class="accounts-selector"
                     >
                       <template
                         slot="selection"
@@ -86,7 +88,7 @@
                   <v-col cols="12" class="text-center">
                     <v-btn
                       @click="submitButton"
-                      class="primary"
+                      class="primary submit-btn"
                       :loading="loading"
                       dark
                     >{{ $t("exchange-points-form.getDollars") }}</v-btn>
@@ -113,7 +115,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" dark :to="{ name: comeBackRoute }">
+                <v-btn color="secondary" dark :to="{ name: comeBackRoute }" class="ok-btn">
                   {{
                   $t("common.ok")
                   }}
@@ -139,7 +141,7 @@
                   $t("common.cancel")
                   }}
                 </v-btn>
-                <v-btn color="success" dark @click="exchangePoints">
+                <v-btn color="success" dark @click="exchangePoints" class="confirm-btn">
                   {{
                   $t("common.yes")
                   }}
