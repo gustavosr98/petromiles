@@ -26,6 +26,14 @@ import { StateName } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { StateDescription } from '@/enums/state.enum';
 import {
+  stateUser,
+  userDetails,
+  userSuscription,
+  bankAccount,
+  stateBankAccount,
+  blockedState,
+} from './mocks/client-bank-account.mock';
+import {
   expectedClientBankAccount,
   expectedUserClient,
   createBankAccountDTO,
@@ -37,6 +45,7 @@ import {
   expectedTransactions,
   verifyingState,
   expectedStateBankAccount,
+  expectedClientBankAccountToBePrimary,
 } from '@/modules/bank-account/services/mocks/client-bank-account.mock';
 
 describe('ClientBankAccountService', () => {
@@ -978,4 +987,394 @@ describe('ClientBankAccountService', () => {
       });
     });
   });
+
+  describe('cancelBankAccount(idUserClient, idBankAccount, email)', () => {
+    let clientBankAccount;
+    let expectedHasPendingTransaction;
+    let expectedChangeState;
+    let idUserClient;
+    let idBankAccount;
+    let email;
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          expectedChangeState = expectedChangeBankAccount;
+          expectedHasPendingTransaction = false;
+          clientBankAccount = expectedClientBankAccount;
+          idUserClient = 1;
+          idBankAccount = 3;
+          email = 'test@petromiles.com';
+
+          jest
+            .spyOn(clientBankAccountService, 'getOne')
+            .mockResolvedValue(clientBankAccount);
+
+          jest
+            .spyOn<any, string>(
+              clientBankAccountService,
+              'hasPendingTransaction',
+            )
+            .mockImplementation(() => {
+              return expectedHasPendingTransaction;
+            });
+
+          jest
+            .spyOn(clientBankAccountService, 'changeState')
+            .mockResolvedValue(expectedChangeState);
+
+          paymentProviderService.deleteBankAccount as jest.Mock;
+
+          await clientBankAccountService.cancelBankAccount(
+            idUserClient,
+            idBankAccount,
+            email,
+          );
+        });
+
+        it('should invoke paymentProviderService.deleteBankAccount()', () => {
+          expect(
+            paymentProviderService.deleteBankAccount,
+          ).toHaveBeenCalledTimes(1);
+          expect(paymentProviderService.deleteBankAccount).toHaveBeenCalledWith(
+            clientBankAccount.userClient.userDetails.customerId,
+            clientBankAccount.chargeId,
+            email,
+          );
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      describe('when user has pending transactions', () => {
+        let expectedError: BadRequestException;
+        beforeEach(async () => {
+          clientBankAccount = expectedClientBankAccount;
+          idUserClient = 1;
+          idBankAccount = 3;
+          expectedHasPendingTransaction = true;
+          email = 'test@petromiles.com';
+
+          jest
+            .spyOn(clientBankAccountService, 'getOne')
+            .mockResolvedValue(clientBankAccount);
+
+          jest
+            .spyOn<any, string>(
+              clientBankAccountService,
+              'hasPendingTransaction',
+            )
+            .mockResolvedValue(expectedHasPendingTransaction);
+
+          expectedError = new BadRequestException();
+
+          jest
+            .spyOn(clientBankAccountService, 'cancelBankAccount')
+            .mockRejectedValue(expectedError);
+        });
+
+        it('should throw when the user has pending transactions', async () => {
+          await expect(
+            clientBankAccountService.cancelBankAccount(
+              idUserClient,
+              idBankAccount,
+              email,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+
+        it('should not invoke paymentProviderService.deleteBankAccount()', () => {
+          expect(
+            paymentProviderService.deleteBankAccount,
+          ).not.toHaveBeenCalled();
+        });
+      });
+    });
+  });
+
+  describe('nicknameIsTaken(nickname,idUserClient)', () => {
+    let expectedBankAccounts;
+    let nickname;
+    let idUserClient;
+    let result;
+    describe('case: success', () => {
+      describe('nickname is not taken', () => {
+        beforeEach(async () => {
+          expectedBankAccounts = Array(expectedBankAccount);
+          nickname = 'test 1';
+          idUserClient = 1;
+
+          jest
+            .spyOn(clientBankAccountService, 'getClientBankAccounts')
+            .mockResolvedValue(expectedBankAccounts);
+
+          result = await clientBankAccountService.nicknameIsTaken(
+            nickname,
+            idUserClient,
+          );
+        });
+
+        it('should invoke clientBankAccountService.getClientBankAccounts()', () => {
+          expect(
+            clientBankAccountService.getClientBankAccounts,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            clientBankAccountService.getClientBankAccounts,
+          ).toHaveBeenCalledWith(idUserClient);
+        });
+
+        it('should return false', () => {
+          expect(result).toStrictEqual(false);
+        });
+      });
+    });
+    describe('case: failure', () => {
+      describe('nickname is taken', () => {
+        beforeEach(async () => {
+          expectedBankAccounts = Array(expectedBankAccount);
+          nickname = 'test';
+          idUserClient = 1;
+
+          jest
+            .spyOn(clientBankAccountService, 'getClientBankAccounts')
+            .mockResolvedValue(expectedBankAccounts);
+
+          result = await clientBankAccountService.nicknameIsTaken(
+            nickname,
+            idUserClient,
+          );
+        });
+
+        it('should invoke clientBankAccountService.getClientBankAccounts()', () => {
+          expect(
+            clientBankAccountService.getClientBankAccounts,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            clientBankAccountService.getClientBankAccounts,
+          ).toHaveBeenCalledWith(idUserClient);
+        });
+
+        it('should return true', () => {
+          expect(result).toStrictEqual(true);
+        });
+      });
+    });
+  });
+  describe('updatePrimary(clientBankAccount,primary)', () => {
+    let clientBankAccount;
+    let expectedPrimaryClientBankAccount;
+    let result;
+    describe('case: success', () => {
+      describe('with primary = true', () => {
+        beforeEach(async () => {
+          clientBankAccount = {
+            idClientBankAccount: 3,
+            paymentProvider: 'STRIPE',
+            chargeId: 'ba_1HEKmkDfwU0tej1wAWeUIPNN',
+            primary: false,
+            transferId: 'ba_1HEKmmJPZXGZidTbJQlcIAOw',
+            userClient: {
+              idUserClient: 1,
+              salt: '$2b$10$yWGg/CN1MIr.kWNeeKDDDO',
+              googleToken: null,
+              facebookToken: null,
+              email: 'test@petromiles.com',
+              password:
+                '$2b$10$yWGg/CN1MIr.kWNeeKDDDO3W9aq2g0K/d1JOG8iPTrIokXtUEDze2',
+              stateUser,
+              userDetails,
+              userSuscription,
+            },
+            bankAccount,
+            stateBankAccount,
+          };
+          expectedPrimaryClientBankAccount = expectedClientBankAccount;
+          expectedPrimaryClientBankAccount.primary = true;
+          (clientBankAccountRepository.save as jest.Mock).mockResolvedValue(
+            expectedPrimaryClientBankAccount,
+          );
+
+          result = await clientBankAccountService.updatePrimary(
+            clientBankAccount,
+            true,
+          );
+        });
+
+        it('should return a client bank account with property primary = true', () => {
+          expect(result).toStrictEqual(expectedPrimaryClientBankAccount);
+        });
+      });
+
+      describe('with primary = false', () => {
+        beforeEach(async () => {
+          clientBankAccount = {
+            idClientBankAccount: 3,
+            paymentProvider: 'STRIPE',
+            chargeId: 'ba_1HEKmkDfwU0tej1wAWeUIPNN',
+            primary: false,
+            transferId: 'ba_1HEKmmJPZXGZidTbJQlcIAOw',
+            userClient: {
+              idUserClient: 1,
+              salt: '$2b$10$yWGg/CN1MIr.kWNeeKDDDO',
+              googleToken: null,
+              facebookToken: null,
+              email: 'test@petromiles.com',
+              password:
+                '$2b$10$yWGg/CN1MIr.kWNeeKDDDO3W9aq2g0K/d1JOG8iPTrIokXtUEDze2',
+              stateUser,
+              userDetails,
+              userSuscription,
+            },
+            bankAccount,
+            stateBankAccount,
+          };
+          expectedPrimaryClientBankAccount = expectedClientBankAccount;
+          expectedPrimaryClientBankAccount.primary = false;
+          (clientBankAccountRepository.save as jest.Mock).mockResolvedValue(
+            expectedPrimaryClientBankAccount,
+          );
+
+          result = await clientBankAccountService.updatePrimary(
+            clientBankAccount,
+            false,
+          );
+        });
+
+        it('should return a client bank account with property primary = false', () => {
+          expect(result).toStrictEqual(expectedPrimaryClientBankAccount);
+        });
+      });
+    });
+  });
+  // describe('updateAccountState(updateAccountStateDto)', () => {
+  //   let updateAccountStateDTO;
+  //   let expectedHasPendingTransaction;
+  //   let expectedNewBankAccountState;
+  //   let result;
+
+  //   describe('case: success', () => {
+  //     describe('when the new state is BLOCKED', () => {
+  //       beforeEach(async () => {
+  //         updateAccountStateDTO = {
+  //           idUserClient: 1,
+  //           idBankAccount: 1,
+  //           state: StateName.BLOCKED,
+  //         };
+  //         expectedHasPendingTransaction = false;
+  //         jest
+  //           .spyOn(clientBankAccountService, 'getOne')
+  //           .mockRejectedValue(expectedClientBankAccount);
+
+  //         jest
+  //           .spyOn(clientBankAccountService, 'hasPendingTransaction')
+  //           .mockRejectedValue(false);
+
+  //         jest
+  //           .spyOn(clientBankAccountService, 'changeState')
+  //           .mockRejectedValue(expectedNewBankAccountState);
+
+  //         result = await clientBankAccountService.updateAccountState(
+  //           updateAccountStateDTO,
+  //         );
+  //       });
+
+  //       it('should return a state bank account with a state = blocked', () => {
+  //         expect(result).toStrictEqual(expectedNewBankAccountState);
+  //       });
+  //     });
+  //   });
+  //   describe('case: failure', () => {
+  //     let expectedError: BadRequestException;
+  //     describe('user has pending transactions', () => {
+  //       beforeEach(async () => {
+  //         updateAccountStateDTO = {
+  //           idUserClient: 1,
+  //           idBankAccount: 1,
+  //           state: StateName.BLOCKED,
+  //         };
+  //         expectedHasPendingTransaction = true;
+  //         jest
+  //           .spyOn(clientBankAccountService, 'getOne')
+  //           .mockRejectedValue(expectedClientBankAccount);
+
+  //         jest
+  //           .spyOn<any, string>(
+  //             clientBankAccountService,
+  //             'hasPendingTransaction',
+  //           )
+  //           .mockResolvedValue(expectedHasPendingTransaction);
+
+  //         expectedError = new BadRequestException();
+
+  //         jest
+  //           .spyOn(clientBankAccountService, 'updateAccountState')
+  //           .mockRejectedValue(expectedError);
+  //       });
+  //       it('should throw when the user has pending transactions', async () => {
+  //         await expect(
+  //           clientBankAccountService.updateAccountState(updateAccountStateDTO),
+  //         ).rejects.toThrow(BadRequestException);
+  //       });
+  //     });
+  //   });
+  // });
+
+  // describe('updateCurrentPrimary(updatePrimaryAccountDTO,idUserClient)', () => {
+  //   let updatePrimaryAccountDTO;
+  //   let idUserClient;
+  //   let result;
+  //   describe('case: success', () => {
+  //     let expectedPrimaryBankAccount;
+  //     let expectedClientBankAccountUpdated;
+  //     describe('when user change to primary account', () => {
+  //       beforeEach(async () => {
+  //         updatePrimaryAccountDTO = {
+  //           primary: true,
+  //           idBankAccount: 1,
+  //         };
+  //         idUserClient = 1;
+  //         expectedPrimaryBankAccount = { ...expectedClientBankAccount };
+  //         expectedPrimaryBankAccount.primary = true;
+
+  //         (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+  //           expectedPrimaryBankAccount,
+  //         );
+
+  //         expectedPrimaryBankAccount.primary = false;
+  //         jest
+  //           .spyOn(clientBankAccountService, 'updatePrimary')
+  //           .mockResolvedValue(expectedPrimaryBankAccount);
+
+  //         (clientBankAccountRepository.findOne as jest.Mock).mockResolvedValue(
+  //           expectedClientBankAccountToBePrimary,
+  //         );
+
+  //         expectedClientBankAccountUpdated = {
+  //           ...expectedClientBankAccountToBePrimary,
+  //         };
+
+  //         expectedClientBankAccountUpdated.primary = true;
+  //         jest
+  //           .spyOn(clientBankAccountService, 'updatePrimary')
+  //           .mockResolvedValue(expectedClientBankAccountUpdated);
+
+  //         result = await clientBankAccountService.updateCurrentPrimary(
+  //           updatePrimaryAccountDTO,
+  //           idUserClient,
+  //         );
+  //       });
+
+  //       it('should invoke clientBankAccountRepository.findOne()', () => {
+  //         expect(clientBankAccountRepository.findOne).toHaveBeenCalledTimes(2);
+  //       });
+  //       it('should invoke clientBankAccountRepository.findOne()', () => {
+  //         expect(clientBankAccountRepository.findOne).toHaveBeenLastCalledWith({
+  //           bankAccount: expectedClientBankAccountToBePrimary.bankAccount,
+  //         });
+  //       });
+  //       it('should return a primary client bank account', () => {
+  //         expect(result).toStrictEqual(expectedClientBankAccountUpdated);
+  //       });
+  //     });
+  //   });
+  // });
 });

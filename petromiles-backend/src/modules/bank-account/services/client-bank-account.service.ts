@@ -376,6 +376,7 @@ export class ClientBankAccountService {
     const hasPendingTransaction = await this.hasPendingTransaction(
       clientBankAccount,
     );
+
     if (hasPendingTransaction) {
       this.logger.error(
         `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: ${clientBankAccount.idClientBankAccount} cannot be deleted yet`,
@@ -401,7 +402,7 @@ export class ClientBankAccountService {
     );
   }
 
-  private async hasPendingTransaction(
+  async hasPendingTransaction(
     clientBankAccount: ClientBankAccount,
   ): Promise<boolean> {
     const pendingValidations = await this.transactionService.getAllFiltered(
@@ -434,7 +435,7 @@ export class ClientBankAccountService {
     idUserClient: number,
   ): Promise<Boolean> {
     const bankAccounts = await this.getClientBankAccounts(idUserClient);
-    const accountWithNickname = bankAccounts.find(
+    const accountWithNickname = await bankAccounts.find(
       bankAccount =>
         bankAccount.nickname.toLowerCase() == nickname.toLowerCase(),
     );
@@ -474,7 +475,9 @@ export class ClientBankAccountService {
     return await this.clientBankAccountRepository.save(clientBankAccount);
   }
 
-  async updateAccountState(updateAccountStateDto: UpdateAccountStateDto) {
+  async updateAccountState(
+    updateAccountStateDto: UpdateAccountStateDto,
+  ): Promise<StateBankAccount> {
     const clientBankAccount = await this.getOne(
       updateAccountStateDto.idUserClient,
       updateAccountStateDto.idBankAccount,
@@ -496,7 +499,7 @@ export class ClientBankAccountService {
       description = StateDescription.BANK_ACCOUNT_ACTIVATED;
     }
 
-    await this.changeState(
+    return await this.changeState(
       updateAccountStateDto.state,
       clientBankAccount,
       description,

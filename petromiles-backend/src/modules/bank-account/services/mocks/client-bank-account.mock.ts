@@ -1,5 +1,5 @@
 // --- Common
-const userSuscription = [
+export const userSuscription = [
   {
     idUserSuscription: 1,
     initialDate: '2020-08-08T01:07:29.940Z',
@@ -14,7 +14,7 @@ const userSuscription = [
     },
   },
 ];
-const state = {
+export const state = {
   idState: 1,
   name: 'active',
   description: 'This state indicates that the object is ready to be used',
@@ -26,8 +26,14 @@ export const verifyingState = {
     'This state indicates that the object is in the verification process',
 };
 
-const language = { idLanguage: 1, name: 'english', shortname: 'en' };
-const userDetails = {
+export const blockedState = {
+  idState: 3,
+  name: 'blocked',
+  description: 'This state indicates that the object is blocked',
+};
+
+export const language = { idLanguage: 1, name: 'english', shortname: 'en' };
+export const userDetails = {
   idUserDetails: 6,
   firstName: 'petro',
   middleName: null,
@@ -42,19 +48,19 @@ const userDetails = {
   userClient: null,
   language,
 };
-const bank = {
+export const bank = {
   idBank: 1,
   name: 'Bank of America',
   photo:
     'https://firebasestorage.googleapis.com/v0/b/petromiles-f04cc.appspot.com/o/banks%2FBank%20of%20America.png?alt=media&token=84f6581d-cffe-47e7-a846-0b185460cc44',
   country: { idCountry: 1, name: 'UNITED STATES' },
 };
-const routingNumber = {
+export const routingNumber = {
   idRoutingNumber: 1,
   number: '124003116',
   bank,
 };
-const bankAccount = {
+export const bankAccount = {
   idBankAccount: 3,
   accountNumber: '000123456789',
   checkNumber: '1234',
@@ -62,7 +68,7 @@ const bankAccount = {
   type: 'Saving',
   routingNumber,
 };
-const stateBankAccount = [
+export const stateBankAccount = [
   {
     idStateBankAccount: 7,
     initialDate: '2020-08-09T20:06:28.639Z',
@@ -71,7 +77,7 @@ const stateBankAccount = [
     state: [state],
   },
 ];
-const stateUser = [
+export const stateUser = [
   {
     idStateUser: 2,
     initialDate: '2020-08-08T01:07:29.899Z',
@@ -84,7 +90,7 @@ const stateUser = [
 export const expectedBankAccount = {
   accountNumber: '000123456789',
   checkNumber: '1234',
-  nickname: 'test 5',
+  nickname: 'test',
   type: 'Checking',
   userDetails,
   routingNumber,
@@ -389,4 +395,25 @@ export const expectedStateBankAccount = {
   finalDate: null,
   idStateBankAccount: 13,
   initialDate: '2020-08-09T23:51:43.355Z',
+};
+
+export const expectedClientBankAccountToBePrimary = {
+  idClientBankAccount: 4,
+  paymentProvider: 'STRIPE',
+  chargeId: 'ba_1HEKmkDfwU0tej1wAWeUIPNN',
+  primary: false,
+  transferId: 'ba_1HEKmmJPZXGZidTbJQlcIAOw',
+  userClient: {
+    idUserClient: 1,
+    salt: '$2b$10$yWGg/CN1MIr.kWNeeKDDDO',
+    googleToken: null,
+    facebookToken: null,
+    email: 'test@petromiles.com',
+    password: '$2b$10$yWGg/CN1MIr.kWNeeKDDDO3W9aq2g0K/d1JOG8iPTrIokXtUEDze2',
+    stateUser,
+    userDetails,
+    userSuscription,
+  },
+  bankAccount,
+  stateBankAccount,
 };
