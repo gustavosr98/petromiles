@@ -37,6 +37,7 @@ import { UserClientService } from '@/modules/user/services/user-client.service';
 import { ClientPoints } from '@/entities/user-points.entity';
 
 import { PasswordEncryptorInterceptor } from '@/interceptors/password-encryptor.interceptor';
+import {AuditUserInterceptor} from "@/interceptors/audit-user.interceptor";
 
 const baseEndpoint = Object.freeze('user');
 @UseGuards(AuthGuard('jwt'))
@@ -87,6 +88,7 @@ export class UserController {
     return this.userClientService.updatePassword(user, credentials);
   }
 
+  @UseInterceptors(AuditUserInterceptor)
   @Put('update-details')
   updateDetails(
     @GetUser() user,
