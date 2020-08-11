@@ -237,7 +237,7 @@
                 <v-card-text>{{ $t("subscription.transactionValidateSubscription") }}</v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="secondary" dark :to="{ name: comeBackRoute }" class="ok-btn">{{ $t("common.ok") }}</v-btn>
+                  <v-btn color="secondary" dark :to="{ name: comeBackRoute }" data-cy="pay-sub-btn">{{ $t("common.ok") }}</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -255,7 +255,7 @@
                     dark
                     @click="areYouSureDialog = false"
                   >{{ $t("common.cancel") }}</v-btn>
-                  <v-btn color="success" dark @click="paySubscription" class="confirm-btn">{{ $t("common.yes") }}</v-btn>
+                  <v-btn color="success" dark @click="paySubscription" data-cy="confirm-btn">{{ $t("common.yes") }}</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
