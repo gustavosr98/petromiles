@@ -1,0 +1,36 @@
+language: node_js
+node_js:
+  - 12.16.2
+branches:
+  only:
+    - develop
+    - master
+jobs:
+  include:
+    - name: Backend | NestJS
+      install:
+        - cd petromiles-backend
+        - npm install
+      script:
+        - npm run test
+        - npm run test:cov
+        - npm run build
+      deploy:
+        provider: heroku
+        api_key: $HEROKU_APIKEY
+        app:
+          develop: staging-petromiles-backend
+          master: prepro-petromiles-backend
+    - name: Frontend | Vue
+      install:
+        - cd petromiles-frontend
+        - npm install
+      script:
+        - npm run test
+        - npm run build
+      deploy:
+        provider: heroku
+        api_key: $HEROKU_APIKEY
+        app:
+          develop: staging-petromiles-frontend
+          master: prepro-petromiles-frontend

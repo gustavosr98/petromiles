@@ -8,7 +8,7 @@ import LogRocket from "logrocket";
 
 Vue.use(Vuex);
 const logrocketPlugin = createPlugin(LogRocket);
-LogRocket.init('heddbo/petromiles-g50dr', {
+LogRocket.init(process.env.VUE_APP_LOGROCKET_ID, {
   dom: {
     inputSanitizer: true,
   },

@@ -41,7 +41,7 @@
       <!-- Loggout button  -->
       <template v-slot:append>
         <div class="pa-2">
-          <v-btn block @click="logout">
+          <v-btn block @click="logout" class="logout-btn">
             {{ $t("navbar.logout") }}
             <v-spacer></v-spacer>
 
@@ -60,7 +60,7 @@ import { createNamespacedHelpers } from "vuex";
 const { mapMutations, mapActions } = createNamespacedHelpers("auth");
 
 import LanguageDropDown from "@/components/General/Navigation/LanguageDropDown";
-import authConstants from "../../../constants/authConstants";
+import authConstants from "@/constants/authConstants";
 import LogRocket from "logrocket";
 
 export default {
@@ -90,26 +90,29 @@ export default {
       model: 1,
     };
   },
+  async mounted() {
+    await this.checkUserToken();
+    this.setLogRocket();
+  },
   methods: {
     ...mapMutations(["logout"]),
     ...mapActions(["checkUserToken"]),
-  },
-  async mounted() {
-    await this.checkUserToken();
-    const user = JSON.parse(
-            localStorage.getItem(authConstants.USER_LOCAL_STORAGE)
-    );
+    setLogRocket() {
+      const user = JSON.parse(
+        localStorage.getItem(authConstants.USER_LOCAL_STORAGE)
+      );
 
-    if (user !== null){
-      const userId = toString(user.details.idUserDetails);
-      const userName = user.details.firstName + ' ' + user.details.lastName;
-      const userEmail = user.email;
+      if (user !== null) {
+        const userId = toString(user.details.idUserDetails);
+        const userName = user.details.firstName + " " + user.details.lastName;
+        const userEmail = user.email;
 
-      LogRocket.identify(userId, {
-        name: userName,
-        email: userEmail,
-      });
-    }
+        LogRocket.identify(userId, {
+          name: userName,
+          email: userEmail,
+        });
+      }
+    },
   },
 };
 </script>
