@@ -5,6 +5,7 @@ export enum StateName {
   CANCELLED = 'cancelled',
   VALID = 'valid',
   INVALID = 'invalid',
+  DELETED = 'deleted',
 }
 
 export enum StateType {
