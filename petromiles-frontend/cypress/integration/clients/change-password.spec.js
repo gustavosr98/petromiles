@@ -17,7 +17,7 @@ const formErrorMessages = {
 };
 
 context("Change Password", () => {
-    before(() => {
+    beforeEach(() => {
         cy.visit("/");
         cy.get(".email-input").type("test@petromiles.com");
         cy.get(".password-input").type("test1234");
@@ -104,6 +104,29 @@ context("Change Password", () => {
         cy.contains(snackMessages.changedPassword).should("be.visible");
         cy.get(':nth-child(2) > .row > .text-center > .v-snack > .v-snack__wrapper > .v-snack__content > .v-btn > .v-btn__content').click();
     });
+});
 
+context("Return to original tester password", () => {
 
+    beforeEach(() => {
+        cy.visit("/");
+        cy.get(".email-input").type("test@petromiles.com");
+        cy.get(".password-input").type("5678test");
+        cy.get(".login-btn").click();
+        cy.wait(4000);
+        cy.url().should("include", "/dashboard");
+        cy.get(":nth-child(2) > .pt-0 > :nth-child(1) > :nth-child(1) > .app-bar > .v-toolbar__content > .v-app-bar__nav-icon > .v-btn__content > .v-icon").click();
+        cy.get(':nth-child(2) > .pt-0 > :nth-child(1) > :nth-child(1) > .v-navigation-drawer > .v-navigation-drawer__content > .v-list > .v-item-group > [href="/profile"] > .v-list-item__content > .v-list-item__title').click();
+        cy.url().should("include", "/profile");
+    });
+
+    it("Change to original Password", () => {
+        cy.get('[data-cy=current-password-input]').type("5678test");
+        cy.get('[data-cy=new-password-input]').type("test1234");
+        cy.get('[data-cy=confirm-new-password-input]').type("test1234");
+        cy.get(".change-btn").click();
+        cy.wait(1000);
+        cy.contains(snackMessages.changedPassword).should("be.visible");
+        cy.get(':nth-child(2) > .row > .text-center > .v-snack > .v-snack__wrapper > .v-snack__content > .v-btn > .v-btn__content').click();
+    });
 });
