@@ -1,13 +1,14 @@
 /// <reference types="cypress" />
 
-const modalMessages = {
-    wrongPassword: "Wrong user or password",
-    noAccount: "User does not have an account in PetroMiles",
-};
 
 const snackMessages = {
     saveInformationProfile: "User Successfully Updated!",
 };
+const formMessages = {
+    requiredName: "First name is required",
+    requiredLastname: "Last name is required",
+};
+
 
 context("Update user Profile", () => {
     beforeEach(() => {
@@ -27,32 +28,55 @@ context("Update user Profile", () => {
     });
 
     it("Updating all the information possible", () => {
-        cy.get('[data-cy=middleName-input]').type("Lorem");
-        cy.get('[data-cy=secondLastName-input]').type("Ipsum");
-        cy.get('[data-cy=birthdate-input]').type("01011991");
+        cy.get('[data-cy=firstName-input]').clear().type("Richard");
+        cy.get('[data-cy=lastName-input]').clear().type("Roe");
+        cy.get('[data-cy=middleName-input]').clear().type("Lorem");
+        cy.get('[data-cy=secondLastName-input]').clear().type("Ipsum");
+        cy.get('[data-cy=phone-input]').type("0491579212");
+        cy.get('[data-cy=country-selector]').click();
+        cy.contains("UNITED STATES").click();
+        cy.get('[data-cy=address-input]').type("3133  Sampson Street, Aurora, Colorado");
         cy.get('[data-cy=save-btn] > .v-btn__content').click();
         cy.wait(1000);
         cy.contains(snackMessages.saveInformationProfile).should("be.visible");
         cy.get('[data-v-23b34533=""][data-v-0020b690=""] > :nth-child(5) > .text-center > .v-snack > .v-snack__wrapper > .v-snack__content > .v-btn > .v-btn__content').click();
     });
 
-    // it("Updating middle name and second last name", () => {
-    //     cy.get('[data-cy=middleName-input]').type("Lorem");
-    //     cy.get('[data-cy=secondLastName-input]').type("Ipsum");
-    //     cy.get('[data-cy=save-btn] > .v-btn__content').click();
-    //     cy.wait(1000);
-    //     cy.contains(snackMessages.saveInformationProfile).should("be.visible");
-    //     cy.get('[data-v-23b34533=""][data-v-0020b690=""] > :nth-child(5) > .text-center > .v-snack > .v-snack__wrapper > .v-snack__content > .v-btn > .v-btn__content').click();
-    // });
+    it("Trying to clean all the forms", () => {
+        cy.get('[data-cy=firstName-input]').clear();
+        cy.get('[data-cy=lastName-input]').clear();
+        cy.get('[data-cy=middleName-input]').clear();
+        cy.get('[data-cy=secondLastName-input]').clear();
+        cy.get('[data-cy=birthdate-input]').clear();
+        cy.get('[data-cy=phone-input]').clear();
+        cy.get('[data-cy=address-input]').clear();
+        cy.get('[data-cy=save-btn] > .v-btn__content').click();
+        cy.contains(formMessages.requiredName).should("be.visible");
+        cy.contains(formMessages.requiredLastname).should("be.visible");
+        cy.get('[data-cy=reset-btn] > .v-btn__content').click();
+    });
 
-    // it("trying to let the password field empty", () => {
-    //     cy.get(".email-input").type("test@petromiles.com");
-    //     cy.get(".login-btn").click();
-    //     cy.wait(1000);
-    //     cy.get('.v-card__title > .v-icon').should("be.visible");
-    //     cy.contains(modalMessages.wrongPassword).should("be.visible");
-    //     cy.get('[data-cy=error-btn]').click();
-    // });
 
+    it("Cleaning all the possible forms", () => {
+        cy.get('[data-cy=middleName-input]').clear();
+        cy.get('[data-cy=secondLastName-input]').clear();
+        cy.get('[data-cy=birthdate-input]').clear();
+        cy.get('[data-cy=phone-input]').clear();
+        cy.get('[data-cy=address-input]').clear();
+        cy.get('[data-cy=save-btn] > .v-btn__content').click();
+        cy.wait(1000);
+        cy.contains(snackMessages.saveInformationProfile).should("be.visible");
+        cy.get('[data-v-23b34533=""][data-v-0020b690=""] > :nth-child(5) > .text-center > .v-snack > .v-snack__wrapper > .v-snack__content > .v-btn > .v-btn__content').click();
+    });
+
+
+    it("Updating Name and Last Name correctly", () => {
+        cy.get('[data-cy=firstName-input]').clear().type("John");
+        cy.get('[data-cy=lastName-input]').clear().type("Doe");
+        cy.get('[data-cy=save-btn] > .v-btn__content').click();
+        cy.wait(1000);
+        cy.contains(snackMessages.saveInformationProfile).should("be.visible");
+        cy.get('[data-v-23b34533=""][data-v-0020b690=""] > :nth-child(5) > .text-center > .v-snack > .v-snack__wrapper > .v-snack__content > .v-btn > .v-btn__content').click();
+    });
 
 });
