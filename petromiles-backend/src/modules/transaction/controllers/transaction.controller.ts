@@ -28,7 +28,7 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 
 const baseEndpoint = Object.freeze('transaction');
 
-//@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller(baseEndpoint)
 export class TransactionController {
