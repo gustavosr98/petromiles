@@ -1,5 +1,7 @@
 import tracer from 'dd-trace';
 
-tracer.init();
+tracer.init({
+  analytics: true,
+});
 
 export default tracer;
