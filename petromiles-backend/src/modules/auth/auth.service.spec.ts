@@ -159,9 +159,18 @@ describe( 'AuthService', () => {
         let Suscription;
 
         describe('case: success', ()=>{
-            describe('whe everything works well', ()=>{
+            describe('when everything works well', ()=>{
                 beforeEach( async () => {
-
+                    user = {
+                        email: 'pp1@pp.com',
+                        firstName:"prueba",
+                        lastName:"petro",
+                        password: "$2b$10$LYeTN2eX5DdsmdAsQCb1YO/8U4mfY.AEH91ollaf39pu45TUScwKm",
+                        salt:"$2b$10$LYeTN2eX5DdsmdAsQCb1YO",
+                    };
+                    ip = {
+                        ip : '::ffff:127.0.0.1'
+                    };
                     expectedUser = {
                         firstName:"prueba",
                         lastName:"petro",
@@ -171,15 +180,17 @@ describe( 'AuthService', () => {
                         ip : '::ffff:127.0.0.1'
                     };
                     expectedCreateUserSuscription = {
-                        email:"pp2@pp.com",
-                        password:"$2b$10$nBRiB1brpskYQn0YoO9IdOdyoZge/k/fQ/.DW.Jf5b4C0CJkdXZVi",
-                        salt:"$2b$10$nBRiB1brpskYQn0YoO9IdO",
-                        googleToken:null,
-                        facebookToken:null,
-                        idUserClient:1
+                        user: {
+                            email:"pp1@pp.com",
+                            password:"$2b$10$nBRiB1brpskYQn0YoO9IdOdyoZge/k/fQ/.DW.Jf5b4C0CJkdXZVi",
+                            salt:"$2b$10$nBRiB1brpskYQn0YoO9IdO",
+                            googleToken:null,
+                            facebookToken:null,
+                            idUserClient:1
+                        },
                     };
                     expectedResult = {
-                        email: 'pp2@pp.com',
+                        email: 'pp1@pp.com',
                         userDetails : {
                             firstName: "pruebaC",
                             lastName: "charlie",
@@ -208,7 +219,7 @@ describe( 'AuthService', () => {
                         expectedUser,
                     );
                     (suscriptionService.createUserSuscription as jest.Mock).mockResolvedValue(
-                        expectedCreateUserSuscription
+                        expectedCreateUserSuscription,
                     );
 
                     result = await authService.createUserClient(
@@ -219,8 +230,8 @@ describe( 'AuthService', () => {
                 it('should invoke userClientService.create()',  () => {
                     expect(userClientService.create).toHaveBeenCalledTimes(1);
                     expect(userClientService.create).toHaveBeenCalledWith({
-                        user,
-                        ip,
+                        user: expectedUser,
+                        ip: expectedUser.ip,
                         }
                     );
                 });
@@ -228,12 +239,48 @@ describe( 'AuthService', () => {
                 it('shouldinvoke userClientService.createUserSuscriptioin() ',  ()=> {
                     expect(suscriptionService.createUserSuscription).toHaveBeenCalledTimes(1);
                     expect(suscriptionService.createUserSuscription).toHaveBeenCalledWith(
-                        createdUser.user,
+                        expectedCreateUserSuscription.user,
                         Suscription.BASIC,
                         null)
                 });
-                it('should return a created user', () => {
+
+                it('should return a created user client', () => {
                     expect(result).toStrictEqual(expectedResult);
+                });
+            });
+
+        });
+    });
+
+    describe('createToken(email,role)', ()=> {
+        let expectedPayload;
+        let email;
+        let role;
+        let result;
+
+        describe('case: success', ()=>{
+            describe('when everything works well', () => {
+                beforeEach( async ()=> {
+                    email= 'pp1@pp.com';
+                    role= 'CLIENT';
+                    expectedPayload= {
+                        email: 'pp1@pp.com',
+                        role: 'CLIENT',
+                    };
+
+                    (jwtService.sign as jest.Mock).mockResolvedValue(
+                        expectedPayload,
+                    );
+
+                    result = await authService.createToken(
+                        email, role,
+                    );
+                });
+                it('should invoke pointsConversionService.getRecentPointsConversion()', ()=>{
+                    expect(jwtService.sign,).toHaveBeenCalledTimes(1);
+                });
+                it('should return a token', ()=> {
+                    expect(result).toStrictEqual(expectedPayload);
                 });
             });
         });
