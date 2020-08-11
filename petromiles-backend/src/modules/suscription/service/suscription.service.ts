@@ -54,6 +54,8 @@ export class SuscriptionService {
     private stateTransactionRepository: Repository<StateTransaction>,
     @InjectRepository(UserSuscription)
     private userSuscriptionRepository: Repository<UserSuscription>,
+    @InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,
     private userClientService: UserClientService,
     private clientBankAccountService: ClientBankAccountService,
     private transactionService: TransactionService,
@@ -219,8 +221,7 @@ export class SuscriptionService {
     if (currentUserSuscription.suscription.name === SuscriptionType.PREMIUM) {
       const goldSuscription = await this.get(SuscriptionType.GOLD);
 
-      const interests = await getConnection()
-        .getRepository(Transaction)
+      const interests = await this.transactionRepository
         .createQueryBuilder('transaction')
         .select(
           'SUM(transaction.totalAmountWithInterest - thirdPartyInterest.amountDollarCents)',

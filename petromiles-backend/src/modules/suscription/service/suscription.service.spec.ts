@@ -1,3 +1,6 @@
+import { MailsSubjets } from '@/constants/mailsSubjectConst';
+import { PlatformInterest } from '@/enums/platform-interest.enum';
+import { Transaction } from '@/entities/transaction.entity';
 import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { StateName, StateDescription } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
@@ -34,6 +37,7 @@ describe('SuscriptionService', () => {
   let platformInterestRepository: Repository<PlatformInterestEntity>;
   let stateTransactionRepository: Repository<StateTransaction>;
   let userSuscriptionRepository: Repository<UserSuscription>;
+  let transactionRepository: Repository<Transaction>;
   let UserClientServiceMock: jest.Mock<Partial<UserClientService>>;
   let userClientService: UserClientService;
   let ClientBankAccountServiceMock: jest.Mock<Partial<
@@ -64,6 +68,7 @@ describe('SuscriptionService', () => {
     let leftJoin = jest.fn().mockReturnThis();
     let where = jest.fn().mockReturnThis();
     let andWhere = jest.fn().mockReturnThis();
+    let innerJoin = jest.fn().mockReturnThis();
     let create = jest.fn().mockReturnThis();
     save = jest.fn().mockReturnThis();
     getRawOne = jest.fn().mockReturnThis();
@@ -79,6 +84,7 @@ describe('SuscriptionService', () => {
         leftJoin,
         where,
         andWhere,
+        innerJoin,
         getRawOne,
       })),
     }));
@@ -160,6 +166,10 @@ describe('SuscriptionService', () => {
           useClass: RepositoryMock,
         },
         {
+          provide: getRepositoryToken(Transaction),
+          useClass: RepositoryMock,
+        },
+        {
           provide: UserClientService,
           useClass: UserClientServiceMock,
         },
@@ -207,6 +217,7 @@ describe('SuscriptionService', () => {
       getRepositoryToken(StateTransaction),
     );
     userSuscriptionRepository = module.get(getRepositoryToken(UserSuscription));
+    transactionRepository = module.get(getRepositoryToken(Transaction));
     userClientService = module.get<UserClientService>(UserClientService);
     clientBankAccountService = module.get<ClientBankAccountService>(
       ClientBankAccountService,
@@ -382,6 +393,9 @@ describe('SuscriptionService', () => {
             finalDate: null,
           };
 
+          (suscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedSuscription,
+          );
           jest
             .spyOn(suscriptionService, 'get')
             .mockResolvedValue(expectedSuscription);
@@ -908,6 +922,312 @@ describe('SuscriptionService', () => {
           expect(
             transactionService.createUpgradeSuscriptionTransaction,
           ).not.toHaveBeenCalled();
+        });
+      });
+    });
+  });
+
+  describe('isAbleToUpgradeToGold(userClient)', () => {
+    let expectedResult;
+    let result;
+    let userClient;
+    let expectedUserSuscription;
+    let expectedSuscription;
+    let interests;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          userClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+          };
+
+          expectedUserSuscription = {
+            idUserSuscription: 1,
+            initialDate: new Date(),
+            finalDate: null,
+            suscription: {
+              name: 'PREMIUM',
+            },
+          };
+          expectedSuscription = {
+            idSuscription: 1,
+            name: 'gold',
+            cost: 0,
+            upgradedAmount: 100,
+          };
+          interests = {
+            totalInterests: 200,
+          };
+
+          (userSuscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'getUserSuscription')
+            .mockResolvedValue(expectedUserSuscription);
+
+          (suscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'get')
+            .mockResolvedValue(expectedSuscription);
+
+          getRawOne.mockResolvedValue(interests);
+
+          expectedResult = true;
+
+          result = await suscriptionService.isAbleToUpgradeToGold(userClient);
+        });
+        it('should invoke transactionRepository.createQueryBuilder()', () => {
+          expect(getRawOne).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return true', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+      describe('when the suscription is not premium', () => {
+        beforeEach(async () => {
+          userClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+          };
+
+          expectedUserSuscription = {
+            idUserSuscription: 1,
+            initialDate: new Date(),
+            finalDate: null,
+            suscription: {
+              name: 'BASIC',
+            },
+          };
+
+          (userSuscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'getUserSuscription')
+            .mockResolvedValue(expectedUserSuscription);
+
+          expectedResult = false;
+
+          result = await suscriptionService.isAbleToUpgradeToGold(userClient);
+        });
+        it('should return false', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+      describe('when the totalInterests is not enough', () => {
+        beforeEach(async () => {
+          userClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+          };
+
+          expectedUserSuscription = {
+            idUserSuscription: 1,
+            initialDate: new Date(),
+            finalDate: null,
+            suscription: {
+              name: 'PREMIUM',
+            },
+          };
+          expectedSuscription = {
+            idSuscription: 1,
+            name: 'gold',
+            cost: 0,
+            upgradedAmount: 100,
+          };
+          interests = {
+            totalInterests: 50,
+          };
+
+          (userSuscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'getUserSuscription')
+            .mockResolvedValue(expectedUserSuscription);
+
+          (suscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'get')
+            .mockResolvedValue(expectedSuscription);
+
+          getRawOne.mockResolvedValue(interests);
+
+          expectedResult = false;
+
+          result = await suscriptionService.isAbleToUpgradeToGold(userClient);
+        });
+        it('should invoke transactionRepository.createQueryBuilder()', () => {
+          expect(getRawOne).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return false', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('sendGoldSubscriptionUpgradeEmail(userClient)', () => {
+    let userClient;
+    let expectedPlatformInterest;
+    let expectedOnePointToDollars;
+    let msg;
+    let languageMails;
+    let extraPoints;
+    let template;
+    let subject;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          userClient = {
+            idUserClient: 1,
+            email: 'prueba@gmail.com',
+            userDetails: {
+              firstName: 'Pedro',
+              lastName: 'Perez',
+              language: {
+                idLanguage: 1,
+                name: 'english',
+                shortname: 'en',
+              },
+            },
+          };
+
+          expectedPlatformInterest = {
+            amount: 0,
+            percentage: 0.2,
+            points: 100,
+          };
+          expectedOnePointToDollars = {
+            idPointsConversion: 1,
+            onePointEqualsDollars: 0.002,
+            initialDate: new Date(),
+            finalDate: null,
+          };
+
+          languageMails = userClient.userDetails.language.name;
+          extraPoints =
+            parseFloat(expectedPlatformInterest.amount) /
+            (100 * expectedOnePointToDollars.onePointEqualsDollars);
+          template = `upgradeToGold[${languageMails}]`;
+          subject = MailsSubjets.upgrade_to_gold[languageMails];
+          msg = {
+            to: userClient.email,
+            subject: subject,
+            templateId: 'prueba',
+            dynamic_template_data: {
+              user: userClient.userDetails.firstName,
+              extraPoints,
+            },
+          };
+
+          (platformInterestService.getInterestByName as jest.Mock).mockResolvedValue(
+            expectedPlatformInterest,
+          );
+
+          (pointsConversionService.getRecentPointsConversion as jest.Mock).mockResolvedValue(
+            expectedOnePointToDollars,
+          );
+
+          (configService.get as jest.Mock).mockReturnValue('prueba');
+
+          (mailsService.sendEmail as jest.Mock).mockImplementation();
+
+          await suscriptionService.sendGoldSubscriptionUpgradeEmail(userClient);
+        });
+        it('should invoke platformInterestService.getInterestByName()', () => {
+          expect(
+            platformInterestService.getInterestByName,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            platformInterestService.getInterestByName,
+          ).toHaveBeenCalledWith(PlatformInterest.GOLD_EXTRA);
+        });
+        it('should invoke pointsConversionService.getRecentPointsConversion()', () => {
+          expect(
+            pointsConversionService.getRecentPointsConversion,
+          ).toHaveBeenCalledTimes(1);
+        });
+        it('should invoke mailsService.sendEmail()', () => {
+          expect(mailsService.sendEmail).toHaveBeenCalledTimes(1);
+          expect(mailsService.sendEmail).toHaveBeenCalledWith(msg);
+        });
+      });
+    });
+  });
+
+  describe('upgradeSubscriptionIfIsPossible(idUserClient, transaction)', () => {
+    let idUserClient;
+    let transaction;
+    let expectedUserClient;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idUserClient = 1;
+          transaction = {
+            idTransaction: 1,
+            totalAmountWithInterest: 77,
+            rawAmount: 524,
+            type: TransactionType.SUSCRIPTION_PAYMENT,
+            clientBankAccount: {
+              idClientBankAccount: 1,
+            },
+            paymentProviderTransactionId: null,
+            stateTransaction: [
+              {
+                idStateTransaction: 1,
+                finalDate: null,
+              },
+            ],
+          };
+          expectedUserClient = {
+            idUserClient,
+            email: 'prueba@gmail.com',
+            userDetails: {
+              firstName: 'Pedro',
+              lastName: 'Perez',
+            },
+          };
+
+          (userClientService.get as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          jest
+            .spyOn(suscriptionService, 'createUserSuscription')
+            .mockImplementation();
+
+          jest
+            .spyOn(suscriptionService, 'isAbleToUpgradeToGold')
+            .mockResolvedValue(true);
+
+          jest
+            .spyOn(suscriptionService, 'createUserSuscription')
+            .mockImplementation();
+
+          jest
+            .spyOn(suscriptionService, 'sendGoldSubscriptionUpgradeEmail')
+            .mockImplementation();
+
+          await suscriptionService.upgradeSubscriptionIfIsPossible(
+            idUserClient,
+            transaction,
+          );
+        });
+        it('should invoke userClientService.get()', () => {
+          expect(userClientService.get).toHaveBeenCalledTimes(1);
+          expect(userClientService.get).toHaveBeenCalledWith({ idUserClient });
         });
       });
     });
