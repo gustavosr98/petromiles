@@ -300,5 +300,49 @@ describe( 'AuthService', () => {
         });
     });
 
+    describe('createUserAdministrator(user)', ()=> {
+
+        describe('case: success', () => {
+            describe('when everything works well', () => {
+                beforeEach(async () => {
+
+                });
+            });
+        });
+    });
+
+    describe('validateUser(credentials)', ()=> {
+
+        describe('case: success', () => {
+            describe('when everything works well', () => {
+                beforeEach(async () => {
+
+                });
+            });
+        });
+    });
+
+    describe('recoverPassword(credentials)', ()=> {
+
+        describe('case: success', () => {
+            describe('when everything works well', () => {
+                beforeEach(async () => {
+
+                });
+            });
+        });
+    });
+
+    describe('createWelcomeEmail(email, name)', ()=> {
+
+        describe('case: success', () => {
+            describe('when everything works well', () => {
+                beforeEach(async () => {
+
+                });
+            });
+        });
+    });
+
 
 });
