@@ -20,6 +20,7 @@ import { Suscription } from '@/entities/suscription.entity';
 import { UserClient } from '@/entities/user-client.entity';
 import { PlatformInterest } from '@/entities/platform-interest.entity';
 import { StateTransaction } from '@/entities/state-transaction.entity';
+import { UserSuscription } from '@/entities/user-suscription.entity';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { StateTransaction } from '@/entities/state-transaction.entity';
       UserClient,
       PlatformInterest,
       StateTransaction,
+      UserSuscription,
     ]),
   ],
   providers: [SuscriptionService],

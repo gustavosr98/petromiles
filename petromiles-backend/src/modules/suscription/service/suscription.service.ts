@@ -52,6 +52,8 @@ export class SuscriptionService {
     private platformInterestRepository: Repository<PlatformInterestEntity>,
     @InjectRepository(StateTransaction)
     private stateTransactionRepository: Repository<StateTransaction>,
+    @InjectRepository(UserSuscription)
+    private userSuscriptionRepository: Repository<UserSuscription>,
     private userClientService: UserClientService,
     private clientBankAccountService: ClientBankAccountService,
     private transactionService: TransactionService,
@@ -63,9 +65,7 @@ export class SuscriptionService {
     private thirdPartyInterestService: ThirdPartyInterestService,
   ) {}
   async get(suscriptionType: SuscriptionType): Promise<Suscription> {
-    return await getConnection()
-      .getRepository(Suscription)
-      .findOne({ name: suscriptionType });
+    return await this.suscriptionRepository.findOne({ name: suscriptionType });
   }
 
   async getAll(): Promise<Suscription[]> {
@@ -73,9 +73,10 @@ export class SuscriptionService {
   }
 
   async getUserSuscription(userClient: UserClient): Promise<UserSuscription> {
-    return await getConnection()
-      .getRepository(UserSuscription)
-      .findOne({ userClient, finalDate: null });
+    return await this.userSuscriptionRepository.findOne({
+      userClient,
+      finalDate: null,
+    });
   }
 
   async createUserSuscription(
@@ -88,8 +89,7 @@ export class SuscriptionService {
     }
     const suscription = await this.get(suscriptionType);
 
-    const userSuscription = await getConnection()
-      .getRepository(UserSuscription)
+    const userSuscription = await this.userSuscriptionRepository
       .create({
         userClient,
         suscription,
