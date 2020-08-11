@@ -1,13 +1,17 @@
 language: node_js
 node_js:
   - 12.16.2
+
 branches:
   only:
-    - develop
     - master
+    - develop
+
 jobs:
   include:
-    - name: Backend | NestJS
+    # DEVELOP
+    - name: Backend (STAGING)
+      if: branch = develop
       install:
         - cd petromiles-backend
         - npm install
@@ -18,10 +22,14 @@ jobs:
       deploy:
         provider: heroku
         api_key: $HEROKU_APIKEY
-        app:
-          develop: staging-petromiles-backend
-          master: prepro-petromiles-backend
-    - name: Frontend | Vue
+        app: $HEROKU_BE_STAGING
+        skip_cleanup: true
+        on:
+          repo: gustavosr98/petromiles
+          branch: develop
+
+    - name: Frontend (STAGING)
+      if: branch = develop
       install:
         - cd petromiles-frontend
         - npm install
@@ -31,6 +39,44 @@ jobs:
       deploy:
         provider: heroku
         api_key: $HEROKU_APIKEY
-        app:
-          develop: staging-petromiles-frontend
-          master: prepro-petromiles-frontend
+        app: $HEROKU_FE_STAGING
+        skip_cleanup: true
+        on:
+          repo: gustavosr98/petromiles
+          branch: develop
+
+    # MASTER
+    - name: Backend (PEPRO)
+      if: branch = master
+      install:
+        - cd petromiles-backend
+        - npm install
+      script:
+        - npm run test
+        - npm run test:cov
+        - npm run build
+      deploy:
+        provider: heroku
+        api_key: $HEROKU_APIKEY
+        app: $HEROKU_BE_PREPRO
+        skip_cleanup: true
+        on:
+          repo: gustavosr98/petromiles
+          branch: master
+
+    - name: Frontend (PEPRO)
+      if: branch = master
+      install:
+        - cd petromiles-frontend
+        - npm install
+      script:
+        - npm run test
+        - npm run build
+      deploy:
+        provider: heroku
+        api_key: $HEROKU_APIKEY
+        app: $HEROKU_FE_PEPRO
+        skip_cleanup: true
+        on:
+          repo: gustavosr98/petromiles
+          branch: master
