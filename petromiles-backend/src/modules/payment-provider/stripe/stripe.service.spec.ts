@@ -266,7 +266,7 @@ describe('StripeService', () => {
         beforeEach(async () => {
           customerId = 'prueba';
           bankAccountId = 'prueba';
-          amounts = [100, 150];
+          amounts = [32, 45];
 
           expectedResult = {
             id: 'prueba',
