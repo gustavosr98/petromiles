@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 import { Repository } from 'typeorm';
 import { WinstonModule } from 'nest-winston';
@@ -44,6 +45,7 @@ describe( 'AuthService', () => {
     let UserServiceMock: jest.Mock<Partial<UserService>>;
     let suscriptionService: SuscriptionService;
     let SuscriptionServiceMock: jest.Mock<Partial<SuscriptionService>>;
+    let bcrypt: bcrypt;
 
 
     beforeEach( () => {
@@ -155,7 +157,6 @@ describe( 'AuthService', () => {
         let expectedResult;
         let user;
         let ip;
-        let createdUser;
         let Suscription;
 
         describe('case: success', ()=>{
@@ -289,34 +290,260 @@ describe( 'AuthService', () => {
     describe('hashPassword(password,salt)', ()=> {
         let password;
         let salt;
+        let expectedHashed;
+        let expectedToHash;
+        let result;
 
         describe('case: success', () => {
             describe('when everything works well', () => {
                 beforeEach(async () => {
-                    password = 'prueba';
-                    salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO'
+                    password = 'test1234';
+                    salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO';
+                    expectedHashed = {
+                        password: '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW'
+                    };
+                    expectedToHash = {
+                        password : 'test1234',
+                        salt : '$2b$10$LYeTN2eX5DdsmdAsQCb1YO',
+                    };
+                    (bcrypt.hash as jest.Mock).mockResolvedValue(
+                        expectedToHash,
+                    );
+
+                    result = await authService.hashPassword(
+                        password, salt
+                    );
                 });
+                it('should invoke bcrypt.hash',  () => {
+                    expect(bcrypt.hash,).toHaveBeenCalledTimes(1);
+                    expect(bcrypt.hash,).toHaveBeenCalledWith(
+                        password, salt
+                    );
+                });
+                it('should return password hashed',  () => {
+                    expect(result).toStrictEqual(expectedHashed);
+                });
+            });
+        });
+        describe('case: failure', () => {
+            let expectedError: BadRequestException;
+            describe('when the password is empty', () => {
+                beforeEach(async () => {
+                    password = '';
+                    salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO';
+                    expectedHashed = {
+                        password: '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW'
+                    };
+                    expectedToHash = {
+                        password :'',
+                        salt : '$2b$10$LYeTN2eX5DdsmdAsQCb1YO',
+                    };
+                    (bcrypt.hash as jest.Mock).mockResolvedValue(
+                        expectedToHash,
+                    );
+
+                    result = await authService.hashPassword(
+                        password, salt
+                    );
+                });
+                it('should throw when the password is empty', async () => {
+                    await expect(bcrypt.hash).rejects.toThrow(BadRequestException);
+                });
+
             });
         });
     });
 
     describe('createUserAdministrator(user)', ()=> {
+        let expectedCreatedUser;
+        let result;
+        let expectedResult;
+        let user;
 
-        describe('case: success', () => {
-            describe('when everything works well', () => {
-                beforeEach(async () => {
+        describe('case: success', ()=>{
+            describe('when everything works well', ()=>{
+                beforeEach( async () => {
+                    user = {
+                        firstName:"admin",
+                        middleName:"",
+                        lastName:"admin",
+                        secondLastName:"",
+                        email:"admin2@petromiles.com",
+                        birthdate:null,
+                        phone:"",
+                        address:"",
+                        country:{},
+                        salt:"$2b$10$VhjJiCEGYFRhJdrqQ.wBw.",
+                        password:"$2b$10$VhjJiCEGYFRhJdrqQ.wBw.P9hAvDRPtTcWA2z5PWcF0lzDoXIb7ma",
+                    };
+
+                    expectedCreatedUser = {
+                        userAdmin:{
+                            email:"admin2@petromiles.com",
+                            country:{},
+                            salt:"$2b$10$VhjJiCEGYFRhJdrqQ.wBw.",
+                            password:"$2b$10$VhjJiCEGYFRhJdrqQ.wBw.P9hAvDRPtTcWA2z5PWcF0lzDoXIb7ma",
+                            photo:null,
+                            idUserAdministrator:2
+                        },
+                        userDetails:{
+                            firstName:"admin",
+                            lastName:"admin",
+                            middleName:"",
+                            secondLastName:"",
+                            birthdate:null,
+                            address:"",
+                            phone:"",
+                            photo:null,
+                            language:{
+                                idLanguage:1,
+                                name:"english",
+                                "shortname":"en"
+                            },
+                            userAdministrator:null,
+                            customerId:null,
+                            accountId:null,
+                            idUserDetails:1
+                        },
+                        role:"ADMINISTRATOR",
+                    };
+                    expectedResult = {
+                        email: expectedCreatedUser.userAdmin.email,
+                        password: expectedCreatedUser.password,
+                        userDetails: expectedCreatedUser.userDetails,
+                        role: 'ADMINISTRATOR',
+                        id: 2,
+                    };
+
+                    (userAdministratorService.create as jest.Mock).mockResolvedValue(
+                        user,
+                    );
+
+                    result = await authService.createUserAdministrator(
+                        user,
+                    );
+                });
+
+                it('should invoke userAdministratorService.create',  ()=> {
+                    expect(userAdministratorService.create).toHaveBeenCalledTimes(1);
+                    expect(userAdministratorService.create).toHaveBeenCalledWith(
+                        user
+                    );
+                });
+                it('should return created administrator',  ()=> {
+                    expect(result).toStrictEqual(expectedResult)
 
                 });
             });
+
         });
     });
 
     describe('validateUser(credentials)', ()=> {
+        let expectedCredentials;
+        let credentials;
+        let expectedToHash;
+        let expectedResult;
+        let result;
+        let password;
+        let expectedInfo;
 
         describe('case: success', () => {
             describe('when everything works well', () => {
                 beforeEach(async () => {
+                    expectedCredentials ={
+                        email:"prueba@petromiles.com",
+                        password:"test1234",
+                        role:"CLIENT",
+                    };
+                    credentials = {
+                        email:"prueba@petromiles.com",
+                        password:"test1234",
+                        role:"CLIENT",
+                    };
+                    password = 'test1234';
+                    expectedInfo = {
+                        user: {
+                                password:"$2$10$nTfXptbWsD.f3.RVjrXLtec9TI13jydydfr37BM1F6eqZM9DNDfj6",
+                                email:"miguel@petromiles.com",
+                                salt:"$2b$10$nTfXptbWsD.f3.RVjrXLte",
+                                id:1
+                            },
+                        userDetails: {
+                            idUserDetails:1,
+                            firstName:"miguel",
+                            middleName:null,
+                            lastName:"coccaro",
+                            secondLastName:null,
+                            birthdate:null,
+                            address:null,
+                            phone:null,
+                            photo:null,
+                            customerId:"",
+                            accountId:"",
+                            language:{
+                                idLanguage:1,
+                                name:"english",
+                                shortname:"en"
+                            },
+                            country:null
+                        },
+                    };
+                    expectedResult = {
+                        email:"miguel@petromiles.com",
+                        userDetails:{
+                            idUserDetails:1,
+                            firstName:"miguel",
+                            middleName:null,
+                            lastName:"coccaro",
+                            secondLastName:null,
+                            birthdate:null,
+                            address:null,
+                            phone:null,
+                            photo:null,
+                            customerId:'',
+                            accountId:"",
+                            language:{
+                                idLanguage:1,
+                                name:"english",
+                                shortname:"en"
+                            },
+                            country:null
+                        },
+                        role:"CLIENT",
+                        id:1,
+                        token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pZ3VlbEBwZXRyb21pbGVzLmNvbSIsInJvbGUiOiJDTElFTlQiLCJpYXQiOjE1OTcxNzU5MzMsImV4cCI6MTU5NzI2MjMzM30.dLj9DofI3OQKmejzLi08rdaI8XhWRobri2l87MaBsXc",
+                        federated:false,
+                    };
+                    expectedToHash = {
+                        password: 'test1234',
+                        salt : '$2b$10$nTfXptbWsD.f3.RVjrXLte',
+                    };
+                    (userService.getActive as jest.Mock).mockResolvedValue(
+                        expectedCredentials,
+                    );
+                    (authService.hashPassword as jest.Mock).mockResolvedValue(
+                        expectedToHash
+                    )
 
+                    result = await authService.validateUser(
+                        expectedCredentials,
+                    );
+                });
+                it('should invoke userService.getActive', () => {
+                    expect(userService.getActive).toHaveBeenCalledTimes(1);
+                    expect(userService.getActive).toHaveBeenCalledWith(
+                        credentials,
+                    );
+                });
+                it('should invoke hashpassword',  () => {
+                    expect(authService.hashPassword).toHaveBeenCalledTimes(1);
+                    expect(authService.hashPassword).toHaveBeenCalledWith(
+                        password, expectedInfo.user.salt
+                    );
+                });
+                it('should return a result', () => {
+                    expect(result).toStrictEqual(expectedResult);
                 });
             });
         });
@@ -332,17 +559,5 @@ describe( 'AuthService', () => {
             });
         });
     });
-
-    describe('createWelcomeEmail(email, name)', ()=> {
-
-        describe('case: success', () => {
-            describe('when everything works well', () => {
-                beforeEach(async () => {
-
-                });
-            });
-        });
-    });
-
 
 });
