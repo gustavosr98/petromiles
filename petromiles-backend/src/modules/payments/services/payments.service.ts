@@ -133,8 +133,14 @@ export class PaymentsService {
       idClientBankAccount,
     });
 
+    const customer = (
+      await clientBankAccount.userClient.userDetails.find(
+        details => details.accountOwner === null,
+      )
+    ).customerId;
+
     const charge = await this.paymentProviderService.createCharge({
-      customer: clientBankAccount.userClient.userDetails.customerId,
+      customer,
       source: clientBankAccount.chargeId,
       currency: 'usd',
       amount: Math.round(amountToCharge),
@@ -204,8 +210,13 @@ export class PaymentsService {
     });
 
     if (await this.verifyEnoughPoints(id, amount)) {
+      const accountId = (
+        await clientBankAccount.userClient.userDetails.find(
+          details => details.accountOwner === null,
+        )
+      ).accountId;
       await this.paymentProviderService.updateBankAccountOfAnAccount(
-        clientBankAccount.userClient.userDetails.accountId,
+        accountId,
         clientBankAccount.transferId,
         {
           default_for_currency: true,
@@ -213,7 +224,7 @@ export class PaymentsService {
       );
 
       const transfer = await this.paymentProviderService.createTransfer({
-        destination: clientBankAccount.userClient.userDetails.accountId,
+        destination: accountId,
         currency: 'usd',
         amount: Math.round(amountToCharge),
         source_type: 'bank_account',
@@ -269,6 +280,9 @@ export class PaymentsService {
       email: user.email,
     });
 
+    const userDetails = await userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
     const transactionCode = await this.transactionService.getTransactions(
       userClient.idUserClient,
     );
@@ -277,7 +291,7 @@ export class PaymentsService {
       idTransaction: (await transactionCode[transactionCode.length - 1]).id,
     });
 
-    const languageMails = userClient.userDetails.language.name;
+    const languageMails = userDetails.language.name;
 
     const template = `invoice[${languageMails}]`;
 
@@ -289,7 +303,7 @@ export class PaymentsService {
       templateId: this.configService.get(
         `mails.sendgrid.templates.${template}`,
       ),
-      dynamic_template_data: { user: userClient.userDetails.firstName },
+      dynamic_template_data: { user: userDetails.firstName },
       attachments: [
         {
           filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${
@@ -307,6 +321,9 @@ export class PaymentsService {
       email: user.email,
     });
 
+    const userDetails = await userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
     const transactionCode = await this.transactionService.getTransactions(
       userClient.idUserClient,
     );
@@ -315,7 +332,7 @@ export class PaymentsService {
       idTransaction: (await transactionCode[transactionCode.length - 1]).id,
     });
 
-    const languageMails = userClient.userDetails.language.name;
+    const languageMails = userDetails.language.name;
 
     const template = `withdrawal[${languageMails}]`;
 
@@ -328,7 +345,7 @@ export class PaymentsService {
         `mails.sendgrid.templates.${template}`,
       ),
       dynamic_template_data: {
-        user: userClient.userDetails.firstName,
+        user: userDetails.firstName,
         numberPoints: points,
         dollarWithdrawal: total,
       },

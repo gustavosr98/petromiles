@@ -58,7 +58,7 @@ export class UserClient extends BaseEntity {
   )
   userRole: UserRole[];
 
-  @OneToOne(
+  @OneToMany(
     type => UserDetails,
     userDetails => userDetails.userClient,
     {
@@ -66,7 +66,7 @@ export class UserClient extends BaseEntity {
       eager: true,
     },
   )
-  userDetails: UserDetails;
+  userDetails: UserDetails[];
 
   @OneToMany(
     type => UserSuscription,
