@@ -28,6 +28,8 @@ import { ApiModules } from '@/logger/api-modules.enum';
 import { UpdateDetailsDTO } from '@/modules/user/dto/update-details.dto';
 import { UpdatePasswordDTO } from '@/modules/user/dto/update-password.dto';
 import { UserInfo } from '@/interfaces/user/user-info.interface';
+import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
+import { CloseAccount } from '@/interfaces/user/close-account.interface';
 
 // SERVICES
 import { UserService } from '@/modules/user/services/user.service';
@@ -35,8 +37,10 @@ import { UserClientService } from '@/modules/user/services/user-client.service';
 
 // ENTITIES
 import { ClientPoints } from '@/entities/user-points.entity';
+import { StateUser } from '@/entities/state-user.entity';
 
 import { PasswordEncryptorInterceptor } from '@/interceptors/password-encryptor.interceptor';
+import {AuditUserInterceptor} from "@/interceptors/audit-user.interceptor";
 
 const baseEndpoint = Object.freeze('user');
 @UseGuards(AuthGuard('jwt'))
@@ -87,6 +91,7 @@ export class UserController {
     return this.userClientService.updatePassword(user, credentials);
   }
 
+  @UseInterceptors(AuditUserInterceptor)
   @Put('update-details')
   updateDetails(
     @GetUser() user,
@@ -97,7 +102,18 @@ export class UserController {
       `[${ApiModules.USER}] (${HttpRequest.PUT}) ${user?.email} asks /${baseEndpoint}/update-details`,
     );
     const id = idUserClient ? idUserClient : user.id;
-    return this.userService.updateDetails(id, details);
+    return this.userService.updateDetails(id, details, false);
+  }
+
+  @Put('close-account')
+  closeAccount(
+    @GetUser() user: AuthenticatedUser,
+    @Body() closeAccount: CloseAccount,
+  ) {
+    this.logger.http(
+      `[${ApiModules.USER}] (${HttpRequest.PUT}) ${user?.email} asks /${baseEndpoint}/close-account`,
+    );
+    return this.userService.closeAccount(user, closeAccount.deleteUserData);
   }
 
   @Roles(Role.ADMINISTRATOR)

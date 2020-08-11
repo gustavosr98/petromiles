@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" persistent max-width="400">
-    <v-card>
+    <v-card class="verify-modal">
       <v-card-title class="title">
         {{
         $t("bank-account-validation.verifyYourBankAccount")
@@ -25,11 +25,13 @@
               name="First amount"
               type="number"
               color="light-blue darken-4"
+              class="first-amount"
             ></v-text-field>
           </v-col>
 
           <v-col cols="12" md="4">
             <v-text-field
+              class="second-amount"
               label="$ 0.00"
               name="Second amount"
               v-model="secondAmount"
@@ -53,6 +55,7 @@
           text
           @click="validateBankAccount"
           :loading="loading"
+          class="verify-account"
         >{{ $t("bank-account-validation.validateButton") }}</v-btn>
       </v-card-actions>
     </v-card>

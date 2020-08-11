@@ -185,9 +185,12 @@ export class SuscriptionService {
       throw new BadRequestException('error-messages.goldUser');
     }
 
+    const customer = clientBankAccount.userClient.userDetails.find(
+      details => details.accountOwner === null,
+    ).customerId;
     const paymentProviderCharge = await this.paymentProviderService.createCharge(
       {
-        customer: clientBankAccount.userClient.userDetails.customerId,
+        customer,
         source: clientBankAccount.chargeId,
         currency: 'usd',
         amount: Math.trunc(
@@ -254,7 +257,10 @@ export class SuscriptionService {
       PlatformInterest.GOLD_EXTRA,
     );
 
-    const languageMails = userClient.userDetails.language.name;
+    const userDetails = userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
+    const languageMails = userDetails.language.name;
 
     const extraPoints =
       parseFloat(platformInterestService.amount) /
@@ -271,7 +277,7 @@ export class SuscriptionService {
         `mails.sendgrid.templates.${template}`,
       ),
       dynamic_template_data: {
-        user: userClient.userDetails.firstName,
+        user: userDetails.firstName,
         extraPoints,
       },
     };

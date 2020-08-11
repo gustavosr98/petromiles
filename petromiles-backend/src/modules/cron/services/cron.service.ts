@@ -103,6 +103,7 @@ export class CronService {
     const bankAccounts = await this.clientBankAccountService.getByState(
       Array(StateName.ACTIVE),
     );
+
     this.logger.info(
       `[${ApiModules.CRON}] bankAccountStatusStripe( ${bankAccounts.length} )`,
     );
@@ -141,12 +142,15 @@ export class CronService {
         .getRepository(Transaction)
         .findOne({ idTransaction: unverifiedTransaction.idTransaction });
 
-      const languageMails =
-        transaction.clientBankAccount.userClient.userDetails.language.name;
+      const userDetails = transaction.clientBankAccount.userClient.userDetails.find(
+        details => details.accountOwner === null,
+      );
+      const languageMails = userDetails.language.name;
       const points =
         transaction.rawAmount /
         transaction.pointsConversion.onePointEqualsDollars /
         100;
+      const user = userDetails.firstName;
 
       if (charge.status === StripeChargeStatus.SUCCEEDED) {
         await this.stateTransactionService.update(
@@ -155,22 +159,23 @@ export class CronService {
           StateDescription.CHANGE_VERIFICATION_TO_VALID,
         );
 
-        const template = `successfulPointsPayment[${languageMails}]`;
-        const subject = MailsSubjets.successful_points_payment[languageMails];
+        if (user.length > 0) {
+          const template = `successfulPointsPayment[${languageMails}]`;
+          const subject = MailsSubjets.successful_points_payment[languageMails];
 
-        const msg = {
-          to: transaction.clientBankAccount.userClient.email,
-          subject: subject,
-          templateId: this.configService.get<string>(
-            `mails.sendgrid.templates.${template}`,
-          ),
-          dynamic_template_data: {
-            user:
-              transaction.clientBankAccount.userClient.userDetails.firstName,
-            numberPoints: points,
-          },
-        };
-        this.mailsService.sendEmail(msg);
+          const msg = {
+            to: transaction.clientBankAccount.userClient.email,
+            subject: subject,
+            templateId: this.configService.get<string>(
+              `mails.sendgrid.templates.${template}`,
+            ),
+            dynamic_template_data: {
+              user: userDetails.firstName,
+              numberPoints: points,
+            },
+          };
+          this.mailsService.sendEmail(msg);
+        }
 
         this.suscriptionService.upgradeSubscriptionIfIsPossible(
           unverifiedTransaction.idUserClient,
@@ -240,22 +245,23 @@ export class CronService {
           );
         }
 
-        const template = `failedPointsPayment[${languageMails}]`;
-        const subject = MailsSubjets.failed_points_payment[languageMails];
+        if (user.length > 0) {
+          const template = `failedPointsPayment[${languageMails}]`;
+          const subject = MailsSubjets.failed_points_payment[languageMails];
 
-        const msg = {
-          to: transaction.clientBankAccount.userClient.email,
-          subject: subject,
-          templateId: this.configService.get<string>(
-            `mails.sendgrid.templates.${template}`,
-          ),
-          dynamic_template_data: {
-            user:
-              transaction.clientBankAccount.userClient.userDetails.firstName,
-            numberPoints: points,
-          },
-        };
-        this.mailsService.sendEmail(msg);
+          const msg = {
+            to: transaction.clientBankAccount.userClient.email,
+            subject: subject,
+            templateId: this.configService.get<string>(
+              `mails.sendgrid.templates.${template}`,
+            ),
+            dynamic_template_data: {
+              user: userDetails.firstName,
+              numberPoints: points,
+            },
+          };
+          this.mailsService.sendEmail(msg);
+        }
       }
     });
   }
