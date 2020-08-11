@@ -1,3 +1,5 @@
+import { PaymentProvider } from '@/enums/payment-provider.enum';
+import { StateName, StateDescription } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { UserSuscription } from '@/entities/user-suscription.entity';
 import { ClientBankAccountService } from '@/modules/bank-account/services/client-bank-account.service';
@@ -55,10 +57,16 @@ describe('SuscriptionService', () => {
   >>;
   let thirdPartyInterestService: ThirdPartyInterestService;
   let save: jest.Mock;
+  let getRawOne: jest.Mock;
 
   beforeEach(() => {
+    let select = jest.fn().mockReturnThis();
+    let leftJoin = jest.fn().mockReturnThis();
+    let where = jest.fn().mockReturnThis();
+    let andWhere = jest.fn().mockReturnThis();
     let create = jest.fn().mockReturnThis();
     save = jest.fn().mockReturnThis();
+    getRawOne = jest.fn().mockReturnThis();
     RepositoryMock = jest.fn(() => ({
       find: jest.fn(),
       findOne: jest.fn(),
@@ -66,6 +74,13 @@ describe('SuscriptionService', () => {
       update: jest.fn(),
       delete: jest.fn(),
       create,
+      createQueryBuilder: jest.fn(() => ({
+        select,
+        leftJoin,
+        where,
+        andWhere,
+        getRawOne,
+      })),
     }));
     UserClientServiceMock = jest.fn<
       Partial<UserClientService>,
@@ -331,7 +346,7 @@ describe('SuscriptionService', () => {
     let expectedSuscription;
 
     describe('case: success', () => {
-      describe('when everything works well with suscription basic', () => {
+      describe('when everything works well', () => {
         beforeEach(async () => {
           userClient = {
             idUserClient: 1,
@@ -392,6 +407,507 @@ describe('SuscriptionService', () => {
 
         it('should return a new user suscription', () => {
           expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('hasPendingUpgrade(iduserClient)', () => {
+    let expectedResult;
+    let result;
+    let iduserClient;
+    let expectedStatus;
+
+    describe('case: success', () => {
+      describe('when the user have pending transactions', () => {
+        beforeEach(async () => {
+          iduserClient = 1;
+
+          expectedStatus = {
+            s_name: StateName.VERIFYING,
+          };
+
+          expectedResult = true;
+
+          getRawOne.mockResolvedValue(expectedStatus);
+
+          result = await suscriptionService.hasPendingUpgrade(iduserClient);
+        });
+
+        it('should invoke stateTransactionRepository.createQueryBuilder()', () => {
+          expect(getRawOne).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return a status - boolean', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+
+      describe('when the user does not have pending transactions', () => {
+        beforeEach(async () => {
+          iduserClient = 1;
+
+          expectedStatus = undefined;
+
+          expectedResult = false;
+
+          getRawOne.mockResolvedValue(expectedStatus);
+
+          result = await suscriptionService.hasPendingUpgrade(iduserClient);
+        });
+
+        it('should invoke stateTransactionRepository.createQueryBuilder()', () => {
+          expect(getRawOne).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return a status - boolean', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('upgradeToPremium(email, idBankAccount, costSuscription)', () => {
+    let result;
+    let email;
+    let idBankAccount;
+    let costSuscription;
+    let expectedSuscription;
+    let expectedUserClient;
+    let expectedThirdPartyInterest;
+    let expectedClientBankAccount;
+    let expectedUserSuscription;
+    let expectedCharge;
+    let expectedTransaction;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          email = 'prueba@gmail.com';
+          idBankAccount = 1;
+          costSuscription = 100;
+
+          expectedUserClient = {
+            idUserClient: 1,
+            email,
+          };
+          expectedSuscription = {
+            idSuscription: 1,
+            name: 'premium',
+            cost: 100,
+          };
+          expectedThirdPartyInterest = { amountDollarCents: 75, percentage: 0 };
+          expectedClientBankAccount = {
+            idClientBankAccount: 1,
+            paymentProvider: 'STRIPE',
+            chargeId: 'prueba',
+            primary: false,
+            transferId: 'prueba',
+            userClient: {
+              idUserClient: 1,
+              email: 'prueba@gmail.com',
+              userDetails: {
+                idUserDetails: 1,
+                firstName: 'Pedro',
+                lastName: 'Perez',
+                customerId: 'prueba',
+                accountId: 'prueba',
+              },
+              userSuscription: [
+                {
+                  idUserSuscription: 3,
+                  initialDate: new Date(),
+                  upgradedAmount: 0,
+                  finalDate: null,
+                  suscription: {
+                    idSuscription: 1,
+                    name: 'basic',
+                    cost: 0,
+                  },
+                },
+              ],
+            },
+            bankAccount: {
+              idBankAccount: 1,
+              accountNumber: '1',
+              checkNumber: '1111',
+              nickname: 'prueba',
+              type: 'Saving',
+              routingNumber: {
+                idRoutingNumber: 1,
+                number: '1',
+              },
+            },
+          };
+          expectedUserSuscription = {
+            idUserSuscription: 1,
+            initialDate: new Date(),
+            finalDate: null,
+            suscription: {
+              name: 'BASIC',
+            },
+          };
+          expectedCharge = {
+            id: 'prueba',
+            object: 'charge',
+            amount: 100,
+            source: 'prueba',
+            customer: 'prueba',
+            currency: 'usd',
+          };
+          expectedTransaction = {
+            totalAmountWithInterest: 100,
+            rawAmount: 0,
+            type: TransactionType.SUSCRIPTION_PAYMENT,
+            stateTransactionDescription: StateDescription.SUSCRIPTION_UPGRADE,
+            thirdPartyInterest: expectedThirdPartyInterest,
+            promotion: null,
+            platformInterestExtraPoints: null,
+          };
+
+          (userClientService.get as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (suscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'get')
+            .mockResolvedValue(expectedSuscription);
+
+          (thirdPartyInterestService.getCurrentInterest as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+          (clientBankAccountService.getOne as jest.Mock).mockResolvedValue(
+            expectedClientBankAccount,
+          );
+
+          getRawOne.mockResolvedValue(undefined);
+          jest
+            .spyOn(suscriptionService, 'hasPendingUpgrade')
+            .mockResolvedValue(false);
+
+          (userSuscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'getUserSuscription')
+            .mockResolvedValue(expectedUserSuscription);
+
+          (paymentProviderService.createCharge as jest.Mock).mockResolvedValue(
+            expectedCharge,
+          );
+          (transactionService.createUpgradeSuscriptionTransaction as jest.Mock).mockResolvedValue(
+            expectedTransaction,
+          );
+
+          result = await suscriptionService.upgradeToPremium(
+            email,
+            idBankAccount,
+            costSuscription,
+          );
+        });
+
+        it('should invoke userClientService.get()', () => {
+          expect(userClientService.get).toHaveBeenCalledTimes(1);
+          expect(userClientService.get).toHaveBeenCalledWith({ email });
+        });
+        it('should invoke thirdPartyInterestService.getCurrentInterest()', () => {
+          expect(
+            thirdPartyInterestService.getCurrentInterest,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            thirdPartyInterestService.getCurrentInterest,
+          ).toHaveBeenCalledWith(
+            PaymentProvider.STRIPE,
+            TransactionType.DEPOSIT,
+          );
+        });
+        it('should invoke clientBankAccountService.getOne()', () => {
+          expect(clientBankAccountService.getOne).toHaveBeenCalledTimes(1);
+          expect(clientBankAccountService.getOne).toHaveBeenCalledWith(
+            expectedUserClient.idUserClient,
+            idBankAccount,
+          );
+        });
+        it('should invoke paymentProviderService.createCharge()', () => {
+          expect(paymentProviderService.createCharge).toHaveBeenCalledTimes(1);
+          expect(paymentProviderService.createCharge).toHaveBeenCalledWith({
+            customer:
+              expectedClientBankAccount.userClient.userDetails.customerId,
+            source: expectedClientBankAccount.chargeId,
+            currency: 'usd',
+            amount: Math.trunc(
+              expectedSuscription.cost +
+                expectedThirdPartyInterest.amountDollarCents,
+            ),
+          });
+        });
+        it('should invoke transactionService.createUpgradeSuscriptionTransaction()', () => {
+          expect(
+            transactionService.createUpgradeSuscriptionTransaction,
+          ).toHaveBeenCalledTimes(1);
+          expect(
+            transactionService.createUpgradeSuscriptionTransaction,
+          ).toHaveBeenCalledWith(
+            expectedClientBankAccount,
+            expectedSuscription,
+            expectedCharge.id,
+          );
+        });
+
+        it('should return a transaction', () => {
+          expect(result).toStrictEqual(expectedTransaction);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedError: BadRequestException;
+      describe('when the cost is incorrect', () => {
+        beforeEach(async () => {
+          email = 'prueba@gmail.com';
+          idBankAccount = 1;
+          costSuscription = 200;
+
+          expectedUserClient = {
+            idUserClient: 1,
+            email,
+          };
+          expectedSuscription = {
+            idSuscription: 1,
+            name: 'premium',
+            cost: 100,
+          };
+          expectedThirdPartyInterest = { amountDollarCents: 75, percentage: 0 };
+
+          (userClientService.get as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (suscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'get')
+            .mockResolvedValue(expectedSuscription);
+
+          (thirdPartyInterestService.getCurrentInterest as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+
+          expectedError = new BadRequestException();
+
+          jest
+            .spyOn(suscriptionService, 'upgradeToPremium')
+            .mockRejectedValue(expectedError);
+        });
+        it('should throw when the cost is incorrect', async () => {
+          await expect(
+            suscriptionService.upgradeToPremium(
+              email,
+              idBankAccount,
+              costSuscription,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+
+        it('should not invoke clientBankAccountService.getOne()', () => {
+          expect(clientBankAccountService.getOne).not.toHaveBeenCalled();
+        });
+        it('should not invoke paymentProviderService.createCharge()', () => {
+          expect(paymentProviderService.createCharge).not.toHaveBeenCalled();
+        });
+        it('should not invoke transactionService.createUpgradeSuscriptionTransaction()', () => {
+          expect(
+            transactionService.createUpgradeSuscriptionTransaction,
+          ).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('when the user has pending transactions', () => {
+        let expectedStatus;
+        beforeEach(async () => {
+          email = 'prueba@gmail.com';
+          idBankAccount = 1;
+          costSuscription = 200;
+
+          expectedUserClient = {
+            idUserClient: 1,
+            email,
+          };
+          expectedSuscription = {
+            idSuscription: 1,
+            name: 'premium',
+            cost: 100,
+          };
+          expectedThirdPartyInterest = { amountDollarCents: 75, percentage: 0 };
+          expectedClientBankAccount = {
+            idClientBankAccount: 1,
+            chargeId: 'prueba',
+            primary: false,
+            transferId: 'prueba',
+            userClient: {
+              idUserClient: 1,
+              email: 'prueba@gmail.com',
+              userDetails: {
+                idUserDetails: 1,
+                firstName: 'Pedro',
+                lastName: 'Perez',
+                customerId: 'prueba',
+                accountId: 'prueba',
+              },
+            },
+          };
+          expectedStatus = {
+            s_name: StateName.VERIFYING,
+          };
+
+          (userClientService.get as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (suscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'get')
+            .mockResolvedValue(expectedSuscription);
+
+          (thirdPartyInterestService.getCurrentInterest as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+          (clientBankAccountService.getOne as jest.Mock).mockResolvedValue(
+            expectedClientBankAccount,
+          );
+
+          getRawOne.mockResolvedValue(expectedStatus);
+          jest
+            .spyOn(suscriptionService, 'hasPendingUpgrade')
+            .mockResolvedValue(true);
+
+          expectedError = new BadRequestException();
+
+          jest
+            .spyOn(suscriptionService, 'upgradeToPremium')
+            .mockRejectedValue(expectedError);
+        });
+        it('should throw when the user has pending transactions', async () => {
+          await expect(
+            suscriptionService.upgradeToPremium(
+              email,
+              idBankAccount,
+              costSuscription,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+
+        it('should not invoke paymentProviderService.createCharge()', () => {
+          expect(paymentProviderService.createCharge).not.toHaveBeenCalled();
+        });
+        it('should not invoke transactionService.createUpgradeSuscriptionTransaction()', () => {
+          expect(
+            transactionService.createUpgradeSuscriptionTransaction,
+          ).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('when the user already has a suscription premium or gold', () => {
+        beforeEach(async () => {
+          email = 'prueba@gmail.com';
+          idBankAccount = 1;
+          costSuscription = 200;
+
+          expectedUserClient = {
+            idUserClient: 1,
+            email,
+          };
+          expectedSuscription = {
+            idSuscription: 1,
+            name: 'premium',
+            cost: 100,
+          };
+          expectedThirdPartyInterest = { amountDollarCents: 75, percentage: 0 };
+          expectedClientBankAccount = {
+            idClientBankAccount: 1,
+            chargeId: 'prueba',
+            primary: false,
+            transferId: 'prueba',
+            userClient: {
+              idUserClient: 1,
+              email: 'prueba@gmail.com',
+              userDetails: {
+                idUserDetails: 1,
+                firstName: 'Pedro',
+                lastName: 'Perez',
+                customerId: 'prueba',
+                accountId: 'prueba',
+              },
+            },
+          };
+          expectedUserSuscription = {
+            idUserSuscription: 1,
+            initialDate: new Date(),
+            finalDate: null,
+            suscription: {
+              name: 'PREMIUM',
+            },
+          };
+
+          (userClientService.get as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (suscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'get')
+            .mockResolvedValue(expectedSuscription);
+
+          (thirdPartyInterestService.getCurrentInterest as jest.Mock).mockResolvedValue(
+            expectedThirdPartyInterest,
+          );
+          (clientBankAccountService.getOne as jest.Mock).mockResolvedValue(
+            expectedClientBankAccount,
+          );
+
+          getRawOne.mockResolvedValue(undefined);
+          jest
+            .spyOn(suscriptionService, 'hasPendingUpgrade')
+            .mockResolvedValue(false);
+
+          (userSuscriptionRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserSuscription,
+          );
+          jest
+            .spyOn(suscriptionService, 'getUserSuscription')
+            .mockResolvedValue(expectedUserSuscription);
+
+          expectedError = new BadRequestException();
+
+          jest
+            .spyOn(suscriptionService, 'upgradeToPremium')
+            .mockRejectedValue(expectedError);
+        });
+        it('should throw when the user already has a suscription premium or gold', async () => {
+          await expect(
+            suscriptionService.upgradeToPremium(
+              email,
+              idBankAccount,
+              costSuscription,
+            ),
+          ).rejects.toThrow(BadRequestException);
+        });
+
+        it('should not invoke paymentProviderService.createCharge()', () => {
+          expect(paymentProviderService.createCharge).not.toHaveBeenCalled();
+        });
+        it('should not invoke transactionService.createUpgradeSuscriptionTransaction()', () => {
+          expect(
+            transactionService.createUpgradeSuscriptionTransaction,
+          ).not.toHaveBeenCalled();
         });
       });
     });
