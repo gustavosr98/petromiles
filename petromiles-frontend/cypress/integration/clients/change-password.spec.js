@@ -70,7 +70,7 @@ context("Change Password", () => {
         cy.get('.v-card__actions > .v-btn > .v-btn__content').click();
     });
 
-    it("Trying to Change Password with a password that doesn't match", () => {
+    it("Trying to Change Password with a confirmation password that doesn't match", () => {
         cy.get('[data-cy=current-password-input]').type("test1234");
         cy.get('[data-cy=new-password-input]').type("5678test");
         cy.get('[data-cy=confirm-new-password-input]').type("91test01");
