@@ -286,5 +286,19 @@ describe( 'AuthService', () => {
         });
     });
 
+    describe('hashPassword(password,salt)', ()=> {
+        let password;
+        let salt;
+
+        describe('case: success', () => {
+            describe('when everything works well', () => {
+                beforeEach(async () => {
+                    password = 'prueba';
+                    salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO'
+                });
+            });
+        });
+    });
+
 
 });
