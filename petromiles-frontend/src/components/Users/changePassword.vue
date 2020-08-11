@@ -5,6 +5,7 @@
     <br />
     <h3 class="text-center">{{ $t("profile.ChangePassword") }}</h3>
 
+<<<<<<< .merge_file_VlTg4o
     <v-row align="center" justify="center">
       <v-col cols="11" lg="3" md="5" sm="5" class="text-center">
         <v-text-field
@@ -60,6 +61,70 @@
       </v-col>
     </v-row>
   </div>
+=======
+      <v-row
+        align="center"
+        justify="center"
+      > 
+        <v-col cols="11" lg="3" md="5" sm="5" class="text-center">
+            <v-text-field
+              v-model="currentPassword"
+              :label="$t('profile.CurrentPassword')"
+              name="currentPassword"          
+              prepend-icon="lock"
+              :append-icon="showcurrentPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showcurrentPassword = !showcurrentPassword"
+              :type="showcurrentPassword ? 'text' : 'password'"
+              color="light-blue darken-4"  
+              @change="$v.currentPassword.$touch()"
+              @blur="$v.currentPassword.$touch()"
+              :error-messages="currentPasswordErrors"
+              data-cy="current-password-input"
+            ></v-text-field>
+
+            <v-text-field
+              v-model="password"
+              :label="$t('profile.NewPassword')"
+              name="password"          
+              prepend-icon="lock"
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showPassword = !showPassword"
+              :type="showPassword ? 'text' : 'password'"
+              color="light-blue darken-4"  
+              @change="$v.password.$touch()"
+              @blur="$v.password.$touch()"
+              :error-messages="passwordErrors"  
+              data-cy="new-password-input"   
+            ></v-text-field>
+
+            <v-text-field
+              v-model="confirmedNewPassword"
+              :label="$t('profile.ConfirmPassword')"
+              name="confirmedNewPassword"          
+              prepend-icon="lock"
+              :append-icon="showconfirmedNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showconfirmedNewPassword = !showconfirmedNewPassword"
+              :type="showconfirmedNewPassword ? 'text' : 'password'"
+              color="light-blue darken-4"  
+              @change="$v.confirmedNewPassword.$touch()"
+              @blur="$v.confirmedNewPassword.$touch()"
+              :error-messages="confirmedNewPasswordError"     
+              data-cy="confirm-new-password-input"
+            ></v-text-field>
+            <br/>
+            <v-btn
+              color="primary"
+              @click="checkingValidForm"
+              :loading="loading"
+              class="change-btn"
+            >
+              {{ $t("profile.ChangePassword") }}
+            </v-btn>
+            <snackbar @close="closeSnackbar" :show="showSnackbar" :text="message"></snackbar>
+        </v-col>
+      </v-row>  
+    </div>
+>>>>>>> .merge_file_sxxNus
 </template>
 
 <script>

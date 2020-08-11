@@ -45,6 +45,7 @@
           @change="$v.phone.$touch()"
           @blur="$v.phone.$touch()"
           :error-messages="phoneError"
+          class="phone-input"
         ></v-text-field>
       </v-col>
       <v-col cols="12" md="5">
@@ -62,7 +63,11 @@
 
     <!-- Actions -->
     <v-row justify="end" class="ma-1 mt-8">
+<<<<<<< .merge_file_fMFbk9
       <v-btn color="primary" @click="nextStep()">
+=======
+      <v-btn color="primary" @click="nextStep()" class="next-btn">
+>>>>>>> .merge_file_AzMfhh
         {{ $t("bank-account-creation-form.continueButton") }}
       </v-btn>
     </v-row>

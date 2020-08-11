@@ -17,6 +17,7 @@
             @change="$v.type.$touch()"
             @blur="$v.type.$touch()"
             :error-messages="typeError"
+            class="account-selector"
           ></v-autocomplete>
         </v-col>
         <v-col cols="12" md="5">
@@ -27,6 +28,7 @@
             @change="$v.bank.$touch()"
             @blur="$v.bank.$touch()"
             :error-messages="bankError"
+            class="banks-selector"
           ></v-autocomplete>
         </v-col>
       </v-row>
@@ -40,6 +42,7 @@
             @change="$v.accountNumber.$touch()"
             @blur="$v.accountNumber.$touch()"
             :error-messages="accountNumberError"
+            class="account-number-input"
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="5">
@@ -51,6 +54,7 @@
             @change="$v.routingNumber.$touch()"
             @blur="$v.routingNumber.$touch()"
             :error-messages="routingNumberError"
+            class="routing-number-input"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -64,6 +68,7 @@
             @change="$v.checkNumber.$touch()"
             @blur="$v.checkNumber.$touch()"
             :error-messages="checkNumberError"
+            class="check-input"
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="5">
@@ -75,6 +80,7 @@
             @change="$v.nickname.$touch()"
             @blur="$v.nickname.$touch()"
             :error-messages="nicknameError"
+            class="nickname-input"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -88,6 +94,7 @@
       </v-btn>
       <v-btn
         color="primary"
+        class="continue-btn"
         @click="nextStep"
         :loading="processing"
         :disable="processing"

@@ -15,8 +15,15 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
+<<<<<<< .merge_file_JBrKoA
           <v-btn @click="clearLastError">
             {{ $t("common.ok") }}
+=======
+          <v-btn @click="clearLastError" data-cy="error-btn">
+            {{
+            $t("common.ok")
+            }}
+>>>>>>> .merge_file_qvPTZD
           </v-btn>
         </v-card-actions>
       </v-card>

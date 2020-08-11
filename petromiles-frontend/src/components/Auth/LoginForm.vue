@@ -40,14 +40,14 @@
       <v-col :cols="showClientElement ? '6' : '12'">
         <h5 class="caption">
           Forgot your password?
-          <router-link :to="{ name: routeNameRecover }">Recover</router-link>
+          <router-link :to="{ name: routeNameRecover }" class="link-to-recover">Recover</router-link>
         </h5>
         <v-spacer />
       </v-col>
       <v-col cols="6" v-if="showClientElement">
         <h5 class="caption">
           New here?
-          <router-link :to="{ name: routeNameSignUp }">Sign Up</router-link>
+          <router-link :to="{ name: routeNameSignUp }" class="link-to-signup">Sign Up</router-link>
         </h5>
       </v-col>
     </v-row>

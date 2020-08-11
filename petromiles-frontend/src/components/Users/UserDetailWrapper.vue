@@ -9,6 +9,7 @@
               <v-divider></v-divider>
               <v-row align="center" justify="center">
                 <v-col cols="11" lg="4" md="4" sm="4">
+<<<<<<< .merge_file_cSAbyA
                   <user-membership
                     :membership="membership"
                     :isAdmin="false"
@@ -31,6 +32,24 @@
             <v-window>
               <user-detail :userDetails="userData" :isAdmin="false" />
               <change-password></change-password>
+=======
+                  <user-membership :membership="membership" :isAdmin="false"></user-membership>
+                </v-col>
+                <v-col cols="11" lg="4" md="4" sm="4">
+                  <user-profile-image :userData="userData" :isAdmin="false"></user-profile-image>
+                </v-col>
+                <v-col cols="11" lg="4" md="4" sm="4">
+                  <user-points :conversion="conversion" :isAdmin="false"></user-points>
+                </v-col>
+              </v-row>
+            </v-window>
+            <v-window>
+              <user-detail :userDetails="userData" :isAdmin="false" />
+              <change-password></change-password>
+            </v-window>
+            <v-window>
+              <account-management />
+>>>>>>> .merge_file_i0V3yF
             </v-window>
           </v-card>
         </v-col>
@@ -48,6 +67,7 @@ import ChangePassword from "@/components/Users/changePassword.vue";
 import UserProfileImage from "@/components/Users/UserProfileImage.vue";
 import UserMembership from "@/components/Users/UserMembership.vue";
 import UserPoints from "@/components/Users/UserPoints.vue";
+import AccountManagement from "@/components/Users/AccountManagement.vue";
 import LoadingScreen from "@/components/General/LoadingScreen/LoadingScreen.vue";
 
 export default {
@@ -59,6 +79,7 @@ export default {
     "user-membership": UserMembership,
     "user-points": UserPoints,
     "loading-screen": LoadingScreen,
+    "account-management": AccountManagement,
   },
   data() {
     return {

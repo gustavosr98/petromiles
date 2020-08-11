@@ -1,10 +1,27 @@
 <template>
+<<<<<<< .merge_file_Ob9uF5
   <v-snackbar v-model="visible" :timeout="timeout">
     {{ text }}
     <v-btn color="warning" text @click="visible = false">
       {{ $t("common.Close") }}
     </v-btn>
   </v-snackbar>
+=======
+    <v-snackbar
+      v-model="visible"
+      :timeout="timeout"
+    >
+      {{ text }}
+      <v-btn
+          color="warning"
+          text              
+          @click="visible = false"
+          data-cy="close-btn"
+        >
+          {{ $t("common.Close") }}
+        </v-btn>              
+    </v-snackbar>
+>>>>>>> .merge_file_MoMQea
 </template>
 
 <script>

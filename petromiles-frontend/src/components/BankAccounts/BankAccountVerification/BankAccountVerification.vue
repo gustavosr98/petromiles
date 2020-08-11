@@ -65,8 +65,13 @@
                   dark
                   small
                   @click="startValidation(account)"
+<<<<<<< .merge_file_dyJt06
                   >{{ $t("bank-account-validation.verify") }}</v-btn
                 >
+=======
+                  class="verify-btn"
+                >{{ $t("bank-account-validation.verify") }}</v-btn>
+>>>>>>> .merge_file_1NIxXc
               </v-list-item-action>
             </v-list-item>
             <v-divider
@@ -127,7 +132,7 @@ export default {
   mounted() {
     // Build an array with the bank accounts available to validate
     if (this.bankAccounts) {
-      this.bankAccounts.map(bankAccount => {
+      this.bankAccounts.map((bankAccount) => {
         const state =
           bankAccount.clientBankAccount[0].stateBankAccount[0].state.name;
         if (state === states.VERIFYING.name) {

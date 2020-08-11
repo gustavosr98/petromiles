@@ -40,11 +40,11 @@ export default {
         },
         {
           text: this.$tc("user-details.firstName"),
-          value: "userDetails.firstName",
+          value: "firstName",
         },
         {
           text: this.$tc("user-details.lastName"),
-          value: "userDetails.lastName",
+          value: "lastName",
         },
         {
           text: this.$tc("common.state"),
@@ -64,7 +64,10 @@ export default {
   },
   computed: {
     mungedData() {
-      return this.fetchedData.map(data => {
+      return this.fetchedData.map((data) => {
+        const userDetails = data.userDetails.find(
+          (details) => details.accountOwner === null
+        );
         const state = {
           name: data.stateUser[0].state.name,
           translated: this.$tc(`state-name.${data.stateUser[0].state.name}`),
@@ -72,6 +75,8 @@ export default {
         return {
           ...data,
           state,
+          firstName: userDetails.firstName,
+          lastName: userDetails.lastName,
         };
       });
     },

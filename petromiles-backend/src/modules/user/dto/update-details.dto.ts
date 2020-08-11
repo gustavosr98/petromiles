@@ -28,5 +28,11 @@ export class UpdateDetailsDTO {
   @IsOptional()
   country?: Country;
 
+  @IsOptional()
+  customerId?: string;
+
+  @IsOptional()
+  accountId?: string;
+
   role: string;
 }
