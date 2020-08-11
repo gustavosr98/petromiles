@@ -6,7 +6,7 @@ const modalMessages = {
   areYouSure: "Are you sure?",
 };
 
-context("Buy points", () => {
+context("Payment Subscription", () => {
   beforeEach(() => {
     cy.visit("/");
     cy.get(".email-input").type("test5@petromiles.com");
