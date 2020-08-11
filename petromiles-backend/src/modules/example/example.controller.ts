@@ -1,7 +1,6 @@
 import { Controller, Inject, Get, UseGuards, Request } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -73,8 +72,8 @@ export class ExampleController {
     return user;
   }
 
-  @Get('relations')
-  testRelations(@GetUser() user) {
-    this.example.example();
+  @Get('test')
+  test(): string {
+    return this.example.test();
   }
 }

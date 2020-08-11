@@ -60,6 +60,8 @@ import { createNamespacedHelpers } from "vuex";
 const { mapMutations, mapActions } = createNamespacedHelpers("auth");
 
 import LanguageDropDown from "@/components/General/Navigation/LanguageDropDown";
+import authConstants from "../../../constants/authConstants";
+import LogRocket from "logrocket";
 
 export default {
   name: "navbar",
@@ -94,6 +96,23 @@ export default {
   },
   async mounted() {
     await this.checkUserToken();
+    this.setLogRocket();
+  },
+  setLogRocket() {
+    const user = JSON.parse(
+      localStorage.getItem(authConstants.USER_LOCAL_STORAGE)
+    );
+
+    if (user !== null) {
+      const userId = toString(user.details.idUserDetails);
+      const userName = user.details.firstName + " " + user.details.lastName;
+      const userEmail = user.email;
+
+      LogRocket.identify(userId, {
+        name: userName,
+        email: userEmail,
+      });
+    }
   },
 };
 </script>

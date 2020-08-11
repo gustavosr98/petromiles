@@ -6,6 +6,12 @@
   width="192" src="petromiles-frontend/public/img/icons/android-chrome-192x192.png">
 </p>
 
+[![Build Status](https://travis-ci.org/gustavosr98/petromiles.svg?branch=master)](https://travis-ci.org/gustavosr98/petromiles)
+
+[![Coverage Status](https://coveralls.io/repos/github/gustavosr98/petromiles/badge.svg?branch=master)](https://coveralls.io/github/gustavosr98/petromiles?branch=master)
+
+---
+
 ![node version](https://img.shields.io/badge/node-12.16.3-blue)
 ![postgresql version](https://img.shields.io/badge/postgresql-12.2-blue)
 
