@@ -33,21 +33,24 @@ export const blockedState = {
 };
 
 export const language = { idLanguage: 1, name: 'english', shortname: 'en' };
-export const userDetails = {
-  idUserDetails: 6,
-  firstName: 'petro',
-  middleName: null,
-  lastName: 'miles',
-  secondLastName: null,
-  birthdate: null,
-  address: null,
-  phone: '12345',
-  photo: null,
-  customerId: null,
-  accountId: null,
-  userClient: null,
-  language,
-};
+export const userDetails = [
+  {
+    idUserDetails: 6,
+    firstName: 'petro',
+    middleName: null,
+    lastName: 'miles',
+    secondLastName: null,
+    birthdate: null,
+    address: null,
+    phone: '12345',
+    photo: null,
+    customerId: null,
+    accountId: null,
+    userClient: null,
+    language,
+    accountOwner: null,
+  },
+];
 export const bank = {
   idBank: 1,
   name: 'Bank of America',
@@ -375,5 +378,5 @@ export const bankAccountWithUserDetails = {
   nickname: 'test 5',
   type: 'Saving',
   routingNumber,
-  userDetails,
+  userDetails: userDetails[0],
 };

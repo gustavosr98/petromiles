@@ -1,6 +1,7 @@
 import { TestingModule, Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 import { WinstonModule } from 'nest-winston';
@@ -18,25 +19,20 @@ import { TransactionService } from '@/modules/transaction/services/transaction.s
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
 import { ManagementService } from '@/modules/management/services/management.service';
 import { MailsService } from '@/modules/mails/mails.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { BankAccountService } from './bank-account.service';
+import { BankAccountService } from '@/modules/bank-account/services/bank-account.service';
 
 import { PaymentProvider } from '@/enums/payment-provider.enum';
 import { StateName } from '@/enums/state.enum';
 import { TransactionType } from '@/enums/transaction.enum';
 import { StateDescription } from '@/enums/state.enum';
 import {
-  state,
-  bankAccountWithUserDetails,
-} from './mocks/client-bank-account.mock';
-import {
   stateUser,
   userDetails,
   userSuscription,
   bankAccount,
   stateBankAccount,
-} from './mocks/client-bank-account.mock';
-import {
+  state,
+  bankAccountWithUserDetails,
   expectedClientBankAccount,
   expectedUserClient,
   createBankAccountDTO,
@@ -226,6 +222,7 @@ describe('ClientBankAccountService', () => {
 
   describe('create(bankAccountCreateParams, user)', () => {
     let bankAccountCreateParams;
+    let userClient;
     let user;
     let expectedNicknameIsTaken;
     let expectedChangeState;
@@ -235,6 +232,18 @@ describe('ClientBankAccountService', () => {
       describe('when everything works well', () => {
         beforeEach(async () => {
           bankAccountCreateParams = createBankAccountDTO;
+          userClient = {
+            email: 'alleyne.michelle333@hotmail.com',
+            facebookToken: null,
+            googleToken: null,
+            idUserClient: 1,
+            password:
+              '$2b$10$4WQNzcG4y7h864.R8X3PxuV5scq/pm1RX3yPfy.j4iBtS/RUvBTn2',
+            salt: '$2b$10$4WQNzcG4y7h864.R8X3Pxu',
+            stateUser: stateUser,
+            userDetails,
+            userSuscription,
+          };
           user = { email: 'test@petromiles.com', id: 1, role: 'CLIENT' };
           expectedNicknameIsTaken = false;
           expectedChangeState = expectedChangeBankAccount;
@@ -282,6 +291,7 @@ describe('ClientBankAccountService', () => {
           expect(bankAccountService.create).toHaveBeenCalledTimes(1);
           expect(bankAccountService.create).toHaveBeenCalledWith(
             bankAccountCreateParams,
+            userClient,
           );
         });
 
@@ -681,7 +691,7 @@ describe('ClientBankAccountService', () => {
           expect(paymentProviderService.verifyBankAccount).toHaveBeenCalledWith(
             {
               customerId:
-                expectedClientBankAccount.userClient.userDetails.customerId,
+                expectedClientBankAccount.userClient.userDetails[0].customerId,
               bankAccountId: expectedClientBankAccount.chargeId,
               amounts,
             },
@@ -1036,7 +1046,7 @@ describe('ClientBankAccountService', () => {
             paymentProviderService.deleteBankAccount,
           ).toHaveBeenCalledTimes(1);
           expect(paymentProviderService.deleteBankAccount).toHaveBeenCalledWith(
-            clientBankAccount.userClient.userDetails.customerId,
+            clientBankAccount.userClient.userDetails[0].customerId,
             clientBankAccount.chargeId,
             email,
           );

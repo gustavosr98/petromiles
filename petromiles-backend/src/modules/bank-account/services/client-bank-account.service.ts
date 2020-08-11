@@ -190,7 +190,7 @@ export class ClientBankAccountService {
       this.logger.error(message);
       throw new BadRequestException('error-messages.invalidVerification');
     }
-    const customerId = clientBankAccount.userClient.userDetails.find(
+    const customerId = await clientBankAccount.userClient.userDetails.find(
       details => details.accountOwner === null,
     ).customerId;
     const verification = await this.paymentProviderService.verifyBankAccount({
@@ -293,7 +293,7 @@ export class ClientBankAccountService {
     clientBankAccount: ClientBankAccount,
   ) {
     const lastNumbersBankAccount = 4;
-    const userDetails = clientBankAccount.userClient.userDetails.find(
+    const userDetails = await clientBankAccount.userClient.userDetails.find(
       details => details.accountOwner === null,
     );
 
