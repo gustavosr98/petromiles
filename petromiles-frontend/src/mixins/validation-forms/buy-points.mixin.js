@@ -17,7 +17,7 @@ export default {
   },
   computed: {
     // Error stacks
-    pointsErrors() {
+    pointsErrors() {      
       let errors = [];
       if (!this.$v.points.$dirty) return errors;
       !this.$v.points.required && errors.push(this.thisIsRequired);

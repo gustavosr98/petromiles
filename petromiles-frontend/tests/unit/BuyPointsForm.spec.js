@@ -1,5 +1,9 @@
-import { shallowMount, mount, config  } from "@vue/test-utils";
+import { shallowMount, createLocalVue  } from "@vue/test-utils";
 import BuyPointForm from "@/components/Payments/BuyPointsForm.vue";
+
+import Vuetify from 'vuetify'
+
+const localVue = createLocalVue()
 
 /*************** Mocking Translations functions ***************/
 const $tc = () => {}
@@ -8,41 +12,24 @@ const $t = () => {}
 
 
 describe("Testing BuyPointsForm component", () => {
-    const wrapper = shallowMount(BuyPointForm, {
-        mocks:{ $tc, $t }
-    })
 
-    it('has a button', () => {
-        expect(wrapper.contains('v-btn')).toBe(true)
-    })
+    let vuetify
+
+    beforeEach(() => {
+        vuetify = new Vuetify()
+      })
+
+    const wrapper = shallowMount(BuyPointForm, {
+        mocks:{ $tc, $t },    
+        localVue,
+        vuetify,
+    })            
 
     it("assign 50 points", () => {
-        wrapper.setData({ points: 500 });
-        console.log("Dollars: ", wrapper.vm.costWithInterests);
+        wrapper.setData({ points: 500 });        
         expect(wrapper.vm.points).toBe(500);
-    })
+    })    
 
-    it("calls buyPoints method", async () => {
-        wrapper.setData({ points: 500 });
-        wrapper.setData({ onePointToDollars: 2 });
-        const localThis = {
-            points: 500,
-            onePointToDollars: 2
-        }
-        console.log("calculated: ", BuyPointForm.computed.rawCost.call(localThis));
-        const calc = BuyPointForm.computed.rawCost.call(localThis);
-        expect(calc).toBe(1000);
-        //const buyPoints = BuyPointForm.buyPoints();
-        //wrapper.setMethods({ buyPoints: buyPoints });
-        //wrapper.find('.confirm-btn').trigger('click')
-        /*wrapper.vm.buyPoints()
-        await wrapper.vm.$nextTick()
-        expect(wrapper.vm.buyPoints().called).toBe(true);*/
-    })
-
-    
-    
-/*************** Oficiales para el componente ***************/
     it("Tests PREMIUM extra points", () => {
         const data = {
             points: 500,            
@@ -100,11 +87,17 @@ describe("Testing BuyPointsForm component", () => {
                 }
             ]
         }
-
         data.rawCost = BuyPointForm.computed.rawCost.call(data);        
-        const costWithInterests = BuyPointForm.computed.costWithInterests.call(data);
-        console.log("costo con intereses: ", costWithInterests);
+        const costWithInterests = BuyPointForm.computed.costWithInterests.call(data);        
         expect(costWithInterests).toBe(1015.75);
     })
-/**************************************************************/
+
+    it("Executes buyPoints method correctly", async () => {
+        const buyPoints = jest.fn();
+        wrapper.setMethods({ buyPoints: buyPoints });
+        wrapper.find("v-btn.confirm-btn").trigger("click");
+        await wrapper.vm.$nextTick()
+        expect(buyPoints).toHaveBeenCalled();        
+    })
+    
 })
