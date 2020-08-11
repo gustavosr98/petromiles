@@ -19,27 +19,6 @@ import "firebase/auth";
 import "roboto-fontface/css/roboto/roboto-fontface.css";
 import "@mdi/font/css/materialdesignicons.css";
 import LogRocket from 'logrocket';
-import authConstants from "./constants/authConstants";
-
-
-
-const user = JSON.parse(
-    localStorage.getItem(authConstants.USER_LOCAL_STORAGE)
-);
-
-if (user !== null){
-  const userId = toString(user.details.idUserDetails);
-  const userName = user.details.firstName + ' ' + user.details.lastName;
-  const userEmail = user.email;
-
-  LogRocket.identify(userId, {
-    name: userName,
-    email: userEmail,
-  });
-}
-
-
-
 
 Vue.config.productionTip = false;
 Vue.prototype.$http = httpClient;
