@@ -46,7 +46,7 @@
       <v-col cols="6" v-if="showClientElement">
         <h5 class="caption">
           New here?
-          <router-link :to="{ name: routeNameSignUp }">Sign Up</router-link>
+          <router-link :to="{ name: routeNameSignUp }" class="link-to-signup">Sign Up</router-link>
         </h5>
       </v-col>
     </v-row>

@@ -1,8 +1,9 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
-import { Repository, getConnection } from 'typeorm';
+import { Repository, getConnection, UpdateResult } from 'typeorm';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -63,6 +64,7 @@ export class ClientBankAccountService {
 
     const bankAccount = await this.bankAccountService.create(
       bankAccountCreateParams,
+      userClient,
     );
 
     const paymentProviderBankAccount = await this.paymentProviderService.createBankAccount(
@@ -166,6 +168,7 @@ export class ClientBankAccountService {
         AND STATE_BANK_ACCOUNT."finalDate" IS NULL
         AND STATE_U.name = 'active'
         AND STATE_BA.name = ANY($1)    
+        AND USER_DETAILS."accountOwner" IS NULL  
     `,
       [states],
     );
@@ -190,9 +193,11 @@ export class ClientBankAccountService {
       this.logger.error(message);
       throw new BadRequestException('error-messages.invalidVerification');
     }
-
+    const customerId = clientBankAccount.userClient.userDetails.find(
+      details => details.accountOwner === null,
+    ).customerId;
     const verification = await this.paymentProviderService.verifyBankAccount({
-      customerId: clientBankAccount.userClient.userDetails.customerId,
+      customerId,
       bankAccountId: clientBankAccount.chargeId,
       amounts: verificationRequest.amounts,
     });
@@ -239,6 +244,15 @@ export class ClientBankAccountService {
       clientBankAccount,
     );
     let correctValues = true;
+
+    if (
+      this.configService.get<boolean>('QAEnvironment') &&
+      amounts[0] === 1.5 &&
+      amounts[1] === 1
+    ) {
+      this.logger.warn(`[${ApiModules.BANK_ACCOUNT}] QA Environment active`);
+      return correctValues;
+    }
 
     transactions.forEach(transaction => {
       if (!amounts.includes(transaction.totalAmountWithInterest / 100)) {
@@ -292,8 +306,11 @@ export class ClientBankAccountService {
     clientBankAccount: ClientBankAccount,
   ) {
     const lastNumbersBankAccount = 4;
-    const languageMails =
-      clientBankAccount.userClient.userDetails.language.name;
+    const userDetails = clientBankAccount.userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
+
+    const languageMails = userDetails.language.name;
     const bank = clientBankAccount.bankAccount.routingNumber.bank.name;
 
     if (bankAccountStatus === StateName.VERIFYING) {
@@ -308,7 +325,7 @@ export class ClientBankAccountService {
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
-          user: clientBankAccount.userClient.userDetails.firstName,
+          user: userDetails.firstName,
           bank,
           accountHolderName:
             clientBankAccount.bankAccount.userDetails.firstName +
@@ -332,7 +349,7 @@ export class ClientBankAccountService {
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
-          user: clientBankAccount.userClient.userDetails.firstName,
+          user: userDetails.firstName,
           bank,
           accountNumber: clientBankAccount.bankAccount.accountNumber.slice(
             -lastNumbersBankAccount,
@@ -352,7 +369,7 @@ export class ClientBankAccountService {
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
-          user: clientBankAccount.userClient.userDetails.firstName,
+          user: userDetails.firstName,
           accountNumber: clientBankAccount.bankAccount.accountNumber.slice(
             -lastNumbersBankAccount,
           ),
@@ -393,7 +410,7 @@ export class ClientBankAccountService {
       StateDescription.BANK_ACCOUNT_CANCELLED,
     );
 
-    const customerId = clientBankAccount.userClient.userDetails.customerId;
+    const customerId = clientBankAccount.userClient.userDetails[0].customerId;
     await this.paymentProviderService.deleteBankAccount(
       customerId,
       clientBankAccount.chargeId,
@@ -405,7 +422,7 @@ export class ClientBankAccountService {
     );
   }
 
-  private async hasPendingTransaction(
+  async hasPendingTransaction(
     clientBankAccount: ClientBankAccount,
   ): Promise<boolean> {
     const pendingValidations = await this.transactionService.getAllFiltered(
@@ -505,5 +522,35 @@ export class ClientBankAccountService {
       clientBankAccount,
       description,
     );
+  }
+
+  async encryptBankAccount(bankAccounts: BankAccount[]): Promise<void> {
+    bankAccounts.forEach(async bankAccount => {
+      const clientBankAccount = bankAccount.clientBankAccount[0];
+
+      await this.updateAccountState({
+        idUserClient: clientBankAccount.userClient.idUserClient,
+        idBankAccount: bankAccount.idBankAccount,
+        state: StateName.DELETED,
+      });
+
+      // This will be encrypted
+      const encryptedData = {
+        accountNumber: await this.encrypt(bankAccount.accountNumber),
+        checkNumber: await this.encrypt(bankAccount.checkNumber),
+        nickname: await this.encrypt(bankAccount.nickname),
+      };
+
+      await this.bankAccountRepository
+        .createQueryBuilder()
+        .update(BankAccount)
+        .set({ ...encryptedData })
+        .where(`idBankAccount = :id`, { id: bankAccount.idBankAccount })
+        .execute();
+    });
+  }
+
+  async encrypt(dataToEncrypt: string): Promise<string> {
+    return await bcrypt.hash(dataToEncrypt, 10);
   }
 }

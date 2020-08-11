@@ -24,6 +24,7 @@
               @change="$v.firstName.$touch()"
               @blur="$v.firstName.$touch()"
               :error-messages="firstNameErrors"
+              class="name-input"
             ></v-text-field>
           </v-col>
           <v-col cols="6">
@@ -36,6 +37,7 @@
               @change="$v.lastName.$touch()"
               @blur="$v.lastName.$touch()"
               :error-messages="lastNameErrors"
+              class="last-name-input"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -50,6 +52,7 @@
           @change="$v.email.$touch()"
           @blur="$v.email.$touch()"
           :error-messages="emailErrors"
+          class="email-input"
         ></v-text-field>
         <v-text-field
           label="Password"
@@ -63,6 +66,7 @@
           @change="$v.password.$touch()"
           @blur="$v.password.$touch()"
           :error-messages="passwordErrors"
+          class="password-input"
         ></v-text-field>
       </v-form>
     </v-card-text>
@@ -73,7 +77,7 @@
       </h5>
     </div>
     <div class="text-center mt-3 mb-8">
-      <v-btn :loading="loading" @click="ckeckingValidForm" type="submit" class="light-blue darken-4" dark>SIGN UP</v-btn>
+      <v-btn :loading="loading" @click="ckeckingValidForm" type="submit" class="light-blue darken-4 submit-btn" dark>SIGN UP</v-btn>
     </div>
   </v-col>
 </template>

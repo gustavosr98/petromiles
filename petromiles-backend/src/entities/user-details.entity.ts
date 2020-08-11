@@ -54,7 +54,10 @@ export class UserDetails extends BaseEntity {
   @Exclude()
   accountId?: string;
 
-  @OneToOne(
+  @Column({ nullable: true })
+  accountOwner?: string;
+
+  @ManyToOne(
     type => UserClient,
     userClient => userClient.idUserClient,
     {

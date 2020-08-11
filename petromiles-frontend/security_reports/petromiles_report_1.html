@@ -1,0 +1,1150 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ZAP Scanning Report</title>
+<style>
+body{
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  color: #000;
+  font-size: 13px;
+}
+h1{
+  text-align: center;
+  font-weight: bold;
+  font-size: 32px
+}
+h3{
+  font-size: 16px;
+}
+table{
+  border: none;
+  font-size: 13px;
+}
+td, th {
+  padding: 3px 4px;
+  word-break: break-word;
+}
+th{
+  font-weight: bold;
+}
+.results th{
+  text-align: left;
+}
+.spacer{
+  margin: 10px;
+}
+.spacer-lg{
+  margin: 40px;
+}
+.indent1{
+  padding: 4px 20px;
+}
+.indent2{
+  padding: 4px 40px;
+}
+.risk-high{
+  background-color: red;
+  color: #FFF;
+}
+.risk-medium{
+  background-color: orange;
+  color: #FFF;
+}
+.risk-low{
+  background-color: yellow;
+  color: #000;
+}
+.risk-info{
+  background-color: blue;
+  color: #FFF;
+}
+.summary th{
+  color: #FFF;
+}
+</style>
+</head>
+<body>
+<h1>
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAABqbAAAamwHdbkbTAAAAB3RJTUUH4QsKDDQPKy6k8AAABxpJREFUWMO9l31sVWcdxz+/55xzbwt9QddJExClvIzNxTKJDZi22oJSbFZpmRb4g8sfhpEIwXQNTKh0NYgiMKIwo5AsdIxdQldGNBN5W2OTFRVcIZE1YwExcXOdc1DK+nLvOc/PP87tC9CWsj98bp6ck3Ofc57v7+37/T3wYGMucBR4F/gK/8exAugAdPXq1bpx40YFekZdHYuP+8PuGP+lAc8CmzIyMtLq6uqora3FcRwAzp49m/7Wv5O95tsNEfyEKvwH9B1V2hT7GnB+PABkhGePAvVA9dy5c6mvr2fp0qX3LOru7iYrK4toSQ1OXhGKohpOiyVQe0NVn9PGFb8iFofGFSMCMMPulwEXgbdXrlxZ3dHRQXt7+4ibA2RmZtLc3Ex/y/O4fg8RMUSMS8RxiRiPqPE+4xrnl07syA3Q+aN5wADlwO1oNPpqQ0NDfl9fH4cPH2bOnDn3dV9VVRWVlVV88vsteNF0XCO4xuA6Bs9xiBgPz/EmueKcIxavHyk/BPjnli1bpm3btu1TZ2hmxkTk8aeYMK8aay1WFVWwqgSqBDYgqQFJGxygccWa4e86IhJpbW39Zk5ODgUFBZ8KwOLFZeyr/wHZs0vw0jMxIqFpAuFt+EOYZ/OrAi41t96dhF8HThcWFnpnzpwhGo0+MIhnamvZs+8AM55uIhn4+Cnrkza8Wqv4NiBhfXwNCgxy3jauuKMKPOCPrpHSU2fOUlJS8sAg8qZP50bGY0xeuIFk4JO0SnIYiMAqSRuQDPyPgsbqh++ugqSsPXGC+WsoLS1lzZqnHxhA40svcfPvfyDNjRARwTOCJ+E0IjgiOGIwRnIkFl97NwBMX9dPvEfLSC+t5cCB/eTk5Ix78ylTplBcXMxDjy3EweIZISKSqoxwcyOCYwRXHETkuSEAsTjE4kVGTLrjpdP7p33U1NTQ2dk5bgCbN28Ow7BoA8YmcVOWR1KWuyKIgEEwYjBiJhN75Ushr15qRp747g9dcRZ4RtCuf3HhdBMlpQuZNm3auAAUFBRw+fJlWl/dy9SCaqwGIBIyJGBTUwemWqzy/mAIRPmaEUGsJeNbz+IVfJ+ioiI2bNgwbi80NTUxJWciV47/GM9Lwwg4CA6CSblbBqYYRPjqEACRR8JaVcRPkPHlJ5m66kX27W8kL2/6uMPR3t7Ox+++yQcXjmLEIEYQA8YIkuIHSYVDkBnDk3DSEDwAi5c5mUfWNtGVPovc3FwOHTp0XwDZ2dm0nTvH9Td+zSedVxDVkIQAEQ1BoIgKCpnmflqpQcAXyjYxo6KeVatWUVZWRiKRGPO1+fPns2vXLjoOr7uvFA8HcHMoQ8IHmkqOINnH1d81kJeXR0VFRcqKkUcQBLS0tHD79u2QXHq7UmkIqgKqoIKKAnQPNiSqXFG0QFVCXbcGK4pVIdnTBcDOnTupqqoa06q2tjZKS0uZ8LmZzKiox5nwWXzfx9qBfmGgCkDRa4MeUNE3repg2QSEiwMFk5nDF8vrWLZsGTNnzqS9vX1UAEVFRezYsYOeD68y8fNPEFifAL2rDAfBnJdhGv0NzzgtoYYbHGOICkSMIWKEqBE8x+X91v18cKGJyspKDh48SFZW1ohAlixZQstfLzM99iK9iQQJqySsxVfFDyz9Nolv/fw7gumsPtIbMZE0zxhcR3DFEDVCZIDTjeA5Drb3Jv84sYOu639j69atNDQ0jAgiN3cyPQ/NJXvhM/QnEwRW8dWSDAL6bbLTHlyee0cVWNWfBhpgVbEWfFUSqiSGqVoyCCCaxayndjKn+nm2736BzIyJHDt27B4AFy9eovvtU3R3nA5DkFJEXwNUtWHEptSsPtIXNW7UMy4mJSLeMA+4IrhCKC6A46XR+VYz772xj/z8fJqampg1a9bg906ePElZWRlZy3+DZuSGPUGQ/G/QuDznHjVMeaEyaS2+WqxVbMryxMDVKv0W+qzSr0pPoo/Mx8uZs/51rgdTmD17NrFYbJArFi9ezKZNm7h1dD1B4JO0PgG23KR6QxnlYLHXM846z7i4oX4P6vmA9Q6ENMsQZyiGxK1OPjr5M5Kd77B7925qamoAWLBgAX+59jFU7tmivy3fPvq5INXDSyx+3DXOd1xx8YzBiGBMKCIDwmKMDLEWEnoMUDdK37U2bp/6BQ9PSueV+BEWLVpEdnYW3be6f67wo7EOJoMgiMX3uuKs84zBEQcjghjBMCAmhF1niskGCMaiqFWs8ehrj+Off5nCwkK2b99OcXExwFTgvdEB3AmizIi85oqTNgDCSKrPFWV4DFRD/beqWLX4YUXdst0ffk+b168CVqZWpwN9YwO4Wzhi8c1GpM6ISTcYREJPMOSAQYZLHc1upY5meyjfBq/XAUwGbgL9Y4dgrBGLFwtSITAPkekCk1L73wS9qsoFxR6nceWfx/O5/wGLCSMJ+zJrfwAAAABJRU5ErkJggg==">
+ZAP Scanning Report
+</h1>
+<p>
+
+</p>
+<h3>Summary of Alerts</h3>
+<table width="45%" class="summary">
+<tr bgcolor="#666666">
+<th width="45%" height="24">Risk 
+      Level</th><th width="55%" align="center">Number 
+      of Alerts</th>
+</tr>
+<tr bgcolor="#e8e8e8">
+<td><a href="#high">High</a></td><td align="center">0</td>
+</tr>
+<tr bgcolor="#e8e8e8">
+<td><a href="#medium">Medium</a></td><td align="center">2</td>
+</tr>
+<tr bgcolor="#e8e8e8">
+<td><a href="#low">Low</a></td><td align="center">1</td>
+</tr>
+<tr bgcolor="#e8e8e8">
+<td><a href="#info">Informational</a></td><td align="center">2</td>
+</tr>
+</table>
+<div class="spacer-lg"></div>
+<h3>Alert Detail</h3>
+<div class="spacer"></div>
+<table width="100%" class="results">
+  
+  
+  
+<tr height="24" class="risk-medium">
+<th width="20%"><a name="medium"></a>Medium (Medium)</th><th width="80%">Divulgaci&oacute;n de error de aplicaci&oacute;n</th>
+</tr>
+  
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Description</td><td width="80%"><p>Esta p&aacute;gina contiene un mensaje de error/advertencia que podr&iacute;a revelar informaci&oacute;n sensible como la ubicaci&oacute;n del archivo que produjo la excepci&oacute;n no controlada. Esta informaci&oacute;n puede ser usada para lanzas futuros ataques contra la aplicaci&oacute;n web. La alerta podr&iacute;a ser una falso positivo si el mensaje de error es encontrado dentro de una p&aacute;gina de documentaci&oacute;n.</p></td>
+</tr>
+<TR vAlign="top">
+<TD colspan="2"></TD>
+</TR>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">internal error</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Instances</td><td width="80%">1</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Solution</td><td width="80%"><p>Revisar el c&oacute;digo de fuente de esta p&aacute;gina. Implementaci&oacute;n de p&aacute;ginas de error personalizadas. Considerar implementar un mecanismos para proveer una &uacute;nica referencia/identificaci&oacute;n de error para el cliente (navegador) mientras insertando los detalles en el sitio del navegador y no exponi&eacute;ndolos al usuario.</p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Reference</td><td width="80%"><p></p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">CWE Id</td><td width="80%">200</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">WASC Id</td><td width="80%">13</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Source ID</td><td width="80%">3</td>
+</tr>
+
+</table>
+<div class="spacer"></div>
+<table width="100%" class="results">
+  
+  
+  
+<tr height="24" class="risk-medium">
+<th width="20%"><a name="medium"></a>Medium (Medium)</th><th width="80%">Encabezado X-Frame-Options no establecido</th>
+</tr>
+  
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Description</td><td width="80%"><p>El encabezado X-Frame_options no est&aacute; incluido en la respuesta HTTP para proteger ante ataques 'ClickJacking'.</p></td>
+</tr>
+<TR vAlign="top">
+<TD colspan="2"></TD>
+</TR>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Frame-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/sitemap.xml</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Frame-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Instances</td><td width="80%">2</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Solution</td><td width="80%"><p>Los navegadores de web mas modernos apoyan la cabecera HTTP X-Frame-Options. Aseg&uacute;rese que est&aacute; establecido en todas las p&aacute;ginas web devuelta por su sitio (si usted espera que la p&aacute;gina este enmarcada solo por p&aacute;ginas en su servidor (por ejemplo, es parte de un FRAMESET) entonces usted querr&aacute; usar SAMEORIGIN, de otras forma si usted nunca espera que la p&aacute;gina est&eacute; enmarcada, deber&iacute;a usar DENY. ALLOW-FROM permite a sitios web espec&iacute;ficos enmarcar la p&aacute;gina web en navegadores web compatibles).</p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Reference</td><td width="80%"><p>http://blogs.msdn.com/b/ieinternals/archive/2010/03/30/combating-clickjacking-with-x-frame-options.aspx</p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">CWE Id</td><td width="80%">16</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">WASC Id</td><td width="80%">15</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Source ID</td><td width="80%">3</td>
+</tr>
+
+</table>
+<div class="spacer"></div>
+<table width="100%" class="results">
+  
+  
+  
+<tr height="24" class="risk-low">
+<a name="low"></a><th width="20%">Low (Medium)</th><th width="80%">No se encuentra encabezado X-Content-Type-Options Header</th>
+</tr>
+  
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Description</td><td width="80%"><p>El encabezado Anti-MIME-Sniffing X-Content-Type-Options no estaba configurado para 'nosniff'. Esto permite versiones antiguas de Internet Explores y Chrome ejecutar MIME-sniffing en el cuerpo de la respuesta, causando potencialmente que el cuerpo de respuesta sea interpretado y desarrollado como un tipo de contenido diferente que el tipo de contenido declarado. Estos (principios de 2014) y versiones antiguas de Firefox preferiblemente usar&aacute;n el tipo de contenido declarado (si hay uno establecido), antes que ejecutar el MIME-Sniffing.</p></td>
+</tr>
+<TR vAlign="top">
+<TD colspan="2"></TD>
+</TR>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-login.58ddfa4d.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0.937cda18.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/css/app.980f84ef.css</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/css/subscription-purchase.fac4a2ce.css</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7.d3015f83.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/partners-info.bf285408.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/profile.ee595161.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/css/client-dashboard.fba5bb1e.css</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/robots.txt</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-transaction-details.8ce8acf6.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d.eab1175e.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/manifest.json</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/css/chunk-vendors.4b02a4d4.css</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/css/subscription.99d383d4.css</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-recover-password.3f949ea5.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/css/admin-dashboard.9deb4d24.css</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/img/icons/favicon-32x32.png</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/subscription-purchase.e5bd79fa.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/css/partners-info.51013fa3.css</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Parameter</td><td width="80%">X-Content-Type-Options</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Instances</td><td width="80%">63</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Solution</td><td width="80%"><p>Aseg&uacute;rese que el servidor de la aplicaci&oacute;n/web establezca el encabezado Content-Type apropiadamente, y que est&eacute; establecido el encabezado X-Content-Type-Options en 'nosniff' para todas las p&aacute;ginas web.</p><p>Si es posible, aseg&uacute;rese que el &uacute;ltimo usuario usa un navegador web complatible con los est&aacute;ndares y moderno que no ejecute MIME-sniffing en absoluto, o que pueda ser dirigida por el servidor de la aplicaci&oacute;n/web para no ejecutar MIME-sniffing.</p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Other information</td><td width="80%"><p>Este inconveniente a&uacute;n aplica para p&aacute;ginas de error (401, 403, 500, etc) ya que esas p&aacute;ginas a menudo todav&iacute;a est&aacute;n afectadas por problemas de inyecci&oacute;n, en cuyos casos a&uacute;n hay preocupaci&oacute;n de buscadores rastreando p&aacute;ginas fuera de su tipo de contenido ver&iacute;dico. En l&iacute;mite 'alto' este esc&aacute;ner no alertar&aacute; sobre las respuestas de error al cliente o servidor.</p></td>
+</tr>
+<TR vAlign="top">
+<TD colspan="2"></TD>
+</TR>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Reference</td><td width="80%"><p>http://msdn.Microsoft.com/en-us/library/Ie/gg622941%28v=vs.85%29.aspx https://www.owasp.org/index.php/List_of_useful_HTTP_headers</p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">CWE Id</td><td width="80%">16</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">WASC Id</td><td width="80%">15</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Source ID</td><td width="80%">3</td>
+</tr>
+
+</table>
+<div class="spacer"></div>
+<table width="100%" class="results">
+  
+  
+  
+<tr height="24" class="risk-info">
+<th width="20%"><a name="info"></a>Informational (Low)</th><th width="80%">Timestamp Disclosure - Unix</th>
+</tr>
+  
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Description</td><td width="80%"><p>A timestamp was disclosed by the application/web server - Unix</p></td>
+</tr>
+<TR vAlign="top">
+<TD colspan="2"></TD>
+</TR>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-buy-points.a3f52f8b.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">382683433</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-user-list.c21f27be.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">33554432</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">1555081692</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-buy-points.a3f52f8b.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">536870912</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">16777215</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">1322822218</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-sell-points.644335a3.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">1604231423</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-buy-points.a3f52f8b.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">1724754687</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">607225278</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">1955562222</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-buy-points.a3f52f8b.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">52200625</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-sell-points.644335a3.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">306562965</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">1359893119</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-sell-points.644335a3.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">33554432</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-sell-points.644335a3.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">175875602</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/create-admin.f74416f2.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">65568211</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">1426881987</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-sell-points.644335a3.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">2147418367</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-buy-points.a3f52f8b.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">0000000000</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-sell-points.644335a3.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Evidence</td><td width="80%">707106781</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Instances</td><td width="80%">160</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Solution</td><td width="80%"><p>Manually confirm that the timestamp data is not sensitive, and that the data cannot be aggregated to disclose exploitable patterns.</p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Other information</td><td width="80%"><p>382683433, which evaluates to: 1982-02-16 00:57:13</p></td>
+</tr>
+<TR vAlign="top">
+<TD colspan="2"></TD>
+</TR>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Reference</td><td width="80%"><p>http://projects.webappsec.org/w/page/13246936/Information%20Leakage</p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">CWE Id</td><td width="80%">200</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">WASC Id</td><td width="80%">13</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Source ID</td><td width="80%">3</td>
+</tr>
+
+</table>
+<div class="spacer"></div>
+<table width="100%" class="results">
+  
+  
+  
+<tr height="24" class="risk-info">
+<th width="20%"><a name="info"></a>Informational (Low)</th><th width="80%">Information Disclosure - Suspicious Comments</th>
+</tr>
+  
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Description</td><td width="80%"><p>The response appears to contain suspicious comments which may help an attacker. Note: Matches made within script blocks or files are against the entire content not only comments.</p></td>
+</tr>
+<TR vAlign="top">
+<TD colspan="2"></TD>
+</TR>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/app.cbc12df1.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad.dabf916a.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7.d3015f83.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-dashboard~client-dashboard.7188b8b3.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-transaction-list.81570c4f.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d.eab1175e.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/subscription.065c5b50.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-sell-points.644335a3.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/profile.ee595161.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-platform-config.9d4fa52c.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-bank-account-list.891fa63d.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-recover-password.852812d2.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/create-admin.f74416f2.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/chunk-vendors.8efb5e58.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-dashboard.64fc9a5a.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-dashboard.afeaa68b.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/client-buy-points.a3f52f8b.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0.937cda18.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up.bf3a8479.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent1">URL</td><td width="80%">http://petromiles-frontend.herokuapp.com/js/admin-user-list.c21f27be.js</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%" class="indent2">Method</td><td width="80%">GET</td>
+</tr>
+  
+  
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Instances</td><td width="80%">26</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Solution</td><td width="80%"><p>Remove all comments that return information that may help an attacker and fix any underlying problems they refer to.</p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Other information</td><td width="80%"><p>The following comment/snippet was identified via the pattern: \bTODO\b</p><p>(function(e){function a(a){for(var i,t,s=a[0],c=a[1],d=a[2],l=0,u=[];l&lt;s.length;l++)t=s[l],Object.prototype.hasOwnProperty.call(o,t)&amp;&amp;o[t]&amp;&amp;u.push(o[t][0]),o[t]=0;for(i in c)Object.prototype.hasOwnProperty.call(c,i)&amp;&amp;(e[i]=c[i]);m&amp;&amp;m(a);while(u.length)u.shift()();return r.push.apply(r,d||[]),n()}function n(){for(var e,a=0;a&lt;r.length;a++){for(var n=r[a],i=!0,t=1;t&lt;n.length;t++){var s=n[t];0!==o[s]&amp;&amp;(i=!1)}i&amp;&amp;(r.splice(a--,1),e=c(c.s=n[0]))}return e}var i={},t={app:0},o={app:0},r=[];function s(e){return c.p+"js/"+({"admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d":"admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d","admin-bank-account-list":"admin-bank-account-list","admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7":"admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7","admin-dashboard~client-dashboard":"admin-dashboard~client-dashboard","admin-dashboard":"admin-dashboard","client-dashboard":"client-dashboard","admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad":"admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad","admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0":"admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0","admin-platform-config":"admin-platform-config","admin-user-list":"admin-user-list","client-bank-account-list":"client-bank-account-list","client-buy-points":"client-buy-points","client-sell-points":"client-sell-points","create-admin":"create-admin","partners-info":"partners-info",profile:"profile","subscription-purchase":"subscription-purchase","admin-transaction-list~client-transaction-list":"admin-transaction-list~client-transaction-list","admin-transaction-list":"admin-transaction-list","client-transaction-list":"client-transaction-list","client-transaction-details":"client-transaction-details",subscription:"subscription","admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up":"admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up","admin-login":"admin-login","client-login":"client-login","admin-recover-password":"admin-recover-password","client-recover-password":"client-recover-password","client-sign-up":"client-sign-up"}[e]||e)+"."+{"admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d":"eab1175e","admin-bank-account-list":"c66c6d4a","admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7":"d3015f83","admin-dashboard~client-dashboard":"7188b8b3","admin-dashboard":"afeaa68b","client-dashboard":"64fc9a5a","admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad":"dabf916a","admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0":"937cda18","admin-platform-config":"9d4fa52c","admin-user-list":"c21f27be","client-bank-account-list":"891fa63d","client-buy-points":"a3f52f8b","client-sell-points":"644335a3","create-admin":"f74416f2","partners-info":"bf285408",profile:"ee595161","subscription-purchase":"e5bd79fa","admin-transaction-list~client-transaction-list":"a519035f","admin-transaction-list":"81570c4f","client-transaction-list":"2231c462","client-transaction-details":"8ce8acf6",subscription:"065c5b50","admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up":"bf3a8479","admin-login":"58ddfa4d","client-login":"7b9da387","admin-recover-password":"852812d2","client-recover-password":"3f949ea5","client-sign-up":"c0991de3"}[e]+".js"}function c(a){if(i[a])return i[a].exports;var n=i[a]={i:a,l:!1,exports:{}};return e[a].call(n.exports,n,n.exports,c),n.l=!0,n.exports}c.e=function(e){var a=[],n={"admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d":1,"admin-bank-account-list":1,"admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7":1,"admin-dashboard":1,"client-dashboard":1,"admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad":1,"admin-platform-config":1,"admin-user-list":1,"client-bank-account-list":1,"client-buy-points":1,"client-sell-points":1,"create-admin":1,"partners-info":1,profile:1,"subscription-purchase":1,"admin-transaction-list~client-transaction-list":1,"admin-transaction-list":1,"client-transaction-list":1,"client-transaction-details":1,subscription:1,"admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up":1,"admin-recover-password":1,"client-recover-password":1};t[e]?a.push(t[e]):0!==t[e]&amp;&amp;n[e]&amp;&amp;a.push(t[e]=new Promise((function(a,n){for(var i="css/"+({"admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d":"admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d","admin-bank-account-list":"admin-bank-account-list","admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7":"admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7","admin-dashboard~client-dashboard":"admin-dashboard~client-dashboard","admin-dashboard":"admin-dashboard","client-dashboard":"client-dashboard","admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad":"admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad","admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0":"admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0","admin-platform-config":"admin-platform-config","admin-user-list":"admin-user-list","client-bank-account-list":"client-bank-account-list","client-buy-points":"client-buy-points","client-sell-points":"client-sell-points","create-admin":"create-admin","partners-info":"partners-info",profile:"profile","subscription-purchase":"subscription-purchase","admin-transaction-list~client-transaction-list":"admin-transaction-list~client-transaction-list","admin-transaction-list":"admin-transaction-list","client-transaction-list":"client-transaction-list","client-transaction-details":"client-transaction-details",subscription:"subscription","admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up":"admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up","admin-login":"admin-login","client-login":"client-login","admin-recover-password":"admin-recover-password","client-recover-password":"client-recover-password","client-sign-up":"client-sign-up"}[e]||e)+"."+{"admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d":"c8f7d2eb","admin-bank-account-list":"20a2e75a","admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7":"f73b5ff8","admin-dashboard~client-dashboard":"31d6cfe0","admin-dashboard":"9deb4d24","client-dashboard":"fba5bb1e","admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad":"7638bb48","admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0":"31d6cfe0","admin-platform-config":"94271a71","admin-user-list":"f804059a","client-bank-account-list":"4403690f","client-buy-points":"ae47c462","client-sell-points":"ae47c462","create-admin":"de43b08b","partners-info":"51013fa3",profile:"e2931ba7","subscription-purchase":"fac4a2ce","admin-transaction-list~client-transaction-list":"0f2bd8a6","admin-transaction-list":"37eca178","client-transaction-list":"71288bfd","client-transaction-details":"9ddaefd7",subscription:"99d383d4","admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up":"9984a492","admin-login":"31d6cfe0","client-login":"31d6cfe0","admin-recover-password":"bd9dffc5","client-recover-password":"bd9dffc5","client-sign-up":"31d6cfe0"}[e]+".css",o=c.p+i,r=document.getElementsByTagName("link"),s=0;s&lt;r.length;s++){var d=r[s],l=d.getAttribute("data-href")||d.getAttribute("href");if("stylesheet"===d.rel&amp;&amp;(l===i||l===o))return a()}var u=document.getElementsByTagName("style");for(s=0;s&lt;u.length;s++){d=u[s],l=d.getAttribute("data-href");if(l===i||l===o)return a()}var m=document.createElement("link");m.rel="stylesheet",m.type="text/css",m.onload=a,m.onerror=function(a){var i=a&amp;&amp;a.target&amp;&amp;a.target.src||o,r=new Error("Loading CSS chunk "+e+" failed.\n("+i+")");r.code="CSS_CHUNK_LOAD_FAILED",r.request=i,delete t[e],m.parentNode.removeChild(m),n(r)},m.href=o;var p=document.getElementsByTagName("head")[0];p.appendChild(m)})).then((function(){t[e]=0})));var i=o[e];if(0!==i)if(i)a.push(i[2]);else{var r=new Promise((function(a,n){i=o[e]=[a,n]}));a.push(i[2]=r);var d,l=document.createElement("script");l.charset="utf-8",l.timeout=120,c.nc&amp;&amp;l.setAttribute("nonce",c.nc),l.src=s(e);var u=new Error;d=function(a){l.onerror=l.onload=null,clearTimeout(m);var n=o[e];if(0!==n){if(n){var i=a&amp;&amp;("load"===a.type?"missing":a.type),t=a&amp;&amp;a.target&amp;&amp;a.target.src;u.message="Loading chunk "+e+" failed.\n("+i+": "+t+")",u.name="ChunkLoadError",u.type=i,u.request=t,n[1](u)}o[e]=void 0}};var m=setTimeout((function(){d({type:"timeout",target:l})}),12e4);l.onerror=l.onload=d,document.head.appendChild(l)}return Promise.all(a)},c.m=e,c.c=i,c.d=function(e,a,n){c.o(e,a)||Object.defineProperty(e,a,{enumerable:!0,get:n})},c.r=function(e){"undefined"!==typeof Symbol&amp;&amp;Symbol.toStringTag&amp;&amp;Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},c.t=function(e,a){if(1&amp;a&amp;&amp;(e=c(e)),8&amp;a)return e;if(4&amp;a&amp;&amp;"object"===typeof e&amp;&amp;e&amp;&amp;e.__esModule)return e;var n=Object.create(null);if(c.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:e}),2&amp;a&amp;&amp;"string"!=typeof e)for(var i in e)c.d(n,i,function(a){return e[a]}.bind(null,i));return n},c.n=function(e){var a=e&amp;&amp;e.__esModule?function(){return e["default"]}:function(){return e};return c.d(a,"a",a),a},c.o=function(e,a){return Object.prototype.hasOwnProperty.call(e,a)},c.p="/",c.oe=function(e){throw console.error(e),e};var d=window["webpackJsonp"]=window["webpackJsonp"]||[],l=d.push.bind(d);d.push=a,d=d.slice();for(var u=0;u&lt;d.length;u++)a(d[u]);var m=l;r.push([0,"chunk-vendors"]),n()})({0:function(e,a,n){e.exports=n("56d7")},"034f":function(e,a,n){"use strict";var i=n("8a23"),t=n.n(i);t.a},4360:function(e,a,n){"use strict";var i={};n.r(i),n.d(i,"namespaced",(function(){return m})),n.d(i,"state",(function(){return p})),n.d(i,"mutations",(function(){return f})),n.d(i,"actions",(function(){return b})),n.d(i,"getters",(function(){return g}));var t={};n.r(t),n.d(t,"namespaced",(function(){return h})),n.d(t,"state",(function(){return v})),n.d(t,"mutations",(function(){return w})),n.d(t,"actions",(function(){return y})),n.d(t,"getters",(function(){return P}));var o={};n.r(o),n.d(o,"namespaced",(function(){return A})),n.d(o,"state",(function(){return k})),n.d(o,"mutations",(function(){return E})),n.d(o,"actions",(function(){return C}));var r=n("2b0e"),s=n("2f62"),c=(n("99af"),n("ac1f"),n("5319"),n("96cf"),n("1da1")),d=n("5530"),l=n("696a"),u=n("e453"),m=!0,p={user:null},f={setUserLocalStorage:function(e,a){e.user={email:a.email,details:a.userDetails,role:a.role,authToken:a.token,federated:a.federated},localStorage.setItem(u["a"].USER_LOCAL_STORAGE,JSON.stringify(e.user))},changeLang:function(e,a){e.user.details.language=a,localStorage.setItem(u["a"].USER_LOCAL_STORAGE,JSON.stringify(e.user))},updateProfileImage:function(e,a){e.user.details.photo=a,localStorage.setItem(u["a"].USER_LOCAL_STORAGE,JSON.stringify(e.user))},updateUserData:function(e,a){e.user.details=a,localStorage.setItem(u["a"].USER_LOCAL_STORAGE,JSON.stringify(e.user))},loadUserToken:function(e){var a=JSON.parse(localStorage.getItem(u["a"].USER_LOCAL_STORAGE));a&amp;&amp;a.authToken&amp;&amp;(console.log("".concat(a.email," is inside his sesion as ").concat(a.role)),e.user=a,l["a"].defaults.headers.common["Authorization"]="Bearer ".concat(a.authToken)),e.user=Object(d["a"])({},a)},logout:function(){localStorage.removeItem(u["a"].USER_LOCAL_STORAGE),location.reload()}},b={signUp:function(e,a){return Object(c["a"])(regeneratorRuntime.mark((function n(){var i;return regeneratorRuntime.wrap((function(n){while(1)switch(n.prev=n.next){case 0:return i=e.commit,n.next=3,l["a"].post("/auth/signup",a).then((function(e){i("setUserLocalStorage",e),i("loadUserToken"),location.reload()}));case 3:case"end":return n.stop()}}),n)})))()},logIn:function(e,a){return Object(c["a"])(regeneratorRuntime.mark((function n(){var i;return regeneratorRuntime.wrap((function(n){while(1)switch(n.prev=n.next){case 0:return i=e.commit,n.next=3,l["a"].post("/auth/login",a).then((function(e){i("setUserLocalStorage",e),i("loadUserToken"),location.reload()}));case 3:case"end":return n.stop()}}),n)})))()},logout:function(e){var a=e.commit;a("logout")},checkUserToken:function(e){return Object(c["a"])(regeneratorRuntime.mark((function a(){var n;return regeneratorRuntime.wrap((function(a){while(1)switch(a.prev=a.next){case 0:n=e.commit,n("loadUserToken"),l["a"].get("/auth/checkToken",{errorHandle:!1}).catch((function(e){n("logout")}));case 3:case"end":return a.stop()}}),a)})))()},changeLang:function(e,a){return Object(c["a"])(regeneratorRuntime.mark((function n(){var i;return regeneratorRuntime.wrap((function(n){while(1)switch(n.prev=n.next){case 0:return i=e.commit,n.next=3,l["a"].patch("user/language",{language:a.bdName});case 3:i("changeLang",a);case 4:case"end":return n.stop()}}),n)})))()},updateProfileImage:function(e,a){return Object(c["a"])(regeneratorRuntime.mark((function n(){var i;return regeneratorRuntime.wrap((function(n){while(1)switch(n.prev=n.next){case 0:return i=e.commit,n.next=3,l["a"].put("user/update-details",{photo:a,role:u["a"].CLIENT.toLowerCase()});case 3:i("updateProfileImage",a);case 4:case"end":return n.stop()}}),n)})))()},changePassword:function(e,a){return Object(c["a"])(regeneratorRuntime.mark((function n(){return regeneratorRuntime.wrap((function(n){while(1)switch(n.prev=n.next){case 0:return e.commit,n.next=3,l["a"].put("user/update-password",{currentPassword:a.currentPassword,password:a.newPassword});case 3:case"end":return n.stop()}}),n)})))()},updateUserData:function(e,a){return Object(c["a"])(regeneratorRuntime.mark((function n(){var i,t,o,r;return regeneratorRuntime.wrap((function(n){while(1)switch(n.prev=n.next){case 0:return i=e.commit,t=JSON.parse(JSON.stringify(a)),null!==t.user.details.birthdate&amp;&amp;(t.user.details.birthdate=t.user.details.birthdate.replace("-","/").replace("-","/")),o="",r=u["a"].CLIENT.toLowerCase(),o=t.isAdmin?"user/update-details?id=".concat(t.user.id):"user/update-details",n.next=8,l["a"].put("".concat(o),Object(d["a"])({role:r},t.user.details));case 8:t.isAdmin||i("updateUserData",a.user.details);case 9:case"end":return n.stop()}}),n)})))()}},g={loggedIn:function(e){return!!e.user},getUser:function(e){return e.user}},h=!0,v={userDetails:null,bankAccount:null,bankAccounts:null},w={SET_USER_DETAILS:function(e,a){e.userDetails=a},SET_BANK_ACCOUNT:function(e,a){e.bankAccount=a},SET_BANK_ACCOUNTS:function(e,a){e.bankAccounts=a}},y={setUserDetails:function(e,a){var n=e.commit;n("SET_USER_DETAILS",a)},setBankAccount:function(e,a){return Object(c["a"])(regeneratorRuntime.mark((function n(){var i,t,o;return regeneratorRuntime.wrap((function(n){while(1)switch(n.prev=n.next){case 0:return i=e.commit,t=e.state,i("SET_BANK_ACCOUNT",a),o=Object(d["a"])(Object(d["a"])({},a),{},{userDetails:t.userDetails}),n.next=5,l["a"].post("/bank-account",o);case 5:case"end":return n.stop()}}),n)})))()}},P={getBankAccountDetails:function(e){return{bankAccount:e.bankAccount,userDetails:e.userDetails}}},A=!0,k={lastError:null},E={setNewError:function(e,a){e.lastError=a},clearLastError:function(e){e.lastError=null}},C={};r["a"].use(s["b"]);a["a"]=new s["b"].Store({modules:{auth:i,bankAccount:t,errors:o}})},"49f8":function(e,a,n){var i={"./en.json":"edd4","./es.json":"a306"};function t(e){var a=o(e);return n(a)}function o(e){if(!n.o(i,e)){var a=new Error("Cannot find module '"+e+"'");throw a.code="MODULE_NOT_FOUND",a}return i[e]}t.keys=function(){return Object.keys(i)},t.resolve=o,e.exports=t,t.id="49f8"},"56d7":function(e,a,n){"use strict";n.r(a);n("e260"),n("e6cf"),n("cca6"),n("a79d");var i=n("2b0e"),t=function(){var e=this,a=e.$createElement,n=e._self._c||a;return n("v-app",[n("v-main",[n("router-view"),n("error-modal")],1)],1)},o=[],r=n("58ca");i["a"].use(r["a"],{refreshOnceOnNavigation:!0});var s={title:"PetroMiles",meta:[{charset:"utf-8"},{name:"viewport",content:"width=device-width, initial-scale=1"},{description:"A platform to earn and exchagen customer points"},{"http-equiv":"X-UA-Compatible",content:"IE=edge"},{name:"keywords",content:"Bank accounts, Stripe, Points, Client fidelity, Promotions"}],noscript:[{innerHTML:"This website requires JavaScript."}]},c=function(){var e=this,a=e.$createElement,n=e._self._c||a;return n("v-row",{attrs:{justify:"center"}},[n("v-dialog",{attrs:{value:!!e.errorMessage,persistent:"",width:"300px"}},[n("v-card",[n("v-card-title",{staticClass:"headline"},[n("v-icon",{attrs:{color:"red",size:"50"}},[e._v("mdi-alert")])],1),n("v-card-text",{staticClass:"mt-2"},[e._v(" "+e._s(e.$t(e.errorMessage))+" ")]),n("v-card-actions",[n("v-spacer"),n("v-btn",{on:{click:e.clearLastError}},[e._v(" "+e._s(e.$t("common.ok"))+" ")])],1)],1)],1)],1)},d=[],l=n("5530"),u=n("2f62"),m={name:"error-modal",methods:Object(u["d"])("errors",["clearLastError"]),computed:Object(l["a"])(Object(l["a"])({},Object(u["e"])("errors",["lastError"])),{},{errorMessage:function(){var e;return null===(e=this.lastError)||void 0===e?void 0:e.message}})},p=m,f=n("2877"),b=n("6544"),g=n.n(b),h=n("8336"),v=n("b0af"),w=n("99d9"),y=n("169a"),P=n("132d"),A=n("0fd9"),k=n("2fa4"),E=Object(f["a"])(p,c,d,!1,null,null,null),C=E.exports;g()(E,{VBtn:h["a"],VCard:v["a"],VCardActions:w["a"],VCardText:w["c"],VCardTitle:w["d"],VDialog:y["a"],VIcon:P["a"],VRow:A["a"],VSpacer:k["a"]});var T={name:"App",components:{"error-modal":C},metaInfo:s},S=T,I=(n("034f"),n("7496")),N=n("f6c4"),_=Object(f["a"])(S,t,o,!1,null,null,null),L=_.exports;g()(_,{VApp:I["a"],VMain:N["a"]});var O=n("9483");Object(O["a"])("".concat("/","service-worker.js"),{ready:function(){console.log("App is being served from cache by a service worker.\nFor more details, visit https://goo.gl/AFskqB")},registered:function(){console.log("Service worker has been registered.")},cached:function(){console.log("Content has been cached for offline use.")},updatefound:function(){console.log("New content is downloading.")},updated:function(){console.log("New content is available; please refresh.")},offline:function(){console.log("No internet connection found. App is running in offline mode.")},error:function(e){console.error("Error during service worker registration:",e)}});n("99af"),n("45fc"),n("b0c0");var D=n("2909"),U=n("8c4f"),B=n("5900"),R=n("f6fc"),x=n("e453");i["a"].use(U["a"]);var V=[].concat(Object(D["a"])(B["a"]),Object(D["a"])(R["a"])),q=new U["a"]({mode:"history",base:"/",routes:V});q.beforeEach((function(e,a,n){var i=JSON.parse(localStorage.getItem(x["a"].USER_LOCAL_STORAGE));e.matched.some((function(e){return e.meta.requiresClientAuth}))?i&amp;&amp;i.authToken&amp;&amp;i.role===x["a"].CLIENT?n():n({name:B["b"].LOGIN.name}):e.matched.some((function(e){return e.meta.clientGuest}))?i&amp;&amp;i.authToken&amp;&amp;i.role===x["a"].CLIENT?n({name:B["b"].DASHBOARD.name}):n():e.matched.some((function(e){return e.meta.requiresAdminAuth}))?i&amp;&amp;i.authToken&amp;&amp;i.role===x["a"].ADMINISTRATOR?n():n({name:R["b"].LOGIN.name}):e.matched.some((function(e){return e.meta.adminGuest}))&amp;&amp;i&amp;&amp;i.authToken&amp;&amp;i.role===x["a"].ADMINISTRATOR?n({name:R["b"].DASHBOARD.name}):n()}));var M=q,j=n("4360"),F=(n("15f5"),n("d1e78"),n("f309")),G=n("21eb"),W=n.n(G),Y=n("2e15"),H=n.n(Y),z=n("da5b"),J=n.n(z);i["a"].use(F["a"]);var K=new F["a"]({lang:{locales:{en:J.a,es:H.a},current:"en"},theme:{options:{customProperties:!0,minifyTheme:W.a,themeCache:{get:function(e){return localStorage.getItem(e)},set:function(e,a){return localStorage.setItem(e,a)}}},icons:{iconfont:"md"},themes:{light:{primary:"#1B3D6E",secondary:"#FCB526",accent:"#82B1FF",error:"#FF5252",info:"#2196F3",success:"#4CAF50",warning:"#FFC107"}}}}),$=(n("4160"),n("d3b7"),n("ac1f"),n("466d"),n("159b"),n("ddb0"),n("a925"));function Z(){var e=n("49f8"),a={};return e.keys().forEach((function(n){var i=n.match(/([A-Za-z0-9-_]+)\./i);if(i&amp;&amp;i.length&gt;1){var t=i[1];a[t]=e(n)}})),a}i["a"].use($["a"]);var Q=new $["a"]({locale:"en",fallbackLocale:"en",messages:Z()}),X=n("696a"),ee={apiKey:"AIzaSyDdwPms3VUtqnwE-67fH4dNpDHnHN6QhUo",authDomain:"petromiles-f04cc.firebaseapp.com",databaseURL:"https://petromiles-f04cc.firebaseio.com",projectId:"petromiles-f04cc",storageBucket:"petromiles-f04cc.appspot.com",messagingSenderId:"669856518368",appId:Object({VUE_APP_FIREBASE_APP_ID:"1:669856518368:web:1cdeea024513a069830085",VUE_APP_I18N_LOCALE:"en",VUE_APP_FIREBASE_AUTH:"petromiles-f04cc.firebaseapp.com",VUE_APP_FIREBASE_DATABASE_URL:"https://petromiles-f04cc.firebaseio.com",VUE_APP_FIREBASE_PROYECT_ID:"petromiles-f04cc",VUE_APP_PETROMILES_API_TIMEOUT:"30000",VUE_APP_FIREBASE_MESSAGING_SENDER_ID:"669856518368",VUE_APP_PETROMILES_API_URL:"https://petromiles-backend.herokuapp.com/api/v1",VUE_APP_PETROMILES_API_PORT:"80",VUE_APP_FIREBASE_STORAGE_BUCKET:"petromiles-f04cc.appspot.com",VUE_APP_FIREBASE_APIKEY:"AIzaSyDdwPms3VUtqnwE-67fH4dNpDHnHN6QhUo",NODE_ENV:"production",VUE_APP_I18N_FALLBACK_LOCALE:"en",BASE_URL:"/"}).APP_ID},ae=n("59ca"),ne=n.n(ae);n("ea7b"),n("d5e8"),n("5363");i["a"].config.productionTip=!1,i["a"].prototype.$http=X["a"],new i["a"]({router:M,store:j["a"],vuetify:K,i18n:Q,created:function(){ne.a.initializeApp(ee)},render:function(e){return e(L)}}).$mount("#app")},5900:function(e,a,n){"use strict";n.d(a,"b",(function(){return r})),n.d(a,"a",(function(){return o}));n("d81d"),n("dca8"),n("b64b"),n("d3b7");var i=n("5530"),t=Object.freeze({LOGIN:{path:"/",name:"ClientLogin",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up"),n.e("client-login")]).then(n.bind(null,"8b38"))},meta:{clientGuest:!0}},SIGN_UP:{path:"/sign-up",name:"ClientSignUp",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up"),n.e("client-sign-up")]).then(n.bind(null,"633c"))},meta:{clientGuest:!0}},RECOVER_PASSWORD:{path:"/recover-password",name:"ClientRecoverPassword",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up"),n.e("client-recover-password")]).then(n.bind(null,"167f"))},meta:{clientGuest:!0}},DASHBOARD:{path:"/dashboard",name:"ClientDashboard",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-dashboard~client-dashboard"),n.e("client-dashboard")]).then(n.bind(null,"b961"))},meta:{requiresClientAuth:!0}},PROFILE:{path:"/profile",name:"ClientProfile",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("profile")]).then(n.bind(null,"b03d"))},meta:{requiresClientAuth:!0}},BANK_ACCOUNT_LIST:{path:"/bank-accounts",name:"ClientBankAccountList",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("client-bank-account-list")]).then(n.bind(null,"945f"))},meta:{requiresClientAuth:!0}},TRANSACTION_LIST:{path:"/transactions",name:"ClientTransactionList",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-transaction-list~client-transaction-list"),n.e("client-transaction-list")]).then(n.bind(null,"d3c3"))},meta:{requiresClientAuth:!0}},TRANSACTION_DETAILS:{path:"/transaction-details/:id",name:"TransactionDetails",props:!0,component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("client-transaction-details")]).then(n.bind(null,"f82e"))},meta:{requiresClientAuth:!0}},BUY_POINTS:{path:"/buy-points",name:"ClientBuyPoints",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("client-buy-points")]).then(n.bind(null,"cb8e"))},meta:{requiresClientAuth:!0}},SELL_POINTS:{path:"/sell-points",name:"ClientSellPoints",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("client-sell-points")]).then(n.bind(null,"944f"))},meta:{requiresClientAuth:!0}},SUBSCRIPTION:{path:"/user-subscription",name:"UserSubscription",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("subscription")]).then(n.bind(null,"6d0c"))},meta:{requiresClientAuth:!0}},SUSCRIPTION_PURCHASE:{path:"/user-subscription-purchase",name:"UserSubscriptionPurchase",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("subscription-purchase")]).then(n.bind(null,"6711"))},meta:{requiresClientAuth:!0}}}),o=Object.keys(t).map((function(e){return t[e]})),r={};Object.keys(t).map((function(e){return r[e]=Object(i["a"])(Object(i["a"])({},t[e]),{},{component:null})}))},"696a":function(e,a,n){"use strict";var i=n("bc3a"),t=n.n(i),o=(n("d3b7"),n("4360")),r=function(e){if(e.config["errorHandle"]&amp;&amp;!1===e.config.errorHandle)return Promise.reject(e);var a=e.response.data;return o["a"].commit("errors/setNewError",a),Promise.reject(e)},s=r,c="https://petromiles-backend.herokuapp.com/api/v1",d=t.a.create({baseURL:c||"http://localhost:3000/api/v1",crossDomain:!0,headers:{Accept:"application/json","Content-Type":"application/json"},timeout:parseInt("30000")||3e4});d.interceptors.response.use((function(e){return e.data}),s);a["a"]=d},"8a23":function(e,a,n){},a306:function(e){e.exports=JSON.parse('{"navbar":{"dashboard":"Panel de control","transaction":"Transacci&oacute;n | Transacciones | {count} Transacciones","bankAccount":"Cuenta bancaria | Cuentas bancarias | {count} Cuentas bancarias","profile":"Perfil","home":"Inicio","logout":"Cerrar sesi&oacute;n","addPoints":"Agrega puntos","exchangePoints":"Canjea puntos","user":"Usuario | Usuarios | {count} Usuarios","platformConfig":"Configuraci&oacute;n de la plataforma","subscriptions":"Suscripciones","partners":"Socios","createAdmin":"Crear Administrador"},"transaction":{"transaction":"Transacci&oacute;n | Transacciones | {count} Transacciones","pointsConversion":"Conversi&oacute;n de puntos","yourPurchase":"Compra","yourWithdrawal":"Retiro","subscriptionExtra":"Extra por suscripci&oacute;n","yourThirdPartyClient":"Puntos externos acumulados","subscriptionExtraPremium":"Extra por suscripci&oacute;n Premium","subscriptionExtraGold":"Extra por suscripci&oacute;n Gold","responsible":"Responsable","company":"Compa&ntilde;&iacute;a"},"profile":{"profile":"Perfil","mainTitle":"Perfil del Usuario","UserProfileImage":"Imagen de Perfil","ChangeProfileImage":"Cambiar foto de perfil","ImageSuccessfullyUpdated":"Imagen actualizada exitosamente","ChangePassword":"Cambiar contrase&ntilde;a","CurrentPassword":"Contrase&ntilde;a Actual","NewPassword":"Nueva Contrase&ntilde;a","ConfirmPassword":"Confirmar Nueva Contrase&ntilde;a","PasswordSuccessfullyChanged":"Contrase&ntilde;a cambiada exitosamente","PersonalInformation":"Informaci&oacute;n Personal","ResetValues":"Restaurar Valores","UserSuccessfullyUpdated":"&iexcl;Perfil actualizado exitosamente!","UserMerbershipLevel":"Nivel de Membres&iacute;a","PointsAvailable":"Puntos Disponibles","PointsInDollars":"Puntos en D&oacute;lares","sentEmail":"Correo enviado a: "},"user-details":{"firstName":"Primer nombre","middleName":"Segundo nombre","lastName":"Primer apellido","secondLastName":"Segundo apellido","address":"Direcci&oacute;n","phone":"Tel&eacute;fono","photo":"Foto","birthdate":"Fecha de nacimiento","password":"Contrase&ntilde;a","email":"Correo","yourProfile":"Tu perfil","dateOfBirth":"Fecha de nacimiento","Country":"Pa&iacute;s"},"bank-account-creation":{"createBankAccountTitle":"Asocia una cuenta bancaria","createBankAccountSubtitle":"Esta informaci&oacute;n nos permitir&aacute; verificar tu cuenta bancaria","ownerDetailsFormTitle":"&iquest;A qui&eacute;n pertenece esta cuenta?","bankAccountFormTitle":"Complete la informaci&oacute;n de la cuenta bancaria","bankAccountCreationSuccessMessage":"Su cuenta ha sido asociada exitosamente. Inicie el proceso de verificaci&oacute;n revisando los dos montos que se han cargado en su cuenta bancaria. Este cargo ser&aacute; efectivo de uno a dos d&iacute;as h&aacute;biles.","newBankAccount":"Nueva cuenta","bankAccountVerification":"Verificaci&oacute;n","ownerDetailsStep":"Detalles del due&ntilde;o","bankAccountDetailsStep":"Detalles de la cuenta bancaria","checkUserAccountStep":"Verifique su cuenta bancaria","errorMessageBankAccountCreation":"Hubo un error asociando su cuenta bancaria"},"bank-account-properties":{"accountType":"Tipo de cuenta","routingNumber":"N&uacute;mero de ruta","accountNumber":"N&uacute;mero de cuenta","saving":"Ahorro","checking":"Corriente","checkNumber":"N&uacute;mero de verificaci&oacute;n","lastFourDigits":"&Uacute;ltimos cuatro d&iacute;gitos","nickname":"Alias"},"user":{"user":"Usuario | Usuarios | {count} Usuarios"},"bank-account-creation-form":{"routingNumberEmptyValidation":"El n&uacute;mero de ruta no puede estar vac&iacute;o","checkNumberEmptyValidation":"El n&uacute;mero de verificaci&oacute;n no puede estar vac&iacute;o","checkNumberLengthValidation":"N&uacute;mero de verificaci&oacute;n debe tener 4 caracteres","accountNumberEmptyValidation":"El n&uacute;mero de cuenta no puede estar vac&iacute;o","continueButton":"Continuar","cancel":"Cancelar","finish":"Terminar","nicknameEmptyValidation":"El alias no puede estar vac&iacute;o","typeEmptyValidation":"El tipo no puede estar vac&iacute;o","bankEmptyValidation":"El banco no puede estar vac&iacute;o","nicknameLengthValidation":"El alias debe tener menos de 255 caracteres"},"user-registration-form":{"firstNameEmptyValidation":"El primer nombre no puede estar vac&iacute;o","lastNameEmptyValidation":"El apellido no puede estar vac&iacute;o","phoneEmptyValidation":"El tel&eacute;fono no puede estar vac&iacute;o","addressEmptyValidation":"La direcci&oacute;n no puede estar vac&iacute;o","emailEmptyValidation":"El correo no puede estar vac&iacute;o","emailValidation":"Debe ser un correo v&aacute;lido"},"common":{"cancel":"Cancelar","state":"Estado","type":"Tipo","code":"C&oacute;digo","amount":"Monto | Montos | {count} Montos","date":"Fecha","seeMore":"Ver m&aacute;s","total":"Total","amounts":"Montos","ok":"Vale","areYouSure":"&iquest;Estas seguro?","yes":"S&iacute;","see":"Ver","yourPoints":"Sus puntos","Save":"Guardar","Close":"Cerrar","moreDetails":"M&aacute;s detalles"},"datatable":{"search":"Buscar"},"role":{"client":"Cliente | Clientes | {count} Clientes","administrator":"Administrador | Administradores | {count} Administradores"},"state-name":{"verifying":"En verificaci&oacute;n","active":"Activo","blocked":"Bloqueado","cancelled":"Cancelada","valid":"V&aacute;lido","invalid":"Inv&aacute;lida"},"user-balance":{"equivalent":"Equivalente","myPoints":"Mis puntos"},"bank-account-validation":{"everythingIsFine":"Todo est&aacute; en orden","nothingToVerifyMessage":"Usted no tiene ninguna cuenta bancaria para verificar","bankAccountsToVerify":"Cuentas bancarias para verificar","verifyYourBankAccount":"Verifique su cuenta bancaria","verifyBankAccountMessage":"Nosotros cargamos dos montos a su cuenta bancaria cuando usted la registr&oacute;. Por favor, introduzca dichos montos aqu&iacute; para verificar su cuenta bancaria.","validateButton":"Validar","verify":"Verificar"},"transaction-type":{"subscriptionPayment":"Pago de suscripci&oacute;n","deposit":"Dep&oacute;sito","withdrawal":"Retiro","bankAccountValidation":"Verificaci&oacute;n de cuenta bancaria","thirdPartyClient":"Acumulaci&oacute;n de puntos externos"},"date-picker":{"end":"Final","start":"Inicio"},"error":{"emailAlreadyInUse":"Este correo no se encuentra disponible","wrongCredentials":"Correo o contrase&ntilde;a incorrectos","userNotFound":"El usuario no posee una cuenta en PetroMiles","loginAgain":"Por favor, vuelva a iniciar sesi&oacute;n","bankAccountAlreadyExists":"La cuenta bancaria ya se encuentra registrada","invalidRoutingNumber":"El n&uacute;mero de ruta de la cuenta bancaria es inv&aacute;lido","userWithoutPassword":"El usuario fue creado sin contrase&ntilde;a"},"error-messages":{"userNotFound":"El usuario no posee una cuenta en PetroMiles","loginAgain":"Por favor, vuelva a iniciar sesi&oacute;n","invalidRoutingNumber":"El n&uacute;mero de ruta de la cuenta bancaria es inv&aacute;lido","required":"Este campo es requerido","shouldBeNumber":"Debe ser un n&uacute;mero","shouldBeInteger":"Debe ser un n&uacute;mero entero","minValue":"El valor debe ser de al menos {min}","errorStripe":"Hubo un problema con nuestro procesador de pago","loginIncorrect":"Usuario o contrase&ntilde;a incorrecto","stripe_amount_too_large":"Monto muy alto","stripe_bank_account_exists":"Esta cuenta bancaria ya esta asociada al cliente","stripe_charge_exceeds_source_limit":"El monto a cobrar excede el limite de la cuenta bancaria","stripe_account_number_invalid":"El n&uacute;mero de cuenta es invalido","invalidVerification":"La combinaci&oacute;n que has indicado es invalida. Por favor intenta de nuevo.","pendingTransactions":"Esta cuenta bancaria no puede ser bloqueada o eliminada todav&iacute;a. Tiene transacciones pendientes.","incorrectPassword":"Contrase&ntilde;a incorrecta","minValueRest":"No tienes suficientes puntos!","minCostTotal":"Necesita extraer mas puntos para que su retiro pueda ser procesado","ErrorEnterNewPassword":"Error. Ingrese nueva contrase&ntilde;a","ErrorConfirmNewPassword":"Error. Por favor, confirme su nueva contrase&ntilde;a.","currentPasswordRequired":"La contrase&ntilde;a actual es requerida.","PasswordMinLength":"La contrase&ntilde;a debe tener como m&iacute;nimo 8 caracteres.","PasswordMaxLength":"La contrase&ntilde;a debe tener como m&aacute;ximo 16 caracteres.","PasswordsAreNotEqual":"Las contrase&ntilde;as no coinciden.","ValidEmail":"Debe ser un correo v&aacute;lido","EmailRequired":"Correo requerido","FirstNameRequired":"Nombre es requerido","LastNameRequired":"Apellido es requerido","ErrorSamePassword":"La nueva contrase&ntilde;a es igual que la contrase&ntilde;a actual","invalidNickname":"Ya posee una cuenta bancaria con este alias. Por favor, ingrese uno nuevo.","userWithoutPassword":"El usuario fue creado sin contrase&ntilde;a","maxDecimals":"Debe tener m&aacute;ximo dos decimales","alreadyPremium":"Este usuario ya es Premium","goldUser":"Este usuario es Gold","pendingUpgradeTransaction":"Este usuario ya tiene una transacci&oacute;n de aumento de suscripci&oacute;n","changeVerificationFirst":"El inter&eacute;s de verificaci&oacute;n depende de esta comisi&oacute;n. Este  debe ser mayor que el inter&eacute;s de dep&oacute;sito del procesador de pago actual. Por favor c&aacute;mbielo o elija otro monto para este inter&eacute;s","invalidVerificationAmount":"Monto inv&aacute;lido: debe ser dos veces mayor que el inter&eacute;s de dep&oacute;sito cobrado por el procesador de pago","unknowCronJob":"Trabajo de cron desconocido","unknownRole":"Rol de usuario desconocido","stripe_no_connection":"Revise su conexi&oacute;n a Internet","oldPlatformConfiguration":"No tienes actualizada la configuraci&oacute;n de la plataforma. Por favor recarga la p&aacute;gina.","stripe_parameter_invalid_integer":"Entero invalido"},"language":{"english":"Ingl&eacute;s","spanish":"Espa&ntilde;ol","myLanguage":"Mi idioma"},"buy-points-form":{"letsEarnPoints":"Tengamos m&aacute;s puntos!","getPoints":"Obt&eacute;n puntos","thanksForBuying":"Gracias por obtener puntos con nosotros!","transactionToValidate":"En los pr&oacute;ximos d&iacute;as esta transacci&oacute;n se har&aacute; efectiva. Ten en cuenta que estos puntos no est&aacute;n disponibles hasta que el pago haya sido verificado. Te enviaremos un correo electr&oacute;nico tan pronto como estos puntos est&eacute;n disponibles para su consumo."},"payments":{"points":"Puntos","totalCost":"Costo total","totalPoints":"Tus puntos disponibles","totalDollars":"Cantidad a transferir","totalPointsSum":"Puntos totales"},"invoice":{"invoice":"Factura","transactionType":"Tipo de transacci&oacute;n","taxes":"Impuestos","warningInvoiceMessage":"Si desconoce esta transacci&oacute;n, por favor comun&iacute;quese con nosotros inmediatamente"},"configuration":{"configurationTitle":"Cambiemos algunas configuraciones de la plataforma","selectAnInterest":"Selecciona un inter&eacute;s","percentage":"Porcentaje","update":"Actualizar","equalsTo":"Equivale a ","thirdPartyInterest":"Inter&eacute;s del procesador de pago","selectAPaymentProvider":"Selecciona un procesador de pago","selectAType":"Selecciona un tipo","changeMadeSuccessfully":"Cambio realizado exitosamente","accept":"Aceptar","integer":"Los puntos deben ser un n&uacute;mero entero.Please, try again","decimals":"El monto debe tener m&aacute;ximo dos decimales. Por favor, intenta de nuevo.","platformInterests":"Intereses de la plataforma","subscriptionBenefits":"Beneficios de las suscripciones","paymentProviderCommissions":"Comisiones de procesadores de pago","jobFrequencies":"Frecuencias de trabajos desatendidos","subscriptionConditionals":"Condiciones de adquisici&oacute;n de suscripciones","transferStatus":"Verificaci&oacute;n de estado de transferencias","chargeStatus":"Verificaci&oacute;n de estado de cobros","frequencies":"Frecuencias","chooseACompany":"Elige una compa&ntilde;&iacute;a","accumulatePercentage":"Porcentaje de acumulaci&oacute;n","accumulatePercentageDescription":"Porcentaje a ser convertido en puntos "},"dashboard":{"wellcome":"&iexcl;Bienvenido a PetroMiles!","currentPoints":"Puntos actuales:","exchangeCardDescription":"Convierte tus puntos en dinero.","buyPointsCardDescription":"Con tu compra ganamos todos.","affiliateSubscription":"&iexcl;Opta por m&aacute;s!","affiliateSubscriptionDescription":"Convi&eacute;rtete en miembro Premium de Petromiles.","welcomeBack":"Bienvenido de vuelta a PetroMiles!","alertWelcomeMessage":"Estamos muy felices de informarte que un nuevo socio es parte de nuestra familia","checkMessage":"&Eacute;chale un vistazo a todas sus transacciones","purchased ":"Comprados","redeemed":"Retirado","allTransactions":"Transactions","moreDetails":"M&aacute;s detalles","purchase":"Compra","external":"Externo","purchaseTransactions":"Transacciones de compra","withdrawalTransactions":"Transacciones de retiro","externalTransaction":"Transacciones externas","associatedBankAccounts":"Cuentas de banco asociadas","associatedBankAccountsMessage":"Estas son todas las cuentas de banco registradas por nuestros clientes","notData":"No hay transacciones ni cuentas de banco","notDataMessage":"Lo sentimos, no hay ninguna transacci&oacute;n o cuentas de banco registradas en PetroMiles","notTransactions":"No hay transacciones","notTransactionsMessage":"Lo sentimos, no tenemos ninguna transacci&oacute;n registrada en PetroMiles","transactionsStats":"Estas son las estad&iacute;sticas de tus Transacciones realizadas:","transactionsBank":"Estas son las estad&iacute;sticas de tus Cuentas Bancarias registradas:","enjoyServices":"Te recomendamos seguir disfrutando de nuestros servicios:","transactions":"Transacciones","buyPoints":"Compra de Puntos","exchangeCard":"Canje de Puntos","thirdPartyTransactions":"Empresas Afiliadas","totalTransactions":"Transacciones totales","bankAccounts":"Cuentas Bancarias","bankAccountsTotal":"Cuentas bancarias totales:","thirdParty":"Empresas Afiliadas","deleteBlock":"Eliminado / Bloqueado"},"sell-points":{"getCash":"Pronto te traeremos nuevas y asombrosas funcionalidades. Como cambiar puntos por dinero"},"interest":{"buyConfig":"Compra","verificationConfig":"Verificaci&oacute;n","goldConfig":"Oro","premiumConfig":"Premium","withdrawalConfig":"Retiro"},"subscription":{"premiumLevel":"Nivel Premium","cost":"Costo","descriptionPremium":"&iexcl;Actualizando a esta suscripci&oacute;n, le garantizamos que cada vez que obtenga puntos obtendr&aacute; un {percentage}% extra como recompensa!","becomePremium":"&iexcl;Convi&eacute;rtete en Premium ahora!","subscribe":"Suscribirse","transactionInformation":"Informaci&oacute;n de la Transacci&oacute;n","description":"Descripci&oacute;n","levelAdquisition":"Adquisici&oacute;n de nivel Premium","level":"Nivel","bankAccountInformation":"Informaci&oacute;n de la Cuenta Bancaria a la que le cobraremos","bankName":"Nombre del banco","holderName":"Nombre del titular","serviceCommision":"Comisi&oacute;n de Servicio","howItWorks":"&iquest;C&oacute;mo Funciona?","premiumApplies":"Al adquirir una suscripci&oacute;n Premium, se aplica lo siguiente:","premiumServiceCommissionAgg":"Al adquirir una suscripci&oacute;n, una comisi&oacute;n de servicio se agrega al costo.","premiumPointsWontAppearInstantly":"El proceso de activaci&oacute;n de su cuenta puede tomar un tiempo luego de haberse suscrito al servicio","premiumPointsPurchaseDelayLabel":"La suscripci&oacute;n puede tardar hasta un m&aacute;ximo de 24 horas en verse reflejada en su cuenta.","premiumPurchaseEmail":"Usted recibir&aacute; un correo electr&oacute;nico con la factura de su pago","premiumProccessedPurchaseEmail":"Usted recibir&aacute; un correo electr&oacute;nico cuando la transacci&oacute;n se haya procesado correctamente","premiumIssues":"Para ayudarte a solventar cualquier problema, cont&aacute;ctenos enviando un correo electr&oacute;nico a","premiumFamily":"&iexcl;Se parte de nuestra familia ahora!","premiumBenefits":"Beneficios","premiumBasicTable":"B&aacute;sico","premiumGoldTable":"Oro","premiumMorePointsTable":"{percentage}% m&aacute;s puntos","premiumForEachPayment":"por cada pago.","premiumExtraPoints":"{extra} Puntos extras","btnAcquireNow":"Adquirir Ahora","goldDescription":"La membres&iacute;a Gold se obtiene al obtener puntos hasta generar ${incomes} en ingresos para Petromiles en cualquier momento. Adem&aacute;s, necesitar&aacute; tener una membres&iacute;a Premium para actualizar.","goldBonusDescription":"&iexcl;Los usuarios Gold obtienen 20% de puntos extras por cada compra adem&aacute;s de 2500 puntos de bonificaci&oacute;n!","btnWantIt":"Comprar puntos","premiumBtn":"M&aacute;s Informaci&oacute;n","thanksForPayingSubscription":"Gracias por confiar en nosotros!","transactionValidateSubscription":"En los pr&oacute;ximos d&iacute;as esta transacci&oacute;n se har&aacute; efectiva. Ten en cuenta que esta suscripci&oacute;n no est&aacute; disponible hasta que el pago haya sido verificado. Te enviaremos un correo electr&oacute;nico tan pronto como esta suscripci&oacute;n est&eacute; disponible en tu cuenta de usuario.","premiumAlready":"Ya tiene una suscripci&oacute;n Premium","goToProfile":"Ir a Perfil","extraPoints":"Puntos extra","goldMorePointsTable":"{percentageGold}% m&aacute;s puntos"},"exchange-points-form":{"letsEarnDollars":"Cambia tus puntos!","successfulWithdrawal":"Tu cambio de puntos a d&oacute;lares fue exitoso!","withdrawalToValidate":"El dinero ya fue depositado en tu cuenta. !Disfr&uacute;talo!","getDollars":"Obt&eacute;n d&oacute;lares"},"countries":{"VENEZUELA":"VENEZUELA","UNITED STATES":"ESTADOS UNIDOS"},"bank-account-details":{"bankAccountDetails":"Detalles de cuenta bancaria","bank":"Banco","name":"Nombre","setAsPrimaryAccount":"Marcar como cuenta primaria","primary":"Primaria","deleteAccount":"Eliminar cuenta","number":"N&uacute;mero"},"interests":{"withdrawalInterest":"El inter&eacute;s de retiro es la comisi&oacute;n combrada a los clientes en el momento en el que deseen canjear sus puntos. ","verificationInterest":"El inter&eacute;s de verificaci&oacute;n es la comisi&oacute;n cobrada al momento de registrar una cuenta bancaria","buyInterest":"El inter&eacute;s de compra es la comisi&oacute;n cobrada a los clientes en el momento en el que deseen comprar puntos.","premiumInterest":"Los clientes reciben este porcentaje de su compra en puntos si poseen esta suscripci&oacute;n","goldInterest":"Los clientes reciben este porcentaje de su compra en puntos si tienen esta suscripci&oacute;n, m&aacute;s este monto convertido a puntos","goldConditionals":"Esta suscripci&oacute;n se activa cuando el cliente ha pagado un monto mayor o igual a esta cantidad en intereses de la compa&ntilde;&iacute;a","premiumConditionals":"El cliente debe pagar este monto para adquirir esta suscripci&oacute;n"},"create-admin":{"successfulCreateAdmin":"&iexcl;Administrador creado exitosamente!","newAdminPassword":"La contrase&ntilde;a del nuevo administrador es la siguiente: "},"transactions-filter":{"resetDates":"Restablecer el filtro de fechas"}}')},e453:function(e,a,n){"use strict";n("dca8");var i=Object.freeze({USER_LOCAL_STORAGE:"user",ADMINISTRATOR:"ADMINISTRATOR",CLIENT:"CLIENT"});a["a"]=i},edd4:function(e){e.exports=JSON.parse('{"navbar":{"dashboard":"Dashboard","transaction":"Transaction | Transactions | {count} Transactions","bankAccount":"Bank account | Bank accounts | {count} Bank accounts","profile":"Profile","home":"Home","logout":"Logout","addPoints":"Add points","exchangePoints":"Exchange points","user":"User | Users | {count} Users","platformConfig":"Platform configuration","subscriptions":"Subscriptions","partners":"Partners","createAdmin":"Create Administrator"},"transaction":{"transaction":"Transaction | Transactions | {count} Transactions","pointsConversion":"Points conversion","yourPurchase":"Purchase","yourWithdrawal":"Withdrawal","subscriptionExtra":"Subscription extra","yourThirdPartyClient":"Accumulated external points","subscriptionExtraPremium":"Premium subscription extra","subscriptionExtraGold":"Gold subscription extra","responsible":"Responsible","company":"Company"},"profile":{"profile":"Profile","mainTitle":"User Profile Information","UserProfileImage":"User Profile Image","ChangeProfileImage":"Change Profile Image","ImageSuccessfullyUpdated":"Image successfully updated","ChangePassword":"Change password","CurrentPassword":"Current Password","NewPassword":"New Password","ConfirmPassword":"Confirm Password","PasswordSuccessfullyChanged":"Password Successfully Changed","PersonalInformation":"Personal Information","ResetValues":"Reset Values","UserSuccessfullyUpdated":"User Successfully Updated!","UserMerbershipLevel":"User Membership Level","PointsAvailable":"Points Available","PointsInDollars":"Points in Dollars","sentEmail":"Email sent to: "},"user-details":{"firstName":"First name","middleName":"Middle name","lastName":"Last name","secondLastName":"Second last name","address":"Address","phone":"Phone","photo":"Photo","birthdate":"Birthdate","password":"Password","email":"Email","yourProfile":"Your profile","dateOfBirth":"Date of birth","Country":"Country"},"bank-account-creation":{"createBankAccountTitle":"Associate a bank account","createBankAccountSubtitle":"This information will let us verify your bank account","ownerDetailsFormTitle":"Who owns this account?","bankAccountFormTitle":"Complete the bank account information","bankAccountCreationSuccessMessage":"Your account has been successfully associated. Please start the verification process by checking the two amounts that has been charged into your bank account. This charge will be effective from one to two business days.","newBankAccount":"New account","bankAccountVerification":"Verification","ownerDetailsStep":"Owner details","bankAccountDetailsStep":"Bank account details","checkUserAccountStep":"Check your bank account","errorMessageBankAccountCreation":"Error associating your bank account"},"bank-account-properties":{"accountType":"Account type","routingNumber":"Routing number","accountNumber":"Account number","saving":"Saving","checking":"Checking","checkNumber":"Check number","lastFourDigits":"Last four digits","nickname":"Nickname"},"user":{"user":"User | Users | {count} Users"},"bank-account-creation-form":{"routingNumberEmptyValidation":"Routing number can\'t be empty","checkNumberEmptyValidation":"Check number can\'t be empty","checkNumberLengthValidation":"Check number must have 4 characters","accountNumberEmptyValidation":"Account number can\'t be empty","continueButton":"Continue","cancel":"Cancel","finish":"Finish","nicknameEmptyValidation":"Nickname can\'t be empty","typeEmptyValidation":"Type is can\'t be empty","bankEmptyValidation":"Bank can\'t be empty","nicknameLengthValidation":"Nickname must have less than 255 characters"},"user-registration-form":{"firstNameEmptyValidation":"First name can\'t be empty\\n","lastNameEmptyValidation":"Last name can\'t be empty\\n","phoneEmptyValidation":"Phone can\'t be empty\\n","addressEmptyValidation":"Address can\'t be empty","emailEmptyValidation":"Email can\'t be empty","emailValidation":"Must be a valid email"},"common":{"cancel":"Cancel","state":"State","type":"Type","code":"Code","amount":"Amount | Amounts | {count} Amounts","date":"Date","seeMore":"See more","total":"Total","amounts":"Amounts","ok":"Okay","areYouSure":"Are you sure?","yes":"Yes","see":"See","yourPoints":"Your points","Save":"Save","Close":"Close","moreDetails":"More details"},"datatable":{"search":"Search"},"role":{"client":"Client | Clients | {count} Clients","administrator":"Administrator | Administrators | {count} Administrators"},"state-name":{"verifying":"Verifying","active":"Active","blocked":"Blocked","cancelled":"Cancelled","valid":"Valid","invalid":"Invalid"},"user-balance":{"equivalent":"Equivalent","myPoints":"My points"},"bank-account-validation":{"everythingIsFine":"Everything is fine","nothingToVerifyMessage":"You don\'t have any bank account to verify","bankAccountsToVerify":"Bank accounts to verify","verifyYourBankAccount":"Verify your bank account","verifyBankAccountMessage":"We charged two amounts to your bank account when you registered it. Please, provide these amounts here to verify your account.","validateButton":"Validate","verify":"Verify"},"transaction-type":{"subscriptionPayment":"Subscription payment","deposit":"Deposit","withdrawal":"Withdrawal","bankAccountValidation":"Bank account verification","thirdPartyClient":"Accumulation of external points"},"date-picker":{"end":"End","start":"Start"},"error":{"emailAlreadyInUse":"Email already in use","wrongCredentials":"Email or password incorrect","userNotFound":"User does not have an account in PetroMiles","loginAgain":"Please, login again","bankAccountAlreadyExists":"Bank account already exists","invalidRoutingNumber":"Invalid bank account routing number","userWithoutPassword":"The user was created without a password"},"error-messages":{"userNotFound":"User does not have an account in PetroMiles","loginAgain":"Please, login again","invalidRoutingNumber":"Invalid bank account routing number","required":"This field is required","shouldBeNumber":"This should be a number","shouldBeInteger":"This should be an integer number","minValue":"The minimun value must be {min}","errorStripe":"There was a problem with our payment provider","loginIncorrect":"Wrong user or password","stripe_amount_too_large":"Amount too large","stripe_bank_account_exists":"This bank account is already asociated with the customer","stripe_charge_exceeds_source_limit":"Charge amount exceeds bank account limit","stripe_account_number_invalid":"Account number is invalid","invalidVerification":"The combination you have provided is invalid. Please try again.","pendingTransactions":"This bank account cannot be blocked or deleted yet. It has pending transactions.","incorrectPassword":"Incorrect password","minValueRest":"You don\'t have enough points!","minCostTotal":"You need to extract more points so that your withdrawal can be processed","ErrorEnterNewPassword":"Error. Enter new password.","ErrorConfirmNewPassword":"Error. Please confirm new password.","currentPasswordRequired":"Current password is required","PasswordMinLength":"Password must have at least 8 characters","PasswordMaxLength":"Password must have at most 16 characters","PasswordsAreNotEqual":"Passwords doesn\'t match","ValidEmail":"Must be valid e-mail","EmailRequired":"E-mail is required","FirstNameRequired":"First name is required","LastNameRequired":"Last name is required","ErrorSamePassword":"New password is the same as current password","invalidNickname":"You already have a bank account with this nickname. Please try with another one.","userWithoutPassword":"The user was created without a password","maxDecimals":"Should have max two decimals","alreadyPremium":"This user is already premium","goldUser":"This is a Gold user","pendingUpgradeTransaction":"this user already has a pending upgrade transaction","changeVerificationFirst":"Verification interest depends on this commission. This must be greater than the deposit interest of the current payment processor. Please change it first or choose another amount for this interest","invalidVerificationAmount":"Invalid amount: it must be twice the deposit interest charged by the payment processor","unknowCronJob":"Unknow Cron Job","unknownRole":"Unknown user role","stripe_no_connection":"Check your Internet connection","oldPlatformConfiguration":"You doesn\'t have up-to-date platform settings. Please reload the page.","stripe_parameter_invalid_integer":"Invalid integer"},"language":{"english":"English","spanish":"Spanish","myLanguage":"My language"},"buy-points-form":{"letsEarnPoints":"Let\'s earn some points!","getPoints":"Get points","thanksForBuying":"Thanks for getting points with us!","transactionToValidate":"In the next few days this transaction will become effective. Be aware that these points will not be available until the payment has been verified. We will send you an email as soon as these points are available to you."},"payments":{"points":"Points","totalCost":"Total cost","totalPoints":"Your available points","totalDollars":"Amount to transfer","totalPointsSum":"Total points"},"invoice":{"invoice":"Invoice","transactionType":"Transaction type","taxes":"Taxes","warningInvoiceMessage":"If you are unaware of this transaction, please contact us immediately"},"configuration":{"configurationTitle":"Let\'s change some platform configurations","selectAnInterest":"Select an interest","percentage":"Percentage","update":"Update","equalsTo":"Equals to","thirdPartyInterest":"Payment provider interest","selectAPaymentProvider":"Select a payment provider","selectAType":"Select a type","changeMadeSuccessfully":"Change made successfully","accept":"Accept","integer":"Points must be a integer number. Please, try again.","decimals":"Amount must has  decimal number. Please, try again.","platformInterests":"Platform interests","subscriptionBenefits":"Subscription Benefits","paymentProviderCommissions":"Payment provider commissions","jobFrequencies":"Job Frequencies","subscriptionConditionals":"Subscription purchase conditions","transferStatus":"Transfer status check","chargeStatus":"Charge status check","frequencies":"Frequencies","chooseACompany":"Choose a company","accumulatePercentage":"Accumulate percentage","accumulatePercentageDescription":"Percentage to be converted into points"},"dashboard":{"wellcome":"Welcome to PetroMiles!","currentPoints":"Current points:","exchangeCardDescription":"Convert your points into money.","buyPointsCardDescription":"With your purchase we all win.","affiliateSubscription":"Subscription benefits!","affiliateSubscriptionDescription":"Become a Premium member of Petromiles.","welcomeBack":"Welcome  back to PetroMiles!","alertWelcomeMessage":"We are very happy to inform you that a new partner is now part of our family","checkMessage":"Check out all its transactions","purchased ":"Purchased ","redeemed":"Redeemed","allTransactions":"All transactions","moreDetails":"More details","purchase":"Purchase","external":"External","purchaseTransactions":"Purchase transactions","withdrawalTransactions":"Withdrawal transactions","externalTransaction":"External transactions","associatedBankAccounts":"Associated bank accounts","associatedBankAccountsMessage":"These are all the bank accounts registered by our clients.","notData":"There is not transactions or bank accounts","notDataMessage":"Sorry, we don\'t have any transaction or bank accounts registered in PetroMiles","notTransactions":"There is not transactions","notTransactionsMessage":"Sorry, we don\'t have any registered transaction in PetroMiles","transactionsStats":"These are the statistics of your Transactions:","transactionsBank":"These are the statistics of your registered Bank Accounts:","enjoyServices":"We recommend you to continue enjoying our services:","transactions":"Transactions","buyPoints":"Buy Points","exchangeCard":"Exchange Points","thirdPartyTransactions":"Third Party","totalTransactions":"Total transactions","bankAccounts":"Bank Accounts","bankAccountsTotal":"Total bank accounts:","thirdParty":"Third Party","deleteBlock":"Deleted / Blocked"},"sell-points":{"getCash":"We will soon bring you new and awesome features. Like exchaging poins to cash"},"interest":{"buyConfig":"Buy","verificationConfig":"Verification","goldConfig":"Gold","premiumConfig":"Premium","withdrawalConfig":"Withdrawal"},"subscription":{"premiumLevel":"Premium Level","cost":"Cost","descriptionPremium":"Upgrading to this subscription we guarantee you that every time you get points you will get {percentage}% extra as a reward!","becomePremium":"Become PREMIUM now!","subscribe":"Subscribe","transactionInformation":"Transaction Information","description":"Description","levelAdquisition":"Level adquisition","level":"Level","bankAccountInformation":"Bank Account Information that we will charge you","bankName":"Bank name","holderName":"Holder Name","serviceCommision":"Service Commision","howItWorks":"How it Works?","premiumApplies":"The following applies once acquiring a Premium subscription:","premiumServiceCommissionAgg":"When acquiring a suscription, a service commission is aggregated to the cost.","premiumPointsWontAppearInstantly":"The account activation process may take a while after you have subscribed to the service","premiumPointsPurchaseDelayLabel":"The subscription can take up to 24 hours to be reflected in your account","premiumPurchaseEmail":"You\'ll receive an email with the invoice of your payment.","premiumProccessedPurchaseEmail":"You\'ll receive an email when the transaction has been successfully proccessed","premiumIssues":"To help you solve any problem, please contact us by sending an email to","premiumFamily":"Be part of our family now!","premiumBenefits":"Benefits","premiumBasicTable":"Basic","premiumGoldTable":"Gold","premiumMorePointsTable":"{percentage}% more points","premiumForEachPayment":"for each payment.","premiumExtraPoints":"{extra} Extra points","btnAcquireNow":"Acquire Now","goldDescription":"The Gold membership is obtained by getting points up to generating ${incomes} in income to Petromiles at any time. Additionally you will need to have a Premium membership to upgrade.","goldBonusDescription":"Gold users get 20% extra points for each points acquisition + 2500 points bonus!","btnWantIt":"Buy points","premiumBtn":"More Info","thanksForPayingSubscription":"Thanks for trust in us!","transactionValidateSubscription":"In the next few days this transaction will become effective. Be aware that this subscription will not be available until the payment has been verified. We will send you an email as soon as the subscription are available in your user account.","premiumAlready":"You already have a Premium subscription","goToProfile":"go to Profile","extraPoints":"Extra points","goldMorePointsTable":"{percentageGold}% more points"},"exchange-points-form":{"letsEarnDollars":"Change your points!","successfulWithdrawal":"Your change from points to dollars was successful!","withdrawalToValidate":"The money was already deposited into your bank account. Enjoy it!","getDollars":"Get dollars"},"countries":{"VENEZUELA":"VENEZUELA","UNITED STATES":"UNITED STATES"},"bank-account-details":{"bankAccountDetails":"Bank account details","bank":"Bank","name":"Name","setAsPrimaryAccount":"Set as primary account","primary":"Primary","deleteAccount":"Delete account","number":"Number"},"interests":{"withdrawalInterest":"Withdrawal interest is the commission charged to customers at the time they wish to exchange their points. ","verificationInterest":"\\nVerification interest is the commission charged at the time of registering a bank account","buyInterest":"Buy interest is the commission charged to customers at the time they wish to acquire points.","premiumInterest":"Clients receive this percentage of their purchase in points if they have this subscription","goldInterest":"Clients receive this percentage of their purchase plus these extra points if they have this subscription ","goldConditionals":"This subscription is active when the client has paid an amount greater or equal to this quantity in company interests.","premiumConditionals":"The customer must pay this amount to purchase this subscription"},"create-admin":{"successfulCreateAdmin":"Successfully created administrator!","newAdminPassword":"The new administrator\'s password is as follows: "},"transactions-filter":{"resetDates":"Reset filter dates"}}')},f6fc:function(e,a,n){"use strict";n.d(a,"b",(function(){return r})),n.d(a,"a",(function(){return o}));n("d81d"),n("dca8"),n("b64b"),n("d3b7");var i=n("5530"),t=Object.freeze({LOGIN:{path:"/admin/",name:"AdminLogin",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up"),n.e("admin-login")]).then(n.bind(null,"55a6"))},meta:{adminGuest:!0}},RECOVER_PASSWORD:{path:"/admin/recover-password",name:"AdminRecoverPassword",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("admin-login~admin-recover-password~client-login~client-recover-password~client-sign-up"),n.e("admin-recover-password")]).then(n.bind(null,"1eb2"))},meta:{adminGuest:!0}},DASHBOARD:{path:"/admin/dashboard",name:"AdminDashboard",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-dashboard~client-dashboard"),n.e("admin-dashboard")]).then(n.bind(null,"dbd7"))},meta:{requiresAdminAuth:!0}},USER_LIST:{path:"/admin/users",name:"AdminUserList",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("admin-user-list")]).then(n.bind(null,"10d9"))},meta:{requiresAdminAuth:!0}},USER_DETAILS:{path:"/admin/users/detail",name:"AdminUsersDetail",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("admin-user-list")]).then(n.bind(null,"3d3b"))},meta:{requiresAdminAuth:!0},props:!0},PLATFORM_CONFIG:{path:"/admin/platform-config",name:"AdminPlatformConfig",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("admin-platform-config")]).then(n.bind(null,"8754"))},meta:{requiresAdminAuth:!0}},BANK_ACCOUNT_LIST:{path:"/admin/bank-accounts",name:"AdminBankAccountList",component:function(){return Promise.all([n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-bank-account-list")]).then(n.bind(null,"7bef"))},meta:{requiresAdminAuth:!0}},TRANSACTION_LIST:{path:"/admin/transactions",name:"AdminTransactionList",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-transaction-list~client-transaction-list"),n.e("admin-transaction-list")]).then(n.bind(null,"76e8"))},meta:{requiresAdminAuth:!0}},PARTNERS_INFO:{path:"/admin/partners",name:"PartnersInfo",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("partners-info")]).then(n.bind(null,"fb31"))},meta:{requiresAdminAuth:!0}},CREATE_ADMIN:{path:"/admin/create-admin",name:"CreateAdmin",component:function(){return Promise.all([n.e("admin-dashboard~admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admi~0b2549c7"),n.e("admin-bank-account-list~admin-dashboard~admin-platform-config~admin-transaction-list~admin-user-list~565c532d"),n.e("admin-login~admin-platform-config~admin-recover-password~admin-transaction-list~admin-user-list~clie~3d0b6bad"),n.e("admin-platform-config~admin-recover-password~admin-user-list~client-bank-account-list~client-buy-poi~7ac241f0"),n.e("create-admin")]).then(n.bind(null,"b334"))},meta:{requiresAdminAuth:!0}}}),o=Object.keys(t).map((function(e){return t[e]})),r={};Object.keys(t).map((function(e){return r[e]=Object(i["a"])(Object(i["a"])({},t[e]),{},{component:null})}))}});</p><p></p></td>
+</tr>
+<TR vAlign="top">
+<TD colspan="2"></TD>
+</TR>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Reference</td><td width="80%"><p></p></td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">CWE Id</td><td width="80%">200</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">WASC Id</td><td width="80%">13</td>
+</tr>
+  
+<tr bgcolor="#e8e8e8">
+<td width="20%">Source ID</td><td width="80%">3</td>
+</tr>
+
+</table>
+</body>
+</html>

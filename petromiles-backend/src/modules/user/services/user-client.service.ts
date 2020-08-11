@@ -18,6 +18,7 @@ import { Role } from '@/enums/role.enum';
 import { UpdatePasswordDTO } from '@/modules/user/dto/update-password.dto';
 import { CreateUserDTO } from '@/modules/user/dto/create-user.dto';
 import { UserInfo } from '@/interfaces/user/user-info.interface';
+import { UpdateUserDTO } from '@/modules/user/dto/update-user.dto';
 
 // SERVICES
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
@@ -44,7 +45,18 @@ export class UserClientService {
   ) {}
 
   async findAll(): Promise<UserClient[]> {
-    return await this.userClientRepository.find();
+    const users = await this.userClientRepository.find();
+
+    const result: UserClient[] = [];
+    users.map(user => {
+      let deleted = false;
+      user.stateUser.forEach(userState => {
+        if (userState.state.name === StateName.DELETED) deleted = true;
+      });
+      if (!deleted) result.push(user);
+    });
+
+    return result;
   }
 
   async create(
@@ -136,8 +148,14 @@ export class UserClientService {
       .save(userState);
   }
 
-  async createDetails(userClientDetails): Promise<UserDetails> {
-    const result = await this.userDetailsRepository.save(userClientDetails);
+  async createDetails(
+    userClientDetails,
+    accountOwner: string,
+  ): Promise<UserDetails> {
+    const result = await this.userDetailsRepository.save({
+      ...userClientDetails,
+      accountOwner,
+    });
     result.userClient = null;
     return result;
   }
@@ -146,7 +164,7 @@ export class UserClientService {
     userClient: UserClient,
     details,
   ): Promise<App.Auth.UserClient> {
-    const userDetails = await this.createDetails(details);
+    const userDetails = await this.createDetails(details, null);
 
     await this.createState(userClient, StateName.ACTIVE, null);
 
@@ -182,9 +200,12 @@ export class UserClientService {
 
   async getInfo(idUserClient: number): Promise<UserInfo> {
     const userClient = await this.get({ idUserClient });
+    const userDetails = userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
     return {
       email: userClient.email,
-      userDetails: userClient.userDetails,
+      userDetails,
       role: Role.CLIENT,
       id: userClient.idUserClient,
       federated: userClient.password ? false : true,
@@ -215,7 +236,7 @@ export class UserClientService {
   async getDetails(userClient: UserClient): Promise<UserDetails> {
     if (userClient)
       return await this.userDetailsRepository.findOne({
-        where: `fk_user_client = ${userClient.idUserClient}`,
+        where: `fk_user_client = ${userClient.idUserClient} and "accountOwner" is NULL`,
       });
     return null;
   }
@@ -244,13 +265,7 @@ export class UserClientService {
     const userClient = await this.get({ idUserClient: user.id });
 
     if (await userClient.isPasswordCorrect(currentPassword)) {
-      await this.userClientRepository
-        .createQueryBuilder()
-        .update(UserClient)
-        .set({ password, salt })
-        .where('idUserClient = :id', { id: userClient.idUserClient })
-        .execute();
-
+      await this.updateClient({ password, salt }, userClient.idUserClient);
       this.logger.silly(
         `[${ApiModules.USER}] {${user.email}} Password successfully updated`,
       );
@@ -267,16 +282,23 @@ export class UserClientService {
     const { password, salt } = credentials;
     const userClient = await this.get({ idUserClient: user.id });
 
-    await this.userClientRepository
-      .createQueryBuilder()
-      .update(UserClient)
-      .set({ password, salt })
-      .where('idUserClient = :id', { id: userClient.idUserClient })
-      .execute();
+    await this.updateClient({ password, salt }, userClient.idUserClient);
 
     this.logger.silly(
       `[${ApiModules.USER}] {${user.email}} Password successfully updated`,
     );
     return userClient;
+  }
+
+  async updateClient(
+    options: UpdateUserDTO,
+    id: number,
+  ): Promise<UpdateResult> {
+    return await this.userClientRepository
+      .createQueryBuilder()
+      .update(UserClient)
+      .set({ ...options })
+      .where('idUserClient = :id', { id })
+      .execute();
   }
 }
