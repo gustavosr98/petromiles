@@ -26,6 +26,7 @@ import {ThirdPartyInterestService} from "@/modules/management/services/third-par
 import {PlatformInterestService} from "@/modules/management/services/platform-interest.service";
 import {http} from "winston";
 import exp = require("constants");
+import {MailsSubjets} from "@/constants/mailsSubjectConst";
 
 
 describe( 'AuthService', () => {
@@ -550,11 +551,120 @@ describe( 'AuthService', () => {
     });
 
     describe('recoverPassword(credentials)', ()=> {
+        let expectedCredentials;
+        let credentials;
+        let expectedInfo;
+        let user;
+        let expectedUserDetails;
+        let password;
+        let salt;
+        let expectedMessage;
+        let subject;
+        let languageMails
 
         describe('case: success', () => {
             describe('when everything works well', () => {
                 beforeEach(async () => {
+                    expectedCredentials = {
+                        email:"ed@co.com",
+                        role:"CLIENT",
+                    };
+                    credentials = {
+                        email:"ed@co.com",
+                        role:"CLIENT",
+                    }
+                    password= "$2b$10$/hMgSe.ho1Gt.8cnVAcVKOYtzJePi/N/EEOo8FKsVqWWBZtsEawde";
+                    salt = "$2b$10$/hMgSe.ho1Gt.8cnVAcVKO";
+                    expectedInfo = {
+                        user:{
+                            password:"$2b$10$/hMgSe.ho1Gt.8cnVAcVKOYtzJePi/N/EEOo8FKsVqWWBZtsEawde",
+                            email:"ed@co.com",
+                            salt:"$2b$10$/hMgSe.ho1Gt.8cnVAcVKO",
+                            id:1,
+                        },
+                        userDetails:{
+                            idUserDetails:14,
+                            firstName:"Ed",
+                            middleName:"Jose",
+                            lastName:"Cocca",
+                            secondLastName:null,
+                            birthdate:null,
+                            address:null,
+                            phone:null,
+                            photo:null,
+                            customerId:"",
+                            accountId:" ",
+                            language:{
+                                idLanguage:1,
+                                name:"english",
+                                shortname:"en"
+                            },
+                            country:null
+                        },
+                    };
+                    user = {
+                        password:"$2b$10$/hMgSe.ho1Gt.8cnVAcVKOYtzJePi/N/EEOo8FKsVqWWBZtsEawde",
+                        email:"ed@co.com",
+                        salt:"$2b$10$/hMgSe.ho1Gt.8cnVAcVKO",
+                        id:6,
+                    };
+                    expectedUserDetails = {
+                        idUserDetails:14,
+                        firstName:"Ed",
+                        middleName:"Jose",
+                        lastName:"Cocca",
+                        secondLastName:null,
+                        birthdate:null,
+                        address:null,
+                        phone:null,
+                        photo:null,
+                        customerId:" ",
+                        accountId:" ",
+                        language:{
+                            idLanguage:1,
+                            name:"english",
+                            shortname:"en"
+                        },
+                        country:null,
+                    };
+                    languageMails = expectedInfo.userDetails.language.name;
+                    subject = MailsSubjets.recover[languageMails];
 
+                    expectedMessage = {
+                        to: expectedInfo.user.email,
+                        subject: subject,
+                        templateId: 'prueba',
+                        dynamic_template_data: {
+                            user: expectedInfo.userDetails.firstName,
+                        }
+                    };
+
+                    (userService.getActive as jest.Mock).mockResolvedValue(
+                        expectedCredentials,
+                    );
+                    (userAdministratorService.updatePasswordWithoutCurrent as jest.Mock).mockResolvedValue(
+                        user,
+                    );
+                    (mailsService.sendEmail as jest.Mock).mockImplementation();
+
+                });
+                it('should invoke userService.getActive',  () => {
+                    expect(userService.getActive).toHaveBeenCalledTimes(1);
+                    expect(userService.getActive).toHaveBeenCalledWith(
+                        credentials,
+                    );
+                });
+                it('should invoke userAdminitratorService.updatePasswordWithoutCurrent',  ()=> {
+                    expect(userAdministratorService.updatePasswordWithoutCurrent).toHaveBeenCalledTimes(1);
+                    expect(userAdministratorService.updatePasswordWithoutCurrent).toHaveBeenCalledWith(
+                        user, password, salt,
+                    )
+
+                });
+
+                it('should invoke mailsService.sendEmail()', () => {
+                    expect(mailsService.sendEmail).toHaveBeenCalledTimes(1);
+                    expect(mailsService.sendEmail).toHaveBeenCalledWith(expectedMessage);
                 });
             });
         });
