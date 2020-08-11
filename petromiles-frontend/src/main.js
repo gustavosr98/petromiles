@@ -18,7 +18,13 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "roboto-fontface/css/roboto/roboto-fontface.css";
 import "@mdi/font/css/materialdesignicons.css";
-import LogRocket from 'logrocket';
+import LogRocket from "logrocket";
+import VueAnalytics from "vue-analytics";
+
+Vue.use(VueAnalytics, {
+  id: process.env.VUE_APP_ANALYTICS_ID,
+  router,
+});
 
 Vue.config.productionTip = false;
 Vue.prototype.$http = httpClient;
