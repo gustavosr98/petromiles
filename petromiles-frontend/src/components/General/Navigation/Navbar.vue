@@ -41,7 +41,7 @@
       <!-- Loggout button  -->
       <template v-slot:append>
         <div class="pa-2">
-          <v-btn block @click="logout">
+          <v-btn block @click="logout" class="logout-btn">
             {{ $t("navbar.logout") }}
             <v-spacer></v-spacer>
 
