@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="transaction">
     <v-subheader>
       <div class="title my-2 mx-2">
         <span class="font-weight-bold">
@@ -24,7 +24,9 @@
       <v-col cols="12" class="pt-0" justify="center">
         <v-list-item three-line>
           <v-list-item-content>
-            <v-list-item-title v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
+            <v-list-item-title
+              v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT && showAllData"
+            >
               <span class="font-weight-medium">{{ $tc("navbar.bankAccount", 0) }}:</span>
               <span class="ml-2 font-weight-light body-2">XXXX - {{ transaction.bankAccount }}</span>
             </v-list-item-title>
@@ -36,7 +38,9 @@
                 }}
               </span>
             </v-list-item-title>
-            <v-list-item-title v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT">
+            <v-list-item-title
+              v-if="transaction.type !== transactionsType.THIRD_PARTY_CLIENT && showAllData"
+            >
               <span class="font-weight-medium">{{ $t("bank-account-properties.nickname") }}:</span>
               <span class="ml-2 font-weight-light body-2 text-uppercase">
                 {{
@@ -171,7 +175,7 @@ export default {
   },
   data() {
     return {
-      transaction: {},
+      transaction: null,
       dialog: false,
       transactionsType: Transactions,
       suscriptionsType: Suscriptions,
@@ -189,14 +193,14 @@ export default {
     }
   },
   computed: {
-    type: function() {
+    type: function () {
       if (this.transaction.type) {
         return this.$tc(`transaction-type.${this.transaction.type}`);
       }
       return "";
     },
 
-    typeLabel: function() {
+    typeLabel: function () {
       let label;
       if (
         this.transaction.type === Transactions.DEPOSIT ||
@@ -211,13 +215,22 @@ export default {
       return label;
     },
 
-    paymentTransaction: function() {
+    paymentTransaction: function () {
       if (
         this.transaction.type === Transactions.BANK_ACCOUNT_VERIFICATION ||
         this.transaction.type === Transactions.SUBSCRIPTION_PAYMENT
       )
         return false;
       return true;
+    },
+    showAllData() {
+      if (
+        this.transaction &&
+        this.transaction.clientBankAccountEmail !== "Deleted account"
+      ) {
+        return true;
+      }
+      return false;
     },
   },
 };
