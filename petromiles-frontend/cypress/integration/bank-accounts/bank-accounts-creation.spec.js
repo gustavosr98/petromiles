@@ -1,21 +1,5 @@
 /// <reference types="cypress" />
 
-const errorMessages = {
-  type: "Type is can't be empty",
-  phoneNumber: "Phone can't be empty",
-  bankAccount: "Bank can't be empty",
-  accountNumber: "Account number can't be empty",
-  routingNumber: "Routing number can't be empty",
-  checkNumber: "Check number can't be empty",
-  nickname: "Nickname can't be empty",
-};
-const modalMessages = {
-  nicknameIsTaken:
-    "You already have a bank account with this nickname. Please try with another one",
-  combinationTaken: "This bank account is already asociated with the customer",
-  invalidAccountNumber: "Account number is invalid",
-  invalidRoutingNumber: "Invalid bank account routing number",
-};
 const accountNumbers = ["000123456789", "000111111116", "1234"];
 const banks = ["Bank of America", "Ally Bank"];
 const nicknames = ["test 1", "test"];
@@ -36,11 +20,12 @@ context("Bank Account Creation", () => {
     ).click();
 
     cy.get(".v-bottom-navigation > :nth-child(2) > .v-btn__content").click();
+    cy.wait(3000);
   });
 
   it("trying to create a bank account without a phone number", () => {
     cy.get(".next-btn").click();
-    cy.contains(errorMessages.phoneNumber).should("be.visible");
+    cy.get(".v-messages__message").should("be.visible");
   });
 
   it("trying to create a bank account without a type", () => {
@@ -54,7 +39,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(errorMessages.type).should("be.visible");
+    cy.get(".v-messages__message").should("be.visible");
   });
 
   it("trying to create a bank account without a bank", () => {
@@ -68,7 +53,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(errorMessages.bankAccount).should("be.visible");
+    cy.get(".v-messages__message").should("be.visible");
   });
 
   it("trying to create a bank account without an account number", () => {
@@ -83,7 +68,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(errorMessages.accountNumber).should("be.visible");
+    cy.get(".v-messages__message").should("be.visible");
   });
 
   it("trying to create a bank account with an invalid account number", () => {
@@ -99,7 +84,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(modalMessages.invalidAccountNumber).should("be.visible");
+    cy.get(".v-card__title").should("be.visible");
   });
 
   it("trying to create a bank account without a routing number", () => {
@@ -114,7 +99,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(errorMessages.routingNumber).should("be.visible");
+    cy.get(".v-messages__message").should("be.visible");
   });
 
   it("trying to create a bank account with an invalid routing number", () => {
@@ -130,7 +115,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(modalMessages.invalidRoutingNumber).should("be.visible");
+    cy.get(".v-card__title").should("be.visible");
   });
 
   it("trying to create a bank account with a routing number that doesn't match with the bank", () => {
@@ -146,7 +131,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(modalMessages.invalidRoutingNumber).should("be.visible");
+    cy.get(".v-card__title").should("be.visible");
   });
 
   it("trying to create a bank account without a check number", () => {
@@ -161,7 +146,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(errorMessages.checkNumber).should("be.visible");
+    cy.get(".v-messages__message").should("be.visible");
   });
 
   it("trying to create a bank account without a nickname", () => {
@@ -176,7 +161,7 @@ context("Bank Account Creation", () => {
     cy.get(".check-input").type("2255");
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(errorMessages.nickname).should("be.visible");
+    cy.get(".v-messages__message").should("be.visible");
   });
 
   it("when everything goes well", () => {
@@ -208,7 +193,7 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(modalMessages.combinationTaken).should("be.visible");
+    cy.get(".v-card__title").should("be.visible");
   });
 
   it("trying to create a bank account with a nickname already in use", () => {
@@ -224,6 +209,6 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[1]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.contains(modalMessages.nicknameIsTaken).should("be.visible");
+    cy.get(".v-card__title").should("be.visible");
   });
 });
