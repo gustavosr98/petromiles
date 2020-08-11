@@ -12,7 +12,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/e2e/jest/jest-e2e.json --passWithNoTests",
     "lint": "vue-cli-service lint",
-    "i18n:load": "node -r esm ./src/locales/load-i18n.js",
+    "i18n:load": "node ./src/locales/load-i18n.js",
     "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'",
     "prebuild": "npm run i18n:load",
     "preserve": "npm run i18n:load",
