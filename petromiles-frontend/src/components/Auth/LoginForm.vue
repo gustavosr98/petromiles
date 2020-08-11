@@ -8,7 +8,8 @@
           :provider="provider"
           @login="login"
           type="login"
-        >Continue with {{ provider.name }}</no-federeded-button>
+          >Continue with {{ provider.name }}</no-federeded-button
+        >
       </v-row>
       <h4 class="text-center mt-3 mb-5 caption">{{ title }}</h4>
       <v-form>
@@ -57,7 +58,8 @@
         color="light-blue darken-4"
         dark
         :loading="loading"
-      >Login</v-btn>
+        >Login</v-btn
+      >
     </div>
   </v-col>
 </template>

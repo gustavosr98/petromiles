@@ -8,7 +8,8 @@
           :provider="provider"
           @signUp="signUp"
           type="signUp"
-        >Sign Up with {{ provider.name }}</no-federeded-button>
+          >Sign Up with {{ provider.name }}</no-federeded-button
+        >
       </v-row>
       <h4 class="text-center mt-4 caption">Or sign up with</h4>
       <v-form ref="signUpForm" v-model="formValidity">
@@ -73,7 +74,14 @@
       </h5>
     </div>
     <div class="text-center mt-3 mb-8">
-      <v-btn :loading="loading" @click="ckeckingValidForm" type="submit" class="light-blue darken-4" dark>SIGN UP</v-btn>
+      <v-btn
+        :loading="loading"
+        @click="ckeckingValidForm"
+        type="submit"
+        class="light-blue darken-4"
+        dark
+        >SIGN UP</v-btn
+      >
     </div>
   </v-col>
 </template>
@@ -170,12 +178,14 @@ export default {
     },
 
     signUp(user) {
-      store.dispatch("auth/signUp", user).then(() => {
-        this.$router.push({ name: clientRoutes.DASHBOARD.name });
-      })
-      .finally(() => {
-        this.loading = false;
-      });
+      store
+        .dispatch("auth/signUp", user)
+        .then(() => {
+          this.$router.push({ name: clientRoutes.DASHBOARD.name });
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
   },
 };

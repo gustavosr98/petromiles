@@ -11,8 +11,18 @@
                 <div class="text-center">
                   <v-col cols="12">
                     <v-avatar size="150">
-                      <v-img :src="profileImg" alt="Avatar" v-if="profileImg" lazy-src="@/assets/general/spinner.gif"></v-img>
-                      <v-img src="@/assets/profile/user-avatar.png" alt="Avatar" lazy-src="@/assets/general/spinner.gif" v-else></v-img>
+                      <v-img
+                        :src="profileImg"
+                        alt="Avatar"
+                        v-if="profileImg"
+                        lazy-src="@/assets/general/spinner.gif"
+                      ></v-img>
+                      <v-img
+                        src="@/assets/profile/user-avatar.png"
+                        alt="Avatar"
+                        lazy-src="@/assets/general/spinner.gif"
+                        v-else
+                      ></v-img>
                     </v-avatar>
                   </v-col>
                   <v-col cols="12">
@@ -31,7 +41,8 @@
                       class="saveButtonPosition"
                       :loading="loadingImage"
                       :disabled="loading"
-                    >{{ $t("profile.ChangeProfileImage") }}</v-btn>
+                      >{{ $t("profile.ChangeProfileImage") }}</v-btn
+                    >
                   </v-col>
                 </div>
               </v-col>
@@ -41,7 +52,9 @@
             <div>
               <v-divider></v-divider>
               <br />
-              <h3 class="text-center">{{ $t("profile.PersonalInformation") }}</h3>
+              <h3 class="text-center">
+                {{ $t("profile.PersonalInformation") }}
+              </h3>
 
               <v-row align="center" justify="center">
                 <v-col cols="11" lg="4" md="4" sm="4">
@@ -160,28 +173,26 @@
                     style="margin-right: 1%"
                     @click="resetValues"
                     :disabled="loading || loadingImage"
-                  >{{ $t("profile.ResetValues") }}</v-btn>
+                    >{{ $t("profile.ResetValues") }}</v-btn
+                  >
                   <v-btn
                     color="primary"
                     @click="checkingValidForm"
                     :loading="loading"
                     :disabled="loadingImage"
-                  >{{ $t("common.Save") }}</v-btn>
+                    >{{ $t("common.Save") }}</v-btn
+                  >
 
                   <!-- Final Dialog -->
                   <v-row justify="center">
                     <v-dialog v-model="dialog" persistent max-width="50%">
                       <v-card>
                         <v-card-title class="headline">
-                          {{
-                          $t("create-admin.successfulCreateAdmin")
-                          }}
+                          {{ $t("create-admin.successfulCreateAdmin") }}
                         </v-card-title>
                         <v-card-text>
-                          {{
-                          $t("create-admin.newAdminPassword")
-                          }}
-                          <p class="font-weight-black">{{this.password}}</p>
+                          {{ $t("create-admin.newAdminPassword") }}
+                          <p class="font-weight-black">{{ this.password }}</p>
                         </v-card-text>
                         <v-card-actions>
                           <v-spacer></v-spacer>
@@ -189,7 +200,8 @@
                             color="secondary"
                             dark
                             :to="{ name: comeBackRoute }"
-                          >{{ $t("common.ok") }}</v-btn>
+                            >{{ $t("common.ok") }}</v-btn
+                          >
                         </v-card-actions>
                       </v-card>
                     </v-dialog>

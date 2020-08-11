@@ -12,7 +12,7 @@
                 width="100%"
                 v-on="on"
               >
-                <div>{{ $t("configuration.chooseACompany")}}</div>
+                <div>{{ $t("configuration.chooseACompany") }}</div>
                 <v-icon>keyboard_arrow_down</v-icon>
               </v-btn>
             </template>
@@ -29,22 +29,32 @@
         </v-col>
         <v-col>
           <v-card class="mx-auto px-3 text-xs-center" v-if="selectedItem">
-            <v-img :src="selectedItem.photo" height="150px" lazy-src="@/assets/general/spinner.gif"></v-img>
+            <v-img
+              :src="selectedItem.photo"
+              height="150px"
+              lazy-src="@/assets/general/spinner.gif"
+            ></v-img>
 
-            <v-card-title class="light-blue-text text--darken-4">{{selectedItem.name}}</v-card-title>
+            <v-card-title class="light-blue-text text--darken-4">{{
+              selectedItem.name
+            }}</v-card-title>
 
-            <v-card-subtitle>{{selectedItem.description}}</v-card-subtitle>
+            <v-card-subtitle>{{ selectedItem.description }}</v-card-subtitle>
             <v-divider></v-divider>
 
             <v-card-text></v-card-text>
 
             <v-card-subtitle class="py-0">
-              {{ $t("configuration.accumulatePercentage")}}
+              {{ $t("configuration.accumulatePercentage") }}
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-icon class="ml-2" small v-bind="attrs" v-on="on">help</v-icon>
+                  <v-icon class="ml-2" small v-bind="attrs" v-on="on"
+                    >help</v-icon
+                  >
                 </template>
-                <span>{{ $t("configuration.accumulatePercentageDescription")}}</span>
+                <span>{{
+                  $t("configuration.accumulatePercentageDescription")
+                }}</span>
               </v-tooltip>
             </v-card-subtitle>
 
@@ -63,8 +73,16 @@
             </v-col>
 
             <v-card-actions class="justify-space-between">
-              <v-btn color="primary" text @click="disableEdit =!disableEdit">Edit</v-btn>
-              <v-btn small color="secondary elevation-0" @click="update" :loading="loading">Save</v-btn>
+              <v-btn color="primary" text @click="disableEdit = !disableEdit"
+                >Edit</v-btn
+              >
+              <v-btn
+                small
+                color="secondary elevation-0"
+                @click="update"
+                :loading="loading"
+                >Save</v-btn
+              >
             </v-card-actions>
           </v-card>
         </v-col>
@@ -73,11 +91,17 @@
       <v-col cols="12" md="8">
         <transactions-table
           v-if="selectedItem"
-          :url="`transaction/getThirdPartyTransactions/${selectedItem.idThirdPartyClient}`"
+          :url="
+            `transaction/getThirdPartyTransactions/${selectedItem.idThirdPartyClient}`
+          "
         />
       </v-col>
     </v-row>
-    <configuration-modal @closeModal="closeModal" :dialog="dialog" :message="modalMessage" />
+    <configuration-modal
+      @closeModal="closeModal"
+      :dialog="dialog"
+      :message="modalMessage"
+    />
   </v-container>
 </template>
 

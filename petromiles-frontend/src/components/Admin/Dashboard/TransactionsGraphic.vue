@@ -1,13 +1,16 @@
 <template>
   <v-row>
     <v-col cols="12" class="pb-0">
-      <h3>{{$t('dashboard.allTransactions')}}</h3>
+      <h3>{{ $t("dashboard.allTransactions") }}</h3>
     </v-col>
     <v-col cols="6" md="4" class="pt-0">
       <bar-chart :datacollection="datacollection" :options="barOptions" />
     </v-col>
     <v-col cols="6" md="4" class="pt-0">
-      <doughnut-example :chart-data="chartData" :options="options"></doughnut-example>
+      <doughnut-example
+        :chart-data="chartData"
+        :options="options"
+      ></doughnut-example>
     </v-col>
     <v-col cols="12" md="4" align="center">
       <v-card class="elevation-1 py-4 mt-9">
@@ -20,7 +23,8 @@
           color="primary"
           class="elevation-0"
           to="/admin/transactions"
-        >{{$t('common.moreDetails')}}</v-btn>
+          >{{ $t("common.moreDetails") }}</v-btn
+        >
       </v-card>
     </v-col>
   </v-row>

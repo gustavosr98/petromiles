@@ -11,7 +11,11 @@
         ></v-select>
       </v-col>
       <v-col cols="12" md="4" class="mt-0" align="center">
-        <v-select v-model="selectedTime" :items="times" label="frecuency"></v-select>
+        <v-select
+          v-model="selectedTime"
+          :items="times"
+          label="frecuency"
+        ></v-select>
       </v-col>
       <update-btn @update="update" :loading="loading" />
       <v-spacer></v-spacer>

@@ -4,7 +4,7 @@
       <v-col cols="12" xs="5" lg="12">
         <div>
           <h1 class="text-center secondary--text text--darken-1">
-            {{ fullName }}, {{ $t("dashboard.wellcome") }} 
+            {{ fullName }}, {{ $t("dashboard.wellcome") }}
           </h1>
           <v-divider></v-divider>
         </div>
@@ -14,7 +14,7 @@
       <v-col cols="12" xs="5" lg="12">
         <div>
           <h2 class="text-center primary--text text--darken-1">
-            {{$t("dashboard.currentPoints")}}
+            {{ $t("dashboard.currentPoints") }}
           </h2>
         </div>
       </v-col>
@@ -26,10 +26,12 @@
     </v-row>
     <v-row align="center" justify="center">
       <router-link to="/buy-points" class="text-decoration-none">
-        <v-btn class="mb-4" x-large dark color="primary--text secondary"> <b> {{ $t("subscription.btnWantIt") }} </b> </v-btn>
+        <v-btn class="mb-4" x-large dark color="primary--text secondary">
+          <b> {{ $t("subscription.btnWantIt") }} </b>
+        </v-btn>
       </router-link>
     </v-row>
-        <v-divider></v-divider>
+    <v-divider></v-divider>
   </v-main>
 </template>
 

@@ -37,7 +37,8 @@
         color="light-blue darken-4"
         :loading="loading"
         dark
-      >Recover Password</v-btn>
+        >Recover Password</v-btn
+      >
     </div>
     <snackbar @close="closeSnackbar" :show="snackbar" :text="text"></snackbar>
   </v-col>
@@ -56,7 +57,7 @@ import adminRoutes from "@/router/adminRoutes";
 export default {
   mixins: [recoverMixin],
   components: {
-    "snackbar": Snackbar
+    snackbar: Snackbar,
   },
   props: {
     title: { required: true, type: String },
@@ -86,13 +87,13 @@ export default {
         })
         .then(res => {
           this.text = this.$tc("profile.sentEmail") + this.email;
-          this.snackbar = true;          
+          this.snackbar = true;
         })
         .finally(() => {
           this.loading = false;
         });
     },
-    closeSnackbar(){
+    closeSnackbar() {
       this.snackbar = false;
     },
   },

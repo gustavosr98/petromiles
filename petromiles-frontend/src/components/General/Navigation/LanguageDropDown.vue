@@ -1,8 +1,14 @@
 <template>
   <v-menu offset-y>
     <template v-slot:activator="{ on }">
-      <v-btn :color="color" class="text-capitalize elevation-0 body-2" dark v-on="on" width="100%">
-        <span class="mr-2">{{`${$i18n.locale} `}}</span>
+      <v-btn
+        :color="color"
+        class="text-capitalize elevation-0 body-2"
+        dark
+        v-on="on"
+        width="100%"
+      >
+        <span class="mr-2">{{ `${$i18n.locale} ` }}</span>
         <v-spacer />
         <v-icon small>mdi-earth</v-icon>
         <v-spacer />

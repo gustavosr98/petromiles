@@ -24,11 +24,11 @@
                   <tr>
                     <td>
                       <span class="invoice-title">
-                        {{
-                        $t("invoice.invoice")
-                        }}
+                        {{ $t("invoice.invoice") }}
                       </span>
-                      <span class="invoice-date">&nbsp; #{{ transaction.idTransaction }}</span>
+                      <span class="invoice-date"
+                        >&nbsp; #{{ transaction.idTransaction }}</span
+                      >
                       <br />
                       {{ date }}
                       <br />
@@ -47,20 +47,25 @@
                 <table>
                   <tr>
                     <td>
-                      <span class="invoice-name">{{ $tc("role.client", 0) }}:</span>
+                      <span class="invoice-name"
+                        >{{ $tc("role.client", 0) }}:</span
+                      >
                       {{ userFullName }}
                       <br />
-                      <span class="invoice-name">{{ $t("user-details.email") }}:</span>
+                      <span class="invoice-name"
+                        >{{ $t("user-details.email") }}:</span
+                      >
                       {{ user.email }}
                       <br />
-                      <span class="invoice-name">{{ $tc("navbar.bankAccount", 0) }}:</span>
+                      <span class="invoice-name"
+                        >{{ $tc("navbar.bankAccount", 0) }}:</span
+                      >
                       xxxx- {{ bankAccount }}
                     </td>
 
                     <td class="align-right">
                       PetroMiles, Inc
-                      <br />Las Mercedes, Caracas
-                      <br />Venezuela,1060
+                      <br />Las Mercedes, Caracas <br />Venezuela,1060
                     </td>
                   </tr>
                 </table>
@@ -77,9 +82,9 @@
                   </tr>
 
                   <tr class="item center-item invoice-table-content">
-                    <td
-                      class="invoice-table-content-type"
-                    >{{ this.$tc(`transaction-type.${transaction.type}`) }}</td>
+                    <td class="invoice-table-content-type">
+                      {{ this.$tc(`transaction-type.${transaction.type}`) }}
+                    </td>
                     <td>{{ points }}</td>
                     <td>{{ Math.round(transaction.rawAmount) / 100 }}</td>
                   </tr>
@@ -90,14 +95,20 @@
                   </tr>
                   <tr class="item center-item invoice-table-content">
                     <td></td>
-                    <td>{{ $t("invoice.taxes") }} ({{ Math.round(tax * 100) / 100 }}):</td>
+                    <td>
+                      {{ $t("invoice.taxes") }} ({{
+                        Math.round(tax * 100) / 100
+                      }}):
+                    </td>
                     <td>{{ total }}</td>
                   </tr>
                   <tr class="total center-item">
                     <td></td>
                     <td></td>
                     <td>
-                      <span class="invoice-name">{{ $t("common.total") }}:</span>
+                      <span class="invoice-name"
+                        >{{ $t("common.total") }}:</span
+                      >
                       $ {{ total }}
                     </td>
                   </tr>

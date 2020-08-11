@@ -1,24 +1,18 @@
- <template>
+<template>
   <!-- Dialog to confirm delete action -->
   <v-row justify="center">
     <v-dialog v-model="showModal" persistent max-width="60%">
       <v-card>
         <v-card-title class="headline">
-          {{
-          $t("common.areYouSure")
-          }}
+          {{ $t("common.areYouSure") }}
         </v-card-title>
         <v-card-actions>
           <v-spacer />
           <v-btn color="error" dark @click="closeModal">
-            {{
-            $t("common.cancel")
-            }}
+            {{ $t("common.cancel") }}
           </v-btn>
           <v-btn color="success" dark :loading="loading" @click="makeAction">
-            {{
-            $t("common.yes")
-            }}
+            {{ $t("common.yes") }}
           </v-btn>
         </v-card-actions>
       </v-card>

@@ -5,7 +5,9 @@
         <v-col cols="12" md="3">
           <v-col v-for="(item, i) in pointsData" :key="i" class="py-1">
             <v-card :color="item.color" dark>
-              <v-card-title class="headline pb-0">{{ item.title }}</v-card-title>
+              <v-card-title class="headline pb-0">{{
+                item.title
+              }}</v-card-title>
               <v-card-subtitle class="mt-1 mb-0 pb-0 font-weight-bold"
                 >{{ item.points }} {{ $t("payments.points") }}</v-card-subtitle
               >
@@ -92,13 +94,12 @@ export default {
   async mounted() {
     try {
       await this.loadPointsDetails();
-      await this.loadStatistics(); 
+      await this.loadStatistics();
     } catch (error) {
       console.log(error);
-    }
-    finally{
+    } finally {
       this.showLoadingScreen = false;
-    }       
+    }
   },
   methods: {
     async loadStatistics() {

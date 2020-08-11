@@ -14,35 +14,49 @@
     <v-row v-if="selectedInterest">
       <v-col cols="12" md="6" align="center" class="mt-3" width="100%">
         <v-expand-transition>
-          <v-alert color="primary" class="white--text d-flex align-center" height="90%">
-            <h3
-              class="subtitle-1 font-weight-bold font-italic text-capitalize"
-            >{{ interestData.name }}</h3>
-            <div
-              class="font-weight-light text-justify"
-            >{{ $t(`interests.${interestData.description}`) }}</div>
+          <v-alert
+            color="primary"
+            class="white--text d-flex align-center"
+            height="90%"
+          >
+            <h3 class="subtitle-1 font-weight-bold font-italic text-capitalize">
+              {{ interestData.name }}
+            </h3>
+            <div class="font-weight-light text-justify">
+              {{ $t(`interests.${interestData.description}`) }}
+            </div>
           </v-alert>
         </v-expand-transition>
       </v-col>
 
       <v-col cols="12" md="6" align="center">
         <v-row align="center">
-          <v-col cols="12" class="mt-0 pb-0" align="center" v-if="interestData.amount !==null">
+          <v-col
+            cols="12"
+            class="mt-0 pb-0"
+            align="center"
+            v-if="interestData.amount !== null"
+          >
             <v-text-field
               :value="amount"
               type="number"
               v-model="amount"
-              :label="$t('subscription.cost') "
+              :label="$t('subscription.cost')"
               @change="$v.interestData.amount.$touch()"
               @blur="$v.interestData.amount.$touch()"
               :error-messages="amountErrors"
             ></v-text-field>
           </v-col>
-          <v-col cols="12" class="mt-0 py-0" align="center" v-if="interestData.percentage !==null">
+          <v-col
+            cols="12"
+            class="mt-0 py-0"
+            align="center"
+            v-if="interestData.percentage !== null"
+          >
             <v-text-field
               :value="interestData.percentage"
               v-model="interestData.percentage"
-              :label="$tc('common.amount', 0) "
+              :label="$tc('common.amount', 0)"
               @change="$v.interestData.percentage.$touch()"
               @blur="$v.interestData.percentage.$touch()"
               :error-messages="percentageErrors"
@@ -53,7 +67,11 @@
         </v-row>
       </v-col>
     </v-row>
-    <configuration-modal @closeModal="closeModal" :dialog="dialog" :message="modalMessage" />
+    <configuration-modal
+      @closeModal="closeModal"
+      :dialog="dialog"
+      :message="modalMessage"
+    />
   </div>
 </template>
 <script>

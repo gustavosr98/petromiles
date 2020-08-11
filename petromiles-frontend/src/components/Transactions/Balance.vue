@@ -11,7 +11,11 @@
           <div class="mr-5">
             <v-icon color="secondary">sync_alt</v-icon>
           </div>
-          <balance-option :header="$t('user-balance.equivalent')" :value="dollars" type="$" />
+          <balance-option
+            :header="$t('user-balance.equivalent')"
+            :value="dollars"
+            type="$"
+          />
         </div>
       </v-col>
     </v-row>

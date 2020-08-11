@@ -11,9 +11,7 @@
 
           <!-- ADMINISTRATORS TAB -->
           <v-tab key="administrators">
-            {{
-            this.$tc("role.administrator", 1)
-            }}
+            {{ this.$tc("role.administrator", 1) }}
           </v-tab>
           <v-tab-item key="administrators">
             <administrators-table />

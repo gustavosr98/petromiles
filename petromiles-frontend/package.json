@@ -3,15 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "preserve": "npm run i18n:load",
     "serve": "vue-cli-service serve",
-    "prebuild": "npm run i18n:load",
     "build": "vue-cli-service build --mode production",
-    "serve:build": "live-server dist/",
+    "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'",
+    "cypress:open": "cypress open",
     "i18n:load": "node -r esm ./src/locales/load-i18n.js",
-    "cypress:open": "cypress open"
+    "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'",
+    "prebuild": "npm run i18n:load",
+    "preserve": "npm run i18n:load",
+    "serve:build": "live-server dist/"
   },
   "dependencies": {
     "@mdi/font": "^3.6.95",
@@ -48,9 +49,11 @@
     "@vue/cli-plugin-eslint": "~4.3.0",
     "@vue/cli-plugin-pwa": "~4.3.0",
     "@vue/cli-plugin-router": "~4.3.0",
+    "@vue/cli-plugin-unit-jest": "^4.5.2",
     "@vue/cli-plugin-vuex": "~4.3.0",
     "@vue/cli-service": "~4.3.0",
     "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/test-utils": "^1.0.3",
     "babel-eslint": "^10.1.0",
     "cypress": "^4.12.1",
     "eslint": "^6.7.2",

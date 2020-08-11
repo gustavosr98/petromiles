@@ -4,7 +4,10 @@
       <v-col cols="12" sm="6" md="9">
         <v-card class="elevation-12">
           <v-window>
-            <auth-window title="Recover your Password" msg="Forgot your password?">
+            <auth-window
+              title="Recover your Password"
+              msg="Forgot your password?"
+            >
               <recover-password
                 title="Write your email"
                 :showClientElement="true"

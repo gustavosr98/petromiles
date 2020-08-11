@@ -1,10 +1,9 @@
 <template>
   <div class="d-flex align-center justify-space-between font-weight-light">
-    <div class="text-capitalize">{{field}}</div>
-    <div :class="`font-weight-bold ${color}--text`">{{data }}</div>
+    <div class="text-capitalize">{{ field }}</div>
+    <div :class="`font-weight-bold ${color}--text`">{{ data }}</div>
   </div>
 </template>
-
 
 <script>
 export default {

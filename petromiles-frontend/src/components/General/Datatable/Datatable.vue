@@ -21,35 +21,59 @@
       <template #item.state="{item}">
         <v-tooltip bottom v-if="isAdmin">
           <template v-slot:activator="{ on, attrs }">
-            <v-chip outlined class="overline" :color="getColor(item.state.name)" label dark @click="changeUserState(item)" v-bind="attrs" v-on="on">
-              {{
-              item.state.translated
-              }}
+            <v-chip
+              outlined
+              class="overline"
+              :color="getColor(item.state.name)"
+              label
+              dark
+              @click="changeUserState(item)"
+              v-bind="attrs"
+              v-on="on"
+            >
+              {{ item.state.translated }}
             </v-chip>
           </template>
           <span>Click to Change State</span>
         </v-tooltip>
-        <v-chip v-else outlined class="overline" :color="getColor(item.state.name)" label dark>
-          {{
-          item.state.translated
-          }}
+        <v-chip
+          v-else
+          outlined
+          class="overline"
+          :color="getColor(item.state.name)"
+          label
+          dark
+        >
+          {{ item.state.translated }}
         </v-chip>
       </template>
       <template #item.bankAccountState="{item}">
         <v-tooltip bottom v-if="isAdmin">
           <template v-slot:activator="{ on, attrs }">
-            <v-chip outlined class="overline" :color="getColor(item.bankAccountState.name)" label dark @click="changeBankAccountState(item)" v-bind="attrs" v-on="on">
-              {{
-              item.bankAccountState.translated
-              }}
+            <v-chip
+              outlined
+              class="overline"
+              :color="getColor(item.bankAccountState.name)"
+              label
+              dark
+              @click="changeBankAccountState(item)"
+              v-bind="attrs"
+              v-on="on"
+            >
+              {{ item.bankAccountState.translated }}
             </v-chip>
           </template>
           <span>Click to Change State</span>
         </v-tooltip>
-        <v-chip v-else outlined class="overline" :color="getColor(item.bankAccountState.name)" label dark>
-          {{
-          item.bankAccountState.translated
-          }}
+        <v-chip
+          v-else
+          outlined
+          class="overline"
+          :color="getColor(item.bankAccountState.name)"
+          label
+          dark
+        >
+          {{ item.bankAccountState.translated }}
         </v-chip>
       </template>
       <template #item.details="{item}">
@@ -58,7 +82,9 @@
         </v-btn>
       </template>
       <template #item.cancel="{item}">
-        <v-icon @click="confirmDeleteAction(item.idBankAccount)">mdi-delete</v-icon>
+        <v-icon @click="confirmDeleteAction(item.idBankAccount)"
+          >mdi-delete</v-icon
+        >
       </template>
       <template #item.userDetails="{item}">
         <v-btn color="secondary" @click="seeUserDetails(item)" x-small>
@@ -83,7 +109,11 @@
       </v-dialog>
     </v-row>
 
-    <snackbar @close="closeSnackbar" :show="showSnackbar" :text="text"></snackbar>
+    <snackbar
+      @close="closeSnackbar"
+      :show="showSnackbar"
+      :text="text"
+    ></snackbar>
   </v-card>
 </template>
 
@@ -103,7 +133,7 @@ export default {
   components: {
     "transaction-information": TransactionInformation,
     "bank-account-details": BankAccountDetails,
-    "snackbar": Snackbar
+    snackbar: Snackbar,
   },
   props: {
     title: {
@@ -121,14 +151,14 @@ export default {
     linkTo: { type: String },
     tableName: { type: String },
     userType: {
-      default: auth.CLIENT
+      default: auth.CLIENT,
     },
     isAdmin: {
-      default: false
+      default: false,
     },
     clientID: {
-      default: 0
-    }
+      default: 0,
+    },
   },
   data() {
     return {
@@ -145,7 +175,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("auth", ["user"]),  
+    ...mapState("auth", ["user"]),
   },
   methods: {
     seeDetails(id) {
@@ -164,26 +194,25 @@ export default {
       this.details = false;
       this.$emit("deleteItem", id);
     },
-    seeUserDetails(user){      
-      this.$router.push({name: "AdminUsersDetail", params: {user: user}});
+    seeUserDetails(user) {
+      this.$router.push({ name: "AdminUsersDetail", params: { user: user } });
     },
-    
-    async changeUserState(item){
-      if(this.user.email !== item.email){
-        this.$emit('updateUserState', item);        
-      }   
-      else {
+
+    async changeUserState(item) {
+      if (this.user.email !== item.email) {
+        this.$emit("updateUserState", item);
+      } else {
         this.text = "You cannot block yourself.";
         this.showSnackbar = true;
-      }   
+      }
     },
-    changeBankAccountState(item){      
-      this.$emit('updateBankAccountState', item);
+    changeBankAccountState(item) {
+      this.$emit("updateBankAccountState", item);
     },
-    closeSnackbar(){
+    closeSnackbar() {
       this.showSnackbar = false;
     },
-  },  
+  },
   watch: {
     details: function() {
       if (!this.details) this.elementDetails = "";

@@ -29,7 +29,7 @@ export const mutations = {
       JSON.stringify(state.user)
     );
   },
-  updateProfileImage(state, imageURL){
+  updateProfileImage(state, imageURL) {
     state.user.details.photo = imageURL;
 
     localStorage.setItem(
@@ -37,7 +37,7 @@ export const mutations = {
       JSON.stringify(state.user)
     );
   },
-  updateUserData(state, userData){
+  updateUserData(state, userData) {
     state.user.details = userData;
 
     localStorage.setItem(
@@ -98,37 +98,41 @@ export const actions = {
     await httpClient.patch("user/language", { language: language.bdName });
     commit("changeLang", language);
   },
-  async updateProfileImage({ commit }, imageURL){
-    await httpClient.put("user/update-details", { photo : imageURL, role: authConstants.CLIENT.toLowerCase() });
+  async updateProfileImage({ commit }, imageURL) {
+    await httpClient.put("user/update-details", {
+      photo: imageURL,
+      role: authConstants.CLIENT.toLowerCase(),
+    });
     commit("updateProfileImage", imageURL);
   },
-  async changePassword({ commit }, passwords){
+  async changePassword({ commit }, passwords) {
     await httpClient.put("user/update-password", {
       currentPassword: passwords.currentPassword,
-      password: passwords.newPassword
-    });    
+      password: passwords.newPassword,
+    });
   },
-  async updateUserData({ commit }, payload){           
-    const data = JSON.parse(JSON.stringify(payload));        
-    if(data.user.details.birthdate !== null){
-      data.user.details.birthdate = data.user.details.birthdate.replace("-", "/").replace("-", "/");
-    }       
+  async updateUserData({ commit }, payload) {
+    const data = JSON.parse(JSON.stringify(payload));
+    if (data.user.details.birthdate !== null) {
+      data.user.details.birthdate = data.user.details.birthdate
+        .replace("-", "/")
+        .replace("-", "/");
+    }
     let saveUserURL = ``;
     let userRole = authConstants.CLIENT.toLowerCase();
-    if(!data.isAdmin){
+    if (!data.isAdmin) {
       saveUserURL = `user/update-details`;
-    }
-    else {
+    } else {
       saveUserURL = `user/update-details?id=${data.user.id}`;
-    }    
+    }
     await httpClient.put(`${saveUserURL}`, {
       role: userRole,
-      ...data.user.details
+      ...data.user.details,
     });
-    if(!data.isAdmin){
+    if (!data.isAdmin) {
       commit("updateUserData", payload.user.details);
     }
-  }
+  },
 };
 
 export const getters = {

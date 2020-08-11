@@ -121,7 +121,7 @@ const clientRoutesRaw = Object.freeze({
     meta: {
       requiresClientAuth: true,
     },
-  }, 
+  },
   SUSCRIPTION_PURCHASE: {
     path: "/user-subscription-purchase",
     name: "UserSubscriptionPurchase",
@@ -132,7 +132,7 @@ const clientRoutesRaw = Object.freeze({
     meta: {
       requiresClientAuth: true,
     },
-  },  
+  },
 });
 
 // To be used in Vue Router

@@ -20,17 +20,19 @@
     >
       <template #item.date="{item}">
         <v-chip outlined class="overline" label @click="seeDetails(item.id)">
-          {{
-          item.date
-          }}
+          {{ item.date }}
         </v-chip>
       </template>
 
       <template #item.state="{value}">
-        <v-chip outlined class="overline" :color="getColor(value.name)" label dark>
-          {{
-          value.translated
-          }}
+        <v-chip
+          outlined
+          class="overline"
+          :color="getColor(value.name)"
+          label
+          dark
+        >
+          {{ value.translated }}
         </v-chip>
       </template>
       <template #item.details="{item}">
@@ -39,7 +41,9 @@
         </v-btn>
       </template>
       <template #item.cancel="{item}">
-        <v-icon @click="confirmDeleteAction(item.idBankAccount)">mdi-delete</v-icon>
+        <v-icon @click="confirmDeleteAction(item.idBankAccount)"
+          >mdi-delete</v-icon
+        >
       </template>
     </v-data-table>
 

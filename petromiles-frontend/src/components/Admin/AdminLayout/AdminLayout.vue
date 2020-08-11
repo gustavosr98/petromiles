@@ -26,7 +26,7 @@ export default {
           name: "navbar.user",
           mdiIcon: "mdi-account-multiple",
           route: adminRoutes.USER_LIST,
-        },        
+        },
         {
           name: "navbar.transaction",
           mdiIcon: "mdi-repeat",

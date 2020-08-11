@@ -3,7 +3,11 @@
     <!-- Horizontal App Bar  -->
 
     <v-app-bar app class="app-bar" color="primary">
-      <v-app-bar-nav-icon class="nav-btn" @click="drawer = true" color="white"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        class="nav-btn"
+        @click="drawer = true"
+        color="white"
+      ></v-app-bar-nav-icon>
       <v-toolbar-title>PetroMiles</v-toolbar-title>
       <v-spacer></v-spacer>
       <div class="text-center" v-if="!isAdmin">
@@ -31,7 +35,9 @@
                 <v-icon v-text="navModule.mdiIcon"></v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="$tc(navModule.name)"></v-list-item-title>
+                <v-list-item-title
+                  v-text="$tc(navModule.name)"
+                ></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>

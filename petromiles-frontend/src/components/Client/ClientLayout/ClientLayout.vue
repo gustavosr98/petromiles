@@ -47,12 +47,12 @@ export default {
           name: "navbar.subscriptions",
           mdiIcon: "mdi-arrow-up-bold-circle-outline",
           route: clientRoutes.SUBSCRIPTION,
-        },        
+        },
         {
           name: "navbar.profile",
           mdiIcon: "mdi-account-circle",
           route: clientRoutes.PROFILE,
-        },        
+        },
       ],
     };
   },

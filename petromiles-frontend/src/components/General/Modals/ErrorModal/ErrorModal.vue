@@ -1,21 +1,22 @@
 <template>
   <v-row justify="center">
-    <v-dialog :value="!!errorMessage" class="error-modal" persistent width="300px">
+    <v-dialog
+      :value="!!errorMessage"
+      class="error-modal"
+      persistent
+      width="300px"
+    >
       <v-card>
         <v-card-title class="headline">
           <v-icon color="red" size="50">mdi-alert</v-icon>
         </v-card-title>
         <v-card-text class="mt-2">
-          {{
-          $t(errorMessage)
-          }}
+          {{ $t(errorMessage) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn @click="clearLastError">
-            {{
-            $t("common.ok")
-            }}
+            {{ $t("common.ok") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -37,5 +38,3 @@ export default {
   },
 };
 </script>
-
-

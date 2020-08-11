@@ -7,7 +7,7 @@
 <script>
 import ClientLayout from "@/components/Client/ClientLayout/ClientLayout";
 import SubscriptionPurchase from "@/components/Users/Subscriptions/Purchase/SubscriptionPurchase";
-                                    
+
 export default {
   name: "client-profile",
   components: {

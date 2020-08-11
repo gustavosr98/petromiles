@@ -19,7 +19,10 @@
               v-on="on"
             ></v-text-field>
           </template>
-          <v-date-picker v-model="initialDate" @input="filterData()"></v-date-picker>
+          <v-date-picker
+            v-model="initialDate"
+            @input="filterData()"
+          ></v-date-picker>
         </v-menu>
       </v-col>
       <v-col cols="12" sm="2" class="py-0 px-1" height="100">
@@ -40,16 +43,17 @@
               v-on="on"
             ></v-text-field>
           </template>
-          <v-date-picker v-model="finalDate" @input="filterData()"></v-date-picker>
+          <v-date-picker
+            v-model="finalDate"
+            @input="filterData()"
+          ></v-date-picker>
         </v-menu>
         <v-spacer></v-spacer>
       </v-col>
       <v-col cols="12" sm="2" class="py-0 px-1 ml-7" height="100">
-        <v-btn
-          color="primary lighten-4"
-          depressed
-          @click="resetDates"
-        >{{ $t("transactions-filter.resetDates") }}</v-btn>
+        <v-btn color="primary lighten-4" depressed @click="resetDates">{{
+          $t("transactions-filter.resetDates")
+        }}</v-btn>
       </v-col>
     </v-row>
   </div>

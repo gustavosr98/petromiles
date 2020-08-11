@@ -1,4 +1,4 @@
 export default Object.freeze({
-    PREMIUM: "premium",
-    GOLD: "gold",
+  PREMIUM: "premium",
+  GOLD: "gold",
 });

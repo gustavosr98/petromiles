@@ -15,14 +15,14 @@ export default {
     "user-detail-wrapper": UserDetailWrapper,
   },
   props: {
-    user:{
-      default: null
+    user: {
+      default: null,
+    },
+  },
+  mounted() {
+    if (!this.user) {
+      this.$router.push({ name: "AdminUserList" });
     }
   },
-  mounted(){
-    if(!this.user){
-      this.$router.push({name: "AdminUserList"});
-    }
-  }
 };
 </script>

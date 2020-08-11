@@ -2,15 +2,11 @@
   <v-dialog v-model="dialog" persistent max-width="400">
     <v-card>
       <v-card-title class="title">
-        {{
-        $t("bank-account-validation.verifyYourBankAccount")
-        }}
+        {{ $t("bank-account-validation.verifyYourBankAccount") }}
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text class="mt-2">
-        {{
-        $t("bank-account-validation.verifyBankAccountMessage")
-        }}
+        {{ $t("bank-account-validation.verifyBankAccountMessage") }}
       </v-card-text>
       <v-container>
         <v-row justify="center" align="center" class="mx-3">
@@ -44,16 +40,15 @@
         <v-spacer></v-spacer>
 
         <v-btn color="primary darken-1" text @click="closeModal">
-          {{
-          $t("common.cancel")
-          }}
+          {{ $t("common.cancel") }}
         </v-btn>
         <v-btn
           color="primary darken-1"
           text
           @click="validateBankAccount"
           :loading="loading"
-        >{{ $t("bank-account-validation.validateButton") }}</v-btn>
+          >{{ $t("bank-account-validation.validateButton") }}</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>

@@ -39,9 +39,9 @@ export default {
       },
     };
   },
-   computed: {
-      chartData() {
-        return {
+  computed: {
+    chartData() {
+      return {
         hoverBackgroundColor: "red",
         hoverBorderWidth: 10,
         labels: [

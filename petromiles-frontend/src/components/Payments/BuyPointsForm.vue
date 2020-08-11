@@ -6,12 +6,21 @@
         <v-row justify="center" align="center">
           <!-- Phrase -->
           <v-col cols="12">
-            <h3 class="text-center">{{ $t("buy-points-form.letsEarnPoints") }}</h3>
+            <h3 class="text-center">
+              {{ $t("buy-points-form.letsEarnPoints") }}
+            </h3>
           </v-col>
 
           <!-- Image -->
 
-          <v-col xs="10" sm="10" md="4" justify="center" align="center" class="pt-lg-12">
+          <v-col
+            xs="10"
+            sm="10"
+            md="4"
+            justify="center"
+            align="center"
+            class="pt-lg-12"
+          >
             <v-img :src="piggyImage" alt="Piggy coins savings" />
           </v-col>
 
@@ -46,7 +55,10 @@
                     ></v-text-field>
                   </v-col>
                 </v-row>
-                <v-row justify="center" v-if="this.subscription.name !== 'BASIC'">
+                <v-row
+                  justify="center"
+                  v-if="this.subscription.name !== 'BASIC'"
+                >
                   <v-col cols="8" xs="8" md="4">
                     <v-text-field
                       :value="extraPoints"
@@ -97,7 +109,8 @@
                       class="primary submit-btn"
                       :loading="loading"
                       dark
-                    >{{ $t("buy-points-form.getPoints") }}</v-btn>
+                      >{{ $t("buy-points-form.getPoints") }}</v-btn
+                    >
                   </v-col>
                 </v-row>
               </v-form>
@@ -107,24 +120,28 @@
 
         <!-- Final Dialog -->
         <v-row justify="center">
-          <v-dialog v-model="dialog" persistent max-width="50%" class="confirm-dialog">
+          <v-dialog
+            v-model="dialog"
+            persistent
+            max-width="50%"
+            class="confirm-dialog"
+          >
             <v-card>
               <v-card-title class="headline">
-                {{
-                $t("buy-points-form.thanksForBuying")
-                }}
+                {{ $t("buy-points-form.thanksForBuying") }}
               </v-card-title>
               <v-card-text>
-                {{
-                $t("buy-points-form.transactionToValidate")
-                }}
+                {{ $t("buy-points-form.transactionToValidate") }}
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" dark :to="{ name: comeBackRoute }" class="ok-btn">
-                  {{
-                  $t("common.ok")
-                  }}
+                <v-btn
+                  color="secondary"
+                  dark
+                  :to="{ name: comeBackRoute }"
+                  class="ok-btn"
+                >
+                  {{ $t("common.ok") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -136,21 +153,20 @@
           <v-dialog v-model="areYouSureDialog" persistent max-width="50%">
             <v-card>
               <v-card-title class="headline">
-                {{
-                $t("common.areYouSure")
-                }}
+                {{ $t("common.areYouSure") }}
               </v-card-title>
               <v-card-actions>
                 <v-spacer />
                 <v-btn color="error" dark @click="areYouSureDialog = false">
-                  {{
-                  $t("common.cancel")
-                  }}
+                  {{ $t("common.cancel") }}
                 </v-btn>
-                <v-btn color="success" dark @click="buyPoints" class="confirm-btn">
-                  {{
-                  $t("common.yes")
-                  }}
+                <v-btn
+                  color="success"
+                  dark
+                  @click="buyPoints"
+                  class="confirm-btn"
+                >
+                  {{ $t("common.yes") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -187,7 +203,7 @@ export default {
     "payments-invoice": PaymentInvoice,
     "loading-screen": LoadingScreen,
   },
-  data: function () {
+  data: function() {
     return {
       piggyImage: piggyImage,
       formValidity: false,
@@ -217,7 +233,7 @@ export default {
     costWithInterests() {
       if (this.points) {
         let result = this.rawCost;
-        this.interests.map((i) => {
+        this.interests.map(i => {
           result = result + this.rawCost * i.percentage + i.amount / 100;
         });
         return Math.round(result * 10000) / 10000;
@@ -280,11 +296,11 @@ export default {
           subscriptionName: this.subscription.name.toLowerCase(),
           infoSubscription: this.infoSubscription,
         })
-        .then((res) => {
+        .then(res => {
           this.transaction = res;
           this.paymentIsReady = true;
         })
-        .catch((err) => {
+        .catch(err => {
           this.loading = false;
         });
     },

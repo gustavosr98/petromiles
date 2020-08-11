@@ -37,7 +37,11 @@
       <update-btn @update="update" :loading="loading" />
     </v-row>
 
-    <configuration-modal @closeModal="closeModal" :dialog="dialog" :message="modalMessage" />
+    <configuration-modal
+      @closeModal="closeModal"
+      :dialog="dialog"
+      :message="modalMessage"
+    />
   </div>
 </template>
 <script>

@@ -4,8 +4,8 @@
       <alert>
         <template>
           <v-col cols="12">
-            <h3>{{$t('dashboard.notTransactions')}}</h3>
-            <p class="mt-1">{{$t('dashboard.notTransactionsMessage')}}</p>
+            <h3>{{ $t("dashboard.notTransactions") }}</h3>
+            <p class="mt-1">{{ $t("dashboard.notTransactionsMessage") }}</p>
           </v-col>
         </template>
       </alert>

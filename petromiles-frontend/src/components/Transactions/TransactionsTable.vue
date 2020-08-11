@@ -25,7 +25,7 @@ export default {
   props: {
     url: { type: String, required: true },
     transactionsData: { default: null },
-    isAdmin: { default: false }
+    isAdmin: { default: false },
   },
   components: {
     Datatable,
@@ -41,7 +41,7 @@ export default {
     };
   },
   async mounted() {
-    await this.loadData();    
+    await this.loadData();
   },
 
   watch: {
@@ -96,14 +96,13 @@ export default {
 
       return headers;
     },
-    async loadData() {      
-      if(!this.isAdmin){
-        this.fetchedData = await this.$http.get(this.url).finally(() => {          
-          this.showLoadingScreen = false;          
+    async loadData() {
+      if (!this.isAdmin) {
+        this.fetchedData = await this.$http.get(this.url).finally(() => {
+          this.showLoadingScreen = false;
         });
-      }
-      else {
-        this.fetchedData = this.transactionsData;        
+      } else {
+        this.fetchedData = this.transactionsData;
       }
       this.showLoadingScreen = false;
       this.transactions = this.fetchedData.sort((a, b) => {
@@ -114,7 +113,7 @@ export default {
           return -1;
         }
         return 0;
-      });           
+      });
     },
   },
   computed: {

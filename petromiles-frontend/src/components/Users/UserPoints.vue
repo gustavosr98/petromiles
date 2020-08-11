@@ -2,9 +2,9 @@
   <div class="text-center">
     <v-col cols="12">
       <h3>{{ $t("profile.PointsAvailable") }}</h3>
-      <h1 class="pointsText">{{conversion.points}}</h1>
+      <h1 class="pointsText">{{ conversion.points }}</h1>
       <h3>{{ $t("profile.PointsInDollars") }}</h3>
-      <h1 class="dolarsText">${{dollars}}</h1>
+      <h1 class="dolarsText">${{ dollars }}</h1>
     </v-col>
   </div>
 </template>

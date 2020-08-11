@@ -3,9 +3,15 @@
     <v-row justify="center" class="mx-5">
       <v-col cols="12" md="4" aling="center">
         <v-card class="elevation-0">
-          <h3 class="font-weight-bold">{{ $t("configuration.configurationTitle") }}</h3>
+          <h3 class="font-weight-bold">
+            {{ $t("configuration.configurationTitle") }}
+          </h3>
           <v-col justify="center" align="center" class="mt-8">
-            <v-img :src="platformConfigImg" width="80%" alt="Platform configuration" />
+            <v-img
+              :src="platformConfigImg"
+              width="80%"
+              alt="Platform configuration"
+            />
           </v-col>
         </v-card>
       </v-col>
@@ -30,10 +36,22 @@
                 :labels="subscriptionInterestLabels"
                 v-if="i === 1"
               />
-              <subscription-conditionals :subscriptions="subscriptions" v-if="i === 2" />
-              <points-conversion-config :pointsConversion="pointsConversion" v-if="i === 3" />
-              <third-party-interest-config :thirdPartyInterest="thirdPartyInterest" v-if="i === 4" />
-              <cron-frenquency-config :frequencies="frequencies" v-if="i === 5" />
+              <subscription-conditionals
+                :subscriptions="subscriptions"
+                v-if="i === 2"
+              />
+              <points-conversion-config
+                :pointsConversion="pointsConversion"
+                v-if="i === 3"
+              />
+              <third-party-interest-config
+                :thirdPartyInterest="thirdPartyInterest"
+                v-if="i === 4"
+              />
+              <cron-frenquency-config
+                :frequencies="frequencies"
+                v-if="i === 5"
+              />
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>

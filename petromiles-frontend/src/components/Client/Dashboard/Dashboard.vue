@@ -17,7 +17,10 @@
           </v-col>
           <v-col cols="11" sm="4" lg="3" xs="6">
             <div class="mx-1">
-              <AddPointsChart v-if="statistics" :addPointsData="addPointsData" />
+              <AddPointsChart
+                v-if="statistics"
+                :addPointsData="addPointsData"
+              />
             </div>
           </v-col>
           <v-col cols="11" sm="4" lg="3" xs="6">
@@ -113,13 +116,15 @@ export default {
   },
   methods: {
     async loadStatistics() {
-      this.statistics = await this.$http.get("management/statistics").finally(() => {
-        this.showLoadingScreen = false;
-      });
+      this.statistics = await this.$http
+        .get("management/statistics")
+        .finally(() => {
+          this.showLoadingScreen = false;
+        });
       this.addPointsTransactions = this.statistics.transactions.addPoints;
       this.exchangeTransactions = this.statistics.transactions.exchangePoints;
       this.thirdPartyTransactions = this.statistics.transactions.thirdPartyClient;
-      this.clientBankAccounts = this.statistics.clientBankAccounts;      
+      this.clientBankAccounts = this.statistics.clientBankAccounts;
     },
   },
   computed: {

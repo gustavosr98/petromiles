@@ -54,7 +54,7 @@ export default {
       this.$store.commit("bankAccount/SET_BANK_ACCOUNTS", this.fetchedData);
     } else {
       this.fetchedData = this.bankAccounts;
-    }    
+    }
     this.showLoadingScreen = false;
   },
   computed: {
@@ -137,15 +137,17 @@ export default {
         state = states.ACTIVE.name;
         stateTranslated = states.ACTIVE.name;
       }
-      await this.$http.put(`bank-account/state`, {
-        idUserClient: item.clientBankAccount[0].userClient.idUserClient,
-        idBankAccount: item.idBankAccount,
-        state: state,
-      }).finally(() => {
-        this.showLoadingScreen = false;
-      });
+      await this.$http
+        .put(`bank-account/state`, {
+          idUserClient: item.clientBankAccount[0].userClient.idUserClient,
+          idBankAccount: item.idBankAccount,
+          state: state,
+        })
+        .finally(() => {
+          this.showLoadingScreen = false;
+        });
       item.bankAccountState.name = state;
-      item.bankAccountState.translated = stateTranslated;      
+      item.bankAccountState.translated = stateTranslated;
     },
   },
 };

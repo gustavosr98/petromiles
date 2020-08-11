@@ -40,8 +40,8 @@ export default {
     };
   },
   computed: {
-      chartData() {
-        return {
+    chartData() {
+      return {
         hoverBackgroundColor: "red",
         hoverBorderWidth: 10,
         labels: [
