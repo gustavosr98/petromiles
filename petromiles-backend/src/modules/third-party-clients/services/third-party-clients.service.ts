@@ -147,7 +147,7 @@ export class ThirdPartyClientsService {
     thirdPartyClientName: string,
     code: string,
   ): Promise<MailsResponse> {
-    const userDetails = userClient.userDetails.find(
+    const userDetails = await userClient.userDetails.find(
       details => details.accountOwner === null,
     );
     const language = userDetails.language.name;
@@ -745,7 +745,7 @@ export class ThirdPartyClientsService {
       email: userEmail,
     });
 
-    const userDetails = userClient.userDetails.find(
+    const userDetails = await userClient.userDetails.find(
       details => details.accountOwner === null,
     );
     const language = userDetails.language.name;
