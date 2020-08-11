@@ -10,7 +10,7 @@ branches:
 jobs:
   include:
     # DEVELOP
-    - stage: Backend (STAGING)
+    - name: Backend (STAGING)
       if: branch = develop
       install:
         - cd petromiles-backend
@@ -28,7 +28,7 @@ jobs:
           repo: gustavosr98/petromiles
           branch: develop
 
-    - stage: Frontend (STAGING)
+    - name: Frontend (STAGING)
       if: branch = develop
       install:
         - cd petromiles-frontend
@@ -46,7 +46,7 @@ jobs:
           branch: develop
 
     # MASTER
-    - stage: Backend (PEPRO)
+    - name: Backend (PEPRO)
       if: branch = master
       install:
         - cd petromiles-backend
@@ -64,8 +64,8 @@ jobs:
           repo: gustavosr98/petromiles
           branch: master
 
-    - stage: Frontend (PEPRO)
-      if: branch = develop
+    - name: Frontend (PEPRO)
+      if: branch = master
       install:
         - cd petromiles-frontend
         - npm install
