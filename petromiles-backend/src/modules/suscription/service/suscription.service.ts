@@ -46,8 +46,6 @@ import { ThirdPartyInterestService } from '@/modules/management/services/third-p
 export class SuscriptionService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    @InjectRepository(UserClient)
-    private userClientRepository: Repository<UserClient>,
     @InjectRepository(Suscription)
     private suscriptionRepository: Repository<Suscription>,
     @InjectRepository(PlatformInterestEntity)
