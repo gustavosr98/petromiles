@@ -74,6 +74,7 @@
                   dark
                   small
                   @click="startValidation(account)"
+                  class="verify-btn"
                 >{{ $t("bank-account-validation.verify") }}</v-btn>
               </v-list-item-action>
             </v-list-item>
@@ -132,7 +133,7 @@ export default {
   mounted() {
     // Build an array with the bank accounts available to validate
     if (this.bankAccounts) {
-      this.bankAccounts.map(bankAccount => {
+      this.bankAccounts.map((bankAccount) => {
         const state =
           bankAccount.clientBankAccount[0].stateBankAccount[0].state.name;
         if (state === states.VERIFYING.name) {

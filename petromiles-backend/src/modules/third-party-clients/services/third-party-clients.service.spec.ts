@@ -350,15 +350,18 @@ describe('ThirdPartyClientsService', () => {
           expectedUserClient = {
             idUserClient: 1,
             email: associateUserCodeRequest.userEmail,
-            userDetails: {
-              firstName: 'Pedro',
-              lastName: 'Perez',
-              language: {
-                idLanguage: 1,
-                name: 'english',
-                shortname: 'en',
+            userDetails: [
+              {
+                firstName: 'Pedro',
+                lastName: 'Perez',
+                accountOwner: null,
+                language: {
+                  idLanguage: 1,
+                  name: 'english',
+                  shortname: 'en',
+                },
               },
-            },
+            ],
           };
           expectedClientOnThirdParty = {
             idClientOnThirdParty: 1,
@@ -471,15 +474,18 @@ describe('ThirdPartyClientsService', () => {
           expectedUserClient = {
             idUserClient: 1,
             email: associateUserCodeRequest.userEmail,
-            userDetails: {
-              firstName: 'Pedro',
-              lastName: 'Perez',
-              language: {
-                idLanguage: 1,
-                name: 'english',
-                shortname: 'en',
+            userDetails: [
+              {
+                firstName: 'Pedro',
+                lastName: 'Perez',
+                accountOwner: null,
+                language: {
+                  idLanguage: 1,
+                  name: 'english',
+                  shortname: 'en',
+                },
               },
-            },
+            ],
           };
           expectedClientOnThirdParty = {
             idClientOnThirdParty: 1,

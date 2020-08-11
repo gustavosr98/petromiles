@@ -70,10 +70,13 @@ describe('PaymentProviderService', () => {
         beforeEach(async () => {
           userClient = {
             email: 'prueba@gmail.com',
-            userDetails: {
-              customerId: 'prueba',
-              accountId: 'prueba',
-            },
+            userDetails: [
+              {
+                customerId: 'prueba',
+                accountId: 'prueba',
+                accountOwner: null,
+              },
+            ],
           };
           bankAccountCreateParams = {
             userDetails: {
@@ -109,6 +112,7 @@ describe('PaymentProviderService', () => {
           (stripeService.createBankAccountByToken as jest.Mock).mockResolvedValue(
             expectedBankAccountToken,
           );
+
           (stripeService.asociateBankToCustomer as jest.Mock).mockResolvedValue(
             expectedBankAccountSource,
           );
@@ -134,7 +138,7 @@ describe('PaymentProviderService', () => {
         it('should invoke stripeService.asociateBankToCustomer()', () => {
           expect(stripeService.asociateBankToCustomer).toHaveBeenCalledTimes(1);
           expect(stripeService.asociateBankToCustomer).toHaveBeenCalledWith(
-            userClient.userDetails.customerId,
+            userClient.userDetails[0].customerId,
             expectedBankAccountToken.id,
           );
         });
@@ -146,7 +150,7 @@ describe('PaymentProviderService', () => {
           expect(
             stripeService.asociateBankAccountToAccount,
           ).toHaveBeenCalledWith(
-            userClient.userDetails.accountId,
+            userClient.userDetails[0].accountId,
             expectedBankAccountToken.id,
           );
         });

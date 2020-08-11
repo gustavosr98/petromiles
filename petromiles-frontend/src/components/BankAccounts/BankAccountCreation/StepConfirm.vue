@@ -3,7 +3,13 @@
     <!-- Showing success message-->
     <template>
       <v-col cols="12" md="10">
-        <v-alert icon="mdi-clock-fast" prominent text type="success">
+        <v-alert
+          icon="mdi-clock-fast"
+          prominent
+          text
+          type="success"
+          class="bank-account-creation-msg"
+        >
           {{ this.$tc(
           "bank-account-creation.bankAccountCreationSuccessMessage"
           ), }}

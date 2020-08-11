@@ -150,8 +150,8 @@
                           :error-messages="selectedBankAccountErrors"
                           :loading="loadingBankAccounts"
                           :disabled="
-                            loadingBankAccounts || loading || isPremium
-                          "
+                            loadingBankAccounts || loading || isPremium"
+                            class="accounts-selector"
                         >
                           <template
                             slot="selection"
@@ -168,7 +168,7 @@
                   <v-row align="center" justify="center">
                     <v-col cols="4" sm="2" md="4" lg="4">
                       <v-btn
-                        class="mb-3"
+                        class="mb-3 submit-btn"
                         dark
                         color="primary"
                         @click="submitButton"
@@ -237,7 +237,7 @@
                 <v-card-text>{{ $t("subscription.transactionValidateSubscription") }}</v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="secondary" dark :to="{ name: comeBackRoute }">{{ $t("common.ok") }}</v-btn>
+                  <v-btn color="secondary" dark :to="{ name: comeBackRoute }" data-cy="pay-sub-btn">{{ $t("common.ok") }}</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -255,7 +255,7 @@
                     dark
                     @click="areYouSureDialog = false"
                   >{{ $t("common.cancel") }}</v-btn>
-                  <v-btn color="success" dark @click="paySubscription">{{ $t("common.yes") }}</v-btn>
+                  <v-btn color="success" dark @click="paySubscription" data-cy="confirm-btn">{{ $t("common.yes") }}</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>

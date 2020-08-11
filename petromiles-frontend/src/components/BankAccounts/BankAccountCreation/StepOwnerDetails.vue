@@ -2,7 +2,9 @@
   <v-stepper-content :step="step">
     <!-- Subtitle -->
     <v-row justify="center">
-      <header class="font-weight-light">{{ $t("bank-account-creation.ownerDetailsFormTitle") }}</header>
+      <header class="font-weight-light">
+        {{ $t("bank-account-creation.ownerDetailsFormTitle") }}
+      </header>
     </v-row>
 
     <!-- Form for owner of the account -->
@@ -43,6 +45,7 @@
           @change="$v.phone.$touch()"
           @blur="$v.phone.$touch()"
           :error-messages="phoneError"
+          class="phone-input"
         ></v-text-field>
       </v-col>
       <v-col cols="12" md="5">
@@ -60,10 +63,8 @@
 
     <!-- Actions -->
     <v-row justify="end" class="ma-1 mt-8">
-      <v-btn color="primary" @click="nextStep()">
-        {{
-        $t("bank-account-creation-form.continueButton")
-        }}
+      <v-btn color="primary" @click="nextStep()" class="next-btn">
+        {{ $t("bank-account-creation-form.continueButton") }}
       </v-btn>
     </v-row>
   </v-stepper-content>

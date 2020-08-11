@@ -21,7 +21,7 @@
         </v-row>
         <v-row align="center" justify="center">
           <router-link to="/user-subscription" class="text-decoration-none">
-            <v-btn large dark color="primary" class="my-4 mb-6">
+            <v-btn large dark color="primary" class="my-4 mb-6 subscriptions-btn">
               <b> {{ $t("subscription.premiumBtn") }} </b>
             </v-btn>
           </router-link>

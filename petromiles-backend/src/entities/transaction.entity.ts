@@ -20,6 +20,7 @@ import { PointsConversion } from '@/entities/points-conversion.entity';
 import { TransactionType } from '@/enums/transaction.enum';
 import { ClientOnThirdParty } from '@/entities/client-on-third-party.entity';
 import { PlatformInterest } from '@/enums/platform-interest.enum';
+import { validateEmail } from '@/utils/validateEmail';
 
 @Entity()
 export class Transaction extends BaseEntity {
@@ -136,7 +137,9 @@ export class Transaction extends BaseEntity {
       type: this.type,
       bankAccount,
       bankAccountNickname,
-      clientBankAccountEmail,
+      clientBankAccountEmail: validateEmail(clientBankAccountEmail)
+        ? clientBankAccountEmail
+        : 'Deleted account',
       thirdPartyClient: this.clientOnThirdParty
         ? this.clientOnThirdParty.thirdPartyClient.name
         : null,

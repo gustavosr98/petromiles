@@ -12,7 +12,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="clearLastError">
+          <v-btn @click="clearLastError" data-cy="error-btn">
             {{
             $t("common.ok")
             }}

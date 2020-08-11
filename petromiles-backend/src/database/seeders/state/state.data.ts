@@ -38,4 +38,9 @@ export const STATES = [
     description:
       'This state indicates that the transaction has not been made successful',
   },
+  {
+    idState: 7,
+    name: StateName.DELETED,
+    description: 'This state indicates that the object has been deleted',
+  },
 ];
