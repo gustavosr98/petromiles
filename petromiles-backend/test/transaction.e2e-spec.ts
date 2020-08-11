@@ -31,7 +31,6 @@ describe('Transaction', () => {
 
   afterEach(async () => {
     await app.close();
-    await new Promise(resolve => setTimeout(() => resolve(), 500));
   });
 
   describe(`GET ${baseEndpoint}/:idTransaction`, () => {
