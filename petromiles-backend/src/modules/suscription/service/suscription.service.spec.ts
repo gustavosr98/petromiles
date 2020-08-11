@@ -10,7 +10,7 @@ import { StateTransaction } from '@/entities/state-transaction.entity';
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
 import { SuscriptionService } from '@/modules/suscription/service/suscription.service';
@@ -62,6 +62,8 @@ describe('SuscriptionService', () => {
   let thirdPartyInterestService: ThirdPartyInterestService;
   let save: jest.Mock;
   let getRawOne: jest.Mock;
+  let getOne: jest.Mock;
+  let execute: jest.Mock;
 
   beforeEach(() => {
     let select = jest.fn().mockReturnThis();
@@ -69,9 +71,13 @@ describe('SuscriptionService', () => {
     let where = jest.fn().mockReturnThis();
     let andWhere = jest.fn().mockReturnThis();
     let innerJoin = jest.fn().mockReturnThis();
+    let update = jest.fn().mockReturnThis();
+    let set = jest.fn().mockReturnThis();
     let create = jest.fn().mockReturnThis();
     save = jest.fn().mockReturnThis();
     getRawOne = jest.fn().mockReturnThis();
+    getOne = jest.fn().mockReturnThis();
+    execute = jest.fn().mockReturnThis();
     RepositoryMock = jest.fn(() => ({
       find: jest.fn(),
       findOne: jest.fn(),
@@ -85,7 +91,11 @@ describe('SuscriptionService', () => {
         where,
         andWhere,
         innerJoin,
+        update,
+        set,
         getRawOne,
+        getOne,
+        execute,
       })),
     }));
     UserClientServiceMock = jest.fn<
@@ -1083,7 +1093,6 @@ describe('SuscriptionService', () => {
     let msg;
     let languageMails;
     let extraPoints;
-    let template;
     let subject;
 
     describe('case: success', () => {
@@ -1119,7 +1128,6 @@ describe('SuscriptionService', () => {
           extraPoints =
             parseFloat(expectedPlatformInterest.amount) /
             (100 * expectedOnePointToDollars.onePointEqualsDollars);
-          template = `upgradeToGold[${languageMails}]`;
           subject = MailsSubjets.upgrade_to_gold[languageMails];
           msg = {
             to: userClient.email,
@@ -1228,6 +1236,210 @@ describe('SuscriptionService', () => {
         it('should invoke userClientService.get()', () => {
           expect(userClientService.get).toHaveBeenCalledTimes(1);
           expect(userClientService.get).toHaveBeenCalledWith({ idUserClient });
+        });
+      });
+    });
+  });
+
+  describe('getActualSubscription(id)', () => {
+    let result;
+    let expectedSuscription;
+    let id;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          id = 1;
+
+          expectedSuscription = {
+            idSuscription: 1,
+            name: 'basic',
+            cost: 0,
+          };
+
+          getOne.mockResolvedValue(expectedSuscription);
+
+          result = await suscriptionService.getActualSubscription(id);
+        });
+        it('should invoke suscriptionRepository.createQueryBuilder()', () => {
+          expect(getOne).toHaveBeenCalledTimes(1);
+        });
+        it('should return actual suscription', () => {
+          expect(result).toStrictEqual(expectedSuscription);
+        });
+      });
+    });
+  });
+
+  describe('getSubscriptionPercentage(subscription)', () => {
+    let result;
+    let expectedResult;
+    let subscription;
+    let expectedPlatformInterest;
+    let expectedAmount;
+
+    describe('case: success', () => {
+      describe('when the suscription is gold', () => {
+        beforeEach(async () => {
+          subscription = 'gold';
+          expectedPlatformInterest = {
+            amount: 0,
+            percentage: 0.2,
+            points: 100,
+            isGold: () => true,
+          };
+          expectedAmount = 100;
+          expectedResult = {
+            points: expectedPlatformInterest.points,
+            amountUpgrade: expectedAmount,
+            percentage: expectedPlatformInterest.percentage * 100,
+          };
+
+          getOne.mockResolvedValue(expectedPlatformInterest);
+
+          jest
+            .spyOn(suscriptionService, 'getGoldInfo')
+            .mockResolvedValue(expectedAmount);
+
+          result = await suscriptionService.getSubscriptionPercentage(
+            subscription,
+          );
+        });
+        it('should invoke platformInterestRepository.createQueryBuilder()', () => {
+          expect(getOne).toHaveBeenCalledTimes(1);
+        });
+        it('should return data of a suscription', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+
+      describe('when the suscription is not gold', () => {
+        beforeEach(async () => {
+          subscription = 'premium';
+          expectedPlatformInterest = {
+            amount: 0,
+            percentage: 0.2,
+            isGold: () => false,
+          };
+          expectedResult = {
+            percentage: expectedPlatformInterest.percentage * 100,
+          };
+
+          getOne.mockResolvedValue(expectedPlatformInterest);
+
+          result = await suscriptionService.getSubscriptionPercentage(
+            subscription,
+          );
+        });
+        it('should invoke platformInterestRepository.createQueryBuilder()', () => {
+          expect(getOne).toHaveBeenCalledTimes(1);
+        });
+        it('should return data of a suscription', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('getGoldInfo()', () => {
+    let result;
+    let expectedResult;
+    let expectedSuscription;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          expectedSuscription = {
+            idSuscription: 1,
+            name: 'gold',
+            cost: 0,
+            upgradedAmount: 100,
+          };
+          expectedResult = 1;
+
+          getOne.mockResolvedValue(expectedSuscription);
+
+          result = await suscriptionService.getGoldInfo();
+        });
+        it('should invoke suscriptionRepository.createQueryBuilder()', () => {
+          expect(getOne).toHaveBeenCalledTimes(1);
+          expect(
+            suscriptionRepository.createQueryBuilder().where,
+          ).toHaveBeenCalledWith('su.name = :name', {
+            name: SuscriptionType.GOLD,
+          });
+        });
+        it('should return upgradeAmount of a gold suscription', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+    });
+  });
+
+  describe('getActualCost(subscriptionName)', () => {
+    let result;
+    let expectedSuscription;
+    let subscriptionName;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          subscriptionName = 'premium';
+          expectedSuscription = {
+            idSuscription: 1,
+            name: subscriptionName,
+            cost: 100,
+          };
+
+          getOne.mockResolvedValue(expectedSuscription);
+
+          result = await suscriptionService.getActualCost(subscriptionName);
+        });
+        it('should invoke suscriptionRepository.createQueryBuilder()', () => {
+          expect(getOne).toHaveBeenCalledTimes(1);
+          expect(
+            suscriptionRepository.createQueryBuilder().where,
+          ).toHaveBeenCalledWith(`subscription.name = :name`, {
+            name: subscriptionName,
+          });
+        });
+        it('should return cost of a suscription', () => {
+          expect(result).toStrictEqual(expectedSuscription);
+        });
+      });
+    });
+  });
+
+  describe('update(updateSubscriptionDTO, idSuscription)', () => {
+    let result;
+    let updateResult;
+    let updateSubscriptionDTO;
+    let idSuscription;
+
+    describe('case: success', () => {
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          idSuscription = 1;
+          updateSubscriptionDTO = {
+            cost: 200,
+          };
+          updateResult = new UpdateResult();
+
+          execute.mockResolvedValue(updateResult);
+
+          result = await suscriptionService.update(
+            updateSubscriptionDTO,
+            idSuscription,
+          );
+        });
+        it('should invoke suscriptionRepository.createQueryBuilder()', () => {
+          expect(execute).toHaveBeenCalledTimes(1);
+          expect(
+            suscriptionRepository.createQueryBuilder().where,
+          ).toHaveBeenCalledWith('idSuscription = :id', { id: idSuscription });
+        });
+        it('should return an updated result', () => {
+          expect(result).toStrictEqual(updateResult);
         });
       });
     });
