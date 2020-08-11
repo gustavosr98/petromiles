@@ -530,13 +530,16 @@ describe('SuscriptionService', () => {
             userClient: {
               idUserClient: 1,
               email: 'prueba@gmail.com',
-              userDetails: {
-                idUserDetails: 1,
-                firstName: 'Pedro',
-                lastName: 'Perez',
-                customerId: 'prueba',
-                accountId: 'prueba',
-              },
+              userDetails: [
+                {
+                  idUserDetails: 1,
+                  firstName: 'Pedro',
+                  lastName: 'Perez',
+                  customerId: 'prueba',
+                  accountId: 'prueba',
+                  accountOwner: null,
+                },
+              ],
               userSuscription: [
                 {
                   idUserSuscription: 3,
@@ -659,7 +662,7 @@ describe('SuscriptionService', () => {
           expect(paymentProviderService.createCharge).toHaveBeenCalledTimes(1);
           expect(paymentProviderService.createCharge).toHaveBeenCalledWith({
             customer:
-              expectedClientBankAccount.userClient.userDetails.customerId,
+              expectedClientBankAccount.userClient.userDetails[0].customerId,
             source: expectedClientBankAccount.chargeId,
             currency: 'usd',
             amount: Math.trunc(
@@ -775,13 +778,16 @@ describe('SuscriptionService', () => {
             userClient: {
               idUserClient: 1,
               email: 'prueba@gmail.com',
-              userDetails: {
-                idUserDetails: 1,
-                firstName: 'Pedro',
-                lastName: 'Perez',
-                customerId: 'prueba',
-                accountId: 'prueba',
-              },
+              userDetails: [
+                {
+                  idUserDetails: 1,
+                  firstName: 'Pedro',
+                  lastName: 'Perez',
+                  customerId: 'prueba',
+                  accountId: 'prueba',
+                  accountOwner: null,
+                },
+              ],
             },
           };
           expectedStatus = {
@@ -861,13 +867,16 @@ describe('SuscriptionService', () => {
             userClient: {
               idUserClient: 1,
               email: 'prueba@gmail.com',
-              userDetails: {
-                idUserDetails: 1,
-                firstName: 'Pedro',
-                lastName: 'Perez',
-                customerId: 'prueba',
-                accountId: 'prueba',
-              },
+              userDetails: [
+                {
+                  idUserDetails: 1,
+                  firstName: 'Pedro',
+                  lastName: 'Perez',
+                  customerId: 'prueba',
+                  accountId: 'prueba',
+                  accountOwner: null,
+                },
+              ],
             },
           };
           expectedUserSuscription = {
@@ -1101,15 +1110,18 @@ describe('SuscriptionService', () => {
           userClient = {
             idUserClient: 1,
             email: 'prueba@gmail.com',
-            userDetails: {
-              firstName: 'Pedro',
-              lastName: 'Perez',
-              language: {
-                idLanguage: 1,
-                name: 'english',
-                shortname: 'en',
+            userDetails: [
+              {
+                firstName: 'Pedro',
+                lastName: 'Perez',
+                language: {
+                  idLanguage: 1,
+                  name: 'english',
+                  shortname: 'en',
+                },
+                accountOwner: null,
               },
-            },
+            ],
           };
 
           expectedPlatformInterest = {
@@ -1124,7 +1136,7 @@ describe('SuscriptionService', () => {
             finalDate: null,
           };
 
-          languageMails = userClient.userDetails.language.name;
+          languageMails = userClient.userDetails[0].language.name;
           extraPoints =
             parseFloat(expectedPlatformInterest.amount) /
             (100 * expectedOnePointToDollars.onePointEqualsDollars);
@@ -1134,7 +1146,7 @@ describe('SuscriptionService', () => {
             subject: subject,
             templateId: 'prueba',
             dynamic_template_data: {
-              user: userClient.userDetails.firstName,
+              user: userClient.userDetails[0].firstName,
               extraPoints,
             },
           };
@@ -1202,10 +1214,13 @@ describe('SuscriptionService', () => {
           expectedUserClient = {
             idUserClient,
             email: 'prueba@gmail.com',
-            userDetails: {
-              firstName: 'Pedro',
-              lastName: 'Perez',
-            },
+            userDetails: [
+              {
+                firstName: 'Pedro',
+                lastName: 'Perez',
+                accountOwner: null,
+              },
+            ],
           };
 
           (userClientService.get as jest.Mock).mockResolvedValue(
