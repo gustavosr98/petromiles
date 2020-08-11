@@ -161,86 +161,49 @@ describe( 'AuthService', () => {
         describe('case: success', ()=>{
             describe('whe everything works well', ()=>{
                 beforeEach( async () => {
-                    expectedUser ={
-                        email: 'petro@petromiles.com',
-                        firstName: 'Petro',
-                        middleName: null,
-                        lastName: 'Miles',
-                        secondLastName: null,
-                        password: 'prueba',
-                        salt: '$2b$10$iUCj0m4iW03/7csR8XdYDe',
-                        birthdate: null,
-                        address: null,
-                        phone: '+12222311',
-                        photo: null,
-                        country: null,
-                        ip: '127.0.0.0',
-                     };
-                    expectedCreateUserSuscription = [
-                        {
-                          user: {
-                              email: 'petro@petromiles.com',
-                              firstName: 'Petro',
-                              lastName: 'Miles',
-                              password: 'prueba',
-                              ip: '127.0.0.0'
-                          },
-                          Suscription: 'BASIC',
-                        },
-                    ];
-                    expectedResult = [
-                        {
-                            email: 'petro@petromiles.com',
-                            userDetails: {
-                                idUserDetails: 1,
-                                firstName: 'Petro',
-                                middleName: null,
-                                lastName: 'Miles',
-                                secondLastName: null,
-                                birthdate: null,
-                                address: null,
-                                phone: '+12222311',
-                                photo: null,
-                                customerId: null,
-                                accountId: null,
-                                userClient: null,
-                            },
-                            role: 'CLIENT',
-                            toke: 'TokenTest',
-                            id: '1',
-                            federated: false,
-                        },
-                    ];
-                    user = {
-                            email: 'petro@petromiles.com',
-                            firstName: 'Petro',
+
+                    expectedUser = {
+                        firstName:"prueba",
+                        lastName:"petro",
+                        email: "pp1@pp.com",
+                        password: "$2b$10$LYeTN2eX5DdsmdAsQCb1YO/8U4mfY.AEH91ollaf39pu45TUScwKm",
+                        salt:"$2b$10$LYeTN2eX5DdsmdAsQCb1YO",
+                        ip : '::ffff:127.0.0.1'
+                    };
+                    expectedCreateUserSuscription = {
+                        email:"pp2@pp.com",
+                        password:"$2b$10$nBRiB1brpskYQn0YoO9IdOdyoZge/k/fQ/.DW.Jf5b4C0CJkdXZVi",
+                        salt:"$2b$10$nBRiB1brpskYQn0YoO9IdO",
+                        googleToken:null,
+                        facebookToken:null,
+                        idUserClient:1
+                    };
+                    expectedResult = {
+                        email: 'pp2@pp.com',
+                        userDetails : {
+                            firstName: "pruebaC",
+                            lastName: "charlie",
                             middleName: null,
-                            lastName: 'Miles',
                             secondLastName: null,
-                            password: 'prueba',
-                            salt: '$2b$10$iUCj0m4iW03/7csR8XdYDe',
                             birthdate: null,
                             address: null,
-                            phone: '+12222311',
+                            phone: null,
                             photo: null,
-                            country: null,
-                        },
-                    ip = {
-                            ip: '127.0.0.0'
-                        },
-                    createdUser = {
-                            user: {
-                                email: 'petro@petromiles.com',
-                                firstName: 'Petro',
-                                lastName: 'Miles',
-                                password: 'prueba',
+                            language: {
+                                idLanguage: 1,
+                                name: "english",
+                                shortname: "en"
                             },
+                            userClient: null,
+                            customerId: "cus_HoPFey3NEkJDHv",
+                            accountId: "acct_1HEmRKC2gPHNel3Q",
+                            idUserDetails: 19
                         },
-                    Suscription = [
-                        {
-                            BASIC :'BASIC'
-                        },
-                    ];
+                        token: 'prueba',
+                        id: 1,
+                        federated: false,
+                    };
+
                     (userClientService.create as jest.Mock).mockResolvedValue(
                         expectedUser,
                     );
@@ -275,4 +238,6 @@ describe( 'AuthService', () => {
             });
         });
     });
+
+
 });
