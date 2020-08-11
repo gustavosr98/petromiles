@@ -32,6 +32,7 @@ import { TransactionType } from '@/enums/transaction.enum';
 import { CreateBankAccountDTO } from '@/modules/bank-account/dto/create-bank-account.dto';
 import { updatePrimaryAccountDTO } from '@/modules/bank-account/dto/update-primary-account.dto';
 import { UpdateAccountStateDto } from '@/modules/bank-account/dto/update-account-state.dto';
+import { AuthenticatedUser } from '@/interfaces/auth/authenticated-user.interface';
 
 @Injectable()
 export class ClientBankAccountService {
@@ -55,7 +56,7 @@ export class ClientBankAccountService {
 
   async create(
     bankAccountCreateParams: CreateBankAccountDTO,
-    user,
+    user: AuthenticatedUser,
   ): Promise<ClientBankAccount> {
     if (await this.nicknameIsTaken(bankAccountCreateParams.nickname, user.id))
       throw new BadRequestException('error-messages.invalidNickname');
@@ -72,15 +73,13 @@ export class ClientBankAccountService {
       bankAccountCreateParams,
     );
 
-    const clientBankAccount = await this.clientBankAccountRepository
-      .create({
-        bankAccount,
-        userClient,
-        transferId: paymentProviderBankAccount.transferId,
-        chargeId: paymentProviderBankAccount.chargeId,
-        paymentProvider: PaymentProvider.STRIPE,
-      })
-      .save();
+    const clientBankAccount = await this.clientBankAccountRepository.save({
+      bankAccount,
+      userClient,
+      transferId: paymentProviderBankAccount.transferId,
+      chargeId: paymentProviderBankAccount.chargeId,
+      paymentProvider: PaymentProvider.STRIPE,
+    });
 
     await this.changeState(
       StateName.VERIFYING,
@@ -100,29 +99,27 @@ export class ClientBankAccountService {
   }
 
   async getClientBankAccounts(idUserClient: number): Promise<BankAccount[]> {
-    return await getConnection()
-      .getRepository(BankAccount)
-      .find({
-        where: `"userClient"."idUserClient" ='${idUserClient}' and "stateBankAccount"."finalDate" is null and state.name != '${StateName.CANCELLED}'`,
-        join: {
-          alias: 'bankAccount',
-          innerJoinAndSelect: {
-            clientBankAccount: 'bankAccount.clientBankAccount',
-            stateBankAccount: 'clientBankAccount.stateBankAccount',
-            userClient: 'clientBankAccount.userClient',
-            state: 'stateBankAccount.state',
-            routingNumber: 'bankAccount.routingNumber',
-            bank: 'routingNumber.bank',
-          },
+    return await this.bankAccountRepository.find({
+      where: `"userClient"."idUserClient" ='${idUserClient}' and "stateBankAccount"."finalDate" is null and state.name != '${StateName.CANCELLED}'`,
+      join: {
+        alias: 'bankAccount',
+        innerJoinAndSelect: {
+          clientBankAccount: 'bankAccount.clientBankAccount',
+          stateBankAccount: 'clientBankAccount.stateBankAccount',
+          userClient: 'clientBankAccount.userClient',
+          state: 'stateBankAccount.state',
+          routingNumber: 'bankAccount.routingNumber',
+          bank: 'routingNumber.bank',
         },
-      });
+      },
+    });
   }
 
   async getOne(
     idUserClient: number,
     idBankAccount: number,
   ): Promise<ClientBankAccount> {
-    const bankAccount = await this.clientBankAccountRepository.findOneOrFail({
+    const bankAccount = await this.clientBankAccountRepository.findOne({
       where: `userClient.idUserClient = ${idUserClient} AND bankAccount.idBankAccount = ${idBankAccount}`,
       join: {
         alias: 'clientBankAccount',
@@ -144,7 +141,7 @@ export class ClientBankAccountService {
       idStateBankAccount: number;
     })[]
   > {
-    const bankAccounts = await getConnection().query(
+    const bankAccounts = await this.clientBankAccountRepository.query(
       `
       SELECT
         CLIENT_BANK_ACCOUNT.*, USER_CLIENT.email, USER_DETAILS."customerId",  STATE_BANK_ACCOUNT."idStateBankAccount"
@@ -193,7 +190,7 @@ export class ClientBankAccountService {
       this.logger.error(message);
       throw new BadRequestException('error-messages.invalidVerification');
     }
-    const customerId = clientBankAccount.userClient.userDetails.find(
+    const customerId = await clientBankAccount.userClient.userDetails.find(
       details => details.accountOwner === null,
     ).customerId;
     const verification = await this.paymentProviderService.verifyBankAccount({
@@ -221,6 +218,7 @@ export class ClientBankAccountService {
       verificationTransactions[0],
       StateDescription.CHANGE_VERIFICATION_TO_VALID,
     );
+
     await this.stateTransactionService.update(
       StateName.VALID,
       verificationTransactions[1],
@@ -281,7 +279,7 @@ export class ClientBankAccountService {
     stateName: StateName,
     clientBankAccount: ClientBankAccount,
     description?,
-  ) {
+  ): Promise<StateBankAccount> {
     if (clientBankAccount.stateBankAccount)
       await this.endLastState(clientBankAccount);
 
@@ -296,17 +294,15 @@ export class ClientBankAccountService {
 
     await this.sendStatusBankAccount(stateName, clientBankAccount);
 
-    return await getConnection()
-      .getRepository(StateBankAccount)
-      .save(stateBankAccount);
+    return await this.stateBankAccountRepository.save(stateBankAccount);
   }
 
-  sendStatusBankAccount(
+  async sendStatusBankAccount(
     bankAccountStatus: StateName,
     clientBankAccount: ClientBankAccount,
   ) {
     const lastNumbersBankAccount = 4;
-    const userDetails = clientBankAccount.userClient.userDetails.find(
+    const userDetails = await clientBankAccount.userClient.userDetails.find(
       details => details.accountOwner === null,
     );
 
@@ -321,7 +317,7 @@ export class ClientBankAccountService {
       const msg = {
         to: clientBankAccount.userClient.email,
         subject: subject,
-        templateId: this.configService.get<string>(
+        templateId: await this.configService.get<string>(
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
@@ -345,7 +341,7 @@ export class ClientBankAccountService {
       const msg = {
         to: clientBankAccount.userClient.email,
         subject: subject,
-        templateId: this.configService.get<string>(
+        templateId: await this.configService.get<string>(
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
@@ -365,7 +361,7 @@ export class ClientBankAccountService {
       const msg = {
         to: clientBankAccount.userClient.email,
         subject: subject,
-        templateId: this.configService.get<string>(
+        templateId: await this.configService.get<string>(
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
@@ -397,6 +393,7 @@ export class ClientBankAccountService {
     const hasPendingTransaction = await this.hasPendingTransaction(
       clientBankAccount,
     );
+
     if (hasPendingTransaction) {
       this.logger.error(
         `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: ${clientBankAccount.idClientBankAccount} cannot be deleted yet`,
@@ -450,12 +447,12 @@ export class ClientBankAccountService {
 
     return false;
   }
-  private async nicknameIsTaken(
+  async nicknameIsTaken(
     nickname: string,
     idUserClient: number,
   ): Promise<Boolean> {
     const bankAccounts = await this.getClientBankAccounts(idUserClient);
-    const accountWithNickname = bankAccounts.find(
+    const accountWithNickname = await bankAccounts.find(
       bankAccount =>
         bankAccount.nickname.toLowerCase() == nickname.toLowerCase(),
     );
@@ -495,7 +492,9 @@ export class ClientBankAccountService {
     return await this.clientBankAccountRepository.save(clientBankAccount);
   }
 
-  async updateAccountState(updateAccountStateDto: UpdateAccountStateDto) {
+  async updateAccountState(
+    updateAccountStateDto: UpdateAccountStateDto,
+  ): Promise<StateBankAccount> {
     const clientBankAccount = await this.getOne(
       updateAccountStateDto.idUserClient,
       updateAccountStateDto.idBankAccount,
@@ -517,7 +516,7 @@ export class ClientBankAccountService {
       description = StateDescription.BANK_ACCOUNT_ACTIVATED;
     }
 
-    await this.changeState(
+    return await this.changeState(
       updateAccountStateDto.state,
       clientBankAccount,
       description,
