@@ -8,6 +8,7 @@
           color="warning"
           text              
           @click="visible = false"
+          data-cy="close-btn"
         >
           {{ $t("common.Close") }}
         </v-btn>              

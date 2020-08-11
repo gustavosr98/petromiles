@@ -1,7 +1,9 @@
 const axios = require("axios");
 const fs = require("fs");
 
-const baseDomain = process.env.VUE_APP_PETROMILES_API_URL;
+const baseDomain =
+  process.env.VUE_APP_PETROMILES_API_URL_I18N ||
+  process.env.VUE_APP_PETROMILES_API_URL;
 
 // Don't forget to add your tags
 // IMPORTANT! Each tag must have the name of the component

@@ -22,6 +22,7 @@
               @change="$v.currentPassword.$touch()"
               @blur="$v.currentPassword.$touch()"
               :error-messages="currentPasswordErrors"
+              data-cy="current-password-input"
             ></v-text-field>
 
             <v-text-field
@@ -35,7 +36,8 @@
               color="light-blue darken-4"  
               @change="$v.password.$touch()"
               @blur="$v.password.$touch()"
-              :error-messages="passwordErrors"     
+              :error-messages="passwordErrors"  
+              data-cy="new-password-input"   
             ></v-text-field>
 
             <v-text-field
@@ -50,12 +52,14 @@
               @change="$v.confirmedNewPassword.$touch()"
               @blur="$v.confirmedNewPassword.$touch()"
               :error-messages="confirmedNewPasswordError"     
+              data-cy="confirm-new-password-input"
             ></v-text-field>
             <br/>
             <v-btn
               color="primary"
               @click="checkingValidForm"
               :loading="loading"
+              class="change-btn"
             >
               {{ $t("profile.ChangePassword") }}
             </v-btn>
