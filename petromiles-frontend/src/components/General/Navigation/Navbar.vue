@@ -96,13 +96,16 @@ export default {
   },
   async mounted() {
     await this.checkUserToken();
+    this.setLogRocket();
+  },
+  setLogRocket() {
     const user = JSON.parse(
-            localStorage.getItem(authConstants.USER_LOCAL_STORAGE)
+      localStorage.getItem(authConstants.USER_LOCAL_STORAGE)
     );
 
-    if (user !== null){
+    if (user !== null) {
       const userId = toString(user.details.idUserDetails);
-      const userName = user.details.firstName + ' ' + user.details.lastName;
+      const userName = user.details.firstName + " " + user.details.lastName;
       const userEmail = user.email;
 
       LogRocket.identify(userId, {

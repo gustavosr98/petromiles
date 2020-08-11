@@ -15,7 +15,7 @@ context("Login User", () => {
         cy.wait(1000);
         cy.get('.v-card__title > .v-icon').should("be.visible");
         cy.contains(modalMessages.noAccount).should("be.visible");
-        cy.get('[data-cy=confirm-btn]').click();
+        cy.get('[data-cy=error-btn]').click();
     });
 
     it("trying to let the password field empty", () => {
@@ -24,7 +24,7 @@ context("Login User", () => {
         cy.wait(1000);
         cy.get('.v-card__title > .v-icon').should("be.visible");
         cy.contains(modalMessages.wrongPassword).should("be.visible");
-        cy.get('[data-cy=confirm-btn]').click();
+        cy.get('[data-cy=error-btn]').click();
     });
 
     it("trying to let the email field empty", () => {
@@ -33,7 +33,7 @@ context("Login User", () => {
         cy.wait(1000);
         cy.contains(modalMessages.noAccount).should("be.visible");
         cy.get('.v-card__title > .v-icon').should("be.visible");
-        cy.get('[data-cy=confirm-btn]').click();
+        cy.get('[data-cy=error-btn]').click();
     });
 
     it("trying to login with a wrong email", () => {
@@ -43,7 +43,7 @@ context("Login User", () => {
         cy.wait(1000);
         cy.get('.v-card__title > .v-icon').should("be.visible");
         cy.contains(modalMessages.noAccount).should("be.visible");
-        cy.get('[data-cy=confirm-btn]').click();
+        cy.get('[data-cy=error-btn]').click();
     });
 
     it("trying to login with a wrong password", () => {
@@ -53,7 +53,7 @@ context("Login User", () => {
         cy.wait(1000);
         cy.get('.v-card__title > .v-icon').should("be.visible");
         cy.contains(modalMessages.wrongPassword).should("be.visible");
-        cy.get('[data-cy=confirm-btn]').click();
+        cy.get('[data-cy=error-btn]').click();
     });
 
     it("trying to login succesfuly", () => {
