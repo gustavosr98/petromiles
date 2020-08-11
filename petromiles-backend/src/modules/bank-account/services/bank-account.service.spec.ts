@@ -271,6 +271,7 @@ describe('BankAccountService', () => {
 
   describe('create(bankAccountCreateParams)', () => {
     let bankAccountCreateParams;
+    let userClient;
     let expectedRoutingNumberFound;
     let expectedUserDetails;
     let expectedBankAccount;
@@ -298,6 +299,67 @@ describe('BankAccountService', () => {
             },
           };
 
+          userClient = {
+            idUserClient: 2,
+            salt: '$2b$10$Kn17wlqKEPqp22qQQGvy3.',
+            googleToken: null,
+            facebookToken: null,
+            email: 'test@petromiles.com',
+            password:
+              '$2b$10$Kn17wlqKEPqp22qQQGvy3.U1Ya/ZwJaQlhMNfriFLp678WKE68Ak.',
+            stateUser: [
+              {
+                idStateUser: 4,
+                initialDate: '2020-08-10T23:48:57.272Z',
+                finalDate: null,
+                description: null,
+                state: [
+                  {
+                    idState: 2,
+                    name: 'verifying',
+                    description:
+                      'This state indicates that the object is in the verification process',
+                  },
+                ],
+              },
+            ],
+            userDetails: [
+              {
+                idUserDetails: 5,
+                firstName: 'petro',
+                middleName: null,
+                lastName: 'miles',
+                secondLastName: null,
+                birthdate: null,
+                address: null,
+                phone: null,
+                photo: null,
+                customerId: 'cus_HoNUdR7m2NJfAR',
+                accountId: 'acct_1HEkjcEyK9mQjk6P',
+                accountOwner: null,
+                language: [{ idLanguage: 1, name: 'english', shortname: 'en' }],
+                country: null,
+              },
+            ],
+            userSuscription: [
+              {
+                idUserSuscription: 2,
+                initialDate: '2020-08-10T23:48:57.294Z',
+                upgradedAmount: 0,
+                finalDate: null,
+                suscription: [
+                  {
+                    idSuscription: 1,
+                    name: 'BASIC',
+                    cost: 0,
+                    upgradedAmount: null,
+                    description: 'Suscription initial of every new client',
+                  },
+                ],
+              },
+            ],
+          };
+
           expectedRoutingNumberFound = {
             idRoutingNumber: 1,
             number: '124003116',
@@ -323,7 +385,7 @@ describe('BankAccountService', () => {
             customerId: null,
             accountId: null,
             idUserDetails: 1,
-            userClient: null,
+            userClient,
           };
 
           expectedBankAccount = {
@@ -371,7 +433,10 @@ describe('BankAccountService', () => {
             expectedBankAccount,
           );
 
-          result = await bankAccountService.create(bankAccountCreateParams);
+          result = await bankAccountService.create(
+            bankAccountCreateParams,
+            userClient,
+          );
         });
 
         it('should invoke bankAccountRepository.save()', () => {

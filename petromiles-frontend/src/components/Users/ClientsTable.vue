@@ -1,6 +1,12 @@
 <template>
   <div>
-    <datatable :title="title" :headers="headers" :fetchedData="mungedData" @updateUserState="updateUserState" :isAdmin="true"/>
+    <datatable
+      :title="title"
+      :headers="headers"
+      :fetchedData="mungedData"
+      @updateUserState="updateUserState"
+      :isAdmin="true"
+    />
     <loading-screen :visible="showLoadingScreen"></loading-screen>
   </div>
 </template>
@@ -34,11 +40,11 @@ export default {
         },
         {
           text: this.$tc("user-details.firstName"),
-          value: "userDetails.firstName",
+          value: "firstName",
         },
         {
           text: this.$tc("user-details.lastName"),
-          value: "userDetails.lastName",
+          value: "lastName",
         },
         {
           text: this.$tc("common.state"),
@@ -46,8 +52,8 @@ export default {
         },
         {
           text: "User Details",
-          value: "userDetails"
-        }
+          value: "userDetails",
+        },
       ],
       showLoadingScreen: true,
     };
@@ -58,7 +64,10 @@ export default {
   },
   computed: {
     mungedData() {
-      return this.fetchedData.map(data => {
+      return this.fetchedData.map((data) => {
+        const userDetails = data.userDetails.find(
+          (details) => details.accountOwner === null
+        );
         const state = {
           name: data.stateUser[0].state.name,
           translated: this.$tc(`state-name.${data.stateUser[0].state.name}`),
@@ -66,36 +75,41 @@ export default {
         return {
           ...data,
           state,
+          firstName: userDetails.firstName,
+          lastName: userDetails.lastName,
         };
       });
     },
   },
   methods: {
-    async updateUserState(item){
+    async updateUserState(item) {
       this.showLoadingScreen = true;
-      let userID = 0;      
+      let userID = 0;
       userID = item.idUserClient;
-      if(item.state.name === states.ACTIVE.name){        
-        await this.$http.post(`management/state/${userID}`, {
-          state: states.BLOCKED.name,
-          role: auth.CLIENT
-        }).finally(() => {
-          this.showLoadingScreen = false;
-        });
+      if (item.state.name === states.ACTIVE.name) {
+        await this.$http
+          .post(`management/state/${userID}`, {
+            state: states.BLOCKED.name,
+            role: auth.CLIENT,
+          })
+          .finally(() => {
+            this.showLoadingScreen = false;
+          });
         item.state.name = states.BLOCKED.name;
         item.state.translated = states.BLOCKED.name;
-      }
-      else{
-        await this.$http.post(`management/state/${userID}`, {
-          state: states.ACTIVE.name,
-          role: auth.CLIENT
-        }).finally(() => {
-          this.showLoadingScreen = false;
-        })
+      } else {
+        await this.$http
+          .post(`management/state/${userID}`, {
+            state: states.ACTIVE.name,
+            role: auth.CLIENT,
+          })
+          .finally(() => {
+            this.showLoadingScreen = false;
+          });
         item.state.name = states.ACTIVE.name;
         item.state.translated = states.ACTIVE.name;
       }
-    }
-  }
+    },
+  },
 };
 </script>

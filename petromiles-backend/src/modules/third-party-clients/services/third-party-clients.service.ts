@@ -147,7 +147,10 @@ export class ThirdPartyClientsService {
     thirdPartyClientName: string,
     code: string,
   ): Promise<MailsResponse> {
-    const language = userClient.userDetails.language.name;
+    const userDetails = await userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
+    const language = userDetails.language.name;
 
     const template = `sendVerificationCodeEmail[${language}]`;
     const subject = MailsSubjets.verification_code[language];
@@ -159,7 +162,7 @@ export class ThirdPartyClientsService {
         `mails.sendgrid.templates.${template}`,
       ),
       dynamic_template_data: {
-        user: userClient.userDetails.firstName,
+        user: userDetails.firstName,
         thirdPartyClientName,
         code,
       },
@@ -258,7 +261,7 @@ export class ThirdPartyClientsService {
     return PlatformInterest.GOLD_EXTRA;
   }
 
-  async calculateExtras(userClient: UserClient) {
+  private async calculateExtras(userClient: UserClient) {
     const currentUserSuscription = await userClient.userSuscription.find(
       suscription => !suscription.finalDate,
     );
@@ -741,7 +744,11 @@ export class ThirdPartyClientsService {
     const userClient = await this.userClientRepository.findOne({
       email: userEmail,
     });
-    const language = userClient.userDetails.language.name;
+
+    const userDetails = await userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
+    const language = userDetails.language.name;
 
     if (status === StateName.VALID) {
       const template = `customerPointsAccumulationApproval[${language}]`;
@@ -755,7 +762,7 @@ export class ThirdPartyClientsService {
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
-          user: userClient.userDetails.firstName,
+          user: userDetails.firstName,
           thirdPartyClientName: thirdPartyClient.name,
           numberPoints: accumulatedPoints,
         },
@@ -773,7 +780,7 @@ export class ThirdPartyClientsService {
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
-          user: userClient.userDetails.firstName,
+          user: userDetails.firstName,
           thirdPartyClientName: thirdPartyClient.name,
           numberPoints: accumulatedPoints,
         },

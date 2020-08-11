@@ -1,9 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, getConnection, Connection, getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { mocked } from 'ts-jest/utils';
 
 import { PaymentsService } from './payments.service';
 import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
@@ -18,9 +17,7 @@ import { SuscriptionService } from '@/modules/suscription/service/suscription.se
 import { Transaction } from '@/entities/transaction.entity';
 import { ClientBankAccount } from '@/entities/client-bank-account.entity';
 import { UserClient } from '@/entities/user-client.entity';
-import { ThirdPartyInterest } from '@/entities/third-party-interest.entity';
 import { ClientPoints } from '@/entities/user-points.entity';
-import { PointsConversion } from '@/entities/points-conversion.entity';
 
 import { Interest } from '@/modules/payments/interest.interface';
 import { PlatformInterest } from '@/enums/platform-interest.enum';
@@ -353,13 +350,16 @@ describe('PaymentsService', () => {
             userClient: {
               idUserClient: 1,
               email: 'prueba@gmail.com',
-              userDetails: {
-                idUserDetails: 1,
-                firstName: 'Pedro',
-                lastName: 'Perez',
-                customerId: 'prueba',
-                accountId: 'prueba',
-              },
+              userDetails: [
+                {
+                  idUserDetails: 1,
+                  firstName: 'Pedro',
+                  lastName: 'Perez',
+                  customerId: 'prueba',
+                  accountId: 'prueba',
+                  accountOwner: null,
+                },
+              ],
               userSuscription: [
                 {
                   idUserSuscription: 3,
@@ -393,6 +393,7 @@ describe('PaymentsService', () => {
               },
             ],
           };
+
           expectedCharge = {
             id: 'prueba',
             amount: 20,
@@ -473,7 +474,7 @@ describe('PaymentsService', () => {
           expect(paymentProviderService.createCharge).toHaveBeenCalledTimes(1);
           expect(paymentProviderService.createCharge).toHaveBeenCalledWith({
             customer:
-              expectedClientBankAccount.userClient.userDetails.customerId,
+              expectedClientBankAccount.userClient.userDetails[0].customerId,
             source: expectedClientBankAccount.chargeId,
             currency: 'usd',
             amount: Math.round(amountToCharge),
@@ -721,13 +722,16 @@ describe('PaymentsService', () => {
             userClient: {
               idUserClient: 1,
               email: 'prueba@gmail.com',
-              userDetails: {
-                idUserDetails: 1,
-                firstName: 'Pedro',
-                lastName: 'Perez',
-                customerId: 'prueba',
-                accountId: 'prueba',
-              },
+              userDetails: [
+                {
+                  idUserDetails: 1,
+                  firstName: 'Pedro',
+                  lastName: 'Perez',
+                  customerId: 'prueba',
+                  accountId: 'prueba',
+                  accountOwner: null,
+                },
+              ],
             },
             bankAccount: {
               idBankAccount: 1,
@@ -817,7 +821,7 @@ describe('PaymentsService', () => {
           expect(
             paymentProviderService.updateBankAccountOfAnAccount,
           ).toHaveBeenCalledWith(
-            expectedClientBankAccount.userClient.userDetails.accountId,
+            expectedClientBankAccount.userClient.userDetails[0].accountId,
             expectedClientBankAccount.transferId,
             {
               default_for_currency: true,
@@ -831,7 +835,7 @@ describe('PaymentsService', () => {
           );
           expect(paymentProviderService.createTransfer).toHaveBeenCalledWith({
             destination:
-              expectedClientBankAccount.userClient.userDetails.accountId,
+              expectedClientBankAccount.userClient.userDetails[0].accountId,
             currency: 'usd',
             amount: Math.round(amountToCharge),
             source_type: 'bank_account',
@@ -983,13 +987,16 @@ describe('PaymentsService', () => {
             userClient: {
               idUserClient: 1,
               email: 'prueba@gmail.com',
-              userDetails: {
-                idUserDetails: 1,
-                firstName: 'Pedro',
-                lastName: 'Perez',
-                customerId: 'prueba',
-                accountId: 'prueba',
-              },
+              userDetails: [
+                {
+                  idUserDetails: 1,
+                  firstName: 'Pedro',
+                  lastName: 'Perez',
+                  customerId: 'prueba',
+                  accountId: 'prueba',
+                  accountOwner: null,
+                },
+              ],
             },
             bankAccount: {
               idBankAccount: 1,
@@ -1102,15 +1109,17 @@ describe('PaymentsService', () => {
           expectedUserClient = {
             idUserClient: 1,
             email: 'prueba@gmail.com',
-            userDetails: {
-              firstName: 'Pedro',
-              lastName: 'Perez',
-              language: {
-                idLanguage: 1,
-                name: 'english',
-                shortname: 'en',
+            userDetails: [
+              {
+                firstName: 'Pedro',
+                lastName: 'Perez',
+                language: {
+                  idLanguage: 1,
+                  name: 'english',
+                  shortname: 'en',
+                },
               },
-            },
+            ],
           };
           expectedTransactionCode = [
             {
@@ -1123,7 +1132,7 @@ describe('PaymentsService', () => {
             paymentProviderTransactionId: 'prueba',
           };
 
-          languageMails = expectedUserClient.userDetails.language.name;
+          languageMails = expectedUserClient.userDetails[0].language.name;
           template = `invoice[${languageMails}]`;
           subject = MailsSubjets.invoice[languageMails];
           mailParameters = {
@@ -1131,7 +1140,7 @@ describe('PaymentsService', () => {
             subject: subject,
             templateId: 'prueba',
             dynamic_template_data: {
-              user: expectedUserClient.userDetails.firstName,
+              user: expectedUserClient.userDetails[0].firstName,
             },
             attachments: [
               {
@@ -1147,6 +1156,10 @@ describe('PaymentsService', () => {
           (userClientRepository.findOne as jest.Mock).mockResolvedValue(
             expectedUserClient,
           );
+
+          jest
+            .spyOn(expectedUserClient.userDetails, 'find')
+            .mockResolvedValue(expectedUserClient.userDetails[0]);
 
           (transactionService.getTransactions as jest.Mock).mockResolvedValue(
             expectedTransactionCode,
@@ -1233,15 +1246,17 @@ describe('PaymentsService', () => {
           expectedUserClient = {
             idUserClient: 1,
             email: 'prueba@gmail.com',
-            userDetails: {
-              firstName: 'Pedro',
-              lastName: 'Perez',
-              language: {
-                idLanguage: 1,
-                name: 'english',
-                shortname: 'en',
+            userDetails: [
+              {
+                firstName: 'Pedro',
+                lastName: 'Perez',
+                language: {
+                  idLanguage: 1,
+                  name: 'english',
+                  shortname: 'en',
+                },
               },
-            },
+            ],
           };
           expectedTransactionCode = [
             {
@@ -1254,7 +1269,7 @@ describe('PaymentsService', () => {
             paymentProviderTransactionId: 'prueba',
           };
 
-          languageMails = expectedUserClient.userDetails.language.name;
+          languageMails = expectedUserClient.userDetails[0].language.name;
           template = `withdrawal[${languageMails}]`;
           subject = MailsSubjets.invoice[languageMails];
           mailParameters = {
@@ -1262,7 +1277,7 @@ describe('PaymentsService', () => {
             subject: subject,
             templateId: 'prueba',
             dynamic_template_data: {
-              user: expectedUserClient.userDetails.firstName,
+              user: expectedUserClient.userDetails[0].firstName,
               numberPoints: points,
               dollarWithdrawal: total,
             },
@@ -1280,6 +1295,10 @@ describe('PaymentsService', () => {
           (userClientRepository.findOne as jest.Mock).mockResolvedValue(
             expectedUserClient,
           );
+
+          jest
+            .spyOn(expectedUserClient.userDetails, 'find')
+            .mockResolvedValue(expectedUserClient.userDetails[0]);
 
           (transactionService.getTransactions as jest.Mock).mockResolvedValue(
             expectedTransactionCode,
