@@ -9,7 +9,7 @@ const modalMessages = {
 context("Payment Subscription", () => {
   beforeEach(() => {
     cy.visit("/");
-    cy.get(".email-input").type("test5@petromiles.com");
+    cy.get(".email-input").type("test@petromiles.com");
     cy.get(".password-input").type("test1234");
     cy.get(".login-btn").click();
     cy.url().should("include", "/dashboard");
