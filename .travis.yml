@@ -1,8 +1,6 @@
 language: node_js
 node_js:
   - 12.16.2
-addons:
-  chrome: stable
 jobs:
   include:
     - name: Backend | NestJS
@@ -20,15 +18,12 @@ jobs:
           develop: staging-petromiles-backend
           master: prepro-petromiles-backend
     - name: Frontend | Vue
-      before_install:
-        - npm install -g @lhci/cli@0.4.x
       install:
         - cd petromiles-frontend
         - npm install
       script:
         - npm run test
         - npm run build
-        - lhci autorun
       deploy:
         provider: heroku
         api_key: $HEROKU_APIKEY
