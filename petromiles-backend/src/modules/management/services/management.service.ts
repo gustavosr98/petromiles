@@ -469,7 +469,6 @@ export class ManagementService {
     role: RoleEnum,
     state: StateName,
     id: number,
-    adminId: number,
   ): Promise<StateUser> {
     const roleName = await this.roleRepository
       .createQueryBuilder('role')

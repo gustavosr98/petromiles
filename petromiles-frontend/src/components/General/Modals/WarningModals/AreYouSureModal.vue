@@ -28,6 +28,7 @@
 
 <script>
 export default {
+  name: "are-you-sure-modal",
   props: {
     showModal: { type: Boolean, required: true },
     loading: { type: Boolean },
