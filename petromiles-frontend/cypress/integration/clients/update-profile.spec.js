@@ -26,14 +26,24 @@ context("Update user Profile", () => {
         cy.url().should("include", "/profile");
     });
 
-    it("Updating middle name and second last name", () => {
+    it("Updating all the information possible", () => {
         cy.get('[data-cy=middleName-input]').type("Lorem");
         cy.get('[data-cy=secondLastName-input]').type("Ipsum");
+        cy.get('[data-cy=birthdate-input]').type("01011991");
         cy.get('[data-cy=save-btn] > .v-btn__content').click();
         cy.wait(1000);
         cy.contains(snackMessages.saveInformationProfile).should("be.visible");
         cy.get('[data-v-23b34533=""][data-v-0020b690=""] > :nth-child(5) > .text-center > .v-snack > .v-snack__wrapper > .v-snack__content > .v-btn > .v-btn__content').click();
     });
+
+    // it("Updating middle name and second last name", () => {
+    //     cy.get('[data-cy=middleName-input]').type("Lorem");
+    //     cy.get('[data-cy=secondLastName-input]').type("Ipsum");
+    //     cy.get('[data-cy=save-btn] > .v-btn__content').click();
+    //     cy.wait(1000);
+    //     cy.contains(snackMessages.saveInformationProfile).should("be.visible");
+    //     cy.get('[data-v-23b34533=""][data-v-0020b690=""] > :nth-child(5) > .text-center > .v-snack > .v-snack__wrapper > .v-snack__content > .v-btn > .v-btn__content').click();
+    // });
 
     // it("trying to let the password field empty", () => {
     //     cy.get(".email-input").type("test@petromiles.com");
