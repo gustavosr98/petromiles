@@ -76,4 +76,53 @@ describe('pointsConversionService', ()=>{
          });
       });
    });
+
+   describe('endLast(idPointsConversion)', ()=>{
+      let expectedFindOne;
+      let expectedCurrentPoint;
+      let idPointsConversion;
+      let result;
+
+      describe('Case: success', ()=>{
+         describe('whe everything works well', ()=>{
+            beforeEach(async  ()=>{
+               expectedFindOne = {
+                  idPointsConversion:2,
+                  onePointEqualsDollars:"0.00166666666667",
+                  initialDate:"2020-08-12T04:00:00.000Z",
+                  finalDate:null,
+               };
+               idPointsConversion = 2;
+               expectedCurrentPoint ={
+                  onePointEqualsDollars:0.005,
+                  finalDate:null,
+                  idPointsConversion:3,
+                  initialDate:"2020-08-12T04:00:00.000Z"
+               };
+
+
+               (pointsConversionRepository.findOne as jest.Mock).mockResolvedValue(
+                   expectedFindOne,
+               );
+               (pointsConversionRepository.save as jest.Mock).mockResolvedValue(
+                   expectedCurrentPoint,
+               );
+
+               result = await pointsConversionService.endLast(
+                   idPointsConversion,
+               );
+            });
+
+            it('should invoke pointsConversionRepository.findOne ',  ()=>{
+               expect(pointsConversionRepository.findOne).toHaveBeenCalledTimes(1);
+               expect(pointsConversionRepository.findOne).toHaveBeenCalledWith(
+                   idPointsConversion,
+               );
+            });
+            it('should return endLast',  ()=> {
+               expect(result).toStrictEqual(expectedCurrentPoint);
+            });
+         });
+      });
+   });
 });
