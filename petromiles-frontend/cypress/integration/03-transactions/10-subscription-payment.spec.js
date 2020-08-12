@@ -9,9 +9,9 @@ const modalMessages = {
 context("Payment Subscription", () => {
   beforeEach(() => {
     cy.visit("/");
-    cy.get(".email-input").type("test@petromiles.com");
-    cy.get(".password-input").type("test1234");
-    cy.get(".login-btn").click();
+    cy.get('[data-cy="email-input"]').type("test@petromiles.com");
+    cy.get('[data-cy="password-input"]').type("test1234");
+    cy.get('[data-cy=login-btn]').click();
     cy.url().should("include", "/dashboard");
     cy.get(".subscriptions-btn").click();
     cy.url().should("include", "/user-subscription");
@@ -19,7 +19,7 @@ context("Payment Subscription", () => {
     cy.wait(1000);
   });
 
-  it("Buying the premium subscription membership", () => {
+  it("68 - Buying the premium subscription membership", () => {
     cy.url().should("include", "/user-subscription-purchase");
     cy.get(".accounts-selector").click();
     cy.contains("XXXX").click();
@@ -31,7 +31,7 @@ context("Payment Subscription", () => {
     cy.get('[data-cy=pay-sub-btn]').click();
   });
 
-  it("Trying to Buy again the premium subscription membership after paying it for the first time", () => {
+  it("69 - Trying to Buy again the premium subscription membership after paying it for the first time", () => {
     cy.url().should("include", "/user-subscription-purchase");
     cy.get(".accounts-selector").click();
     cy.contains("XXXX").click();

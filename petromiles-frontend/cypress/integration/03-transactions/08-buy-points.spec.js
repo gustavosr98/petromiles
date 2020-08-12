@@ -78,7 +78,7 @@ context("Buy points", () => {
     cy.wait(8000);
     cy.url().should("include", "/buy-points");
     cy.contains(modalMessages.invalidAmount).should('be.visible');
-  cy.get('[data-cy=error-btn] > .v-btn__content').click();
+    cy.get('[data-cy=error-btn] > .v-btn__content').click();
   });
 
   it("60 - when everything goes well", () => {
@@ -90,6 +90,6 @@ context("Buy points", () => {
     cy.wait(10000);
     cy.get(".ok-btn").click();
     cy.url().should("include", "/transactions");
-  cy.contains("500000").should('be.visible');
+    cy.contains("500000").should('be.visible');
   });
 });
