@@ -8,20 +8,11 @@
           :provider="provider"
           @login="login"
           type="login"
-        >Continue with {{ provider.name }}</no-federeded-button>
+          >Continue with {{ provider.name }}</no-federeded-button
+        >
       </v-row>
       <h4 class="text-center mt-3 mb-5 caption">{{ title }}</h4>
       <v-form>
-        <v-text-field
-          label="Email"
-          name="Email"
-          v-model="email"
-          prepend-icon="email"
-          type="text"
-          color="light-blue darken-4"
-          @keyup.enter="buildUser"
-          class="email-input"
-        ></v-text-field>
         <v-text-field
           id="password"
           label="Password"
@@ -33,20 +24,34 @@
           @keyup.enter="buildUser"
           class="password-input"
         ></v-text-field>
+        <v-text-field
+          label="Email"
+          name="Email"
+          v-model="email"
+          prepend-icon="email"
+          type="text"
+          color="light-blue darken-4"
+          @keyup.enter="buildUser"
+          class="email-input"
+        ></v-text-field>
       </v-form>
     </v-card-text>
     <v-row class="text-center">
       <v-col :cols="showClientElement ? '6' : '12'">
         <h5 class="caption">
           Forgot your password?
-          <router-link :to="{ name: routeNameRecover }" class="link-to-recover">Recover</router-link>
+          <router-link :to="{ name: routeNameRecover }" class="link-to-recover"
+            >Recover</router-link
+          >
         </h5>
         <v-spacer />
       </v-col>
       <v-col cols="6" v-if="showClientElement">
         <h5 class="caption">
           New here?
-          <router-link :to="{ name: routeNameSignUp }" class="link-to-signup">Sign Up</router-link>
+          <router-link :to="{ name: routeNameSignUp }" class="link-to-signup"
+            >Sign Up</router-link
+          >
         </h5>
       </v-col>
     </v-row>
@@ -57,7 +62,8 @@
         color="light-blue darken-4"
         dark
         :loading="loading"
-      >Login</v-btn>
+        >BOTON CAMBIADO</v-btn
+      >
     </div>
   </v-col>
 </template>

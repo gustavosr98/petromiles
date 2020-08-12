@@ -4,7 +4,7 @@
       <v-col cols="12" sm="6" md="9">
         <v-card class="elevation-12">
           <v-window>
-            <auth-window title="Welcome back" msg="Nice to see you again">
+            <auth-window title="MENSAJE DE BIENVENIDA" msg="cambiado">
               <login-form
                 title="Or login with"
                 :showClientElement="true"
