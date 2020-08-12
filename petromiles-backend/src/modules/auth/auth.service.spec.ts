@@ -1,9 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
-import { Repository } from 'typeorm';
 import { WinstonModule } from 'nest-winston';
 
 import createOptions from '@/logger/winston/winston-config';
@@ -13,20 +11,11 @@ import {UserAdministratorService} from "@/modules/user/services/user-administrat
 import {JwtService} from "@nestjs/jwt";
 import {MailsService} from "@/modules/mails/mails.service";
 import {UserService} from "@/modules/user/services/user.service";
-import {PaymentProviderService} from "@/modules/payment-provider/payment-provider.service";
 import {ConfigService} from "@nestjs/config";
 import {SuscriptionService} from "@/modules/suscription/service/suscription.service";
-import {PaymentsService} from "@/modules/payments/services/payments.service";
-import {ClientBankAccount} from "@/entities/client-bank-account.entity";
-import {UserClient} from "@/entities/user-client.entity";
-import {Transaction} from "@/entities/transaction.entity";
-import {TransactionService} from "@/modules/transaction/services/transaction.service";
-import {PointsConversionService} from "@/modules/management/services/points-conversion.service";
-import {ThirdPartyInterestService} from "@/modules/management/services/third-party-interest.service";
-import {PlatformInterestService} from "@/modules/management/services/platform-interest.service";
-import {http} from "winston";
-import exp = require("constants");
 import {MailsSubjets} from "@/constants/mailsSubjectConst";
+import {Role} from "@/enums/role.enum";
+import {Suscription} from "@/enums/suscription.enum";
 
 
 describe( 'AuthService', () => {
@@ -138,6 +127,12 @@ describe( 'AuthService', () => {
             ],
         }).compile();
 
+        authService = module.get<AuthService>(AuthService);
+
+        userService = module.get<UserService>(
+            UserService,
+        );
+
         userClientService = module.get<UserClientService>(
             UserClientService,
         );
@@ -158,60 +153,101 @@ describe( 'AuthService', () => {
         let expectedResult;
         let user;
         let ip;
-        let Suscription;
+        let expectedCreatedToken;
+        let createdUser;
 
         describe('case: success', ()=>{
             describe('when everything works well', ()=>{
                 beforeEach( async () => {
                     user = {
+                        firstName:"prueba",
+                        lastName:"prueba",
                         email: 'pp1@pp.com',
-                        firstName:"prueba",
-                        lastName:"petro",
                         password: "$2b$10$LYeTN2eX5DdsmdAsQCb1YO/8U4mfY.AEH91ollaf39pu45TUScwKm",
                         salt:"$2b$10$LYeTN2eX5DdsmdAsQCb1YO",
                     };
-                    ip = {
-                        ip : '::ffff:127.0.0.1'
-                    };
+                    ip = '::ffff:127.0.0.1';
                     expectedUser = {
-                        firstName:"prueba",
-                        lastName:"petro",
-                        email: "pp1@pp.com",
-                        password: "$2b$10$LYeTN2eX5DdsmdAsQCb1YO/8U4mfY.AEH91ollaf39pu45TUScwKm",
-                        salt:"$2b$10$LYeTN2eX5DdsmdAsQCb1YO",
-                        ip : '::ffff:127.0.0.1'
-                    };
-                    expectedCreateUserSuscription = {
-                        user: {
+                        user:{
                             email:"pp1@pp.com",
-                            password:"$2b$10$nBRiB1brpskYQn0YoO9IdOdyoZge/k/fQ/.DW.Jf5b4C0CJkdXZVi",
-                            salt:"$2b$10$nBRiB1brpskYQn0YoO9IdO",
+                            password: "$2b$10$LYeTN2eX5DdsmdAsQCb1YO/8U4mfY.AEH91ollaf39pu45TUScwKm",
+                            salt:"$2b$10$LYeTN2eX5DdsmdAsQCb1YO",
                             googleToken:null,
                             facebookToken:null,
                             idUserClient:1
                         },
-                    };
-                    expectedResult = {
-                        email: 'pp1@pp.com',
-                        userDetails : {
-                            firstName: "pruebaC",
-                            lastName: "charlie",
-                            middleName: null,
-                            secondLastName: null,
-                            birthdate: null,
-                            address: null,
-                            phone: null,
-                            photo: null,
-                            language: {
-                                idLanguage: 1,
-                                name: "english",
-                                shortname: "en"
+                        userDetails:{
+                            firstName:"prueba",
+                            lastName:"prueba",
+                            middleName:null,
+                            secondLastName:null,
+                            birthdate:null,
+                            address:null,
+                            phone:null,
+                            photo:null,
+                            language:{
+                                idLanguage:1,
+                                name:"english",
+                                shortname:"en"
                             },
-                            userClient: null,
-                            customerId: "cus_HoPFey3NEkJDHv",
-                            accountId: "acct_1HEmRKC2gPHNel3Q",
-                            idUserDetails: 19
+                            userClient:null,
+                            customerId:" ",
+                            accountId:" ",
+                            accountOwner:null,
+                            idUserDetails:1
                         },
+                        role:"CLIENT",
+                    };
+                    expectedCreatedToken = {
+                        email: 'pp1@pp.com',
+                        role: 'CLIENT',
+                    };
+                    expectedCreateUserSuscription = {
+                        suscription:{
+                            idSuscription: 1,
+                            name: 'BASIC',
+                            cost: 0,
+                            upgradedAmount: null,
+                            description: 'Suscription initial of every new client'
+                        },
+                    };
+                    createdUser = {
+                        user: {
+                            email:"pp1@pp.com",
+                            password: "$2b$10$LYeTN2eX5DdsmdAsQCb1YO/8U4mfY.AEH91ollaf39pu45TUScwKm",
+                            salt:"$2b$10$LYeTN2eX5DdsmdAsQCb1YO",
+                            googleToken:null,
+                            facebookToken:null,
+                            idUserClient:1,
+                        },
+                        userDetails: {
+                            firstName: 'prueba',
+                        },
+                    };
+
+                    expectedResult = {
+                        email: "pp1@pp.com",
+                        userDetails: {
+                            firstName:"prueba",
+                            lastName:"prueba",
+                            middleName:null,
+                            secondLastName:null,
+                            birthdate:null,
+                            address:null,
+                            phone:null,
+                            photo:null,
+                            language:{
+                                idLanguage:1,
+                                name:"english",
+                                shortname:"en"
+                            },
+                            userClient:null,
+                            customerId:" ",
+                            accountId:" ",
+                            accountOwner:null,
+                            idUserDetails:1
+                        },
+                        role: Role.CLIENT,
                         token: 'prueba',
                         id: 1,
                         federated: false,
@@ -220,9 +256,18 @@ describe( 'AuthService', () => {
                     (userClientService.create as jest.Mock).mockResolvedValue(
                         expectedUser,
                     );
+
+                    jest
+                        .spyOn(authService, 'createWelcomeEmail')
+                        .mockResolvedValue();
+
                     (suscriptionService.createUserSuscription as jest.Mock).mockResolvedValue(
                         expectedCreateUserSuscription,
                     );
+
+                    // jest
+                    //     .spyOn(authService, 'createToken')
+                    //     .mockResolvedValue(expectedCreatedToken);
 
                     result = await authService.createUserClient(
                         user, ip
@@ -231,17 +276,16 @@ describe( 'AuthService', () => {
 
                 it('should invoke userClientService.create()',  () => {
                     expect(userClientService.create).toHaveBeenCalledTimes(1);
-                    expect(userClientService.create).toHaveBeenCalledWith({
-                        user: expectedUser,
-                        ip: expectedUser.ip,
-                        }
+                    expect(userClientService.create).toHaveBeenCalledWith(
+                        user,
+                        ip,
                     );
                 });
 
-                it('shouldinvoke userClientService.createUserSuscriptioin() ',  ()=> {
+                it('should invoke userClientService.createUserSuscription() ',  ()=> {
                     expect(suscriptionService.createUserSuscription).toHaveBeenCalledTimes(1);
                     expect(suscriptionService.createUserSuscription).toHaveBeenCalledWith(
-                        expectedCreateUserSuscription.user,
+                        createdUser.user,
                         Suscription.BASIC,
                         null)
                 });
@@ -288,78 +332,79 @@ describe( 'AuthService', () => {
         });
     });
 
-    describe('hashPassword(password,salt)', ()=> {
-        let password;
-        let salt;
-        let expectedHashed;
-        let expectedToHash;
-        let result;
-
-        describe('case: success', () => {
-            describe('when everything works well', () => {
-                beforeEach(async () => {
-                    password = 'test1234';
-                    salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO';
-                    expectedHashed = {
-                        password: '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW'
-                    };
-                    expectedToHash = {
-                        password : 'test1234',
-                        salt : '$2b$10$LYeTN2eX5DdsmdAsQCb1YO',
-                    };
-                    (bcrypt.hash as jest.Mock).mockResolvedValue(
-                        expectedToHash,
-                    );
-
-                    result = await authService.hashPassword(
-                        password, salt
-                    );
-                });
-                it('should invoke bcrypt.hash',  () => {
-                    expect(bcrypt.hash,).toHaveBeenCalledTimes(1);
-                    expect(bcrypt.hash,).toHaveBeenCalledWith(
-                        password, salt
-                    );
-                });
-                it('should return password hashed',  () => {
-                    expect(result).toStrictEqual(expectedHashed);
-                });
-            });
-        });
-        describe('case: failure', () => {
-            let expectedError: BadRequestException;
-            describe('when the password is empty', () => {
-                beforeEach(async () => {
-                    password = '';
-                    salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO';
-                    expectedHashed = {
-                        password: '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW'
-                    };
-                    expectedToHash = {
-                        password :'',
-                        salt : '$2b$10$LYeTN2eX5DdsmdAsQCb1YO',
-                    };
-                    (bcrypt.hash as jest.Mock).mockResolvedValue(
-                        expectedToHash,
-                    );
-
-                    result = await authService.hashPassword(
-                        password, salt
-                    );
-                });
-                it('should throw when the password is empty', async () => {
-                    await expect(bcrypt.hash).rejects.toThrow(BadRequestException);
-                });
-
-            });
-        });
-    });
+    // describe('hashPassword(password,salt)', ()=> {
+    //     let password;
+    //     let salt;
+    //     let expectedHashed;
+    //     let expectedToHash;
+    //     let result;
+    //
+    //     describe('case: success', () => {
+    //         describe('when everything works well', () => {
+    //             beforeEach(async () => {
+    //                 password = 'test1234';
+    //                 salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO';
+    //                 expectedHashed = {
+    //                     password: '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW'
+    //                 };
+    //                 expectedToHash = {
+    //                     password : 'test1234',
+    //                     salt : '$2b$10$LYeTN2eX5DdsmdAsQCb1YO',
+    //                 };
+    //                 (bcrypt.hash as jest.Mock).mockResolvedValue(
+    //                     expectedToHash,
+    //                 );
+    //
+    //                 result = await authService.hashPassword(
+    //                     password, salt
+    //                 );
+    //             });
+    //             it('should invoke bcrypt.hash',  () => {
+    //                 expect(bcrypt.hash,).toHaveBeenCalledTimes(1);
+    //                 expect(bcrypt.hash,).toHaveBeenCalledWith(
+    //                     password, salt
+    //                 );
+    //             });
+    //             it('should return password hashed',  () => {
+    //                 expect(result).toStrictEqual(expectedHashed);
+    //             });
+    //         });
+    //     });
+    //     describe('case: failure', () => {
+    //         let expectedError: BadRequestException;
+    //         describe('when the password is empty', () => {
+    //             beforeEach(async () => {
+    //                 password = '';
+    //                 salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO';
+    //                 expectedHashed = {
+    //                     password: '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW'
+    //                 };
+    //                 expectedToHash = {
+    //                     password :'',
+    //                     salt : '$2b$10$LYeTN2eX5DdsmdAsQCb1YO',
+    //                 };
+    //                 (bcrypt.hash as jest.Mock).mockResolvedValue(
+    //                     expectedToHash,
+    //                 );
+    //
+    //                 result = await authService.hashPassword(
+    //                     password, salt
+    //                 );
+    //             });
+    //             it('should throw when the password is empty', async () => {
+    //                 await expect(bcrypt.hash).rejects.toThrow(BadRequestException);
+    //             });
+    //
+    //         });
+    //     });
+    // });
 
     describe('createUserAdministrator(user)', ()=> {
         let expectedCreatedUser;
         let result;
         let expectedResult;
         let user;
+        let passwordAdmin;
 
         describe('case: success', ()=>{
             describe('when everything works well', ()=>{
@@ -374,8 +419,7 @@ describe( 'AuthService', () => {
                         phone:"",
                         address:"",
                         country:{},
-                        salt:"$2b$10$VhjJiCEGYFRhJdrqQ.wBw.",
-                        password:"$2b$10$VhjJiCEGYFRhJdrqQ.wBw.P9hAvDRPtTcWA2z5PWcF0lzDoXIb7ma",
+                        password:"6OjZQfo767",
                     };
 
                     expectedCreatedUser = {
@@ -409,16 +453,37 @@ describe( 'AuthService', () => {
                         role:"ADMINISTRATOR",
                     };
                     expectedResult = {
-                        email: expectedCreatedUser.userAdmin.email,
-                        password: expectedCreatedUser.password,
-                        userDetails: expectedCreatedUser.userDetails,
-                        role: 'ADMINISTRATOR',
+                        email: 'admin2@petromiles.com' ,
                         id: 2,
+                        password: user.password,
+                        userDetails:{
+                            firstName:"admin",
+                            lastName:"admin",
+                            middleName:"",
+                            secondLastName:"",
+                            birthdate:null,
+                            address:"",
+                            phone:"",
+                            photo:null,
+                            language:{
+                                idLanguage:1,
+                                name:"english",
+                                "shortname":"en"
+                            },
+                            userAdministrator:null,
+                            customerId:null,
+                            accountId:null,
+                            idUserDetails:1
+                        },
+                        role: Role.ADMINISTRATOR,
                     };
 
                     (userAdministratorService.create as jest.Mock).mockResolvedValue(
-                        user,
+                        expectedCreatedUser,
                     );
+                    jest
+                        .spyOn(authService, 'createWelcomeEmail')
+                        .mockResolvedValue();
 
                     result = await authService.createUserAdministrator(
                         user,
@@ -448,6 +513,7 @@ describe( 'AuthService', () => {
         let result;
         let password;
         let expectedInfo;
+        let expectedEmail;
 
         describe('case: success', () => {
             describe('when everything works well', () => {
@@ -465,11 +531,11 @@ describe( 'AuthService', () => {
                     password = 'test1234';
                     expectedInfo = {
                         user: {
-                                password:"$2$10$nTfXptbWsD.f3.RVjrXLtec9TI13jydydfr37BM1F6eqZM9DNDfj6",
-                                email:"miguel@petromiles.com",
-                                salt:"$2b$10$nTfXptbWsD.f3.RVjrXLte",
-                                id:1
-                            },
+                            password:"$2$10$nTfXptbWsD.f3.RVjrXLtec9TI13jydydfr37BM1F6eqZM9DNDfj6",
+                            email:"miguel@petromiles.com",
+                            salt:"$2b$10$nTfXptbWsD.f3.RVjrXLte",
+                            id:1
+                        },
                         userDetails: {
                             idUserDetails:1,
                             firstName:"miguel",
@@ -488,6 +554,14 @@ describe( 'AuthService', () => {
                                 shortname:"en"
                             },
                             country:null
+                        },
+                    };
+                    expectedEmail = {
+                        userAdmin :{
+                            email: 'miguel@petromiles.com',
+                        },
+                        userDetails:{
+                            firstName: 'miguel'
                         },
                     };
                     expectedResult = {
@@ -518,14 +592,20 @@ describe( 'AuthService', () => {
                     };
                     expectedToHash = {
                         password: 'test1234',
-                        salt : '$2b$10$nTfXptbWsD.f3.RVjrXLte',
+                        user: {
+                            salt : '$2b$10$nTfXptbWsD.f3.RVjrXLte',
+                        },
                     };
                     (userService.getActive as jest.Mock).mockResolvedValue(
                         expectedCredentials,
                     );
-                    (authService.hashPassword as jest.Mock).mockResolvedValue(
-                        expectedToHash
-                    )
+                    jest
+                        .spyOn(authService, 'hashPassword')
+                        .mockResolvedValue(expectedToHash );
+
+                    jest
+                        .spyOn(authService, 'createWelcomeEmail')
+                        .mockResolvedValue(expectedEmail);
 
                     result = await authService.validateUser(
                         expectedCredentials,
