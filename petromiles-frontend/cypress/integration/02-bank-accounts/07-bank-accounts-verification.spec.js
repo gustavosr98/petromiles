@@ -1,9 +1,9 @@
 context("Bank Account Verification", () => {
   beforeEach(() => {
     cy.visit("/");
-    cy.get(".email-input").type("test@petromiles.com");
-    cy.get(".password-input").type("test1234");
-    cy.get(".login-btn").click();
+    cy.get('[data-cy="email-input"]').type("test@petromiles.com");
+    cy.get('[data-cy="password-input"]').type("test1234");
+    cy.get('[data-cy=login-btn]').click();
     cy.get(
       ":nth-child(2) > .pt-0 > :nth-child(1) > :nth-child(1) > .app-bar > .v-toolbar__content > .v-app-bar__nav-icon > .v-btn__content > .v-icon"
     ).click();
@@ -16,26 +16,26 @@ context("Bank Account Verification", () => {
     cy.wait(3000);
   });
 
-  it("trying to verify an account without any amount", () => {
+  it("49 - trying to verify an account without any amount", () => {
     cy.get(".verify-account").click();
     cy.url().should("include", "/bank-accounts");
     cy.get(".v-card__title").should("be.visible");
   });
 
-  it("trying to verify an account with just the first amount", () => {
+  it("50 - trying to verify an account with just the first amount", () => {
     cy.get(".first-amount").type("1.5");
     cy.get(".verify-account").click();
     cy.url().should("include", "/bank-accounts");
     cy.get(".v-card__title").should("be.visible");
   });
-  it("trying to verify an account with just the second amount", () => {
+  it("51 - trying to verify an account with just the second amount", () => {
     cy.get(".second-amount").type("1.5");
     cy.get(".verify-account").click();
     cy.url().should("include", "/bank-accounts");
     cy.get(".v-card__title").should("be.visible");
   });
 
-  it("trying to verify an account with an invalid combination", () => {
+  it("52 - trying to verify an account with an invalid combination", () => {
     cy.get(".first-amount").type("0.2");
     cy.get(".second-amount").type("1.5");
     cy.get(".verify-account").click();
@@ -43,12 +43,10 @@ context("Bank Account Verification", () => {
     cy.get(".v-card__title").should("be.visible");
   });
 
-  it("when everything goes well", () => {
+  it("53 - when everything goes well", () => {
     cy.get(".first-amount").type("1.5");
     cy.get(".second-amount").type("1");
     cy.get(".verify-account").click();
     cy.wait(10000);
-    cy.get(".v-card__title").should("not.be.visible");
-    cy.get(".verify-modal").should("not.be.visible");
   });
 });
