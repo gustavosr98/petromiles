@@ -34,7 +34,7 @@ jobs:
         - cd petromiles-frontend
         - npm install
       script:
-        - npm run test
+        - npm run test:unit
         - npm run build
       deploy:
         provider: heroku
@@ -70,7 +70,7 @@ jobs:
         - cd petromiles-frontend
         - npm install
       script:
-        - npm run test
+        - npm run test:unit
         - npm run build
       deploy:
         provider: heroku
