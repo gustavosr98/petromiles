@@ -46,14 +46,13 @@ jobs:
           branch: develop
 
     # MASTER
-    - name: Backend (PEPRO)
+    - name: Backend (PREPRO)
       if: branch = master
       install:
         - cd petromiles-backend
         - npm install
       script:
         - npm run test
-        - npm run test:cov
         - npm run build
       deploy:
         provider: heroku
@@ -64,7 +63,7 @@ jobs:
           repo: gustavosr98/petromiles
           branch: master
 
-    - name: Frontend (PEPRO)
+    - name: Frontend (PREPRO)
       if: branch = master
       install:
         - cd petromiles-frontend
@@ -75,7 +74,7 @@ jobs:
       deploy:
         provider: heroku
         api_key: $HEROKU_APIKEY
-        app: $HEROKU_FE_PEPRO
+        app: $HEROKU_FE_PREPRO
         skip_cleanup: true
         on:
           repo: gustavosr98/petromiles
