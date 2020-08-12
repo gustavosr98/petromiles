@@ -151,4 +151,162 @@ describe('platformInterestService', ()=>{
             });
         });
     });
+
+    describe('getInterest(type)', ()=>{
+        let subscription;
+        let type;
+        let expectedFind;
+        let result;
+        describe(' case: success', ()=> {
+            describe('whe everything works well', () => {
+                beforeEach(async () => {
+                    expectedFind = {
+                        idPlatformInterest: 1,
+                        name: "premium",
+                        amount: null,
+                        percentage: "0.20",
+                        points: null,
+                        initialDate: "2020-08-12T04:00:00.000Z",
+                        finalDate: null,
+                        description: "premiumInterest",
+                        suscription: {
+                            idSuscription: 2,
+                            name: "PREMIUM",
+                            cost: 2500,
+                            upgradedAmount: null,
+                            description: "premiumConditionals",
+                        },
+                    };
+                    type= 'INTEREST';
+                    subscription = {
+                        _multipleParameters: false,
+                        _type: "isNull",
+                        _useParameter: false,
+                        _value: undefined,
+                    };
+
+                    (platformInterestRepository.find as jest.Mock).mockResolvedValue(
+                        expectedFind,
+                    );
+
+                    result = await platformInterestService.getInterests(
+                        type,
+                    );
+                });
+                it('should invoke platformInterestRepository.find',  () =>{
+                    expect(platformInterestRepository.find).toHaveBeenCalledTimes(1);
+                    expect(platformInterestRepository.find).toHaveBeenCalledWith(
+                        {where:{
+                            finalDate: null,
+                            suscription: subscription,
+                            }}
+                    );
+                });
+                it('should get interest',  () =>{
+                    expect(result).toStrictEqual(expectedFind);
+                });
+            });
+        });
+    });
+    describe('update(currentPlatformInterestId,createPlatformInterest)', ()=>{
+        let createPlatformInterest;
+        let currentId;
+        let expectedEndLast;
+        let expectedVerify;
+        let amount;
+        let name;
+        let expectedSave;
+        let result;
+        let lastInterest;
+        let current;
+        describe(' case: success', ()=> {
+            describe('whe everything works well', () => {
+                beforeEach(async () => {
+                 expectedVerify ={
+                     idThirdPartyInterest:1,
+                     name:"Transaction Interest",
+                     transactionType:"deposit",
+                     paymentProvider:"STRIPE",amountDollarCents:75,
+                     percentage:null,
+                     initialDate:"2020-08-12T04:00:00.000Z",
+                     finalDate:null,
+                 };
+                 name = 'verification';
+                 amount= 300;
+                 expectedEndLast={
+                    idPlatformInterest:6,
+                     name:"verification",
+                     amount:"400",
+                     percentage:null,
+                     points:null,
+                     initialDate:"2020-08-12T04:00:00.000Z",
+                     finalDate:"2020-08-12T07:50:19.418Z",
+                     description:"verificationInterest",
+                     suscription:null,
+                 };
+                 current={
+                     amount:300,
+                     percentage:null,
+                     name:"verification",
+                     points:null,
+                     description:"verificationInterest",
+                     suscription:null,
+                 }
+                 expectedSave = {
+                     amount: 300,
+                     percentage: null,
+                     name: 'verification',
+                     points: null,
+                     description: 'verificationInterest',
+                     suscription: null,
+                     finalDate: null,
+                     idPlatformInterest: 7,
+                     initialDate: "2020-08-12T04:00:00.000Z"
+                 }
+                 currentId = 1;
+                 createPlatformInterest = {
+                     amount:300,
+                     percentage:null,
+                     name:"verification",
+                     points:null,
+                     description:"verificationInterest",
+                     suscription:null,
+                 }
+                 lastInterest={
+                     description: 'verificationInterest',
+                 }
+
+
+                 jest
+                     .spyOn(platformInterestService, 'verifyCorrectAmount')
+                     .mockResolvedValue(expectedVerify);
+
+                 jest
+                     .spyOn(platformInterestService, 'endLast')
+                     .mockResolvedValue(current);
+
+                    (platformInterestRepository.save as jest.Mock).mockResolvedValue(
+                        expectedSave,
+                    );
+
+                    result = await platformInterestService.update(
+                        current,
+                        currentId
+                    )
+
+                });
+                it('should invoke platformInterestRepository.save',  ()=> {
+                    expect(platformInterestRepository.save).toHaveBeenCalledTimes(1);
+                    expect(platformInterestRepository.save).toHaveBeenCalledWith(
+                        {
+                            description: lastInterest.description
+                        },
+                    );
+                });
+                it('should update',  ()=> {
+                    expect(result).toStrictEqual(expectedSave);
+                });
+            });
+        });
+    });
 });
