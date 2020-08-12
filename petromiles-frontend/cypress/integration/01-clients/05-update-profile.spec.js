@@ -13,9 +13,9 @@ const formMessages = {
 context("Update user Profile", () => {
     beforeEach(() => {
         cy.visit("/");
-        cy.get(".email-input").type("test@petromiles.com");
-        cy.get(".password-input").type("test1234");
-        cy.get(".login-btn").click();
+        cy.get('[data-cy="email-input"]').type("test@petromiles.com");
+        cy.get('[data-cy="password-input"]').type("test1234");
+        cy.get('[data-cy=login-btn]').click();
         cy.wait(5000);
         cy.url().should("include", "/dashboard");
         cy.get(
@@ -27,7 +27,7 @@ context("Update user Profile", () => {
         cy.url().should("include", "/profile");
     });
 
-    it("Updating all the information possible", () => {
+    it("31 - Updating all the information possible", () => {
         cy.get('[data-cy=firstName-input]').clear().type("Richard");
         cy.get('[data-cy=lastName-input]').clear().type("Roe");
         cy.get('[data-cy=middleName-input]').clear().type("Lorem");
@@ -42,7 +42,7 @@ context("Update user Profile", () => {
         cy.get('[data-v-23b34533=""][data-v-0020b690=""] > :nth-child(5) > .text-center > .v-snack > .v-snack__wrapper > .v-snack__content > .v-btn > .v-btn__content').click();
     });
 
-    it("Trying to clean all the forms", () => {
+    it("32 - Trying to clean all the forms", () => {
         cy.get('[data-cy=firstName-input]').clear();
         cy.get('[data-cy=lastName-input]').clear();
         cy.get('[data-cy=middleName-input]').clear();
@@ -57,7 +57,7 @@ context("Update user Profile", () => {
     });
 
 
-    it("Cleaning all the possible forms", () => {
+    it("33 - Cleaning all the possible forms", () => {
         cy.get('[data-cy=middleName-input]').clear();
         cy.get('[data-cy=secondLastName-input]').clear();
         cy.get('[data-cy=birthdate-input]').clear();
@@ -70,7 +70,7 @@ context("Update user Profile", () => {
     });
 
 
-    it("Updating Name and Last Name correctly", () => {
+    it("34 - Updating Name and Last Name correctly", () => {
         cy.get('[data-cy=firstName-input]').clear().type("John");
         cy.get('[data-cy=lastName-input]').clear().type("Doe");
         cy.get('[data-cy=save-btn] > .v-btn__content').click();
