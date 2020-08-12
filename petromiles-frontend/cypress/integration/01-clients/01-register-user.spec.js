@@ -17,10 +17,10 @@ const modalMessages = {
 context("Register User", () => {
     beforeEach(() => {
         cy.visit("/");
-        cy.get(".link-to-signup").click();
+        cy.get('[data-cy="link-to-signup"]').click();
     });
 
-    it("trying to let all the fields empty", () => {
+    it("01 - trying to let all the fields empty", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy=signup-btn]').click();
         cy.contains(formErrorMessages.requiredName).should("be.visible");
@@ -29,7 +29,7 @@ context("Register User", () => {
         cy.contains(formErrorMessages.requiredPassword).should("be.visible");
     });
 
-    it("trying to let the Name field empty", () => {
+    it("02 - trying to let the Name field empty", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy="last-name-input"]').type("Doe");
         cy.get('[data-cy="email-input"]').type("test@petromiles.com");
@@ -39,7 +39,7 @@ context("Register User", () => {
     });
 
 
-    it("trying to let the Last-Name field empty", () => {
+    it("03 - trying to let the Last-Name field empty", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy="name-input"]').type("John");
         cy.get('[data-cy="email-input"]').type("test@petromiles.com");
@@ -48,7 +48,7 @@ context("Register User", () => {
         cy.contains(formErrorMessages.requiredLastName).should("be.visible");
     });
 
-    it("trying to let the Password field empty", () => {
+    it("04 - trying to let the Password field empty", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy="name-input"]').type("John");
         cy.get('[data-cy="last-name-input"]').type("Doe");
@@ -57,7 +57,7 @@ context("Register User", () => {
         cy.contains(formErrorMessages.requiredPassword).should("be.visible");
     });
 
-    it("trying to let the Email field empty", () => {
+    it("05 - trying to let the Email field empty", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy="name-input"]').type("John");
         cy.get('[data-cy="last-name-input"]').type("Doe");
@@ -66,7 +66,7 @@ context("Register User", () => {
         cy.contains(formErrorMessages.requiredEmail).should("be.visible");
     });
 
-    it("trying to input an invalid Email", () => {
+    it("06 - trying to input an invalid Email", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy="name-input"]').type("John");
         cy.get('[data-cy="last-name-input"]').type("Doe");
@@ -76,7 +76,7 @@ context("Register User", () => {
         cy.contains(formErrorMessages.invalidEmail).should("be.visible");
     });
 
-    it("trying to input an invalid short Password", () => {
+    it("07 - trying to input an invalid short Password", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy="name-input"]').type("John");
         cy.get('[data-cy="last-name-input"]').type("Doe");
@@ -86,7 +86,7 @@ context("Register User", () => {
         cy.contains(formErrorMessages.shortPassword).should("be.visible");
     });
 
-    it("trying to input an invalid long Password", () => {
+    it("08 - trying to input an invalid long Password", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy="name-input"]').type("John");
         cy.get('[data-cy="last-name-input"]').type("Doe");
@@ -96,7 +96,7 @@ context("Register User", () => {
         cy.contains(formErrorMessages.longPassword).should("be.visible");
     });
 
-    it("trying register a new user correctly", () => {
+    it("09 - trying register a new user correctly", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy="name-input"]').type("John");
         cy.get('[data-cy="last-name-input"]').type("Doe");
@@ -107,7 +107,7 @@ context("Register User", () => {
         cy.url().should("include", "/dashboard");
     });
 
-    it("trying to register a new user with a email already in use", () => {
+    it("10 - trying to register a new user with a email already in use", () => {
         cy.url().should("include", "/sign-up");
         cy.get('[data-cy="name-input"]').type("John");
         cy.get('[data-cy="last-name-input"]').type("Doe");

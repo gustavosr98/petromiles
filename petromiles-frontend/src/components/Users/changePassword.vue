@@ -59,7 +59,7 @@
               color="primary"
               @click="checkingValidForm"
               :loading="loading"
-              class="change-btn"
+              data-cy="change-btn"
             >
               {{ $t("profile.ChangePassword") }}
             </v-btn>
