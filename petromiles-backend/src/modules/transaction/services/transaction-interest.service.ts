@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
-import { getConnection } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 
 // ENTITIES
 import { TransactionInterest } from '@/entities/transaction-interest.entity';
@@ -11,6 +12,11 @@ import { Transaction } from '@/entities/transaction.entity';
 
 @Injectable()
 export class TransactionInterestService {
+  constructor(
+    @InjectRepository(TransactionInterest)
+    private repository: Repository<TransactionInterest>,
+  ) {}
+
   async createTransactionInterest(
     transaction: Transaction,
     thirdPartyInterest: ThirdPartyInterest,
@@ -25,14 +31,13 @@ export class TransactionInterestService {
     transactionInterest.promotion = promotion;
     transactionInterest.platformInterestExtraPoints = platformInterestExtraPoints;
 
-    return await getConnection()
-      .getRepository(TransactionInterest)
-      .save(transactionInterest);
+    return await this.repository.save(transactionInterest);
   }
 
   async getExtraPointsTypeByTransaction(transaction: Transaction) {
     const transactionInterest = await getConnection()
-      .getRepository(TransactionInterest).findOne({ transaction});
+      .getRepository(TransactionInterest)
+      .findOne({ transaction });
 
     return transactionInterest.platformInterestExtraPoints.name
   }
