@@ -18,7 +18,8 @@
           @change="$v.userData.details.firstName.$touch()"
           @blur="$v.userData.details.firstName.$touch()"
           :error-messages="firstNameErrors"  
-          v-on:keypress="validateMaxChars($event, userData.details.firstName)"               
+          v-on:keypress="validateMaxChars($event, userData.details.firstName)"        
+          data-cy="firstName-input"       
         ></v-text-field>     
         <v-text-field
           v-model="userData.details.middleName"
@@ -27,7 +28,8 @@
           prepend-icon="person"
           type="text"
           color="light-blue darken-4"
-          v-on:keypress="validateMaxChars($event, userData.details.middleName)"                             
+          v-on:keypress="validateMaxChars($event, userData.details.middleName)"       
+          data-cy="middleName-input"                      
         ></v-text-field>   
         <v-text-field
           v-model="userData.details.lastName"
@@ -39,7 +41,8 @@
           @change="$v.userData.details.lastName.$touch()"
           @blur="$v.userData.details.lastName.$touch()"
           :error-messages="lastNameErrors"    
-          v-on:keypress="validateMaxChars($event, userData.details.lastName)"                
+          v-on:keypress="validateMaxChars($event, userData.details.lastName)" 
+          data-cy="lastName-input"               
         ></v-text-field>   
         <v-text-field
           v-model="userData.details.secondLastName"
@@ -48,7 +51,8 @@
           prepend-icon="person"
           type="text"
           color="light-blue darken-4"   
-          v-on:keypress="validateMaxChars($event, userData.details.secondLastName)"                 
+          v-on:keypress="validateMaxChars($event, userData.details.secondLastName)"    
+          data-cy="secondLastName-input"             
         ></v-text-field>      
         <v-text-field
           v-model="userData.email"
@@ -73,6 +77,7 @@
           type="date"          
           :max="maxDate"
           :min="minDate"
+          data-cy="birthdate-input"
         >
         </v-text-field>
         <v-text-field
@@ -82,7 +87,8 @@
           prepend-icon="mdi-cellphone-android"
           type="number"
           color="light-blue darken-4"  
-          v-on:keypress="restrictChars($event)"                            
+          v-on:keypress="restrictChars($event)"    
+          data-cy="phone-input"                        
         ></v-text-field>   
         <v-autocomplete  
           return-object               
@@ -90,7 +96,8 @@
           :item-text="item => $t(`countries.${item.name}`)"
           prepend-icon= "mdi-map-marker"
           :label="$t('user-details.Country')"          
-          :items="countries"                                             
+          :items="countries"                        
+          data-cy="country-selector"                     
           >
         </v-autocomplete>
         <v-text-field
@@ -100,7 +107,8 @@
           prepend-icon="home"
           type="text"
           color="light-blue darken-4"  
-          v-on:keypress="validateMaxChars($event, userData.details.address)"                            
+          v-on:keypress="validateMaxChars($event, userData.details.address)"   
+          data-cy="address-input"              
         ></v-text-field> 
       </v-col>
 
@@ -116,6 +124,7 @@
           style="margin-right: 1%"
           @click="resetValues"
           :disabled="loading"
+          data-cy="reset-btn"
         >
           {{ $t("profile.ResetValues") }}
         </v-btn>            
@@ -123,6 +132,7 @@
           color="primary"
           @click="checkingValidForm"
           :loading="loading"
+          data-cy="save-btn"
         >
           {{ $t("common.Save") }}
         </v-btn>        

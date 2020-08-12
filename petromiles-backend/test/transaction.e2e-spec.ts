@@ -5,12 +5,11 @@ import { INestApplication, HttpStatus, ExecutionContext } from '@nestjs/common';
 
 import { AppModule } from '@/app.module';
 
-describe('Transaction', () => {
+describe('Transaction E2E', () => {
   let app: INestApplication;
-  let baseEndpoint: string;
   let user = { id: 1, email: 'test@petromiles.com' };
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -24,21 +23,16 @@ describe('Transaction', () => {
       })
       .compile();
 
-    baseEndpoint = Object.freeze('/transaction');
     app = moduleRef.createNestApplication();
     await app.init();
   });
 
-  afterEach(async () => {
-    await app.close();
-  });
-
-  describe(`GET ${baseEndpoint}/:idTransaction`, () => {
+  describe(`GET /transaction/:idTransaction`, () => {
     let idTransaction: number = 1;
 
-    it(`should return the search result`, () => {
-      request(app.getHttpServer())
-        .get(`${baseEndpoint}/${idTransaction}`)
+    it(`should return the search result`, async () => {
+      return await request(app.getHttpServer())
+        .get(`/transaction/1`)
         .expect(HttpStatus.OK)
         .then(res => {
           expect(res.body).toStrictEqual(
@@ -58,8 +52,11 @@ describe('Transaction', () => {
               state: expect.any(String),
             }),
           );
-        })
-        .catch();
+        });
     });
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });
