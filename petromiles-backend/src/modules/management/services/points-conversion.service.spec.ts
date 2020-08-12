@@ -125,4 +125,40 @@ describe('pointsConversionService', ()=>{
          });
       });
    });
+   describe('update()', ()=>{
+      let pointsConversionId;
+      let onePointEqualsDollar;
+      let expectedEndLast;
+      let result;
+      describe('case: success', ()=>{
+         describe('when everything works well', ()=>{
+            beforeEach(async ()=>{
+               expectedEndLast ={
+                  onePointEqualsDollars:0.005,
+                  finalDate:null,
+                  idPointsConversion:1,
+                  initialDate:"2020-08-12T04:00:00.000Z"
+               };
+               pointsConversionId=1;
+               onePointEqualsDollar = 0.005;
+
+               jest
+                   .spyOn(pointsConversionService, 'update')
+                   .mockResolvedValue(expectedEndLast);
+
+               (pointsConversionRepository.save as jest.Mock).mockResolvedValue(
+                   expectedEndLast,
+               );
+
+               result = await pointsConversionService.update(
+                   pointsConversionId,
+                   onePointEqualsDollar
+               );
+            });
+            it('should return conversion',  ()=> {
+               expect(result).toStrictEqual(expectedEndLast)
+            });
+         });
+      });
+   });
 });
