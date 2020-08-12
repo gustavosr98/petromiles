@@ -46,7 +46,6 @@ export class PaymentsController {
     @GetUser() user,
     @Body(ValidationPipe) paymentProperties: CreatePaymentDTO,
   ): Promise<Transaction> {
-    console.log('request-buy', paymentProperties);
     const {
       idClientBankAccount,
       amount,
@@ -66,7 +65,6 @@ export class PaymentsController {
       subscriptionName,
       infoSubscription,
     );
-    console.log('response-buy', res);
     return res;
   }
 
@@ -75,7 +73,6 @@ export class PaymentsController {
     @GetUser() user,
     @Body(ValidationPipe) paymentProperties: CreatePaymentDTO,
   ) {
-    console.log('request-with', paymentProperties);
     const {
       idClientBankAccount,
       amount,
@@ -93,7 +90,6 @@ export class PaymentsController {
       amountToCharge,
       points,
     );
-    console.log('response-with', res);
     return res;
   }
 
