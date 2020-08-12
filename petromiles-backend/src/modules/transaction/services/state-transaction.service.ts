@@ -35,9 +35,7 @@ export class StateTransactionService {
     stateTransaction.description = description;
     stateTransaction.state = await this.managementService.getState(stateName);
 
-    return await getConnection()
-      .getRepository(StateTransaction)
-      .save(stateTransaction);
+    return await this.repository.save(stateTransaction);
   }
 
   async update(
