@@ -7,7 +7,7 @@
     "start": "serve -s dist/",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode production",
-    "test:unit": "vue-cli-service test:unit --passWithNoTests",
+    "test:unit": "vue-cli-service test:unit",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/e2e/jest/jest-e2e.json --passWithNoTests",
@@ -16,7 +16,9 @@
     "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'",
     "prebuild": "npm run i18n:load",
     "preserve": "npm run i18n:load",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "lighthouse:chrome": "lighthouse http://localhost:5000 --output-path ./tests/lighthouse/pretromiles --output json --output html --output csv",
+    "lighthouse:quiet": "lighthouse http://localhost:5000 --chrome-flags=\"--headless\" --output-path ./tests/lighthouse/pretromiles --output json --output html --output csv"
   },
   "dependencies": {
     "@mdi/font": "^3.6.95",
@@ -67,6 +69,7 @@
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^6.2.2",
+    "lighthouse": "^6.2.0",
     "material-design-icons-iconfont": "^5.0.1",
     "sass": "^1.19.0",
     "sass-loader": "^8.0.0",

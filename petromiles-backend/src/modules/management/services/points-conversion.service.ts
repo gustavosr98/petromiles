@@ -44,7 +44,6 @@ export class PointsConversionService {
       idPointsConversion,
     );
     currentPointsConversion.finalDate = new Date();
-
     return await this.pointsConversionRepository.save(currentPointsConversion);
   }
 }
