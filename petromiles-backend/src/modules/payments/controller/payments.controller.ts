@@ -57,7 +57,7 @@ export class PaymentsController {
     this.logger.http(
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/buy-points`,
     );
-    return await this.paymentsService.buyPoints(
+    const res = await this.paymentsService.buyPoints(
       idClientBankAccount,
       amount,
       amountToCharge,
@@ -65,6 +65,7 @@ export class PaymentsController {
       subscriptionName,
       infoSubscription,
     );
+    return res;
   }
 
   @Post('withdraw-points')
@@ -82,13 +83,14 @@ export class PaymentsController {
       `[${ApiModules.PAYMENTS}] {${user.email}} asks /${baseEndpoint}/withdraw-points`,
     );
 
-    return await this.paymentsService.withdrawPoints(
+    const res = await this.paymentsService.withdrawPoints(
       user,
       idClientBankAccount,
       amount,
       amountToCharge,
       points,
     );
+    return res;
   }
 
   @Get('one-point-to-dollars')
