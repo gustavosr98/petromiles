@@ -147,7 +147,10 @@ export class ThirdPartyClientsService {
     thirdPartyClientName: string,
     code: string,
   ): Promise<MailsResponse> {
-    const language = userClient.userDetails.language.name;
+    const userDetails = await userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
+    const language = userDetails.language.name;
 
     const template = `sendVerificationCodeEmail[${language}]`;
     const subject = MailsSubjets.verification_code[language];
@@ -159,7 +162,7 @@ export class ThirdPartyClientsService {
         `mails.sendgrid.templates.${template}`,
       ),
       dynamic_template_data: {
-        user: userClient.userDetails.firstName,
+        user: userDetails.firstName,
         thirdPartyClientName,
         code,
       },
@@ -258,7 +261,7 @@ export class ThirdPartyClientsService {
     return PlatformInterest.GOLD_EXTRA;
   }
 
-  async calculateExtras(userClient: UserClient) {
+  private async calculateExtras(userClient: UserClient) {
     const currentUserSuscription = await userClient.userSuscription.find(
       suscription => !suscription.finalDate,
     );
@@ -530,7 +533,9 @@ export class ThirdPartyClientsService {
               userEmail: ourTransaction.clientBankAccountEmail,
               pointsToDollars: Math.trunc(ourTransaction.amount * 100),
               commission: Math.trunc(ourTransaction.interest * 100),
-              accumulatedPoints: Math.trunc(ourTransaction.pointsEquivalent),
+              accumulatedPoints: Math.trunc(
+                ourTransaction.pointsEquivalent + ourTransaction.extra,
+              ),
               state: ourTransaction.state,
             };
 
@@ -645,12 +650,21 @@ export class ThirdPartyClientsService {
     theirConfirmationTicket,
     processingDetails,
   }) {
-    if (ourConfirmationTicket.date !== theirConfirmationTicket.date) {
-      processingDetails.description.push(CsvProcessDescription.NO_MATCH_DATE);
+    if (
+      ourConfirmationTicket.date.toISOString() !== theirConfirmationTicket.date
+    ) {
+      processingDetails.description.push(
+        CsvProcessDescription.NO_MATCH_DATE +
+          `: ${ourConfirmationTicket.date.toISOString()} != ${
+            theirConfirmationTicket.date
+          }`,
+      );
     }
+
     if (ourConfirmationTicket.userEmail !== theirConfirmationTicket.userEmail) {
       processingDetails.description.push(
-        CsvProcessDescription.NO_MATCH_USER_EMAIL,
+        CsvProcessDescription.NO_MATCH_USER_EMAIL +
+          `: ${ourConfirmationTicket.userEmail} != ${theirConfirmationTicket.userEmail}`,
       );
     }
     if (
@@ -658,14 +672,16 @@ export class ThirdPartyClientsService {
       theirConfirmationTicket.pointsToDollars
     ) {
       processingDetails.description.push(
-        CsvProcessDescription.NO_MATCH_POINTS_TO_DOLLARS,
+        CsvProcessDescription.NO_MATCH_POINTS_TO_DOLLARS +
+          `: ${ourConfirmationTicket.pointsToDollars} != ${theirConfirmationTicket.pointsToDollars}`,
       );
     }
     if (
       ourConfirmationTicket.commission != theirConfirmationTicket.commission
     ) {
       processingDetails.description.push(
-        CsvProcessDescription.NO_MATCH_COMMISSION,
+        CsvProcessDescription.NO_MATCH_COMMISSION +
+          `: ${ourConfirmationTicket.commission} != ${theirConfirmationTicket.commission}`,
       );
     }
     if (
@@ -673,7 +689,8 @@ export class ThirdPartyClientsService {
       theirConfirmationTicket.accumulatedPoints
     ) {
       processingDetails.description.push(
-        CsvProcessDescription.NO_MATCH_ACCUMULATED_POINTS,
+        CsvProcessDescription.NO_MATCH_ACCUMULATED_POINTS +
+          `: ${ourConfirmationTicket.accumulatedPoints} != ${theirConfirmationTicket.accumulatedPoints}`,
       );
     }
   }
@@ -727,7 +744,11 @@ export class ThirdPartyClientsService {
     const userClient = await this.userClientRepository.findOne({
       email: userEmail,
     });
-    const language = userClient.userDetails.language.name;
+
+    const userDetails = await userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
+    const language = userDetails.language.name;
 
     if (status === StateName.VALID) {
       const template = `customerPointsAccumulationApproval[${language}]`;
@@ -741,7 +762,7 @@ export class ThirdPartyClientsService {
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
-          user: userClient.userDetails.firstName,
+          user: userDetails.firstName,
           thirdPartyClientName: thirdPartyClient.name,
           numberPoints: accumulatedPoints,
         },
@@ -759,7 +780,7 @@ export class ThirdPartyClientsService {
           `mails.sendgrid.templates.${template}`,
         ),
         dynamic_template_data: {
-          user: userClient.userDetails.firstName,
+          user: userDetails.firstName,
           thirdPartyClientName: thirdPartyClient.name,
           numberPoints: accumulatedPoints,
         },

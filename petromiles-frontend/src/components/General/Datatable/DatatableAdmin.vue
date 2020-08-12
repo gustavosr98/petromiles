@@ -18,6 +18,14 @@
       :items="fetchedData"
       :search="search"
     >
+      <template #item.date="{item}">
+        <v-chip outlined class="overline" label @click="seeDetails(item.id)">
+          {{
+          item.date
+          }}
+        </v-chip>
+      </template>
+
       <template #item.state="{value}">
         <v-chip outlined class="overline" :color="getColor(value.name)" label dark>
           {{

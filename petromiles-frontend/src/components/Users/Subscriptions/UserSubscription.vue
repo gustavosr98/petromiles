@@ -126,7 +126,7 @@
                   to="/user-subscription-purchase"
                   class="text-decoration-none"
                 >
-                  <v-btn dark color="primary">{{
+                  <v-btn dark color="primary" class="acquire-btn">{{
                     $t("subscription.btnAcquireNow")
                   }}</v-btn>
                 </router-link>

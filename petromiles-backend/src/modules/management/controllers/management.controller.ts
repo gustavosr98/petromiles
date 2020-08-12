@@ -188,7 +188,6 @@ export class ManagementController {
       updateUserStateDTO.role,
       updateUserStateDTO.state,
       userId,
-      user.id,
     );
   }
 }

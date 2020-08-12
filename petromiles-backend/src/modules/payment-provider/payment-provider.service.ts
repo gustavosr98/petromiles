@@ -50,8 +50,12 @@ export class PaymentProviderService {
       `[${ApiModules.PAYMENT_PROVIDER}] {${userClient.email}} Bank account first token created ${bankAccountToken.id}`,
     );
 
+    const userDetails = await userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
+
     const bankAccountSource = await this.asociateBankToCustomer(
-      userClient.userDetails.customerId,
+      userDetails.customerId,
       bankAccountToken.id,
     );
     this.logger.verbose(
@@ -74,7 +78,7 @@ export class PaymentProviderService {
     );
 
     const asociatedBankAccount = await this.stripeService.asociateBankAccountToAccount(
-      userClient.userDetails.accountId,
+      userDetails.accountId,
       bankAccountToken.id,
     );
     this.logger.verbose(

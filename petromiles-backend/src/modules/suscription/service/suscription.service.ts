@@ -46,14 +46,16 @@ import { ThirdPartyInterestService } from '@/modules/management/services/third-p
 export class SuscriptionService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    @InjectRepository(UserClient)
-    private userClientRepository: Repository<UserClient>,
     @InjectRepository(Suscription)
     private suscriptionRepository: Repository<Suscription>,
     @InjectRepository(PlatformInterestEntity)
     private platformInterestRepository: Repository<PlatformInterestEntity>,
     @InjectRepository(StateTransaction)
     private stateTransactionRepository: Repository<StateTransaction>,
+    @InjectRepository(UserSuscription)
+    private userSuscriptionRepository: Repository<UserSuscription>,
+    @InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,
     private userClientService: UserClientService,
     private clientBankAccountService: ClientBankAccountService,
     private transactionService: TransactionService,
@@ -65,9 +67,7 @@ export class SuscriptionService {
     private thirdPartyInterestService: ThirdPartyInterestService,
   ) {}
   async get(suscriptionType: SuscriptionType): Promise<Suscription> {
-    return await getConnection()
-      .getRepository(Suscription)
-      .findOne({ name: suscriptionType });
+    return await this.suscriptionRepository.findOne({ name: suscriptionType });
   }
 
   async getAll(): Promise<Suscription[]> {
@@ -75,9 +75,10 @@ export class SuscriptionService {
   }
 
   async getUserSuscription(userClient: UserClient): Promise<UserSuscription> {
-    return await getConnection()
-      .getRepository(UserSuscription)
-      .findOne({ userClient, finalDate: null });
+    return await this.userSuscriptionRepository.findOne({
+      userClient,
+      finalDate: null,
+    });
   }
 
   async createUserSuscription(
@@ -90,8 +91,7 @@ export class SuscriptionService {
     }
     const suscription = await this.get(suscriptionType);
 
-    const userSuscription = await getConnection()
-      .getRepository(UserSuscription)
+    const userSuscription = await this.userSuscriptionRepository
       .create({
         userClient,
         suscription,
@@ -185,9 +185,12 @@ export class SuscriptionService {
       throw new BadRequestException('error-messages.goldUser');
     }
 
+    const customer = clientBankAccount.userClient.userDetails.find(
+      details => details.accountOwner === null,
+    ).customerId;
     const paymentProviderCharge = await this.paymentProviderService.createCharge(
       {
-        customer: clientBankAccount.userClient.userDetails.customerId,
+        customer,
         source: clientBankAccount.chargeId,
         currency: 'usd',
         amount: Math.trunc(
@@ -221,8 +224,7 @@ export class SuscriptionService {
     if (currentUserSuscription.suscription.name === SuscriptionType.PREMIUM) {
       const goldSuscription = await this.get(SuscriptionType.GOLD);
 
-      const interests = await getConnection()
-        .getRepository(Transaction)
+      const interests = await this.transactionRepository
         .createQueryBuilder('transaction')
         .select(
           'SUM(transaction.totalAmountWithInterest - thirdPartyInterest.amountDollarCents)',
@@ -255,7 +257,10 @@ export class SuscriptionService {
       PlatformInterest.GOLD_EXTRA,
     );
 
-    const languageMails = userClient.userDetails.language.name;
+    const userDetails = userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
+    const languageMails = userDetails.language.name;
 
     const extraPoints =
       parseFloat(platformInterestService.amount) /
@@ -272,7 +277,7 @@ export class SuscriptionService {
         `mails.sendgrid.templates.${template}`,
       ),
       dynamic_template_data: {
-        user: userClient.userDetails.firstName,
+        user: userDetails.firstName,
         extraPoints,
       },
     };

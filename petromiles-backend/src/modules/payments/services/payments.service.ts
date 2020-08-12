@@ -38,9 +38,12 @@ import { Interest } from '@/modules/payments/interest.interface';
 export class PaymentsService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
-    private clientBankAccountService: ClientBankAccountService,
     @InjectRepository(ClientBankAccount)
     private clientBankAccountRepository: Repository<ClientBankAccount>,
+    @InjectRepository(UserClient)
+    private userClientRepository: Repository<UserClient>,
+    @InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,
     private transactionService: TransactionService,
     private thirdPartyInterestService: ThirdPartyInterestService,
     private platformInterestService: PlatformInterestService,
@@ -130,14 +133,20 @@ export class PaymentsService {
       idClientBankAccount,
     });
 
+    const customer = (
+      await clientBankAccount.userClient.userDetails.find(
+        details => details.accountOwner === null,
+      )
+    ).customerId;
+
     const charge = await this.paymentProviderService.createCharge({
-      customer: clientBankAccount.userClient.userDetails.customerId,
+      customer,
       source: clientBankAccount.chargeId,
       currency: 'usd',
       amount: Math.round(amountToCharge),
     });
 
-    let currentUserSuscription = clientBankAccount.userClient.userSuscription.find(
+    let currentUserSuscription = await clientBankAccount.userClient.userSuscription.find(
       suscription => !suscription.finalDate,
     );
 
@@ -201,8 +210,13 @@ export class PaymentsService {
     });
 
     if (await this.verifyEnoughPoints(id, amount)) {
+      const accountId = (
+        await clientBankAccount.userClient.userDetails.find(
+          details => details.accountOwner === null,
+        )
+      ).accountId;
       await this.paymentProviderService.updateBankAccountOfAnAccount(
-        clientBankAccount.userClient.userDetails.accountId,
+        accountId,
         clientBankAccount.transferId,
         {
           default_for_currency: true,
@@ -210,17 +224,19 @@ export class PaymentsService {
       );
 
       const transfer = await this.paymentProviderService.createTransfer({
-        destination: clientBankAccount.userClient.userDetails.accountId,
+        destination: accountId,
         currency: 'usd',
         amount: Math.round(amountToCharge),
         source_type: 'bank_account',
       });
 
-      return this.transactionService.createWithdrawalTransaction(
+      const withdrawal = await this.transactionService.createWithdrawalTransaction(
         clientBankAccount,
         amount,
         transfer.id,
       );
+
+      return withdrawal;
     }
 
     this.logger.error(
@@ -260,21 +276,22 @@ export class PaymentsService {
   }
 
   async sendPaymentInvoiceEmail(user, file) {
-    const userClient = await getConnection()
-      .getRepository(UserClient)
-      .findOne({ email: user.email });
+    const userClient = await this.userClientRepository.findOne({
+      email: user.email,
+    });
 
+    const userDetails = await userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
     const transactionCode = await this.transactionService.getTransactions(
       userClient.idUserClient,
     );
 
-    const transaction = await getConnection()
-      .getRepository(Transaction)
-      .findOne({
-        idTransaction: (await transactionCode[transactionCode.length - 1]).id,
-      });
+    const transaction = await this.transactionRepository.findOne({
+      idTransaction: (await transactionCode[transactionCode.length - 1]).id,
+    });
 
-    const languageMails = userClient.userDetails.language.name;
+    const languageMails = userDetails.language.name;
 
     const template = `invoice[${languageMails}]`;
 
@@ -286,7 +303,7 @@ export class PaymentsService {
       templateId: this.configService.get(
         `mails.sendgrid.templates.${template}`,
       ),
-      dynamic_template_data: { user: userClient.userDetails.firstName },
+      dynamic_template_data: { user: userDetails.firstName },
       attachments: [
         {
           filename: `PetroMiles[invoice]-${new Date().toLocaleDateString()}-${
@@ -300,21 +317,22 @@ export class PaymentsService {
   }
 
   async sendWithdrawalInvoiceEmail(user, file, points, total) {
-    let userClient = await getConnection()
-      .getRepository(UserClient)
-      .findOne({ email: user.email });
+    const userClient = await this.userClientRepository.findOne({
+      email: user.email,
+    });
 
+    const userDetails = await userClient.userDetails.find(
+      details => details.accountOwner === null,
+    );
     const transactionCode = await this.transactionService.getTransactions(
       userClient.idUserClient,
     );
 
-    const transaction = await getConnection()
-      .getRepository(Transaction)
-      .findOne({
-        idTransaction: (await transactionCode[transactionCode.length - 1]).id,
-      });
+    const transaction = await this.transactionRepository.findOne({
+      idTransaction: (await transactionCode[transactionCode.length - 1]).id,
+    });
 
-    const languageMails = userClient.userDetails.language.name;
+    const languageMails = userDetails.language.name;
 
     const template = `withdrawal[${languageMails}]`;
 
@@ -327,7 +345,7 @@ export class PaymentsService {
         `mails.sendgrid.templates.${template}`,
       ),
       dynamic_template_data: {
-        user: userClient.userDetails.firstName,
+        user: userDetails.firstName,
         numberPoints: points,
         dollarWithdrawal: total,
       },

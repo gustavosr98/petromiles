@@ -9,6 +9,7 @@ import { Repository, getConnection } from 'typeorm';
 import { BankAccount } from '@/entities/bank-account.entity';
 import { RoutingNumber } from '@/entities/routing-number.entity';
 import { Bank } from '@/entities/bank.entity';
+import { UserClient } from '@/entities/user-client.entity';
 
 // INTERFACES
 import { ApiModules } from '@/logger/api-modules.enum';
@@ -29,13 +30,12 @@ export class BankAccountService {
   ) {}
 
   async getAll(): Promise<BankAccount[]> {
-    return await getConnection()
-      .getRepository(BankAccount)
-      .find();
+    return await this.bankAccountRepository.find();
   }
 
   async create(
     bankAccountCreateParams: CreateBankAccountDTO,
+    userClient: UserClient,
   ): Promise<BankAccount> {
     const { routingNumber, ...bankAccount } = bankAccountCreateParams;
     const routingNumberFound = await this.getValidRoutingNumber(
@@ -46,16 +46,15 @@ export class BankAccountService {
     //  Verify if the account is of a Petromiles User. If it isn't, create the person in the entity UserDetails
     if (bankAccount.userDetails) {
       bankAccount.userDetails = await this.userClientService.createDetails(
-        bankAccount.userDetails,
+        { ...bankAccount.userDetails, userClient },
+        'yes',
       );
     }
 
-    const bankAccountCreated = await this.bankAccountRepository
-      .create({
-        routingNumber: routingNumberFound,
-        ...bankAccount,
-      })
-      .save();
+    const bankAccountCreated = await this.bankAccountRepository.save({
+      routingNumber: routingNumberFound,
+      ...bankAccount,
+    });
 
     this.logger.silly(
       `[${ApiModules.BANK_ACCOUNT}] Bank Account ID: %s was created`,
@@ -65,7 +64,7 @@ export class BankAccountService {
   }
 
   // Only validates American bank routing numbers
-  private async getValidRoutingNumber(
+  async getValidRoutingNumber(
     number: string,
     bank: Bank,
   ): Promise<RoutingNumber> {
@@ -82,29 +81,6 @@ export class BankAccountService {
     }
 
     return routingNumberFound;
-  }
-
-  async existsBankAccount(accountNumber): Promise<BankAccount> {
-    return await this.bankAccountRepository.findOne({ accountNumber });
-  }
-
-  async getAllAccounts() {
-    const accounts = await this.bankAccountRepository
-      .createQueryBuilder('ba')
-      .select(
-        'rn.number, ba."accountNumber", ba."idBankAccount", ba.nickname ,uc.email, s.name',
-      )
-      .distinct(true)
-      .leftJoin('ba.clientBankAccount', 'cba')
-      .leftJoin('ba.routingNumber', 'rn')
-      .leftJoin('ba.userDetails', 'ud')
-      .leftJoin('cba.userClient', 'uc')
-      .leftJoin('cba.stateBankAccount', 'sba')
-      .leftJoin('sba.state', 's')
-      .where('sba."finalDate" IS NULL')
-      .getRawMany();
-
-    return accounts;
   }
 
   async accountInfo(accountId: number) {
@@ -127,5 +103,4 @@ export class BankAccountService {
       .andWhere('sba."finalDate" IS NULL')
       .execute();
   }
-
 }
