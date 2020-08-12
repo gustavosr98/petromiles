@@ -5,7 +5,7 @@ import { INestApplication, HttpStatus, ExecutionContext } from '@nestjs/common';
 
 import { AppModule } from '@/app.module';
 
-describe('E2E', () => {
+describe('Transaction E2E', () => {
   let app: INestApplication;
   let user = { id: 1, email: 'test@petromiles.com' };
 
