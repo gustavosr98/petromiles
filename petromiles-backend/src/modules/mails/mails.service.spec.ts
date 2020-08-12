@@ -18,31 +18,20 @@ import createOptions from '../../logger/winston/winston-config';
 
 describe('MailsService', () => {
   let mailsService: MailsService;
-  let sendGridConfig: typeof SendGridConfig;
+  let sendGridConfig;
   let sendGridService: SendGridService;
-  let RepositoryMock: jest.Mock;
-  let userClientRepository: Repository<UserClient>;
-  let SendGridConfigMock: jest.Mock<Partial<typeof SendGridConfig>>;
   let SendGridServiceMock: jest.Mock<Partial<SendGridService>>;
 
   beforeEach(() => {
-    RepositoryMock = jest.fn(() => ({
-      find: jest.fn(),
-      findOne: jest.fn(),
-      save: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    }));
-    SendGridConfigMock = jest.fn<
-      Partial<typeof SendGridConfig>,
-      typeof SendGridConfig[]
-    >(() => ({}));
     SendGridServiceMock = jest.fn<Partial<SendGridService>, SendGridService[]>(
       () => ({
         send: jest.fn(),
-        sendMultiple: jest.fn(),
       }),
     );
+
+    sendGridConfig = {
+      emailFrom: 'maalleyne.17@est.ucab.edu.ve',
+    };
   });
 
   beforeEach(async () => {
@@ -51,33 +40,26 @@ describe('MailsService', () => {
         WinstonModule.forRoot(
           createOptions({ fileName: 'petromiles-global.log' }),
         ),
-        SendGridConfig,
       ],
       providers: [
         MailsService,
         {
-          provide: getRepositoryToken(UserClient),
-          useClass: RepositoryMock,
+          provide: SendGridService,
+          useClass: SendGridServiceMock,
         },
         {
           provide: 'SENDGRID_CONFIG',
-          useClass: SendGridConfigMock,
-        },
-        {
-          provide: SendGridService,
-          useClass: SendGridServiceMock,
+          useValue: sendGridConfig,
         },
       ],
     }).compile();
 
-    userClientRepository = module.get(getRepositoryToken(UserClient));
     mailsService = module.get<MailsService>(MailsService);
     sendGridService = module.get<SendGridService>(SendGridService);
     sendGridConfig = await module.resolve('SENDGRID_CONFIG');
   });
 
   describe('sendEmail(user)', () => {
-    let expectedUserClient;
     let template;
     let subject;
     let mailParameters;
@@ -86,35 +68,17 @@ describe('MailsService', () => {
     describe('case: success', () => {
       describe('when everything works well', () => {
         beforeEach(async () => {
-          expectedUserClient = {
-            idUserClient: 1,
-            email: 'test@petromiles.com',
-            userDetails: {
-              firstName: 'Petro',
-              lastName: 'Miles',
-              language: {
-                idLanguage: 1,
-                name: 'english',
-                shortname: 'en',
-              },
-            },
-          };
-
           template = 'welcome';
           subject = MailsSubjets.welcome;
           emailFrom = 'maalleyne.17@est.ucab.edu.ve';
           mailParameters = {
-            to: expectedUserClient.email,
+            to: 'test@petromiles.com',
             subject: subject,
             templateId: template,
             dynamic_template_data: {
-              user: expectedUserClient.userDetails.firstName,
+              user: 'Pedro',
             },
           };
-
-          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
-            expectedUserClient,
-          );
 
           (sendGridService.send as jest.Mock).mockImplementation();
 
@@ -133,65 +97,37 @@ describe('MailsService', () => {
 
     describe('case: failure', () => {
       let expectedError: BadRequestException;
-      describe('When the mail has an error when it is sent', () => {
+      describe('when there is a problem sending the mail', () => {
         beforeEach(async () => {
-          expectedUserClient = {
-            idUserClient: 1,
-            email: 'test',
-            userDetails: {
-              firstName: 'Petro',
-              lastName: 'Miles',
-              language: {
-                idLanguage: 1,
-                name: 'english',
-                shortname: 'en',
-              },
-            },
-          };
-
           template = 'welcome';
           subject = MailsSubjets.welcome;
           emailFrom = 'maalleyne.17@est.ucab.edu.ve';
           mailParameters = {
-            to: expectedUserClient.email,
+            to: 'test@petromiles.com',
             subject: subject,
             templateId: 'test',
             dynamic_template_data: {
-              user: expectedUserClient.userDetails.firstName,
+              user: 'Pedro',
             },
           };
 
-          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
-            expectedUserClient,
-          );
-
-          (sendGridService.send as jest.Mock).mockImplementation();
-
-          await mailsService.sendEmail(mailParameters);
-
           expectedError = new BadRequestException();
+
+          (sendGridService.send as jest.Mock).mockRejectedValue(expectedError);
 
           jest
             .spyOn(mailsService, 'sendEmail')
             .mockRejectedValue(expectedError);
         });
 
-        it('should invoke sendGridService.send()', () => {
-          expect(sendGridService.send).toHaveBeenCalledTimes(1);
-          expect(sendGridService.send).toHaveBeenCalledWith({
-            ...mailParameters,
-            emailFrom,
-          });
-        });
-
-        it('should be thrown when there is an error in the mail', async () => {
+        it('should be throw when there is a problem sending the mail', async () => {
           await expect(mailsService.sendEmail(mailParameters)).rejects.toThrow(
             BadRequestException,
           );
         });
       });
 
-      describe('When the mail does not exist in sendgrid', () => {
+      describe('when the mail does not exist in sendgrid', () => {
         beforeEach(async () => {
           subject = MailsSubjets.welcome;
 
@@ -204,17 +140,17 @@ describe('MailsService', () => {
             },
           };
 
-          (sendGridService.send as jest.Mock).mockImplementation();
-
           await mailsService.sendEmail(mailParameters);
         });
 
+        it('should be throw when the mail does not exist in sendgrid', async () => {
+          await expect(mailsService.sendEmail(mailParameters)).rejects.toThrow(
+            BadRequestException,
+          );
+        });
+
         it('should invoke sendGridService.send()', () => {
-          expect(sendGridService.send).toHaveBeenCalledTimes(1);
-          expect(sendGridService.send).toHaveBeenCalledWith({
-            ...mailParameters,
-            emailFrom,
-          });
+          expect(sendGridService.send).not.toHaveBeenCalled();
         });
       });
     });
