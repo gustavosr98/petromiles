@@ -4,13 +4,15 @@ import { Test } from '@nestjs/testing';
 import { INestApplication, HttpStatus, ExecutionContext } from '@nestjs/common';
 
 import { AppModule } from '@/app.module';
+import { stringify } from 'querystring';
+import { isNumber } from 'util';
 
 describe('Payments', () => {
   let app: INestApplication;
   let baseEndpoint: string;
   let user = { id: 1, email: 'test@petromiles.com' };
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -29,7 +31,7 @@ describe('Payments', () => {
     await app.init();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await app.close();
   });
 
@@ -44,9 +46,9 @@ describe('Payments', () => {
 
     beforeEach(async () => {
       idClientBankAccount = 1;
-      amount = 100;
-      amountToCharge = 100;
-      points = 100;
+      amount = 200;
+      amountToCharge = 295;
+      points = '1000';
       subscriptionName = 'BASIC';
       infoSubscription = {};
 
@@ -62,13 +64,83 @@ describe('Payments', () => {
 
     it(`should return the search result`, () => {
       request(app.getHttpServer())
-        .post(`${baseEndpoint}/buy-points`)
+        .post(`/payments/buy-points`)
         .send(paymentProperties)
         .expect(HttpStatus.CREATED)
         .then(res => {
-          expect(res.body).toStrictEqual(expect.objectContaining({}));
+          console.log(baseEndpoint);
+          console.log(res.body);
+          expect(res.body).toStrictEqual(
+            expect.objectContaining({
+              totalAmountWithInterest: expect.any(Number),
+              rawAmount: expect.any(Number),
+              type: expect.any(String),
+              pointsConversion: expect.objectContaining({
+                idPointsConversion: expect.any(Number),
+                onePointEqualsDollars: expect.any(String),
+                initialDate: expect.any(Date),
+                finalDate: null,
+              }),
+              clientBankAccount: expect.objectContaining({
+                idClientBankAccount: expect.any(Number),
+                paymentProvider: expect.any(String),
+                chargeId: expect.any(String),
+                primary: expect.any(Boolean),
+                transferId: expect.any(String),
+                userClient: expect.objectContaining({
+                  idUserClient: expect.any(Number),
+                  salt: null,
+                  googleToken: null,
+                  facebookToken: null,
+                  email: expect.any(String),
+                  password: null,
+                  stateUser: expect.any(Array),
+                  userDetails: expect.any(Array),
+                  userSuscription: expect.any(Array),
+                }),
+                bankAccount: expect.objectContaining({
+                  idBankAccount: expect.any(Number),
+                  accountNumber: expect.any(String),
+                  checkNumber: expect.any(String),
+                  nickname: expect.any(String),
+                  type: expect.any(String),
+                  routingNumber: expect.any(Array),
+                }),
+                stateBankAccount: expect.any(Array),
+              }),
+              thirdPartyInterest: expect.objectContaining({
+                idThirdPartyInterest: expect.any(Number),
+                name: expect.any(String),
+                transactionType: expect.any(String),
+                paymentProvider: expect.any(String),
+                amountDollarCents: expect.any(Number),
+                percentage: null,
+                initialDate: expect.any(Date),
+                finalDate: null,
+              }),
+              platformInterest: expect.objectContaining({
+                idPlatformInterest: expect.any(isNumber),
+                name: expect.any(String),
+                amount: null,
+                percentage: expect.any(String),
+                points: null,
+                initialDate: expect.any(Date),
+                finalDate: null,
+                description: expect.any(String),
+                suscription: null,
+              }),
+              stateTransactionDescription: expect.any(String),
+              platformInterestExtraPoints: null,
+              operation: expect.any(Number),
+              paymentProviderTransactionId: expect.any(String),
+              idTransaction: expect.any(Number),
+              initialDate: expect.any(Date),
+            }),
+          );
         })
-        .catch();
+        .catch(e => {
+          console.log(e);
+        });
     });
   });
 });
