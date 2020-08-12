@@ -84,7 +84,6 @@ context("Bank Account Creation", () => {
     cy.get(".nickname-input").type(nicknames[0]);
     cy.get(".continue-btn").click();
     cy.url().should("include", "/bank-accounts");
-    cy.get(".v-card__title").should("be.visible");
   });
 
   it("40 - trying to create a bank account without a routing number", () => {
