@@ -266,7 +266,7 @@ describe('StripeService', () => {
         beforeEach(async () => {
           customerId = 'prueba';
           bankAccountId = 'prueba';
-          amounts = [100, 150];
+          amounts = [32, 45];
 
           expectedResult = {
             id: 'prueba',
@@ -286,13 +286,11 @@ describe('StripeService', () => {
 
         it('should invoke stripe.customers.verifySource()', () => {
           expect(stripe.customers.verifySource).toHaveBeenCalledTimes(1);
-          
-          // FAILING on Travis. PASS on localhost. Must be checked
-          // expect(stripe.customers.verifySource).toHaveBeenCalledWith(
-          //   customerId,
-          //   bankAccountId,
-          //   { amounts },
-          // );
+          expect(stripe.customers.verifySource).toHaveBeenCalledWith(
+            customerId,
+            bankAccountId,
+            { amounts },
+          );
         });
 
         it('should return a verified bank account', () => {
