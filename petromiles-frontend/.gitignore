@@ -22,3 +22,6 @@ yarn-error.log*
 
 # i18n
 src/locales/*.json
+
+# Lighthouse
+tests/lighthouse/petromiles*
