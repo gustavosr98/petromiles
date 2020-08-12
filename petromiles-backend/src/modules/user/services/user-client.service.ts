@@ -149,14 +149,11 @@ export class UserClientService {
     userClientDetails,
     accountOwner: string,
   ): Promise<UserDetails> {
-    console.log(userClientDetails);
-    console.log(accountOwner);
     const result = await this.userDetailsRepository.save({
       ...userClientDetails,
       accountOwner,
     });
     result.userClient = null;
-    console.log(result);
     return result;
   }
 

@@ -30,14 +30,26 @@ describe('UserClientService', () => {
   let ManagementServiceMock: jest.Mock<Partial<ManagementService>>;
   let managementService: ManagementService;
   let stateUserRepository: Repository<StateUser>;
+  let getOne: jest.Mock;
 
   beforeEach(() => {
+    let innerJoin = jest.fn().mockReturnThis();
+    let where = jest.fn().mockReturnThis();
+    let andWhere = jest.fn().mockReturnThis();
+    getOne = jest.fn().mockReturnThis();
+
     RepositoryMock = jest.fn(() => ({
       find: jest.fn(),
       findOne: jest.fn(),
       save: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      createQueryBuilder: jest.fn(() => ({
+        innerJoin,
+        where,
+        andWhere,
+        getOne,
+      })),
     }));
 
     ManagementServiceMock = jest.fn<
@@ -169,7 +181,7 @@ describe('UserClientService', () => {
     });
   });
 
-  describe('createUserDTO,ip', () => {
+  describe('create(createUserDTO,ip)', () => {
     describe('case: success', () => {
       let createUserDTO;
       let ip;
@@ -534,8 +546,74 @@ describe('UserClientService', () => {
           );
         });
 
+        it('should invoke userDetailsRepository.save()', () => {
+          expect(userDetailsRepository.save).toHaveBeenCalledTimes(1);
+          expect(userDetailsRepository.save).toHaveBeenCalledWith({
+            ...userClientDetails,
+            accountOwner,
+          });
+        });
+
         it('should return an  user details object', () => {
           expect(result).toStrictEqual(expectedUserDetails);
+        });
+      });
+
+      describe('when accountOwner is not null', () => {
+        beforeEach(async () => {
+          userClientDetails = {
+            firstName: 'petro',
+            lastName: 'miles',
+            language: { idLanguage: 1, name: 'english', shortname: 'en' },
+            userClient: {
+              email: 'test@petromiles.com',
+              password:
+                '$2b$10$H1XfwQjhOhrgXfaHGFRDRew1FIwm/.YJBbujF6hU8zCp5eiExnimS',
+              salt: '$2b$10$H1XfwQjhOhrgXfaHGFRDRe',
+              googleToken: null,
+              facebookToken: null,
+              idUserClient: 1,
+            },
+            customerId: 'cus_HolEeiXLpfllA2',
+            accountId: 'acct_1HF7hfL9nokkIfXn',
+          };
+          accountOwner = 'yes';
+          expectedUserDetails = userClientDetails;
+          expectedUserDetails.userClient = null;
+
+          (userDetailsRepository.save as jest.Mock).mockResolvedValue(
+            userClientDetails,
+          );
+
+          result = await userClientService.createDetails(
+            userClientDetails,
+            accountOwner,
+          );
+        });
+
+        it('should invoke userDetailsRepository.save()', () => {
+          expect(userDetailsRepository.save).toHaveBeenCalledTimes(1);
+          expect(userDetailsRepository.save).toHaveBeenCalledWith({
+            ...userClientDetails,
+            accountOwner,
+          });
+        });
+
+        it('should return an  user details object', () => {
+          expect(result).toStrictEqual(expectedUserDetails);
+        });
+      });
+    });
+  });
+
+  describe('getActive(email)', () => {
+    describe('case: success', () => {
+      let email;
+      let expectedActiveClient;
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          email = 'test@petromiles.com';
+          getOne.mockResolvedValue(expectedBankAccounts);
         });
       });
     });
