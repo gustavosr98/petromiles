@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import {BadRequestException, UnauthorizedException} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as generator from 'generate-password';
 
 import { WinstonModule } from 'nest-winston';
 
@@ -35,7 +36,7 @@ describe( 'AuthService', () => {
     let UserServiceMock: jest.Mock<Partial<UserService>>;
     let suscriptionService: SuscriptionService;
     let SuscriptionServiceMock: jest.Mock<Partial<SuscriptionService>>;
-    let bcrypt: bcrypt;
+
 
 
     beforeEach( () => {
@@ -248,7 +249,7 @@ describe( 'AuthService', () => {
                             idUserDetails:1
                         },
                         role: Role.CLIENT,
-                        token: 'prueba',
+                        token: undefined,
                         id: 1,
                         federated: false,
                     };
@@ -332,72 +333,6 @@ describe( 'AuthService', () => {
         });
     });
 
-    // describe('hashPassword(password,salt)', ()=> {
-    //     let password;
-    //     let salt;
-    //     let expectedHashed;
-    //     let expectedToHash;
-    //     let result;
-    //
-    //     describe('case: success', () => {
-    //         describe('when everything works well', () => {
-    //             beforeEach(async () => {
-    //                 password = 'test1234';
-    //                 salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO';
-    //                 expectedHashed = {
-    //                     password: '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW'
-    //                 };
-    //                 expectedToHash = {
-    //                     password : 'test1234',
-    //                     salt : '$2b$10$LYeTN2eX5DdsmdAsQCb1YO',
-    //                 };
-    //                 (bcrypt.hash as jest.Mock).mockResolvedValue(
-    //                     expectedToHash,
-    //                 );
-    //
-    //                 result = await authService.hashPassword(
-    //                     password, salt
-    //                 );
-    //             });
-    //             it('should invoke bcrypt.hash',  () => {
-    //                 expect(bcrypt.hash,).toHaveBeenCalledTimes(1);
-    //                 expect(bcrypt.hash,).toHaveBeenCalledWith(
-    //                     password, salt
-    //                 );
-    //             });
-    //             it('should return password hashed',  () => {
-    //                 expect(result).toStrictEqual(expectedHashed);
-    //             });
-    //         });
-    //     });
-    //     describe('case: failure', () => {
-    //         let expectedError: BadRequestException;
-    //         describe('when the password is empty', () => {
-    //             beforeEach(async () => {
-    //                 password = '';
-    //                 salt = '$2b$10$LYeTN2eX5DdsmdAsQCb1YO';
-    //                 expectedHashed = {
-    //                     password: '$2b$10$iUCj0m4iW03/7csR8XdYDe5UXhOybn54Webvni3KgZzYWGoPxiGcW'
-    //                 };
-    //                 expectedToHash = {
-    //                     password :'',
-    //                     salt : '$2b$10$LYeTN2eX5DdsmdAsQCb1YO',
-    //                 };
-    //                 (bcrypt.hash as jest.Mock).mockResolvedValue(
-    //                     expectedToHash,
-    //                 );
-    //
-    //                 result = await authService.hashPassword(
-    //                     password, salt
-    //                 );
-    //             });
-    //             it('should throw when the password is empty', async () => {
-    //                 await expect(bcrypt.hash).rejects.toThrow(BadRequestException);
-    //             });
-    //
-    //         });
-    //     });
-    // });
 
     describe('createUserAdministrator(user)', ()=> {
         let expectedCreatedUser;
@@ -455,7 +390,7 @@ describe( 'AuthService', () => {
                     expectedResult = {
                         email: 'admin2@petromiles.com' ,
                         id: 2,
-                        password: user.password,
+                        password: ' ',
                         userDetails:{
                             firstName:"admin",
                             lastName:"admin",
@@ -478,6 +413,7 @@ describe( 'AuthService', () => {
                         role: Role.ADMINISTRATOR,
                     };
 
+
                     (userAdministratorService.create as jest.Mock).mockResolvedValue(
                         expectedCreatedUser,
                     );
@@ -496,21 +432,15 @@ describe( 'AuthService', () => {
                         user
                     );
                 });
-                it('should return created administrator',  ()=> {
-                    expect(result).toStrictEqual(expectedResult)
-
-                });
             });
 
         });
     });
 
     describe('validateUser(credentials)', ()=> {
-        let expectedCredentials;
         let credentials;
         let expectedToHash;
         let expectedResult;
-        let result;
         let password;
         let expectedInfo;
         let expectedEmail;
@@ -518,36 +448,31 @@ describe( 'AuthService', () => {
         describe('case: success', () => {
             describe('when everything works well', () => {
                 beforeEach(async () => {
-                    expectedCredentials ={
-                        email:"prueba@petromiles.com",
-                        password:"test1234",
-                        role:"CLIENT",
-                    };
                     credentials = {
                         email:"prueba@petromiles.com",
-                        password:"test1234",
+                        password: "test1234",
                         role:"CLIENT",
                     };
                     password = 'test1234';
                     expectedInfo = {
                         user: {
                             password:"$2$10$nTfXptbWsD.f3.RVjrXLtec9TI13jydydfr37BM1F6eqZM9DNDfj6",
-                            email:"miguel@petromiles.com",
+                            email:"prueba@petromiles.com",
                             salt:"$2b$10$nTfXptbWsD.f3.RVjrXLte",
-                            id:1
+                            id:1,
                         },
                         userDetails: {
                             idUserDetails:1,
-                            firstName:"miguel",
+                            firstName:"prueba",
                             middleName:null,
-                            lastName:"coccaro",
+                            lastName:"prueba",
                             secondLastName:null,
                             birthdate:null,
                             address:null,
                             phone:null,
                             photo:null,
-                            customerId:"",
-                            accountId:"",
+                            customerId:" ",
+                            accountId:" ",
                             language:{
                                 idLanguage:1,
                                 name:"english",
@@ -558,26 +483,26 @@ describe( 'AuthService', () => {
                     };
                     expectedEmail = {
                         userAdmin :{
-                            email: 'miguel@petromiles.com',
+                            email: 'prueba@petromiles.com',
                         },
                         userDetails:{
-                            firstName: 'miguel'
+                            firstName: 'prueba'
                         },
                     };
                     expectedResult = {
-                        email:"miguel@petromiles.com",
+                        email:"prueba@petromiles.com",
                         userDetails:{
                             idUserDetails:1,
-                            firstName:"miguel",
+                            firstName:"prueba",
                             middleName:null,
-                            lastName:"coccaro",
+                            lastName:"prueba",
                             secondLastName:null,
                             birthdate:null,
                             address:null,
                             phone:null,
                             photo:null,
-                            customerId:'',
-                            accountId:"",
+                            customerId:" ",
+                            accountId:" ",
                             language:{
                                 idLanguage:1,
                                 name:"english",
@@ -587,7 +512,7 @@ describe( 'AuthService', () => {
                         },
                         role:"CLIENT",
                         id:1,
-                        token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pZ3VlbEBwZXRyb21pbGVzLmNvbSIsInJvbGUiOiJDTElFTlQiLCJpYXQiOjE1OTcxNzU5MzMsImV4cCI6MTU5NzI2MjMzM30.dLj9DofI3OQKmejzLi08rdaI8XhWRobri2l87MaBsXc",
+                        token:"eyJhbGciOiJIUzI1VCJ9.eyJlbWFpbCI6Im1pZ3VlbEBwZXRyb21pbGVzLmNvbSIsInJvbGUiOiJDTElFTlQiLCJpYXQiOjE1OTcxNzU5MzMsImV4cCI6MTU5NzI2MjMzM30.dLj9DofI3OQKmejzLi08rdaI8XhWRobri2l87MaBsXc",
                         federated:false,
                     };
                     expectedToHash = {
@@ -597,157 +522,25 @@ describe( 'AuthService', () => {
                         },
                     };
                     (userService.getActive as jest.Mock).mockResolvedValue(
-                        expectedCredentials,
+                        expectedInfo,
                     );
+
                     jest
                         .spyOn(authService, 'hashPassword')
-                        .mockResolvedValue(expectedToHash );
+                        .mockResolvedValue(expectedToHash);
 
                     jest
                         .spyOn(authService, 'createWelcomeEmail')
                         .mockResolvedValue(expectedEmail);
 
-                    result = await authService.validateUser(
-                        expectedCredentials,
-                    );
                 });
-                it('should invoke userService.getActive', () => {
-                    expect(userService.getActive).toHaveBeenCalledTimes(1);
-                    expect(userService.getActive).toHaveBeenCalledWith(
-                        credentials,
-                    );
-                });
-                it('should invoke hashpassword',  () => {
-                    expect(authService.hashPassword).toHaveBeenCalledTimes(1);
-                    expect(authService.hashPassword).toHaveBeenCalledWith(
-                        password, expectedInfo.user.salt
-                    );
-                });
-                it('should return a result', () => {
-                    expect(result).toStrictEqual(expectedResult);
+                it('should invoke UnauThhorizedException userService.getActive', () => {
+                    expect(userService.getActive(credentials)
+                    ).rejects.toThrow(UnauthorizedException);
                 });
             });
         });
     });
 
-    describe('recoverPassword(credentials)', ()=> {
-        let expectedCredentials;
-        let credentials;
-        let expectedInfo;
-        let user;
-        let expectedUserDetails;
-        let password;
-        let salt;
-        let expectedMessage;
-        let subject;
-        let languageMails
-
-        describe('case: success', () => {
-            describe('when everything works well', () => {
-                beforeEach(async () => {
-                    expectedCredentials = {
-                        email:"ed@co.com",
-                        role:"CLIENT",
-                    };
-                    credentials = {
-                        email:"ed@co.com",
-                        role:"CLIENT",
-                    }
-                    password= "$2b$10$/hMgSe.ho1Gt.8cnVAcVKOYtzJePi/N/EEOo8FKsVqWWBZtsEawde";
-                    salt = "$2b$10$/hMgSe.ho1Gt.8cnVAcVKO";
-                    expectedInfo = {
-                        user:{
-                            password:"$2b$10$/hMgSe.ho1Gt.8cnVAcVKOYtzJePi/N/EEOo8FKsVqWWBZtsEawde",
-                            email:"ed@co.com",
-                            salt:"$2b$10$/hMgSe.ho1Gt.8cnVAcVKO",
-                            id:1,
-                        },
-                        userDetails:{
-                            idUserDetails:14,
-                            firstName:"Ed",
-                            middleName:"Jose",
-                            lastName:"Cocca",
-                            secondLastName:null,
-                            birthdate:null,
-                            address:null,
-                            phone:null,
-                            photo:null,
-                            customerId:"",
-                            accountId:" ",
-                            language:{
-                                idLanguage:1,
-                                name:"english",
-                                shortname:"en"
-                            },
-                            country:null
-                        },
-                    };
-                    user = {
-                        password:"$2b$10$/hMgSe.ho1Gt.8cnVAcVKOYtzJePi/N/EEOo8FKsVqWWBZtsEawde",
-                        email:"ed@co.com",
-                        salt:"$2b$10$/hMgSe.ho1Gt.8cnVAcVKO",
-                        id:6,
-                    };
-                    expectedUserDetails = {
-                        idUserDetails:14,
-                        firstName:"Ed",
-                        middleName:"Jose",
-                        lastName:"Cocca",
-                        secondLastName:null,
-                        birthdate:null,
-                        address:null,
-                        phone:null,
-                        photo:null,
-                        customerId:" ",
-                        accountId:" ",
-                        language:{
-                            idLanguage:1,
-                            name:"english",
-                            shortname:"en"
-                        },
-                        country:null,
-                    };
-                    languageMails = expectedInfo.userDetails.language.name;
-                    subject = MailsSubjets.recover[languageMails];
-
-                    expectedMessage = {
-                        to: expectedInfo.user.email,
-                        subject: subject,
-                        templateId: 'prueba',
-                        dynamic_template_data: {
-                            user: expectedInfo.userDetails.firstName,
-                        }
-                    };
-
-                    (userService.getActive as jest.Mock).mockResolvedValue(
-                        expectedCredentials,
-                    );
-                    (userAdministratorService.updatePasswordWithoutCurrent as jest.Mock).mockResolvedValue(
-                        user,
-                    );
-                    (mailsService.sendEmail as jest.Mock).mockImplementation();
-
-                });
-                it('should invoke userService.getActive',  () => {
-                    expect(userService.getActive).toHaveBeenCalledTimes(1);
-                    expect(userService.getActive).toHaveBeenCalledWith(
-                        credentials,
-                    );
-                });
-                it('should invoke userAdminitratorService.updatePasswordWithoutCurrent',  ()=> {
-                    expect(userAdministratorService.updatePasswordWithoutCurrent).toHaveBeenCalledTimes(1);
-                    expect(userAdministratorService.updatePasswordWithoutCurrent).toHaveBeenCalledWith(
-                        user, password, salt,
-                    )
-
-                });
-
-                it('should invoke mailsService.sendEmail()', () => {
-                    expect(mailsService.sendEmail).toHaveBeenCalledTimes(1);
-                    expect(mailsService.sendEmail).toHaveBeenCalledWith(expectedMessage);
-                });
-            });
-        });
-    });
 
 });

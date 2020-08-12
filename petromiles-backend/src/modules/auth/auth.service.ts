@@ -40,6 +40,7 @@ export class AuthService {
     user: CreateUserDTO,
     ip: string,
   ): Promise<App.Auth.Response> {
+
     const createdUser = await this.userClientService.create(user, ip);
 
     const token = this.createToken(createdUser.user.email, Role.CLIENT);
@@ -138,7 +139,7 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  private async createWelcomeEmail(email, name) {
+  async createWelcomeEmail(email, name) {
     const message = {
       to: email,
       subject: MailsSubjets.welcome,
