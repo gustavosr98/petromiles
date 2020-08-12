@@ -40,13 +40,18 @@ export class UserClientService {
     private userClientRepository: Repository<UserClient>,
     @InjectRepository(UserDetails)
     private userDetailsRepository: Repository<UserDetails>,
+    @InjectRepository(UserRole)
+    private userRoleRepository: Repository<UserRole>,
+    @InjectRepository(StateUser)
+    private stateUserRepository: Repository<StateUser>,
+    @InjectRepository(Language)
+    private languageRepository: Repository<Language>,
     private paymentProviderService: PaymentProviderService,
     private managementService: ManagementService,
   ) {}
 
   async findAll(): Promise<UserClient[]> {
     const users = await this.userClientRepository.find();
-
     const result: UserClient[] = [];
     users.map(user => {
       let deleted = false;
@@ -97,9 +102,7 @@ export class UserClientService {
         ip,
       },
     );
-
     const userClient = await this.userClientRepository.save(user);
-
     const userClientDetails = await this.completeRegistration(userClient, {
       firstName,
       lastName,
@@ -128,9 +131,7 @@ export class UserClientService {
     userRole.role = role;
     userRole.userClient = user;
 
-    return await getConnection()
-      .getRepository(UserRole)
-      .save(userRole);
+    return await this.userRoleRepository.save(userRole);
   }
 
   async createState(
@@ -143,9 +144,7 @@ export class UserClientService {
     userState.initialDate = new Date();
     userState.description = description;
     userState.state = await this.managementService.getState(stateName);
-    return await getConnection()
-      .getRepository(StateUser)
-      .save(userState);
+    return await this.stateUserRepository.save(userState);
   }
 
   async createDetails(
@@ -247,9 +246,9 @@ export class UserClientService {
   ): Promise<Language> {
     const userClient = await this.userClientRepository.findOne({ email });
 
-    const languageFound = await getConnection()
-      .getRepository(Language)
-      .findOne({ name: language });
+    const languageFound = await this.languageRepository.findOne({
+      name: language,
+    });
 
     const userDetails = await this.userDetailsRepository.findOne({
       userClient,
