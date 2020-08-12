@@ -2,8 +2,16 @@ import { shallowMount, createLocalVue  } from "@vue/test-utils";
 import ExchangePointsForm from "@/components/Withdrawal/ExchangePointsForm.vue";
 
 import Vuetify from 'vuetify'
+import Vue from "vue";
 
 const localVue = createLocalVue()
+
+Vue.config.ignoredElements = [
+    'v-text-field', 'v-card-text', 'v-col', 'v-row', 'v-form',
+    'router-link', 'v-btn', 'v-img', 'v-card', 'v-select',
+    'v-dialog', 'v-card-title', 'v-card-actions', 'v-spacer',
+    
+]
 
 /*************** Mocking Translations functions ***************/
 const $tc = () => {}

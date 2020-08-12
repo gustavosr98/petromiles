@@ -2,10 +2,18 @@ import { shallowMount, createLocalVue  } from "@vue/test-utils";
 import LoginForm from "@/components/Auth/LoginForm.vue";
 
 import Vuetify from 'vuetify'
+import Vue from "vue";
 
 jest.mock("@/store/index");
 
 const localVue = createLocalVue()
+
+Vue.config.ignoredElements = [
+    'v-text-field', 'v-card-text', 'v-col', 'v-row', 'v-form',
+    'router-link', 'v-btn', 'v-img', 'v-card', 'v-select',
+    'v-dialog', 'v-card-title', 'v-card-actions', 'v-spacer',
+    
+]
 
 /*************** Mocking Translations functions ***************/
 const $tc = () => {}
@@ -25,7 +33,10 @@ describe("Testing LoginForm component", () => {
         localVue,
         vuetify,
         propsData: {
-            role: "ADMINISTRATOR"
+            role: "ADMINISTRATOR",
+            title: "LoginForm",
+            dashboardRoute: "",
+            showClientElement: false
         }
     })  
 
