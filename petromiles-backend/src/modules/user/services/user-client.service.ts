@@ -40,13 +40,16 @@ export class UserClientService {
     private userClientRepository: Repository<UserClient>,
     @InjectRepository(UserDetails)
     private userDetailsRepository: Repository<UserDetails>,
+    @InjectRepository(UserRole)
+    private userRoleRepository: Repository<UserRole>,
+    @InjectRepository(StateUser)
+    private stateUserRepository: Repository<StateUser>,
     private paymentProviderService: PaymentProviderService,
     private managementService: ManagementService,
   ) {}
 
   async findAll(): Promise<UserClient[]> {
     const users = await this.userClientRepository.find();
-
     const result: UserClient[] = [];
     users.map(user => {
       let deleted = false;
@@ -97,9 +100,7 @@ export class UserClientService {
         ip,
       },
     );
-
     const userClient = await this.userClientRepository.save(user);
-
     const userClientDetails = await this.completeRegistration(userClient, {
       firstName,
       lastName,
@@ -128,9 +129,7 @@ export class UserClientService {
     userRole.role = role;
     userRole.userClient = user;
 
-    return await getConnection()
-      .getRepository(UserRole)
-      .save(userRole);
+    return await this.userRoleRepository.save(userRole);
   }
 
   async createState(
@@ -143,20 +142,21 @@ export class UserClientService {
     userState.initialDate = new Date();
     userState.description = description;
     userState.state = await this.managementService.getState(stateName);
-    return await getConnection()
-      .getRepository(StateUser)
-      .save(userState);
+    return await this.stateUserRepository.save(userState);
   }
 
   async createDetails(
     userClientDetails,
     accountOwner: string,
   ): Promise<UserDetails> {
+    console.log(userClientDetails);
+    console.log(accountOwner);
     const result = await this.userDetailsRepository.save({
       ...userClientDetails,
       accountOwner,
     });
     result.userClient = null;
+    console.log(result);
     return result;
   }
 
