@@ -1,23 +1,29 @@
-import { UserClientService } from './user-client.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { TestingModule, Test } from '@nestjs/testing';
+import { BadRequestException } from '@nestjs/common';
+
 import { Repository } from 'typeorm';
+import { WinstonModule } from 'nest-winston';
+
+import createOptions from '@/logger/winston/winston-config';
+
 import { UserClient } from '@/entities/user-client.entity';
 import { UserDetails } from '@/entities/user-details.entity';
-import { PaymentProviderService } from '../../payment-provider/payment-provider.service';
-import { ManagementService } from '../../management/services/management.service';
-import { TestingModule, Test } from '@nestjs/testing';
-import { WinstonModule } from 'nest-winston';
-import createOptions from '@/logger/winston/winston-config';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { UserRole } from '@/entities/user-role.entity';
+import { StateUser } from '@/entities/state-user.entity';
+import { Language } from '@/entities/language.entity';
+
+import { PaymentProviderService } from '@/modules/payment-provider/payment-provider.service';
+import { UserClientService } from '@/modules/user/services/user-client.service';
+import { ManagementService } from '@/modules/management/services/management.service';
+
 import {
   expectedActiveClient,
   expectedDeletedClient,
-} from './mocks/user-client.mock';
-import { Language } from '@/enums/language.enum';
-import { BadRequestException } from '@nestjs/common';
-import { UserRole } from '../../../entities/user-role.entity';
+} from '@/modules/user/services/mocks/user-client.mock';
 import { Role } from '@/enums/role.enum';
-import { StateUser } from '../../../entities/state-user.entity';
 import { StateName } from '@/enums/state.enum';
+import { Language as LanguageName } from '@/enums/language.enum';
 
 describe('UserClientService', () => {
   let userClientService: UserClientService;
@@ -30,13 +36,16 @@ describe('UserClientService', () => {
   let ManagementServiceMock: jest.Mock<Partial<ManagementService>>;
   let managementService: ManagementService;
   let stateUserRepository: Repository<StateUser>;
-  let getOne: jest.Mock;
+  let languageRepository: Repository<Language>;
+  let execute: jest.Mock;
 
   beforeEach(() => {
     let innerJoin = jest.fn().mockReturnThis();
     let where = jest.fn().mockReturnThis();
     let andWhere = jest.fn().mockReturnThis();
-    getOne = jest.fn().mockReturnThis();
+    let set = jest.fn().mockReturnThis();
+    let update = jest.fn().mockReturnThis();
+    execute = jest.fn().mockReturnThis();
 
     RepositoryMock = jest.fn(() => ({
       find: jest.fn(),
@@ -45,10 +54,12 @@ describe('UserClientService', () => {
       update: jest.fn(),
       delete: jest.fn(),
       createQueryBuilder: jest.fn(() => ({
+        set,
+        update,
         innerJoin,
         where,
         andWhere,
-        getOne,
+        execute,
       })),
     }));
 
@@ -84,6 +95,10 @@ describe('UserClientService', () => {
           useClass: RepositoryMock,
         },
         {
+          provide: getRepositoryToken(Language),
+          useClass: RepositoryMock,
+        },
+        {
           provide: getRepositoryToken(UserRole),
           useClass: RepositoryMock,
         },
@@ -115,6 +130,7 @@ describe('UserClientService', () => {
     userClientRepository = module.get(getRepositoryToken(UserClient));
     userRoleRepository = module.get(getRepositoryToken(UserRole));
     stateUserRepository = module.get(getRepositoryToken(StateUser));
+    languageRepository = module.get(getRepositoryToken(Language));
   });
 
   describe('findAll()', () => {
@@ -313,7 +329,7 @@ describe('UserClientService', () => {
         it('should invoke managementService.getLanguage()', () => {
           expect(managementService.getLanguage).toHaveBeenCalledTimes(1);
           expect(managementService.getLanguage).toHaveBeenCalledWith(
-            Language.ENGLISH,
+            LanguageName.ENGLISH,
           );
         });
 
@@ -606,14 +622,372 @@ describe('UserClientService', () => {
     });
   });
 
-  describe('getActive(email)', () => {
+  describe('getActive(credentials)', () => {
+    describe('case: success', () => {
+      let credentials;
+      let result;
+      let expectedClient;
+      describe('when idUserClient is null', () => {
+        beforeEach(async () => {
+          credentials = {
+            email: 'test@petromiles.com',
+          };
+          expectedClient = {
+            idUserClient: 1,
+            salt: '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/O',
+            googleToken: null,
+            facebookToken: null,
+            email: 'test@petromiles.com',
+            password:
+              '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/OVi0BCakxus81xdQ3yNlVg3QJgteHGHe',
+          };
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClient,
+          );
+
+          result = await userClientService.get(credentials);
+        });
+
+        it('should invoke userClientRepository.findOne()', () => {
+          expect(userClientRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userClientRepository.findOne).toHaveBeenCalledWith({
+            email: credentials.email,
+          });
+        });
+
+        it('should return an active user', () => {
+          expect(result).toStrictEqual(expectedClient);
+        });
+      });
+      describe('when idUserClient is not null', () => {
+        beforeEach(async () => {
+          credentials = {
+            idUserClient: 1,
+          };
+          expectedClient = {
+            idUserClient: 1,
+            salt: '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/O',
+            googleToken: null,
+            facebookToken: null,
+            email: 'test@petromiles.com',
+            password:
+              '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/OVi0BCakxus81xdQ3yNlVg3QJgteHGHe',
+          };
+
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedClient,
+          );
+
+          result = await userClientService.get(credentials);
+        });
+
+        it('should invoke userClientRepository.findOne()', () => {
+          expect(userClientRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userClientRepository.findOne).toHaveBeenCalledWith({
+            idUserClient: credentials.idUserClient,
+          });
+        });
+
+        it('should return an active user', () => {
+          expect(result).toStrictEqual(expectedClient);
+        });
+      });
+    });
+  });
+
+  describe('getInfo(idUserClient)', () => {
+    describe('case: success', () => {
+      let idUserClient;
+      let result;
+      let expectedUserClient;
+      let expectedUserDetails;
+      let expectedResult;
+      describe('when user is not federated', () => {
+        beforeEach(async () => {
+          idUserClient = 1;
+          expectedUserClient = {
+            idUserClient: 1,
+            salt: '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/O',
+            googleToken: null,
+            facebookToken: null,
+            email: 'test@petromiles.com',
+            password:
+              '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/OVi0BCakxus81xdQ3yNlVg3QJgteHGHe',
+            userDetails: [{ accountOwner: null }],
+          };
+          expectedUserDetails = { accountOwner: null };
+
+          expectedResult = {
+            email: expectedUserClient.email,
+            userDetails: expectedUserDetails,
+            role: Role.CLIENT,
+            id: expectedUserClient.idUserClient,
+            federated: false,
+          };
+          jest
+            .spyOn(userClientService, 'get')
+            .mockResolvedValue(expectedUserClient);
+
+          result = await userClientService.getInfo(idUserClient);
+        });
+
+        it('should return an active user', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+      });
+      describe('when user is federated', () => {
+        beforeEach(async () => {
+          idUserClient = 1;
+          expectedUserClient = {
+            idUserClient: 1,
+            salt: null,
+            googleToken: null,
+            facebookToken: null,
+            email: 'test@petromiles.com',
+            password: null,
+            userDetails: [{ accountOwner: null }],
+          };
+          expectedUserDetails = { accountOwner: null };
+
+          expectedResult = {
+            email: expectedUserClient.email,
+            userDetails: expectedUserDetails,
+            role: Role.CLIENT,
+            id: expectedUserClient.idUserClient,
+            federated: true,
+          };
+          jest
+            .spyOn(userClientService, 'get')
+            .mockResolvedValue(expectedUserClient);
+
+          result = await userClientService.getInfo(idUserClient);
+        });
+
+        it('should return an active user', () => {
+          expect(result).toStrictEqual(expectedResult);
+        });
+
+        it('should not invoke paymentProviderService.createCustomer()', () => {
+          expect(paymentProviderService.createCustomer).not.toHaveBeenCalled();
+        });
+      });
+    });
+  });
+
+  describe('getDetails(userClient)', () => {
+    describe('case: success', () => {
+      let expectedUserClient;
+      let userClient;
+      let result;
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          userClient = {
+            idUserClient: 1,
+            salt: '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/O',
+            googleToken: null,
+            facebookToken: null,
+            email: 'test@petromiles.com',
+            password:
+              '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/OVi0BCakxus81xdQ3yNlVg3QJgteHGHe',
+          };
+
+          expectedUserClient = {
+            ...expectedActiveClient,
+            userDetails: [
+              { firstName: 'petro', lastName: 'miles', accountOwner: null },
+            ],
+          };
+          (userDetailsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          result = await userClientService.getDetails(userClient);
+        });
+
+        it('should invoke userDetailsRepository.findOne()', () => {
+          expect(userDetailsRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userDetailsRepository.findOne).toHaveBeenCalledWith({
+            where: `fk_user_client = ${userClient.idUserClient} and "accountOwner" is NULL`,
+          });
+        });
+
+        it('should return an user with details', () => {
+          expect(result).toStrictEqual(expectedUserClient);
+        });
+      });
+    });
+
+    describe('case: failure', () => {
+      let expectedUserClient;
+      let userClient;
+      let result;
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          userClient = null;
+
+          result = await userClientService.getDetails(userClient);
+        });
+
+        it('should return null', () => {
+          expect(result).toStrictEqual(userClient);
+        });
+
+        it('should not invoke  userDetailsRepository.findOne()', () => {
+          expect(userDetailsRepository.findOne).not.toHaveBeenCalled();
+        });
+      });
+    });
+  });
+
+  describe('updateDefaultLanguage(email,language)', () => {
     describe('case: success', () => {
       let email;
-      let expectedActiveClient;
+      let expectedUserClient;
+      let expectedLanguage;
+      let expectedUserDetails;
+      let expectedLanguageChange;
+      let result;
       describe('when everything works well', () => {
         beforeEach(async () => {
           email = 'test@petromiles.com';
-          getOne.mockResolvedValue(expectedBankAccounts);
+          expectedUserClient = expectedActiveClient;
+          expectedLanguage = {
+            idLanguage: 1,
+            name: 'english',
+            shortname: 'en',
+          };
+
+          expectedUserDetails = {
+            firstName: 'petro',
+            lastname: 'miles',
+            language: null,
+          };
+
+          expectedLanguageChange = {
+            firstName: 'petro',
+            lastname: 'miles',
+            language: expectedLanguage,
+          };
+          (userClientRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserClient,
+          );
+
+          (languageRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedLanguage,
+          );
+
+          (userDetailsRepository.findOne as jest.Mock).mockResolvedValue(
+            expectedUserDetails,
+          );
+
+          (userDetailsRepository.save as jest.Mock).mockResolvedValue(
+            expectedLanguageChange,
+          );
+
+          result = await userClientService.updateDefaultLanguage(
+            email,
+            'english',
+          );
+        });
+
+        it('should return language object', () => {
+          expect(result).toStrictEqual(expectedLanguage);
+        });
+
+        it('should invoke userClientRepository.findOne()', () => {
+          expect(userClientRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userClientRepository.findOne).toHaveBeenCalledWith({ email });
+        });
+
+        it('should invoke languageRepository.findOne()', () => {
+          expect(languageRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(languageRepository.findOne).toHaveBeenCalledWith({
+            name: 'english',
+          });
+        });
+
+        it('should invoke userDetailsRepository.findOne()', () => {
+          expect(userDetailsRepository.findOne).toHaveBeenCalledTimes(1);
+          expect(userDetailsRepository.findOne).toHaveBeenCalledWith({
+            userClient: expectedUserClient,
+          });
+        });
+
+        it('should invoke userDetailsRepository.save()', () => {
+          expect(userDetailsRepository.save).toHaveBeenCalledTimes(1);
+          expect(userDetailsRepository.save).toHaveBeenCalledWith(
+            expectedUserDetails,
+          );
+        });
+      });
+    });
+  });
+
+  describe('updatePasswordWithoutCurrent(user, credentials)', () => {
+    describe('case: success', () => {
+      let user;
+      let credentials;
+      let expectedUserClient;
+      let result;
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          user = { email: 'test@petromiles.com', id: 1, role: 'CLIENT' };
+          credentials = {
+            salt: '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/O',
+            password:
+              '$2b$10$gOcQ/FGTjNo1Cy5zgt6g/OVi0BCakxus81xdQ3yNlVg3QJgteHGHe',
+          };
+
+          expectedUserClient = expectedActiveClient;
+
+          jest
+            .spyOn(userClientService, 'get')
+            .mockResolvedValue(expectedUserClient);
+
+          jest.spyOn(userClientService, 'updateClient').mockResolvedValue(null);
+
+          result = await userClientService.updatePasswordWithoutCurrent(
+            user,
+            credentials,
+          );
+        });
+
+        it('should return a user client', () => {
+          expect(result).toStrictEqual(expectedUserClient);
+        });
+      });
+    });
+  });
+
+  describe('updateClient( options, id)', () => {
+    describe('case: success', () => {
+      let options;
+      let id;
+      let expectedUpdateResult = { affected: 1 };
+      let result;
+      describe('when everything works well', () => {
+        beforeEach(async () => {
+          id = 1;
+          options = {
+            email: 'test@petromiles.com',
+            password: 'test1234',
+            salt: 'test',
+          };
+
+          execute.mockResolvedValue(expectedUpdateResult);
+          result = await userClientService.updateClient(options, id);
+        });
+
+        it('should invoke userClientRepository.createQueryBuilder()', () => {
+          expect(execute).toHaveBeenCalledTimes(1);
+          expect(
+            userClientRepository.createQueryBuilder().where,
+          ).toHaveBeenCalledWith('idUserClient = :id', { id });
+        });
+
+        it('should return update result', () => {
+          expect(result).toStrictEqual(expectedUpdateResult);
         });
       });
     });

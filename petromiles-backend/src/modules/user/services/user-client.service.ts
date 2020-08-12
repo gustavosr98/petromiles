@@ -44,6 +44,8 @@ export class UserClientService {
     private userRoleRepository: Repository<UserRole>,
     @InjectRepository(StateUser)
     private stateUserRepository: Repository<StateUser>,
+    @InjectRepository(Language)
+    private languageRepository: Repository<Language>,
     private paymentProviderService: PaymentProviderService,
     private managementService: ManagementService,
   ) {}
@@ -244,9 +246,9 @@ export class UserClientService {
   ): Promise<Language> {
     const userClient = await this.userClientRepository.findOne({ email });
 
-    const languageFound = await getConnection()
-      .getRepository(Language)
-      .findOne({ name: language });
+    const languageFound = await this.languageRepository.findOne({
+      name: language,
+    });
 
     const userDetails = await this.userDetailsRepository.findOne({
       userClient,
