@@ -20,6 +20,7 @@
           type="text"
           color="light-blue darken-4"
           @keyup.enter="buildUser"
+          class="email-input"
           data-cy="email-input"
         ></v-text-field>
         <v-text-field
@@ -31,6 +32,7 @@
           type="password"
           color="light-blue darken-4"
           @keyup.enter="buildUser"
+          class="password-input"
           data-cy="password-input"
         ></v-text-field>
       </v-form>
@@ -39,14 +41,14 @@
       <v-col :cols="showClientElement ? '6' : '12'">
         <h5 class="caption">
           Forgot your password?
-          <router-link :to="{ name: routeNameRecover }" data-cy="link-to-recover">Recover</router-link>
+          <router-link :to="{ name: routeNameRecover }" class="link-to-recover" data-cy="link-to-recover">Recover</router-link>
         </h5>
         <v-spacer />
       </v-col>
       <v-col cols="6" v-if="showClientElement">
         <h5 class="caption">
           New here?
-          <router-link :to="{ name: routeNameSignUp }" data-cy="link-to-signup">Sign Up</router-link>
+          <router-link :to="{ name: routeNameSignUp }" class="link-to-signup" data-cy="link-to-signup">Sign Up</router-link>
         </h5>
       </v-col>
     </v-row>
