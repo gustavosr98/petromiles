@@ -53,6 +53,7 @@
     <div class="text-center mt-3 mb-8">
       <v-btn
         @click="buildUser()"
+        class="login-btn"
         data-cy="login-btn"
         color="light-blue darken-4"
         dark
