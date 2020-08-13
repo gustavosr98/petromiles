@@ -8,21 +8,11 @@
           :provider="provider"
           @login="login"
           type="login"
-        >Continue with {{ provider.name }}</no-federeded-button>
+          >Continue with {{ provider.name }}</no-federeded-button
+        >
       </v-row>
       <h4 class="text-center mt-3 mb-5 caption">{{ title }}</h4>
       <v-form>
-        <v-text-field
-          label="Email"
-          name="Email"
-          v-model="email"
-          prepend-icon="email"
-          type="text"
-          color="light-blue darken-4"
-          @keyup.enter="buildUser"
-          class="email-input"
-          data-cy="email-input"
-        ></v-text-field>
         <v-text-field
           id="password"
           label="Password"
@@ -34,6 +24,17 @@
           @keyup.enter="buildUser"
           class="password-input"
           data-cy="password-input"
+        ></v-text-field>
+        <v-text-field
+          label="Email"
+          name="Email"
+          v-model="email"
+          prepend-icon="email"
+          type="text"
+          color="light-blue darken-4"
+          @keyup.enter="buildUser"
+          class="email-input"
+          data-cy="email-input"
         ></v-text-field>
       </v-form>
     </v-card-text>
@@ -60,7 +61,8 @@
         color="light-blue darken-4"
         dark
         :loading="loading"
-      >Login</v-btn>
+        >BOTON CAMBIADO</v-btn
+      >
     </div>
   </v-col>
 </template>
